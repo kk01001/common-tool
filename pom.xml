@@ -26,12 +26,43 @@
         <hutool.version>5.8.28</hutool.version>
     </properties>
 
-    <dependencies>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
 
+    <developers>
+        <developer>
+            <name>kk01001</name>
+            <email>656667021@qq.com</email>
+            <organization>kk01001</organization>
+            <organizationUrl>https://github.com/kk01001</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/kk01001/common-spring-boot-starter.git</connection>
+        <developerConnection>scm:git:ssh://github.com:kk01001/common-spring-boot-starter.git</developerConnection>
+        <url>https://github.com/kk01001/common-spring-boot-starter/tree/main</url>
+    </scm>
+
+    <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
         </dependency>
 
         <dependency>
@@ -82,22 +113,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>kk01001</name>
-            <email>656667021@qq.com</email>
-            <organizationUrl>https://github.com/kk01001</organizationUrl>
-        </developer>
-    </developers>
 
     <distributionManagement>
         <snapshotRepository>
