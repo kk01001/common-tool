@@ -3,16 +3,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <groupId>io.github.kk01001</groupId>
     <artifactId>common-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>${revision}</version>
     <name>common-spring-boot-starter</name>
     <description>Common Tool Spring Boot Starter</description>
     <url>https://github.com/kk01001/common-spring-boot-starter/tree/main</url>
 
     <properties>
+        <revision>1.0.2</revision>
         <serverId>central</serverId>
         <argLine>-Dfile.encoding=UTF-8</argLine>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,6 +26,7 @@
         <lombok.version>1.18.28</lombok.version>
         <xxl.job.version>2.4.1</xxl.job.version>
         <hutool.version>5.8.28</hutool.version>
+        <aws.s3.version>1.12.423</aws.s3.version>
     </properties>
 
     <licenses>
@@ -83,6 +85,12 @@
             <artifactId>hutool-all</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -111,6 +119,12 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-s3</artifactId>
+                <version>${aws.s3.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

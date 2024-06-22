@@ -3,7 +3,7 @@ package io.github.kk01001.xxljob.service;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import io.github.kk01001.xxljob.config.XxlJobProperties;
+import io.github.kk01001.xxljob.XxlJobProperties;
 import io.github.kk01001.xxljob.constants.XxlJobConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

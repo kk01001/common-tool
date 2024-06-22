@@ -6,7 +6,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import io.github.kk01001.xxljob.config.XxlJobProperties;
+import io.github.kk01001.xxljob.XxlJobProperties;
 import io.github.kk01001.xxljob.constants.XxlJobConstants;
 import io.github.kk01001.xxljob.model.XxlJobGroup;
 import lombok.RequiredArgsConstructor;

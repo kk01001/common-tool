@@ -1,4 +1,4 @@
-package io.github.kk01001.xxljob.config;
+package io.github.kk01001.xxljob;
 
 import cn.hutool.core.collection.CollUtil;
 import io.github.kk01001.xxljob.annotations.XxlJobRegister;

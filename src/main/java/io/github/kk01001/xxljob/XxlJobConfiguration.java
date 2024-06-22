@@ -1,4 +1,4 @@
-package io.github.kk01001.xxljob.config;
+package io.github.kk01001.xxljob;
 
 import io.github.kk01001.util.Utils;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
@@ -14,7 +14,7 @@ import org.springframework.util.Assert;
  * @date 2022/2/14 10:34
  */
 @Slf4j
-@ComponentScan(basePackages = "com.github.kk0")
+@ComponentScan(basePackages = "io.github.kk01001")
 @Configuration
 @ConditionalOnProperty(prefix = "xxl-job", name = "enable", havingValue = "true")
 public class XxlJobConfiguration {
@@ -32,6 +32,8 @@ public class XxlJobConfiguration {
         Assert.notNull(xxlJobProperties.getAppName(), "xxl-job appName is null");
         Assert.notNull(xxlJobProperties.getLogPath(), "xxl-job LogPath is null");
         Assert.notNull(xxlJobProperties.getLogRetentionDays(), "xxl-job logRetentionDays is null");
+        Assert.notNull(xxlJobProperties.getPort(), "xxl-job port is null");
+
 
         String ipAddress = Utils.getLocalServerIp();
         log.info(">>>>>>>>>>> xxl-job config init. {}", ipAddress);

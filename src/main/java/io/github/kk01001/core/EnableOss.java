@@ -1,5 +1,6 @@
 package io.github.kk01001.core;
 
+import io.github.kk01001.oss.OssConfiguration;
 import io.github.kk01001.xxljob.XxlJobConfiguration;
 import org.springframework.context.annotation.Import;
 
@@ -13,6 +14,6 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-@Import(XxlJobConfiguration.class)
-public @interface EnableXxlJob {
+@Import(OssConfiguration.class)
+public @interface EnableOss {
 }

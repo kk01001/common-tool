@@ -1,4 +1,4 @@
-package io.github.kk01001.xxljob.config;
+package io.github.kk01001.xxljob;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
