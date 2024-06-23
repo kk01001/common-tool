@@ -11,8 +11,9 @@
 
     <name>common-tool-spring-boot-starter</name>
     <artifactId>common-tool-spring-boot-starter</artifactId>
+    <version>${revision}</version>
     <description>Common Tool Spring Boot Starter</description>
-    <url>https://github.com/kk01001/common-tool/tree/main</url>
+    <url>https://github.com/kk01001/common-tool.git</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -60,6 +61,36 @@
         </dependency>
     </dependencies>
 
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>kk01001</name>
+            <email>656667021@qq.com</email>
+            <organization>kk01001</organization>
+            <organizationUrl>https://github.com/kk01001</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/kk01001/common-tool.git</connection>
+        <developerConnection>scm:git:ssh://github.com:kk01001/common-tool.git</developerConnection>
+        <url>https://github.com/kk01001/common-tool.git</url>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <!-- 与settings.xml的server.id保持一致 -->
+            <id>${serverId}</id>
+            <url>https://central.sonatype.com/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <!-- 编译插件，设置源码以及编译的jdk版本 -->
@@ -70,8 +101,10 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                    <compilerArgument>-Xlint:unchecked</compilerArgument>
                 </configuration>
             </plugin>
+
             <!-- Source -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -86,6 +119,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!-- Javadoc -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -109,6 +143,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!-- Gpg Signature -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -132,6 +167,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>${serverId}</publishingServerId>
+                    <!--<pluginGroupId>${project.parent.groupId}</pluginGroupId>
+                    <pluginArtifactId>${project.artifactId}</pluginArtifactId>
+                    <pluginVersion>${revision}</pluginVersion>-->
                 </configuration>
             </plugin>
         </plugins>
