@@ -2,18 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <packaging>jar</packaging>
-
     <groupId>io.github.kk01001</groupId>
-    <artifactId>common-spring-boot-starter</artifactId>
+    <artifactId>common-tool</artifactId>
     <version>${revision}</version>
-    <name>common-spring-boot-starter</name>
-    <description>Common Tool Spring Boot Starter</description>
-    <url>https://github.com/kk01001/common-spring-boot-starter/tree/main</url>
+    <name>common-tool</name>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>examples</module>
+        <module>common-tool-spring-boot-starter</module>
+    </modules>
 
     <properties>
-        <revision>1.0.2</revision>
+        <revision>1.0.3</revision>
         <serverId>central</serverId>
         <argLine>-Dfile.encoding=UTF-8</argLine>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -46,52 +48,10 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/kk01001/common-spring-boot-starter.git</connection>
-        <developerConnection>scm:git:ssh://github.com:kk01001/common-spring-boot-starter.git</developerConnection>
-        <url>https://github.com/kk01001/common-spring-boot-starter/tree/main</url>
+        <connection>scm:git:https://github.com/kk01001/common-tool.git</connection>
+        <developerConnection>scm:git:ssh://github.com:kk01001/common-tool.git</developerConnection>
+        <url>https://github.com/kk01001/common-tool/tree/main</url>
     </scm>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.xuxueli</groupId>
-            <artifactId>xxl-job-core</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
-            <optional>true</optional>
-        </dependency>
-    </dependencies>
 
     <dependencyManagement>
         <dependencies>
