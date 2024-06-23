@@ -6,12 +6,12 @@
     <parent>
         <groupId>io.github.kk01001</groupId>
         <artifactId>common-tool</artifactId>
-        <version>${revision}</version>
+        <version>1.0.5</version>
     </parent>
 
     <name>common-tool-spring-boot-starter</name>
     <artifactId>common-tool-spring-boot-starter</artifactId>
-    <version>${revision}</version>
+
     <description>Common Tool Spring Boot Starter</description>
     <url>https://github.com/kk01001/common-tool.git</url>
 
@@ -29,11 +29,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -91,87 +93,4 @@
         </snapshotRepository>
     </distributionManagement>
 
-    <build>
-        <plugins>
-            <!-- 编译插件，设置源码以及编译的jdk版本 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <compilerArgument>-Xlint:unchecked</compilerArgument>
-                </configuration>
-            </plugin>
-
-            <!-- Source -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Javadoc -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.5.0</version>
-                <configuration>
-                    <show>private</show>
-                    <nohelp>true</nohelp>
-                    <charset>UTF-8</charset>
-                    <encoding>UTF-8</encoding>
-                    <docencoding>UTF-8</docencoding>
-                    <doclint>none</doclint>
-                    <detectJavaApiLink>false</detectJavaApiLink>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Gpg Signature -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!--新账号的配置：将组件部署到OSSRH并将其发布到Central Repository-->
-            <plugin>
-                <groupId>org.sonatype.central</groupId>
-                <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.5.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <publishingServerId>${serverId}</publishingServerId>
-                    <!--<pluginGroupId>${project.parent.groupId}</pluginGroupId>
-                    <pluginArtifactId>${project.artifactId}</pluginArtifactId>
-                    <pluginVersion>${revision}</pluginVersion>-->
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.kk01001</groupId>
     <artifactId>common-tool</artifactId>
-    <version>${revision}</version>
+    <version>1.0.5</version>
     <name>common-tool</name>
     <description>通用工具</description>
 
@@ -17,7 +17,6 @@
     </modules>
 
     <properties>
-        <revision>1.0.4</revision>
         <serverId>central</serverId>
         <argLine>-Dfile.encoding=UTF-8</argLine>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -154,7 +153,7 @@
             </plugin>
 
             <!-- Gpg Signature -->
-            <!--<plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
@@ -166,21 +165,21 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
 
             <!--新账号的配置：将组件部署到OSSRH并将其发布到Central Repository-->
-            <!--<plugin>
+            <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
                 <version>0.5.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>${serverId}</publishingServerId>
-                    &lt;!&ndash;<pluginGroupId>${project.parent.groupId}</pluginGroupId>
-                    <pluginArtifactId>${project.artifactId}</pluginArtifactId>
-                    <pluginVersion>${revision}</pluginVersion>&ndash;&gt;
+                    <excludeArtifacts>
+                        <artifact>examples</artifact>
+                    </excludeArtifacts>
                 </configuration>
-            </plugin>-->
+            </plugin>
         </plugins>
     </build>
 </project>

@@ -6,13 +6,40 @@
     <parent>
         <groupId>io.github.kk01001</groupId>
         <artifactId>common-tool</artifactId>
-        <version>${revision}</version>
+        <version>1.0.5</version>
     </parent>
 
     <artifactId>examples</artifactId>
-    <version>${revision}</version>
+    <version>1.0.5</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.github.kk01001</groupId>
+            <artifactId>common-tool-spring-boot-starter</artifactId>
+            <version>1.0.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+    </dependencies>
 </project>
