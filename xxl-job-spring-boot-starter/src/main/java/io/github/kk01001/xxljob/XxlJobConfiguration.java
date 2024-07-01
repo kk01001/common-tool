@@ -1,7 +1,10 @@
 package io.github.kk01001.xxljob;
 
-import io.github.kk01001.util.Utils;
+import cn.hutool.core.net.NetUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
+import io.github.kk01001.xxljob.core.XxlJobProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +22,7 @@ import org.springframework.util.Assert;
 @ConditionalOnProperty(prefix = "xxl-job", name = "enable", havingValue = "true")
 public class XxlJobConfiguration {
 
+    private static final String SERVER_IP_KEY = "SERVER_IP";
 
     private final XxlJobProperties xxlJobProperties;
 
@@ -34,8 +38,7 @@ public class XxlJobConfiguration {
         Assert.notNull(xxlJobProperties.getLogRetentionDays(), "xxl-job logRetentionDays is null");
         Assert.notNull(xxlJobProperties.getPort(), "xxl-job port is null");
 
-
-        String ipAddress = Utils.getLocalServerIp();
+        String ipAddress = getLocalServerIp();
         log.info(">>>>>>>>>>> xxl-job config init. {}", ipAddress);
         XxlJobSpringExecutor xxlJobSpringExecutor = new XxlJobSpringExecutor();
         xxlJobSpringExecutor.setAdminAddresses(xxlJobProperties.getAdminAddresses());
@@ -46,6 +49,14 @@ public class XxlJobConfiguration {
         xxlJobSpringExecutor.setLogPath(xxlJobProperties.getLogPath());
         xxlJobSpringExecutor.setLogRetentionDays(xxlJobProperties.getLogRetentionDays());
         return xxlJobSpringExecutor;
+    }
+
+    public static String getLocalServerIp() {
+        String serverIp = SpringUtil.getProperty(SERVER_IP_KEY);
+        if (StrUtil.isNotEmpty(serverIp)) {
+            return serverIp;
+        }
+        return NetUtil.getLocalhostStr();
     }
 
 }

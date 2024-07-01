@@ -1,12 +1,12 @@
-package io.github.kk01001.xxljob;
+package io.github.kk01001.xxljob.core;
 
 import cn.hutool.core.collection.CollUtil;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import io.github.kk01001.xxljob.annotations.XxlJobRegister;
 import io.github.kk01001.xxljob.model.XxlJobGroup;
 import io.github.kk01001.xxljob.model.XxlJobInfo;
 import io.github.kk01001.xxljob.service.XxlJobGroupService;
 import io.github.kk01001.xxljob.service.XxlJobInfoService;
-import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.kk01001</groupId>
     <artifactId>common-tool</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <name>common-tool</name>
     <description>通用工具</description>
 
@@ -16,6 +16,7 @@
         <module>common-tool-spring-boot-starter</module>
         <module>multi-redis-spring-boot-starter</module>
         <module>mybatis-plus-spring3-boot-starter</module>
+        <module>xxl-job-spring-boot-starter</module>
     </modules>
 
     <properties>
