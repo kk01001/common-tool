@@ -2,7 +2,6 @@ package io.github.kk01001.xxljob.core;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * @author kk01001
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Component;
  * xxljob 属性
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "xxl-job")
 public class XxlJobProperties {
 
