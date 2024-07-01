@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>multi-redis-spring-boot-starter</artifactId>
+    <description>Redisson多实例自动配置</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

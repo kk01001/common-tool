@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>xxl-job-spring-boot-starter</artifactId>
+    <description>XXL-JOB 自动注册任务</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
