@@ -1,7 +1,7 @@
 package io.github.kk01001.excel.write;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date:  2024-06-24 9:21
  */
 public abstract class AbstractExcelWriterQueue<T> {

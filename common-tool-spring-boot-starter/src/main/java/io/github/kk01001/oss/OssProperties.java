@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date 2022-09-19 22:30:00
  */
 @ConfigurationProperties(prefix = "oss")

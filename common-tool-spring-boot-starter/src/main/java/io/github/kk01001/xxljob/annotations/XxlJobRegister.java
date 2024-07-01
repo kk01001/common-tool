@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date:  2023-02-02 14:03
  * xx-job任务配置信息
  */

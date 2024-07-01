@@ -4,7 +4,7 @@ import io.github.kk01001.common.ServiceThread;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date:  2024-06-24 9:14
  */
 @Slf4j

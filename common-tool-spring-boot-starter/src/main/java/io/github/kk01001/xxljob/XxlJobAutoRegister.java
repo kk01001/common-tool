@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date 2023-01-23 16:01:00
  * 自动注册执行器和添加@Xxljob任务
  */

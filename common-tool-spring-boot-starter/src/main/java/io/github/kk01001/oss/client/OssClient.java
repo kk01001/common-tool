@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date 2022-09-19 22:32:00
  * Oss 基础操作
  * <a href="https://docs.aws.amazon.com/zh_cn/sdk-for-java/v1/developer-guide/examples-s3-buckets.html">...</a>

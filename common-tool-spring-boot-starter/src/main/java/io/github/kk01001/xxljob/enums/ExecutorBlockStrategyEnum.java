@@ -1,7 +1,7 @@
 package io.github.kk01001.xxljob.enums;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date 2023-02-02 14:03
  * 阻塞处理策略枚举
  */

@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.time.Duration;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date:  2024-06-24 9:20
  */
 @Data

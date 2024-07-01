@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date 2024-06-21 21:07:00
  */
 public class Utils {

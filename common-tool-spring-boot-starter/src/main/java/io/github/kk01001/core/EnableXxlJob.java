@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date 2024-06-21 21:00:00
  */
 @Documented

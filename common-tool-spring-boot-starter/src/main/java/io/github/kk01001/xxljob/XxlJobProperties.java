@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * @date 2022/2/8 14:30
  * xxljob 属性
  */

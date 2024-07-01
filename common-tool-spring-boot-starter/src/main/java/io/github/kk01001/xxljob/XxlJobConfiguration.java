@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Assert;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * @date 2022/2/14 10:34
  */
 @Slf4j

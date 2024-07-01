@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date 2024-06-23 15:41:00
  */
 @EnableXxlJob
