@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.kk01001</groupId>
     <artifactId>common-tool</artifactId>
-    <version>1.0.10</version>
+    <version>1.0.11</version>
     <name>common-tool</name>
     <description>通用工具</description>
 
@@ -31,6 +31,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <spring-boot-dependencies.version>3.3.1</spring-boot-dependencies.version>
+        <spring-cloud-alibaba-dependencies.version>2022.0.0.0</spring-cloud-alibaba-dependencies.version>
         <lombok.version>1.18.34</lombok.version>
         <xxl.job.version>2.4.1</xxl.job.version>
         <hutool.version>5.8.28</hutool.version>
@@ -52,6 +53,14 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

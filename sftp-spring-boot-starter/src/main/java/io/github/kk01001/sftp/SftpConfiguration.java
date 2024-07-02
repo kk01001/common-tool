@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date:  2024-07-01 16:14
  */
 @Slf4j
