@@ -18,7 +18,7 @@ import org.springframework.util.Assert;
  * @date 2022/2/14 10:34
  */
 @Slf4j
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ComponentScan(basePackages = "io.github.kk01001")
 @EnableConfigurationProperties(XxlJobProperties.class)
 @ConditionalOnProperty(prefix = "xxl-job", name = "enable", havingValue = "true")

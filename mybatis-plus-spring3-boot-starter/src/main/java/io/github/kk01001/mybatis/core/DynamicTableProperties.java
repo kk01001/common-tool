@@ -1,7 +1,6 @@
 package io.github.kk01001.mybatis.core;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -10,7 +9,6 @@ import java.util.Map;
  * date 2023-07-22 15:23:00
  * 动态表名规则
  */
-@Component
 @ConfigurationProperties(prefix = "mybatis.dynamic")
 public class DynamicTableProperties {
 

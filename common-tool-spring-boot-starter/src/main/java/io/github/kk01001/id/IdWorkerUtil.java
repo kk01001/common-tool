@@ -21,7 +21,6 @@ public class IdWorkerUtil {
     public IdWorkerUtil(Long workerId) {
         this.workerId = workerId;
         buildIdWorker();
-        log.info("init Id Worker, workerId: {}", workerId);
     }
 
     public void buildIdWorker() {
@@ -52,4 +51,7 @@ public class IdWorkerUtil {
         return this.idWorker.nextId();
     }
 
+    public String nextIdStr() {
+        return String.valueOf(nextId());
+    }
 }
