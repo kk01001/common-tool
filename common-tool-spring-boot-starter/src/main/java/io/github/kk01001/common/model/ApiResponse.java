@@ -40,6 +40,22 @@ public class ApiResponse<T> {
      * 构建成功响应
      *
      * @param requestId 请求ID
+     * @param <T>       泛型类型
+     * @return ApiResponse实例
+     */
+    public static <T> ApiResponse<T> ok(String requestId) {
+        ApiResponse<T> response = new ApiResponse<>();
+        response.setCode(0);
+        response.setMessage("success");
+        response.setRequestId(requestId);
+        response.setTs(System.currentTimeMillis());
+        return response;
+    }
+
+    /**
+     * 构建成功响应
+     *
+     * @param requestId 请求ID
      * @param data      响应数据
      * @param <T>       泛型类型
      * @return ApiResponse实例
