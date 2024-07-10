@@ -112,3 +112,13 @@ public class Demo {
     }
 }
 ```
+
+## MinIO
+
+```yaml
+oss:
+  accessKey: 123
+  accessSecret: 123
+  endpoint: http://10.255.1.8:9000
+  maxConnections: 100
+```

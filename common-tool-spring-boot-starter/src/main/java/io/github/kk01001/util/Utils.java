@@ -1,6 +1,8 @@
 package io.github.kk01001.util;
 
 import cn.hutool.core.util.StrUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
@@ -102,6 +104,24 @@ public class Utils {
                 MDC.clear();
             }
         });
-
     }
+
+    public static String toJson(ObjectMapper objectMapper, Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            log.error("toJson error: ", e);
+        }
+        return "";
+    }
+
+    public static <T> T toObject(ObjectMapper objectMapper, String json, Class<T> clazz) {
+        try {
+            return objectMapper.readValue(json, clazz);
+        } catch (JsonProcessingException e) {
+            log.error("toObject error: ", e);
+        }
+        return null;
+    }
+
 }
