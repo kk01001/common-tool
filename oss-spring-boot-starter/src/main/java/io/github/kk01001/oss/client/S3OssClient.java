@@ -9,9 +9,10 @@ import lombok.SneakyThrows;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Calendar;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -61,8 +62,8 @@ public class S3OssClient implements OssClient {
      */
     @Override
     @SneakyThrows
-    public void putObject(String bucketName, String objectName, InputStream stream, String contextType) {
-        putObject(bucketName, objectName, stream, stream.available(), contextType);
+    public PutObjectResult putObject(String bucketName, String objectName, InputStream stream, String contextType) {
+        return putObject(bucketName, objectName, stream, stream.available(), contextType);
     }
 
     /**
@@ -71,8 +72,8 @@ public class S3OssClient implements OssClient {
      */
     @Override
     @SneakyThrows
-    public void putObject(String bucketName, String objectName, InputStream stream) {
-        putObject(bucketName, objectName, stream, stream.available(), "application/octet-stream");
+    public PutObjectResult putObject(String bucketName, String objectName, InputStream stream) {
+        return putObject(bucketName, objectName, stream, stream.available(), "application/octet-stream");
     }
 
     /**
@@ -91,12 +92,9 @@ public class S3OssClient implements OssClient {
      */
     @Override
     @SneakyThrows
-    public String getObjectUrl(String bucketName, String objectName, Integer expires) {
-        Date date = new Date();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-        calendar.add(Calendar.DAY_OF_MONTH, expires);
-        URL url = amazonS3.generatePresignedUrl(bucketName, objectName, calendar.getTime());
+    public String getObjectUrl(String bucketName, String objectName, Duration expires) {
+        LocalDateTime time = LocalDateTime.now().plusSeconds(expires.toSeconds());
+        URL url = amazonS3.generatePresignedUrl(bucketName, objectName, Date.from(time.toInstant(ZoneOffset.UTC)));
         return url.toString();
     }
 

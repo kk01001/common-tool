@@ -10,6 +10,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import io.github.kk01001.oss.client.OssClient;
 import io.github.kk01001.oss.client.S3OssClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -23,6 +24,7 @@ import java.util.stream.Stream;
  * @author kk01001
  * date 2022-09-19 22:27:00
  */
+@Slf4j
 @Configuration
 @EnableConfigurationProperties(OssProperties.class)
 @ConditionalOnProperty(prefix = "oss", name = "enable", havingValue = "true")
@@ -31,6 +33,7 @@ public class OssConfiguration {
     @Bean
     @ConditionalOnMissingBean(S3OssClient.class)
     public OssClient ossClient(AmazonS3 amazonS3) {
+        log.info("OssClient 初始化完成");
         return new S3OssClient(amazonS3);
     }
 
@@ -62,12 +65,14 @@ public class OssConfiguration {
         AWSCredentials awsCredentials = new BasicAWSCredentials(ossProperties.getAccessKey(),
                 ossProperties.getAccessSecret());
         AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
-        return AmazonS3Client.builder()
+        AmazonS3 amazonS3 = AmazonS3Client.builder()
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ossProperties.getEndpoint(), ossProperties.getRegion()))
                 .withCredentials(awsCredentialsProvider)
                 .disableChunkedEncoding()
                 .withClientConfiguration(clientConfiguration)
                 .withPathStyleAccessEnabled(ossProperties.isPathStyleAccess())
                 .build();
+        log.info("amazonS3 初始化完成");
+        return amazonS3;
     }
 }

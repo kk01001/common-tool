@@ -2,10 +2,12 @@ package io.github.kk01001.oss.client;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -46,7 +48,7 @@ public interface OssClient {
      * @param contextType 文件类型
      * @throws Exception 异常
      */
-    void putObject(String bucketName, String objectName, InputStream stream, String contextType) throws Exception;
+    PutObjectResult putObject(String bucketName, String objectName, InputStream stream, String contextType) throws Exception;
 
     /**
      * 上传文件
@@ -56,7 +58,7 @@ public interface OssClient {
      * @param stream     文件流
      * @throws Exception 异常
      */
-    void putObject(String bucketName, String objectName, InputStream stream) throws Exception;
+    PutObjectResult putObject(String bucketName, String objectName, InputStream stream) throws Exception;
 
     /**
      * 获取文件
@@ -75,7 +77,7 @@ public interface OssClient {
      * @param expires    有效期
      * @return 对象的url
      */
-    String getObjectUrl(String bucketName, String objectName, Integer expires);
+    String getObjectUrl(String bucketName, String objectName, Duration expires);
 
     /**
      * 通过bucketName和objectName删除对象
