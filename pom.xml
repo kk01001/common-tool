@@ -41,7 +41,7 @@
         <transmittable.thread.local.version>2.14.5</transmittable.thread.local.version>
         <mybatis.plus.version>3.5.7</mybatis.plus.version>
         <dynamic.datasource.version>4.3.1</dynamic.datasource.version>
-        <shardingsphere.version>5.2.0</shardingsphere.version>
+        <shardingsphere.version>5.2.1</shardingsphere.version>
         <mysql.version>9.0.0</mysql.version>
         <jsch.version>0.1.55</jsch.version>
         <commons-pool2.version>2.12.0</commons-pool2.version>
