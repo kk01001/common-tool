@@ -12,6 +12,18 @@ import lombok.Getter;
 @Getter
 public class BizException extends RuntimeException {
 
+    private String requestId;
+
+    public BizException(String requestId, String message) {
+        super(message);
+        this.requestId = requestId;
+    }
+
+    public BizException(String requestId, String message, Throwable e) {
+        super(message, e);
+        this.requestId = requestId;
+    }
+
     public BizException(Throwable e) {
         super(ExceptionUtil.getMessage(e), e);
     }
@@ -33,6 +45,10 @@ public class BizException extends RuntimeException {
 
     public BizException(Throwable throwable, String messageTemplate, Object... params) {
         super(StrUtil.format(messageTemplate, params), throwable);
+    }
+
+    public String getRequestId() {
+        return requestId;
     }
 
     @Override

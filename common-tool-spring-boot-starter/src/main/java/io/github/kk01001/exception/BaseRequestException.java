@@ -12,6 +12,18 @@ import lombok.Getter;
 @Getter
 public class BaseRequestException extends RuntimeException {
 
+    private String requestId;
+
+    public BaseRequestException(String requestId, String message) {
+        super(message);
+        this.requestId = requestId;
+    }
+
+    public BaseRequestException(String requestId, String message, Throwable e) {
+        super(message, e);
+        this.requestId = requestId;
+    }
+
     public BaseRequestException(Throwable e) {
         super(ExceptionUtil.getMessage(e), e);
     }
@@ -33,6 +45,10 @@ public class BaseRequestException extends RuntimeException {
 
     public BaseRequestException(Throwable throwable, String messageTemplate, Object... params) {
         super(StrUtil.format(messageTemplate, params), throwable);
+    }
+
+    public String getRequestId() {
+        return requestId;
     }
 
     @Override

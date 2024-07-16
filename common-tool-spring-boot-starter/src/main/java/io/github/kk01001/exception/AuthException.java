@@ -12,6 +12,18 @@ import lombok.Getter;
 @Getter
 public class AuthException extends RuntimeException {
 
+    private String requestId;
+
+    public AuthException(String requestId, String message) {
+        super(message);
+        this.requestId = requestId;
+    }
+
+    public AuthException(String requestId, String message, Throwable e) {
+        super(message, e);
+        this.requestId = requestId;
+    }
+
     public AuthException(Throwable e) {
         super(ExceptionUtil.getMessage(e), e);
     }
@@ -33,6 +45,10 @@ public class AuthException extends RuntimeException {
 
     public AuthException(Throwable throwable, String messageTemplate, Object... params) {
         super(StrUtil.format(messageTemplate, params), throwable);
+    }
+
+    public String getRequestId() {
+        return requestId;
     }
 
     @Override
