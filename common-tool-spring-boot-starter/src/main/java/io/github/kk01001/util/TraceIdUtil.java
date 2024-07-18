@@ -40,6 +40,18 @@ public class TraceIdUtil {
         return builder.toString();
     }
 
+    public static void buildAndSetTraceId(Object... params) {
+        StringBuilder builder = new StringBuilder();
+        int length = params.length;
+        for (int i = 0; i < length; i++) {
+            builder.append(params[i]);
+            if (i != length - 1) {
+                builder.append(StrUtil.SPACE);
+            }
+        }
+        MDC.put(TRACE_ID, builder.toString());
+    }
+
     public static String getTraceId() {
         String traceId = MDC.get(TRACE_ID);
         return traceId == null ? "" : traceId;
