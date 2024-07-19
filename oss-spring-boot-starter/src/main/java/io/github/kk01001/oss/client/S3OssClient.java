@@ -144,6 +144,8 @@ public class S3OssClient implements OssClient {
                 return "video/mp4";
             case "mp3":
                 return "audio/mpeg";
+            case "wav":
+                return "audio/wav";
             case "pdf":
                 return "application/pdf";
             default:
