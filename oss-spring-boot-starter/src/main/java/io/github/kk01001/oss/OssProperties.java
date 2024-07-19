@@ -44,4 +44,9 @@ public class OssProperties {
      * 最大线程数，默认： 100
      */
     private Integer maxConnections = 100;
+
+    /**
+     * 存储空间名称
+     */
+    private String bucketName;
 }

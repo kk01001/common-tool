@@ -101,10 +101,10 @@ public interface OssClient {
     /**
      * 根据文件名称获取 ContentType
      *
-     * @param objectName 文件名称
+     * @param format 文件格式
      * @return ContentType
      */
-    String getContentType(String objectName);
+    String getContentType(String format);
 
     /**
      * 获取AmazonS3

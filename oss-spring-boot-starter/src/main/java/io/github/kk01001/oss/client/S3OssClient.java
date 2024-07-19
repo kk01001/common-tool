@@ -133,9 +133,22 @@ public class S3OssClient implements OssClient {
     }
 
     @Override
-    public String getContentType(String objectName) {
-
-        return null;
+    public String getContentType(String format) {
+        switch (format.toLowerCase()) {
+            case "jpg":
+            case "jpeg":
+                return "image/jpeg";
+            case "png":
+                return "image/png";
+            case "mp4":
+                return "video/mp4";
+            case "mp3":
+                return "audio/mpeg";
+            case "pdf":
+                return "application/pdf";
+            default:
+                return "application/octet-stream";
+        }
     }
 
     @Override
