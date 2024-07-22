@@ -19,20 +19,58 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public class JschConnectionPool {
 
-    private final GenericObjectPool<ChannelSftp> defaultPool;
+    private static final String defaultKey = "default";
+
+    private final Map</*sftp key*/String, /*连接池*/GenericObjectPool<ChannelSftp>> poolMap = new ConcurrentHashMap<>(16);
 
     private final ReentrantLock lock = new ReentrantLock();
 
-    private final Map</*sftp key*/String, /*连接池*/GenericObjectPool<ChannelSftp>> poolMap = new ConcurrentHashMap<>(16);
+    public JschConnectionPool() {
+    }
+
+    public JschConnectionPool(String host,
+                              int port,
+                              String username,
+                              String password,
+                              Integer maxTotal,
+                              Integer minIdle,
+                              Integer maxIdle,
+                              Duration timout,
+                              Duration minEvictableIdleTime) {
+        lock.lock();
+        try {
+            JschFactory jschFactory = new JschFactory(host, port, username, password);
+            GenericObjectPoolConfig<ChannelSftp> config = new GenericObjectPoolConfig<>();
+
+            // 设置最大连接数
+            config.setMaxTotal(maxTotal);
+
+            // 设置空闲连接数
+            config.setMinIdle(minIdle);
+
+            // 设置最大空闲连接数
+            config.setMaxIdle(maxIdle);
+
+            // 设置连接等待时间，单位毫秒
+            config.setMaxWait(timout);
+            config.setTestOnReturn(true);
+            config.setTestOnBorrow(true);
+            config.setTestOnCreate(true);
+            config.setBlockWhenExhausted(true);
+            config.setTestWhileIdle(true);
+            config.setMinEvictableIdleDuration(minEvictableIdleTime);
+            GenericObjectPool<ChannelSftp> genericObjectPool = new GenericObjectPool<>(jschFactory, config);
+            poolMap.put(defaultKey, genericObjectPool);
+        } finally {
+            lock.unlock();
+        }
+    }
 
     public void buildPool(String poolKey, SftpInfoProperties sftpInfoProperties) {
         lock.lock();
         try {
             GenericObjectPool<ChannelSftp> pool = poolMap.get(poolKey);
             if (Objects.nonNull(pool)) {
-                pool.close();
-                GenericObjectPool<ChannelSftp> genericObjectPool = getPool(sftpInfoProperties);
-                poolMap.put(poolKey, genericObjectPool);
                 return;
             }
             GenericObjectPool<ChannelSftp> genericObjectPool = getPool(sftpInfoProperties);
@@ -42,7 +80,11 @@ public class JschConnectionPool {
         }
     }
 
-    private GenericObjectPool<ChannelSftp> getPool(SftpInfoProperties sftpInfoProperties) {
+    public GenericObjectPool<ChannelSftp> getPool(String poolKey) {
+        return poolMap.get(poolKey);
+    }
+
+    public GenericObjectPool<ChannelSftp> getPool(SftpInfoProperties sftpInfoProperties) {
         return buildJschConnectionPool(sftpInfoProperties.getHost(),
                 sftpInfoProperties.getPort(),
                 sftpInfoProperties.getUsername(),
@@ -86,41 +128,14 @@ public class JschConnectionPool {
         return new GenericObjectPool<>(jschFactory, config);
     }
 
-    public JschConnectionPool(String host,
-                              int port,
-                              String username,
-                              String password,
-                              Integer maxTotal,
-                              Integer minIdle,
-                              Integer maxIdle,
-                              Duration timout,
-                              Duration minEvictableIdleTime) {
-        JschFactory jschFactory = new JschFactory(host, port, username, password);
-        GenericObjectPoolConfig<ChannelSftp> config = new GenericObjectPoolConfig<>();
-
-        // 设置最大连接数
-        config.setMaxTotal(maxTotal);
-
-        // 设置空闲连接数
-        config.setMinIdle(minIdle);
-
-        // 设置最大空闲连接数
-        config.setMaxIdle(maxIdle);
-
-        // 设置连接等待时间，单位毫秒
-        config.setMaxWait(timout);
-        config.setTestOnReturn(true);
-        config.setTestOnBorrow(true);
-        config.setTestOnCreate(true);
-        config.setBlockWhenExhausted(true);
-        config.setTestWhileIdle(true);
-        config.setMinEvictableIdleDuration(minEvictableIdleTime);
-        defaultPool = new GenericObjectPool<>(jschFactory, config);
+    private GenericObjectPool<ChannelSftp> getDefaultPool() {
+        return getPool(defaultKey);
     }
 
+
     public ChannelSftp borrowObject() throws Exception {
-        ChannelSftp channelSftp = defaultPool.borrowObject();
-        log.info("borrow pool active: {}, idle: {}", defaultPool.getNumActive(), defaultPool.getNumIdle());
+        ChannelSftp channelSftp = getDefaultPool().borrowObject();
+        log.info("borrow pool active: {}, idle: {}", getDefaultPool().getNumActive(), getDefaultPool().getNumIdle());
         return channelSftp;
     }
 
@@ -137,9 +152,9 @@ public class JschConnectionPool {
             return;
         }
         if (channelSftp.isConnected()) {
-            defaultPool.returnObject(channelSftp);
+            getDefaultPool().returnObject(channelSftp);
         }
-        log.info("return pool active: {}, idle: {}", defaultPool.getNumActive(), defaultPool.getNumIdle());
+        log.info("return pool active: {}, idle: {}", getDefaultPool().getNumActive(), getDefaultPool().getNumIdle());
     }
 
     public void returnObject(String poolKey, ChannelSftp channelSftp) {
@@ -156,7 +171,7 @@ public class JschConnectionPool {
     }
 
     public void close() {
-        defaultPool.close();
+        getDefaultPool().close();
     }
 
     public void close(String poolKey) {

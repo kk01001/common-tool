@@ -23,6 +23,11 @@ public class SftpConfiguration {
     private final SftpInfoProperties sftpInfoProperties;
 
     @Bean
+    public JschConnectionPool defaultConnectionPool() {
+        return new JschConnectionPool();
+    }
+
+    @Bean
     public JschConnectionPool jschConnectionPool() {
         JschConnectionPool pool = new JschConnectionPool(sftpInfoProperties.getHost(),
                 sftpInfoProperties.getPort(),
