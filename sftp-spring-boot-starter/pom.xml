@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.kk01001</groupId>
         <artifactId>common-tool</artifactId>
-        <version>1.0.20</version>
+        <version>1.1.0</version>
     </parent>
 
     <artifactId>sftp-spring-boot-starter</artifactId>
