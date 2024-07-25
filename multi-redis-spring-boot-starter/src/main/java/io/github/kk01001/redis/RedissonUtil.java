@@ -295,21 +295,31 @@ public class RedissonUtil {
      *
      * @param key 键
      */
-    public void increment(String key, Duration duration) {
+    public long increment(String key, Duration duration) {
+        long value = 0L;
         try {
             RAtomicLong atomicLong = redissonClient.getAtomicLong(key);
-            atomicLong.addAndGet(1);
-            atomicLong.expire(duration);
+            value = atomicLong.addAndGet(1);
+            if (value < 10) {
+                atomicLong.expire(duration);
+            }
             if (redisProperties.getCluster2().getActive()) {
                 otherExecutor.execute(() -> {
-                    RAtomicLong rAtomicLong = redissonClient2.getAtomicLong(key);
-                    rAtomicLong.addAndGet(1);
-                    rAtomicLong.expire(duration);
+                    try {
+                        RAtomicLong rAtomicLong = redissonClient2.getAtomicLong(key);
+                        long added = rAtomicLong.addAndGet(1);
+                        if (added < 10) {
+                            rAtomicLong.expire(duration);
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("redisson other RAtomicLong increment 操作异常: ", e);
+                    }
                 });
             }
         } catch (Exception e) {
-            LOGGER.error("redisson LongAdder increment 操作异常: ", e);
+            LOGGER.error("redisson RAtomicLong increment 操作异常: ", e);
         }
+        return value;
     }
 
     public void decrement(String key) {
