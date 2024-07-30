@@ -46,6 +46,7 @@ public class XxlJobLoginService {
         try (HttpResponse response = HttpRequest.post(loginUrl)
                 .form("userName", xxlJobProperties.getUserName())
                 .form("password", xxlJobProperties.getPassword())
+                .timeout(5000)
                 .execute()) {
             List<HttpCookie> cookies = response.getCookies();
             Optional<HttpCookie> cookieOpt = cookies.stream()
@@ -53,12 +54,13 @@ public class XxlJobLoginService {
                     .findFirst();
             if (!cookieOpt.isPresent()) {
                 log.error("get xxl-job cookie error!");
-                return;
+                throw new RuntimeException("get xxl-job cookie error!");
             }
 
             LOGIN_COOKIE.put(XxlJobConstants.XXL_JOB_LOGIN_IDENTITY, cookieOpt.get().getValue());
         } catch (Exception e) {
             log.error("xxl-job loginUrl: {}, request error: ", loginUrl, e);
+            throw new RuntimeException("get xxl-job cookie error!");
         }
     }
 
@@ -74,7 +76,7 @@ public class XxlJobLoginService {
             login();
         }
         log.error("get xxl-job cookie error!");
-        return "";
+        throw new RuntimeException("get xxl-job cookie is null!");
     }
 
 }

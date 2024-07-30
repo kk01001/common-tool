@@ -48,6 +48,7 @@ public class XxlJobInfoService {
                 .form("executorHandler", executorHandler)
                 .form("triggerStatus", -1)
                 .cookie(xxlJobLoginService.getCookie())
+                .timeout(3000)
                 .execute()) {
             String body = response.body();
             JSONArray array = JSONUtil.parse(body).getByPath("data", JSONArray.class);
@@ -71,6 +72,7 @@ public class XxlJobInfoService {
         try (HttpResponse response = HttpRequest.post(url)
                 .form(paramMap)
                 .cookie(xxlJobLoginService.getCookie())
+                .timeout(3000)
                 .execute()) {
             JSON json = JSONUtil.parse(response.body());
             Object code = json.getByPath("code");

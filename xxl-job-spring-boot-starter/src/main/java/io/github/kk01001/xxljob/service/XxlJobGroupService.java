@@ -40,6 +40,7 @@ public class XxlJobGroupService {
                 .form("appname", xxlJobProperties.getAppName())
                 .form("title", xxlJobProperties.getTitle())
                 .cookie(xxlJobLoginService.getCookie())
+                .timeout(3000)
                 .execute()) {
             String body = response.body();
             JSONArray array = JSONUtil.parse(body).getByPath("data", JSONArray.class);
@@ -75,6 +76,7 @@ public class XxlJobGroupService {
                 .form("appname", xxlJobProperties.getAppName())
                 .form("title", xxlJobProperties.getTitle())
                 .cookie(xxlJobLoginService.getCookie())
+                .timeout(3000)
                 .execute()) {
             Object code = JSONUtil.parse(response.body()).getByPath("code");
             return code.equals(200);
