@@ -6,6 +6,7 @@ import com.alibaba.nacos.api.config.listener.AbstractListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.Set;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnClass(NacosConfigManager.class)
 public class CommonNacosConfigListener implements CommandLineRunner {
 
     private final NacosConfigManager nacosConfigManager;

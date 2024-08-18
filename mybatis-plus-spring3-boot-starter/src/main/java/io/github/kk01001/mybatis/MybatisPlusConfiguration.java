@@ -1,5 +1,8 @@
 package io.github.kk01001.mybatis;
 
+import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
+import com.baomidou.dynamic.datasource.creator.DefaultDataSourceCreator;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
@@ -7,9 +10,14 @@ import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInt
 import io.github.kk01001.mybatis.core.DynamicTableProperties;
 import io.github.kk01001.mybatis.core.EasySqlInjector;
 import io.github.kk01001.mybatis.core.RequestDataHelper;
+import io.github.kk01001.mybatis.datasource.DataSourceManager;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -22,6 +30,17 @@ import java.util.Map;
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties({DynamicTableProperties.class})
 public class MybatisPlusConfiguration {
+
+    @Bean
+    @Order(Ordered.LOWEST_PRECEDENCE)
+    @ConditionalOnBean({DynamicRoutingDataSource.class, DynamicDataSourceProperties.class, DefaultDataSourceCreator.class})
+    @DependsOn({"dynamicRoutingDataSource", "dynamicDataSourceProperties", "defaultDataSourceCreator"})
+    public DataSourceManager dataSourceManager(DynamicRoutingDataSource dynamicRoutingDataSource,
+                                               DynamicDataSourceProperties dynamicDataSourceProperties,
+                                               DefaultDataSourceCreator defaultDataSourceCreator) {
+
+        return new DataSourceManager(dynamicRoutingDataSource, dynamicDataSourceProperties, defaultDataSourceCreator);
+    }
 
     /**
      * 批量新增sql
