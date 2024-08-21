@@ -1001,6 +1001,24 @@ public class RedissonUtil {
         return map.size();
     }
 
+    public Long hashIncrement(String key, String item, Long value, Duration duration) {
+        RMap<String, Long> map = redissonClient.getMap(key);
+        Long added = map.addAndGet(item, value);
+        map.expire(duration);
+        if (redisProperties.getCluster2().getActive()) {
+            otherExecutor.execute(() -> {
+                try {
+                    RMap<String, Long> rMap = redissonClient2.getMap(key);
+                    rMap.addAndGet(item, value);
+                    rMap.expire(duration);
+                } catch (Exception e) {
+                    LOGGER.error("back redis hashIncrement error: ", e);
+                }
+            });
+        }
+        return added;
+    }
+
     public Map<String, String> getStringMap(String key) {
         Map<Object, Object> objectObjectMap = redissonClient.getMap(key).readAllMap();
         return objectObjectMap.entrySet().stream().collect(Collectors.toMap(e -> (String) e.getKey(), e -> (String) e.getValue()));

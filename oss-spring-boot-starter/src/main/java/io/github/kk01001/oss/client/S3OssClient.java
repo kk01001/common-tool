@@ -148,6 +148,8 @@ public class S3OssClient implements OssClient {
                 return "audio/wav";
             case "pdf":
                 return "application/pdf";
+            case "json":
+                return "application/json";
             default:
                 return "application/octet-stream";
         }
