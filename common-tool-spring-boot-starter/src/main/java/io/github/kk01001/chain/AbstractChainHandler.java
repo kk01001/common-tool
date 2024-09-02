@@ -2,7 +2,7 @@ package io.github.kk01001.chain;
 
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * @since 2022-10-17 10:20
  * 责任链抽象类
  */
