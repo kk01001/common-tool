@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.kk01001</groupId>
     <artifactId>common-tool</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
     <name>common-tool</name>
     <description>通用工具</description>
 
@@ -19,6 +19,7 @@
         <module>xxl-job-spring-boot-starter</module>
         <module>oss-spring-boot-starter</module>
         <module>sftp-spring-boot-starter</module>
+        <module>dynamic-mq-spring-boot-starter</module>
     </modules>
 
     <properties>

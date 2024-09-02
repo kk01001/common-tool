@@ -1,18 +1,24 @@
 package io.github.kk01001.util;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author linshiqiang
+ * @author kk01001
  * date:  2024-07-11 13:33
  */
 @Slf4j
 public class JacksonUtil {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    static {
+        // 配置 ObjectMapper 在序列化时忽略 null 值
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    }
 
     /**
      * 对象转json
