@@ -9,6 +9,7 @@ import io.github.kk01001.core.ApplicationInfoInitialize;
 import io.github.kk01001.id.IdWorkerUtil;
 import io.github.kk01001.util.NetworkUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +42,7 @@ public class CommonToolConfiguration {
     }
 
     @ConditionalOnMissingBean(ConfigService.class)
+    @ConditionalOnBean(NacosConfigProperties.class)
     @ConditionalOnClass(NacosConfigProperties.class)
     @Bean
     public ConfigService configService(NacosConfigProperties nacosConfigProperties) throws NacosException {

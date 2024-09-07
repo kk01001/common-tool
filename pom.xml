@@ -20,6 +20,7 @@
         <module>oss-spring-boot-starter</module>
         <module>sftp-spring-boot-starter</module>
         <module>dynamic-mq-spring-boot-starter</module>
+        <module>rate-limiter-spring-boot-starter</module>
     </modules>
 
     <properties>
