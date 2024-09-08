@@ -1,7 +1,6 @@
 package io.github.kk01001.ratelimter.core.impl;
 
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.IdUtil;
 import io.github.kk01001.ratelimter.core.RateLimiterStrategy;
 import io.github.kk01001.ratelimter.enums.RateLimiterType;
 import io.github.kk01001.ratelimter.manager.LuaScriptManager;
@@ -60,9 +59,7 @@ public class RedissonFixedWindowRateLimiterStrategyImpl implements RateLimiterSt
                 RScript.ReturnType.VALUE,
                 keys,
                 rule.getWindowTime(),
-                rule.getMaxRequests(),
-                System.currentTimeMillis(),
-                IdUtil.fastSimpleUUID());
+                rule.getMaxRequests());
 
         return Objects.nonNull(result) && 1 == (long) result;
     }

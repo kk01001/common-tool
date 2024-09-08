@@ -17,9 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("rate-limiter")
 public class RateLimiterController {
 
+    @PostMapping("guava")
+    @RateLimiter(type = RateLimiterType.GUAVA,
+            key = "'guava:'+ #dataModel.code",
+            tokenRate = 20,
+            windowTime = 5)
+    public Boolean guava(@RequestBody DataModel dataModel) {
+
+        return true;
+    }
+
     @PostMapping("redisson")
     @RateLimiter(type = RateLimiterType.REDISSON,
-            key = "'redissonRateLimiter:'+ #DataModel.code",
+            key = "'redissonRateLimiter:'+ #dataModel.code",
             maxRequests = 200,
             windowTime = 5)
     public Boolean redisson(@RequestBody DataModel dataModel) {
@@ -29,7 +39,7 @@ public class RateLimiterController {
 
     @PostMapping("slidingWindow")
     @RateLimiter(type = RateLimiterType.REDISSON_LUA_SLIDING_WINDOW,
-            key = "'slidingWindow:'+ #DataModel.code",
+            key = "'slidingWindow:'+ #dataModel.code",
             maxRequests = 29,
             windowTime = 1)
     public Boolean slidingWindow(@RequestBody DataModel dataModel) {
@@ -39,7 +49,7 @@ public class RateLimiterController {
 
     @PostMapping("fixedWindow")
     @RateLimiter(type = RateLimiterType.REDISSON_LUA_FIXED_WINDOW,
-            key = "'fixedWindow:'+ #DataModel.code",
+            key = "'fixedWindow:'+ #dataModel.code",
             maxRequests = 29,
             windowTime = 1)
     public Boolean fixedWindow(@RequestBody DataModel dataModel) {
@@ -49,7 +59,7 @@ public class RateLimiterController {
 
     @PostMapping("tokenBucket")
     @RateLimiter(type = RateLimiterType.REDISSON_LUA_TOKEN_BUCKET,
-            key = "'tokenBucket:'+ #DataModel.code",
+            key = "'tokenBucket:'+ #dataModel.code",
             bucketCapacity = 29,
             tokenRate = 10)
     public Boolean tokenBucket(@RequestBody DataModel dataModel) {

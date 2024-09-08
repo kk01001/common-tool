@@ -9,6 +9,8 @@ public enum RateLimiterType {
 
     LOCAL,
 
+    GUAVA,
+
     /**
      * redisson自带RRateLimiter
      */
