@@ -1,19 +1,12 @@
 package io.github.kk01001.ratelimter.core.impl;
 
-import cn.hutool.core.collection.ListUtil;
 import io.github.kk01001.ratelimter.core.RateLimiterStrategy;
 import io.github.kk01001.ratelimter.enums.RateLimiterType;
 import io.github.kk01001.ratelimter.manager.LuaScriptManager;
 import io.github.kk01001.ratelimter.model.Rule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RScript;
-import org.redisson.api.RedissonClient;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * @author linshiqiang
@@ -36,31 +29,25 @@ import java.util.Objects;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnClass(RedissonClient.class)
-public class RedissonTokenBucketRateLimiterStrategyImpl implements RateLimiterStrategy {
-
-    private final RedissonClient redissonClient;
+public class RedisTokenBucketRateLimiterStrategyImpl extends AbstractRedisRateLimiterStrategy implements RateLimiterStrategy {
 
     @Override
     public RateLimiterType getType() {
-        return RateLimiterType.REDISSON_LUA_TOKEN_BUCKET;
+        return RateLimiterType.REDIS_LUA_TOKEN_BUCKET;
     }
 
     @Override
     public boolean tryAccess(Rule rule) {
-        String key = rule.getKey();
-        RScript script = redissonClient.getScript();
-        String slidingWindowScript = LuaScriptManager.getTokenBucketScript();
-        List<Object> keys = ListUtil.of(key);
-        Object result = script.eval(RScript.Mode.READ_WRITE,
-                slidingWindowScript,
-                RScript.ReturnType.VALUE,
-                keys,
+
+        return tryAccess(rule,
                 rule.getBucketCapacity(),
                 rule.getTokenRate(),
                 System.currentTimeMillis());
+    }
 
-        return Objects.nonNull(result) && 1 == (long) result;
+    @Override
+    protected String getScript() {
+        return LuaScriptManager.getTokenBucketScript();
     }
 
 }

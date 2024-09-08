@@ -1,6 +1,7 @@
 package io.github.kk01001.ratelimter.aspect;
 
 import io.github.kk01001.ratelimter.enums.RateLimiterType;
+import io.github.kk01001.ratelimter.enums.RedisClientType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -20,6 +21,8 @@ public @interface RateLimiter {
      * 限流器类型
      */
     RateLimiterType type() default RateLimiterType.LOCAL;
+
+    RedisClientType redisClientType() default RedisClientType.REDISSON;
 
     /**
      * 限流key el

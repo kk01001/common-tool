@@ -4,6 +4,12 @@
 
 ## Rate-Limiter
 
+### TODO
+
+- [ ] 自定义fallback
+- [ ] 集成sentinel
+- [ ] 集成redisTemplate
+
 ### 自定义注解
 
 ```java

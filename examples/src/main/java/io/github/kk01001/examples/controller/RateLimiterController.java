@@ -38,7 +38,7 @@ public class RateLimiterController {
     }
 
     @PostMapping("slidingWindow")
-    @RateLimiter(type = RateLimiterType.REDISSON_LUA_SLIDING_WINDOW,
+    @RateLimiter(type = RateLimiterType.REDIS_LUA_SLIDING_WINDOW,
             key = "'slidingWindow:'+ #dataModel.code",
             maxRequests = 29,
             windowTime = 1)
@@ -48,7 +48,7 @@ public class RateLimiterController {
     }
 
     @PostMapping("fixedWindow")
-    @RateLimiter(type = RateLimiterType.REDISSON_LUA_FIXED_WINDOW,
+    @RateLimiter(type = RateLimiterType.REDIS_LUA_FIXED_WINDOW,
             key = "'fixedWindow:'+ #dataModel.code",
             maxRequests = 29,
             windowTime = 1)
@@ -58,7 +58,7 @@ public class RateLimiterController {
     }
 
     @PostMapping("tokenBucket")
-    @RateLimiter(type = RateLimiterType.REDISSON_LUA_TOKEN_BUCKET,
+    @RateLimiter(type = RateLimiterType.REDIS_LUA_TOKEN_BUCKET,
             key = "'tokenBucket:'+ #dataModel.code",
             bucketCapacity = 29,
             tokenRate = 10)
@@ -68,7 +68,7 @@ public class RateLimiterController {
     }
 
     @PostMapping("leakyBucket")
-    @RateLimiter(type = RateLimiterType.REDISSON_LUA_LEAKY_BUCKET,
+    @RateLimiter(type = RateLimiterType.REDIS_LUA_LEAKY_BUCKET,
             // key = "'leakyBucket:'+ #DataModel.code",
             key = "@ruleService.getKey(#dataModel)",
             ruleFunction = "@ruleService.getRule(#dataModel)",

@@ -70,6 +70,7 @@ public class RateLimiterAspect {
 
         return Rule.builder()
                 .rateLimiterType(rateLimiter.type())
+                .redisClientType(rateLimiter.redisClientType())
                 .maxRequests(getValue(rateLimiter.maxRequests(), parseExpression(rateLimiter.maxRequestsFunction(), context, Integer.class)))
                 .windowTime(getValue(rateLimiter.windowTime(), parseExpression(rateLimiter.windowTimeFunction(), context, Integer.class)))
                 .bucketCapacity(getValue(rateLimiter.bucketCapacity(), parseExpression(rateLimiter.bucketCapacityFunction(), context, Integer.class)))

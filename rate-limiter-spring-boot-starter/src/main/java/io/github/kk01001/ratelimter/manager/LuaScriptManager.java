@@ -16,29 +16,29 @@ public class LuaScriptManager {
     private static final Map<RateLimiterType, String> CONFIG_MAP = new HashMap<>(1);
 
     static {
-        CONFIG_MAP.put(RateLimiterType.REDISSON_LUA_SLIDING_WINDOW, ResourceUtil.readUtf8Str("lua/sliding_window.lua"));
-        CONFIG_MAP.put(RateLimiterType.REDISSON_LUA_FIXED_WINDOW, ResourceUtil.readUtf8Str("lua/fixed_window.lua"));
-        CONFIG_MAP.put(RateLimiterType.REDISSON_LUA_TOKEN_BUCKET, ResourceUtil.readUtf8Str("lua/token_bucket.lua"));
-        CONFIG_MAP.put(RateLimiterType.REDISSON_LUA_LEAKY_BUCKET, ResourceUtil.readUtf8Str("lua/leaky_bucket.lua"));
-    }
-
-    public static String getSlidingWindowScript() {
-
-        return CONFIG_MAP.get(RateLimiterType.REDISSON_LUA_SLIDING_WINDOW);
+        CONFIG_MAP.put(RateLimiterType.REDIS_LUA_FIXED_WINDOW, ResourceUtil.readUtf8Str("lua/fixed_window.lua"));
+        CONFIG_MAP.put(RateLimiterType.REDIS_LUA_SLIDING_WINDOW, ResourceUtil.readUtf8Str("lua/sliding_window.lua"));
+        CONFIG_MAP.put(RateLimiterType.REDIS_LUA_TOKEN_BUCKET, ResourceUtil.readUtf8Str("lua/token_bucket.lua"));
+        CONFIG_MAP.put(RateLimiterType.REDIS_LUA_LEAKY_BUCKET, ResourceUtil.readUtf8Str("lua/leaky_bucket.lua"));
     }
 
     public static String getFixedWindowScript() {
 
-        return CONFIG_MAP.get(RateLimiterType.REDISSON_LUA_FIXED_WINDOW);
+        return CONFIG_MAP.get(RateLimiterType.REDIS_LUA_FIXED_WINDOW);
+    }
+
+    public static String getSlidingWindowScript() {
+
+        return CONFIG_MAP.get(RateLimiterType.REDIS_LUA_SLIDING_WINDOW);
     }
 
     public static String getTokenBucketScript() {
 
-        return CONFIG_MAP.get(RateLimiterType.REDISSON_LUA_TOKEN_BUCKET);
+        return CONFIG_MAP.get(RateLimiterType.REDIS_LUA_TOKEN_BUCKET);
     }
 
     public static String getLeakyBucketScript() {
 
-        return CONFIG_MAP.get(RateLimiterType.REDISSON_LUA_LEAKY_BUCKET);
+        return CONFIG_MAP.get(RateLimiterType.REDIS_LUA_LEAKY_BUCKET);
     }
 }

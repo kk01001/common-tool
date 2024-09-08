@@ -1,5 +1,7 @@
 package io.github.kk01001.ratelimter.enums;
 
+import org.redisson.api.RRateLimiter;
+
 /**
  * @author linshiqiang
  * @date 2024-09-06 21:38:00
@@ -12,27 +14,29 @@ public enum RateLimiterType {
     GUAVA,
 
     /**
-     * redisson自带RRateLimiter
+     * redisson
+     * @see RRateLimiter
      */
     REDISSON,
 
     /**
-     * redisson lua 滑动窗口算法
+     * redis lua 固定窗口算法
      */
-    REDISSON_LUA_SLIDING_WINDOW,
+    REDIS_LUA_FIXED_WINDOW,
 
     /**
-     * redisson lua 固定窗口算法
+     * redis lua 滑动窗口算法
      */
-    REDISSON_LUA_FIXED_WINDOW,
+    REDIS_LUA_SLIDING_WINDOW,
 
     /**
-     * redisson lua 令牌桶算法
+     * redis lua 令牌桶算法
      */
-    REDISSON_LUA_TOKEN_BUCKET,
+    REDIS_LUA_TOKEN_BUCKET,
 
     /**
-     * redisson lua 漏桶算法
+     * redis lua 漏桶算法
      */
-    REDISSON_LUA_LEAKY_BUCKET,
+    REDIS_LUA_LEAKY_BUCKET,
+
 }
