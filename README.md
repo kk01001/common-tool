@@ -2,6 +2,52 @@
 
 > SpringBoot Common Tool Starter
 
+## Rate-Limiter
+
+### 自定义注解
+
+```java
+
+@PostMapping("leakyBucket")
+@RateLimiter(type = RateLimiterType.REDISSON_LUA_LEAKY_BUCKET,
+        // key = "'leakyBucket:'+ #DataModel.code",
+        key = "@ruleService.getKey(#dataModel)",
+        ruleFunction = "@ruleService.getRule(#dataModel)",
+        bucketCapacity = 3,
+        bucketCapacityFunction = "@ruleService.getBucketCapacity(#dataModel)",
+        tokenRate = 2,
+        tokenRateFunction = "@ruleService.getTokenRate(#dataModel)",
+        permits = 1,
+        maxRequestsFunction = "@ruleService.getMaxRequests(#dataModel)")
+public Boolean leakyBucket(@RequestBody DataModel dataModel) {
+
+   return true;
+}
+```
+
+### 规则说明
+
+1. 限流算法类型
+   - type
+
+2. 自定义设置限流规则
+   - ruleFunction
+
+3. 限流值el表达式
+   - key 限流key
+   - maxRequestsFunction
+   - windowTimeFunction
+   - tokenRateFunction
+   - bucketCapacityFunction
+   - permitsFunction
+
+4. 指定限流数值
+   - windowTime 时间窗口，单位为秒
+   - maxRequests 最大请求数
+   - bucketCapacity 是桶的容量（最大令牌数）
+   - tokenRate 是令牌生成速率（每秒生成的令牌数）
+   - permits 本次申请请求的凭证数
+
 ## XXL-JOB
 
 ```yaml

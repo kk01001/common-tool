@@ -59,11 +59,15 @@ public class RateLimiterController {
 
     @PostMapping("leakyBucket")
     @RateLimiter(type = RateLimiterType.REDISSON_LUA_LEAKY_BUCKET,
-            key = "'leakyBucket:'+ #DataModel.code",
+            // key = "'leakyBucket:'+ #DataModel.code",
+            key = "@ruleService.getKey(#dataModel)",
+            ruleFunction = "@ruleService.getRule(#dataModel)",
             bucketCapacity = 3,
+            bucketCapacityFunction = "@ruleService.getBucketCapacity(#dataModel)",
             tokenRate = 2,
+            tokenRateFunction = "@ruleService.getTokenRate(#dataModel)",
             permits = 1,
-            ruleFunction = "@ruleService.getTokenRate(#dataModel)")
+            maxRequestsFunction = "@ruleService.getMaxRequests(#dataModel)")
     public Boolean leakyBucket(@RequestBody DataModel dataModel) {
 
         return true;

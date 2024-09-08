@@ -56,7 +56,21 @@ public @interface RateLimiter {
     int permits() default 1;
 
     /**
-     * 限流规则获取方法 el
+     * 最大请求数 el
+     */
+    String maxRequestsFunction() default "";
+
+    String windowTimeFunction() default "";
+
+    String bucketCapacityFunction() default "";
+
+    String tokenRateFunction() default "";
+
+    String permitsFunction() default "";
+
+    /**
+     * 自定义规则查询方法
+     * 优先级最高
      */
     String ruleFunction() default "";
 }
