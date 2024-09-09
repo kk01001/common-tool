@@ -1258,6 +1258,26 @@ public class RedissonUtil {
         return sortedSet.pollFirstEntry();
     }
 
+    public Double getZsetFirstScore(String key) {
+        RScoredSortedSet<String> sortedSet = redissonClient.getScoredSortedSet(key);
+        return sortedSet.firstScore();
+    }
+
+    public ScoredEntry<String> getZsetFirstEntry(String key) {
+        RScoredSortedSet<String> sortedSet = redissonClient.getScoredSortedSet(key);
+        return sortedSet.firstEntry();
+    }
+
+    public Double getZsetLastScore(String key) {
+        RScoredSortedSet<String> sortedSet = redissonClient.getScoredSortedSet(key);
+        return sortedSet.lastScore();
+    }
+
+    public ScoredEntry<String> getZsetLastEntry(String key) {
+        RScoredSortedSet<String> sortedSet = redissonClient.getScoredSortedSet(key);
+        return sortedSet.lastEntry();
+    }
+
     /**
      * 获取zset 全部member和score
      *
