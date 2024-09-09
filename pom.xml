@@ -20,6 +20,7 @@
         <module>oss-spring-boot-starter</module>
         <module>sftp-spring-boot-starter</module>
         <module>dynamic-mq-spring-boot-starter</module>
+        <module>rate-limiter-spring-boot-starter</module>
     </modules>
 
     <properties>
@@ -46,6 +47,7 @@
         <mysql.version>9.0.0</mysql.version>
         <jsch.version>0.1.55</jsch.version>
         <commons-pool2.version>2.12.0</commons-pool2.version>
+        <guava.version>33.2.1-jre</guava.version>
     </properties>
 
     <dependencyManagement>
@@ -148,6 +150,12 @@
                 <groupId>org.apache.shardingsphere</groupId>
                 <artifactId>shardingsphere-jdbc-core-spring-boot-starter</artifactId>
                 <version>${shardingsphere.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
