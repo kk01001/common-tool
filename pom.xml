@@ -37,7 +37,7 @@
         <lombok.version>1.18.34</lombok.version>
         <xxl.job.version>2.4.1</xxl.job.version>
         <hutool.version>5.8.29</hutool.version>
-        <aws.s3.version>1.12.761</aws.s3.version>
+        <aws.s3.version>1.12.772</aws.s3.version>
         <easyexcel.version>4.0.1</easyexcel.version>
         <redisson.version>3.35.0</redisson.version>
         <transmittable.thread.local.version>2.14.5</transmittable.thread.local.version>
