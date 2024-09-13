@@ -33,6 +33,9 @@ public class RateLimiterFactory implements CommandLineRunner {
     }
 
     public boolean tryAccess(Rule rule) {
+        if (!Boolean.TRUE.equals(rule.getEnable())) {
+            return true;
+        }
         RateLimiterType rateLimiterType = rule.getRateLimiterType();
         return Optional.ofNullable(STRATEGY_MAP.get(rateLimiterType))
                 .map(strategy -> strategy.tryAccess(rule))

@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Rule {
 
+    private Boolean enable;
+
     private RateLimiterType rateLimiterType;
 
     private RedisClientType redisClientType;

@@ -69,6 +69,7 @@ public class RateLimiterAspect {
         }
 
         return Rule.builder()
+                .enable(rateLimiter.enable())
                 .rateLimiterType(rateLimiter.type())
                 .redisClientType(rateLimiter.redisClientType())
                 .maxRequests(getValue(rateLimiter.maxRequests(), parseExpression(rateLimiter.maxRequestsFunction(), context, Integer.class)))

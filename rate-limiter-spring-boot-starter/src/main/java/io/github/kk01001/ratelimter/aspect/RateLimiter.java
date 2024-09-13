@@ -22,13 +22,21 @@ public @interface RateLimiter {
      */
     RateLimiterType type() default RateLimiterType.LOCAL;
 
+    /**
+     * redis客户端类型
+     */
     RedisClientType redisClientType() default RedisClientType.REDISSON;
+
+    /**
+     * 是否开启限流
+     */
+    boolean enable() default true;
 
     /**
      * 限流key el
      * ex: key = "'fixedWindow:'+ #DataModel.code",
      */
-    String key();
+    String key() default "defaultRateLimiterKey";
 
     /**
      * 最大请求数
