@@ -1,21 +1,13 @@
 package io.github.kk01001;
 
 import cn.hutool.core.net.Ipv4Util;
-import com.alibaba.cloud.nacos.NacosConfigProperties;
-import com.alibaba.nacos.api.NacosFactory;
-import com.alibaba.nacos.api.config.ConfigService;
-import com.alibaba.nacos.api.exception.NacosException;
 import io.github.kk01001.core.ApplicationInfoInitialize;
 import io.github.kk01001.id.IdWorkerUtil;
 import io.github.kk01001.util.NetworkUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Properties;
 
 /**
  * @author kk01001
@@ -39,14 +31,4 @@ public class CommonToolConfiguration {
         log.info("init Id Worker, localIp: {}, workerId: {}", localIp, workerId);
         return new IdWorkerUtil(workerId);
     }
-
-    @Bean
-    @ConditionalOnMissingBean(ConfigService.class)
-    @ConditionalOnProperty(name = "spring.cloud.nacos.config.enabled", matchIfMissing = true)
-    public ConfigService configService(NacosConfigProperties nacosConfigProperties) throws NacosException {
-        log.info("init nacos config service");
-        Properties properties = nacosConfigProperties.assembleConfigServiceProperties();
-        return NacosFactory.createConfigService(properties);
-    }
-
 }

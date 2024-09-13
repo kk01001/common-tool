@@ -2,12 +2,14 @@ package io.github.kk01001.examples.excel;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ZipUtil;
 import io.github.kk01001.excel.model.ExporterResultDTO;
 import io.github.kk01001.excel.model.ExporterVO;
 import io.github.kk01001.excel.write.AbstractExcelExporter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -88,12 +90,21 @@ public class RecordExcelExporterService extends AbstractExcelExporter<RecordQuer
 
     @Override
     protected ExporterVO afterProcess(ExporterResultDTO exporterResultDTO) {
-
+        Integer excelCount = exporterResultDTO.getExcelCount();
+        if (excelCount == 1) {
+            File firstExcel = exporterResultDTO.getFirstExcel();
+            return ExporterVO.builder()
+                    .url("http://")
+                    .fileName("xxx.xlsx")
+                    .build();
+        }
+        String fileDir = exporterResultDTO.getFileDir();
         // 上传oss
-
+        log.info("afterProcess....");
+        ZipUtil.zip(fileDir);
         return ExporterVO.builder()
                 .url("http://")
-                .fileName("xxx.xlsx")
+                .fileName("xxx.zip")
                 .build();
     }
 }

@@ -1,2 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  io.github.kk01001.CommonToolConfiguration
+  io.github.kk01001.CommonToolConfiguration\
+  io.github.kk01001.nacos.NacosConfiguration
+

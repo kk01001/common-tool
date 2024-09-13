@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnClass(NacosConfigManager.class)
+@ConditionalOnProperty(name = "spring.cloud.nacos.config.enabled", matchIfMissing = true)
 public class CommonNacosConfigListener implements CommandLineRunner {
 
     private final NacosConfigManager nacosConfigManager;

@@ -2,9 +2,34 @@ spring:
   application:
     name: examples
 
+  data:
+    redis:
+      password: Cqt@redis2021
+      masterConnectionPoolSize: 200
+      cluster:
+        nodes:
+          - 10.255.1.11:9100
+        max-redirects: 5
+        location: A
+      cluster2:
+        # 激活异地机房
+        active: false
+        nodes:
+          - 10.255.1.11:9100
+        max-redirects: 5
+        location: B
+      timeout: 10000
+      database: 0
+      lettuce:
+        pool:
+          maxIdle: 8
+          minIdle: 0
+          maxActive: 8
+          timeBetweenEvictionRuns: 600s
+
 xxl-job:
   accessToken:
-  adminAddresses: http://127.0.0.1:38080/xxl-job-admin/
+  adminAddresses: http://172.16.251.79:38080/xxl-job-admin/
   logRetentionDays: 30
   logPath: /home/logs/${spring.application.name}
   address:
@@ -13,5 +38,5 @@ xxl-job:
   appName: ${spring.application.name}
   title: ${spring.application.name}
   userName: admin
-  password: admin
+  password: cqt!010@Xxljob
   enable: true
