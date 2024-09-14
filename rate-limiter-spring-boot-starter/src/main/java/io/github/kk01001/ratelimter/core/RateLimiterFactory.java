@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author linshiqiang
@@ -33,6 +30,9 @@ public class RateLimiterFactory implements CommandLineRunner {
     }
 
     public boolean tryAccess(Rule rule) {
+        if (Objects.isNull(rule)) {
+            return true;
+        }
         if (!Boolean.TRUE.equals(rule.getEnable())) {
             return true;
         }
