@@ -1,20 +1,18 @@
 # 分布式锁和单机锁
 
-## 非阻塞锁 try-lock
+## 单机
 
-> 不阻塞线程
+- [x] ReentrantLock
+- [x] Semaphore
+- [ ] StampedLock
 
-- ReentrantLock
-- synchronized
-- RLock
+## 分布式
 
-## 阻塞锁 lock
-
-> 阻塞线程
-
-- ReentrantLock
-- Semaphore
-- RSemaphore
-- RLock
-- 线程池
-- 
+- [x] redisson RSemaphore
+- [x] redisson RLock 常规锁, 公平锁, 自旋锁
+- [ ] redis setNx
+- [ ] 线程池
+- [ ] 数据库
+    - 主键插入获取锁, 删除释放锁
+    - for update
+- [ ] Zookeeper

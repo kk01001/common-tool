@@ -30,23 +30,53 @@ public class LockFactory implements CommandLineRunner {
     }
 
     public void lock(Rule rule) {
-
+        if (Objects.isNull(rule)) {
+            return;
+        }
+        if (disable(rule)) {
+            return;
+        }
+        LockType lockType = rule.getLockType();
+        Optional<LockStrategy> lockStrategy = Optional.ofNullable(STRATEGY_MAP.get(lockType));
+        if (lockStrategy.isPresent()) {
+            lockStrategy.get().lock(rule);
+            return;
+        }
+        throw new LockException("未找到对应的锁策略类型: " + lockType);
     }
 
     public boolean tryLock(Rule rule) {
         if (Objects.isNull(rule)) {
             return true;
         }
-        if (!Boolean.TRUE.equals(rule.getEnable())) {
+        if (disable(rule)) {
             return true;
         }
         LockType lockType = rule.getLockType();
-        return Optional.ofNullable(STRATEGY_MAP.get(lockType))
-                .map(strategy -> strategy.tryLock(rule))
-                .orElseThrow(() -> new LockException("未找到对应的限流策略类型: " + lockType));
+        Optional<LockStrategy> lockStrategy = Optional.ofNullable(STRATEGY_MAP.get(lockType));
+        if (lockStrategy.isPresent()) {
+            return lockStrategy.get().tryLock(rule);
+        }
+        throw new LockException("未找到对应的锁策略类型: " + lockType);
     }
 
     public void unlock(Rule rule) {
+        if (Objects.isNull(rule)) {
+            return;
+        }
+        if (disable(rule)) {
+            return;
+        }
+        LockType lockType = rule.getLockType();
+        Optional<LockStrategy> lockStrategy = Optional.ofNullable(STRATEGY_MAP.get(lockType));
+        if (lockStrategy.isPresent()) {
+            lockStrategy.get().unlock(rule);
+            return;
+        }
+        throw new LockException("未找到对应的锁策略类型: " + lockType);
+    }
 
+    private boolean disable(Rule rule) {
+        return !Boolean.TRUE.equals(rule.getEnable());
     }
 }
