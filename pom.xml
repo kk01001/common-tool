@@ -21,6 +21,7 @@
         <module>sftp-spring-boot-starter</module>
         <module>dynamic-mq-spring-boot-starter</module>
         <module>rate-limiter-spring-boot-starter</module>
+        <module>lock-spring-boot-starter</module>
     </modules>
 
     <properties>
