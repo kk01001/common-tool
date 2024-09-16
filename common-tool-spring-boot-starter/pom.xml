@@ -83,6 +83,13 @@
             <artifactId>easyexcel</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <dependency>
+            <groupId>com.zendesk</groupId>
+            <artifactId>mysql-binlog-connector-java</artifactId>
+            <optional>true</optional>
+        </dependency>
+
     </dependencies>
 
 </project>

@@ -48,6 +48,7 @@
         <jsch.version>0.1.55</jsch.version>
         <commons-pool2.version>2.12.0</commons-pool2.version>
         <guava.version>33.2.1-jre</guava.version>
+        <mysql-binlog-connector-java.version>0.29.0</mysql-binlog-connector-java.version>
     </properties>
 
     <dependencyManagement>
@@ -90,6 +91,12 @@
                 <groupId>com.jcraft</groupId>
                 <artifactId>jsch</artifactId>
                 <version>${jsch.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zendesk</groupId>
+                <artifactId>mysql-binlog-connector-java</artifactId>
+                <version>${mysql-binlog-connector-java.version}</version>
             </dependency>
 
             <dependency>
