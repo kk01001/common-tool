@@ -3,7 +3,7 @@ package io.github.kk01001.ratelimter.aspect;
 import cn.hutool.core.util.StrUtil;
 import io.github.kk01001.ratelimter.core.RateLimiterFactory;
 import io.github.kk01001.ratelimter.exception.RateLimitException;
-import io.github.kk01001.ratelimter.model.Rule;
+import io.github.kk01001.ratelimter.model.FlowRule;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -51,9 +51,9 @@ public class RateLimiterAspect {
         // 创建SpEL上下文
         EvaluationContext context = getEvaluationContext(joinPoint);
 
-        Rule rule = buildRule(rateLimiter, context);
+        FlowRule flowRule = buildRule(rateLimiter, context);
 
-        boolean access = rateLimiterFactory.tryAccess(rule);
+        boolean access = rateLimiterFactory.tryAccess(flowRule);
         if (!access) {
             throw new RateLimitException("请求过于频繁，请稍后再试");
         }
@@ -61,14 +61,14 @@ public class RateLimiterAspect {
         return joinPoint.proceed();
     }
 
-    private Rule buildRule(RateLimiter rateLimiter, EvaluationContext context) {
+    private FlowRule buildRule(RateLimiter rateLimiter, EvaluationContext context) {
         String ruledFunction = rateLimiter.ruleFunction();
-        Rule rule = parseExpression(ruledFunction, context, Rule.class);
-        if (Objects.nonNull(rule)) {
-            return rule;
+        FlowRule flowRule = parseExpression(ruledFunction, context, FlowRule.class);
+        if (Objects.nonNull(flowRule)) {
+            return flowRule;
         }
 
-        return Rule.builder()
+        return FlowRule.builder()
                 .enable(rateLimiter.enable())
                 .rateLimiterType(rateLimiter.type())
                 .redisClientType(rateLimiter.redisClientType())

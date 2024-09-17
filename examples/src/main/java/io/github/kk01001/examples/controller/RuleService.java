@@ -2,7 +2,7 @@ package io.github.kk01001.examples.controller;
 
 import io.github.kk01001.examples.model.DataModel;
 import io.github.kk01001.ratelimter.enums.RateLimiterType;
-import io.github.kk01001.ratelimter.model.Rule;
+import io.github.kk01001.ratelimter.model.FlowRule;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,14 +13,14 @@ import org.springframework.stereotype.Component;
 @Component("ruleService")
 public class RuleService {
 
-    public Rule getRule(DataModel dataModel) {
+    public FlowRule getRule(DataModel dataModel) {
 
-        Rule rule = new Rule();
-        rule.setRateLimiterType(RateLimiterType.REDISSON);
-        rule.setKey(String.format("key002:%s", dataModel.getCode()));
-        rule.setMaxRequests(10);
-        rule.setWindowTime(1);
-        return rule;
+        FlowRule flowRule = new FlowRule();
+        flowRule.setRateLimiterType(RateLimiterType.REDISSON);
+        flowRule.setKey(String.format("key002:%s", dataModel.getCode()));
+        flowRule.setMaxRequests(10);
+        flowRule.setWindowTime(1);
+        return flowRule;
     }
 
     public String getKey(DataModel dataModel) {

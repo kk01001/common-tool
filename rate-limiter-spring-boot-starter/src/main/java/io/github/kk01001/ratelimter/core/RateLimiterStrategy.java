@@ -1,7 +1,7 @@
 package io.github.kk01001.ratelimter.core;
 
 import io.github.kk01001.ratelimter.enums.RateLimiterType;
-import io.github.kk01001.ratelimter.model.Rule;
+import io.github.kk01001.ratelimter.model.FlowRule;
 
 /**
  * @author linshiqiang
@@ -12,5 +12,5 @@ public interface RateLimiterStrategy {
 
     RateLimiterType getType();
 
-    boolean tryAccess(Rule rule);
+    boolean tryAccess(FlowRule flowRule);
 }

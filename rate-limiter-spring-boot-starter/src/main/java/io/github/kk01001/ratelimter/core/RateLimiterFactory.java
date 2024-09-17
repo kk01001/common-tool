@@ -2,7 +2,7 @@ package io.github.kk01001.ratelimter.core;
 
 import io.github.kk01001.ratelimter.enums.RateLimiterType;
 import io.github.kk01001.ratelimter.exception.RateLimitException;
-import io.github.kk01001.ratelimter.model.Rule;
+import io.github.kk01001.ratelimter.model.FlowRule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -29,16 +29,16 @@ public class RateLimiterFactory implements CommandLineRunner {
         }
     }
 
-    public boolean tryAccess(Rule rule) {
-        if (Objects.isNull(rule)) {
+    public boolean tryAccess(FlowRule flowRule) {
+        if (Objects.isNull(flowRule)) {
             return true;
         }
-        if (!Boolean.TRUE.equals(rule.getEnable())) {
+        if (!Boolean.TRUE.equals(flowRule.getEnable())) {
             return true;
         }
-        RateLimiterType rateLimiterType = rule.getRateLimiterType();
+        RateLimiterType rateLimiterType = flowRule.getRateLimiterType();
         return Optional.ofNullable(STRATEGY_MAP.get(rateLimiterType))
-                .map(strategy -> strategy.tryAccess(rule))
+                .map(strategy -> strategy.tryAccess(flowRule))
                 .orElseThrow(() -> new RateLimitException("未找到对应的限流策略类型: " + rateLimiterType));
     }
 }

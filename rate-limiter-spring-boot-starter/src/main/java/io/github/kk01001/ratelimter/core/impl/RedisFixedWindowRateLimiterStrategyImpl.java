@@ -3,7 +3,7 @@ package io.github.kk01001.ratelimter.core.impl;
 import io.github.kk01001.ratelimter.core.RateLimiterStrategy;
 import io.github.kk01001.ratelimter.enums.RateLimiterType;
 import io.github.kk01001.ratelimter.manager.LuaScriptManager;
-import io.github.kk01001.ratelimter.model.Rule;
+import io.github.kk01001.ratelimter.model.FlowRule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,10 +39,10 @@ public class RedisFixedWindowRateLimiterStrategyImpl extends AbstractRedisRateLi
     }
 
     @Override
-    public boolean tryAccess(Rule rule) {
-        return tryAccess(rule,
-                rule.getWindowTime(),
-                rule.getMaxRequests());
+    public boolean tryAccess(FlowRule flowRule) {
+        return tryAccess(flowRule,
+                flowRule.getWindowTime(),
+                flowRule.getMaxRequests());
     }
 
     @Override

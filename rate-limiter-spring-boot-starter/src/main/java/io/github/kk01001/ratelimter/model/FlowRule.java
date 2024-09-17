@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Rule {
+public class FlowRule {
 
     private Boolean enable = true;
 

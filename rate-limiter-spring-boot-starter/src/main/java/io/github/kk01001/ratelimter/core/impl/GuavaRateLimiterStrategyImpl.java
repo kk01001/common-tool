@@ -3,7 +3,7 @@ package io.github.kk01001.ratelimter.core.impl;
 import com.google.common.util.concurrent.RateLimiter;
 import io.github.kk01001.ratelimter.core.RateLimiterStrategy;
 import io.github.kk01001.ratelimter.enums.RateLimiterType;
-import io.github.kk01001.ratelimter.model.Rule;
+import io.github.kk01001.ratelimter.model.FlowRule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -33,9 +33,9 @@ public class GuavaRateLimiterStrategyImpl implements RateLimiterStrategy {
     }
 
     @Override
-    public boolean tryAccess(Rule rule) {
-        String key = rule.getKey();
-        RateLimiter rateLimiter = getRateLimiter(key, rule.getTokenRate(), rule.getWindowTime(), TimeUnit.SECONDS);
+    public boolean tryAccess(FlowRule flowRule) {
+        String key = flowRule.getKey();
+        RateLimiter rateLimiter = getRateLimiter(key, flowRule.getTokenRate(), flowRule.getWindowTime(), TimeUnit.SECONDS);
         return rateLimiter.tryAcquire();
     }
 

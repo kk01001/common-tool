@@ -4,7 +4,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.extra.spring.SpringUtil;
 import io.github.kk01001.ratelimter.enums.RedisClientType;
-import io.github.kk01001.ratelimter.model.Rule;
+import io.github.kk01001.ratelimter.model.FlowRule;
 import org.redisson.api.RScript;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,12 +21,12 @@ import java.util.Objects;
  */
 public abstract class AbstractRedisRateLimiterStrategy {
 
-    public boolean tryAccess(Rule rule, Object... values) {
-        RedisClientType redisClientType = rule.getRedisClientType();
+    public boolean tryAccess(FlowRule flowRule, Object... values) {
+        RedisClientType redisClientType = flowRule.getRedisClientType();
         if (RedisClientType.REDISSON.equals(redisClientType)) {
-            return getResult(executeRedisson(ListUtil.of(rule.getKey()), values));
+            return getResult(executeRedisson(ListUtil.of(flowRule.getKey()), values));
         }
-        return getResult(executeRedisTemplate(ListUtil.of(rule.getKey()), values));
+        return getResult(executeRedisTemplate(ListUtil.of(flowRule.getKey()), values));
     }
 
     private Object executeRedisson(List<Object> keys, Object... values) {
