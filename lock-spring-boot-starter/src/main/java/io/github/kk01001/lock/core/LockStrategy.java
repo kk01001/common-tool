@@ -1,7 +1,7 @@
 package io.github.kk01001.lock.core;
 
 import io.github.kk01001.lock.enums.LockType;
-import io.github.kk01001.lock.model.Rule;
+import io.github.kk01001.lock.model.LockRule;
 
 /**
  * @author linshiqiang
@@ -12,10 +12,10 @@ public interface LockStrategy {
 
     LockType getType();
 
-    void lock(Rule rule);
+    void lock(LockRule lockRule);
 
-    boolean tryLock(Rule rule);
+    boolean tryLock(LockRule lockRule);
 
-    void unlock(Rule rule);
+    void unlock(LockRule lockRule);
 
 }

@@ -2,7 +2,7 @@ package io.github.kk01001.lock.core;
 
 import io.github.kk01001.lock.enums.LockType;
 import io.github.kk01001.lock.exception.LockException;
-import io.github.kk01001.lock.model.Rule;
+import io.github.kk01001.lock.model.LockRule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -29,54 +29,54 @@ public class LockFactory implements CommandLineRunner {
         }
     }
 
-    public void lock(Rule rule) {
-        if (Objects.isNull(rule)) {
+    public void lock(LockRule lockRule) {
+        if (Objects.isNull(lockRule)) {
             return;
         }
-        if (disable(rule)) {
+        if (disable(lockRule)) {
             return;
         }
-        LockType lockType = rule.getLockType();
+        LockType lockType = lockRule.getLockType();
         Optional<LockStrategy> lockStrategy = Optional.ofNullable(STRATEGY_MAP.get(lockType));
         if (lockStrategy.isPresent()) {
-            lockStrategy.get().lock(rule);
+            lockStrategy.get().lock(lockRule);
             return;
         }
         throw new LockException("未找到对应的锁策略类型: " + lockType);
     }
 
-    public boolean tryLock(Rule rule) {
-        if (Objects.isNull(rule)) {
+    public boolean tryLock(LockRule lockRule) {
+        if (Objects.isNull(lockRule)) {
             return true;
         }
-        if (disable(rule)) {
+        if (disable(lockRule)) {
             return true;
         }
-        LockType lockType = rule.getLockType();
+        LockType lockType = lockRule.getLockType();
         Optional<LockStrategy> lockStrategy = Optional.ofNullable(STRATEGY_MAP.get(lockType));
         if (lockStrategy.isPresent()) {
-            return lockStrategy.get().tryLock(rule);
+            return lockStrategy.get().tryLock(lockRule);
         }
         throw new LockException("未找到对应的锁策略类型: " + lockType);
     }
 
-    public void unlock(Rule rule) {
-        if (Objects.isNull(rule)) {
+    public void unlock(LockRule lockRule) {
+        if (Objects.isNull(lockRule)) {
             return;
         }
-        if (disable(rule)) {
+        if (disable(lockRule)) {
             return;
         }
-        LockType lockType = rule.getLockType();
+        LockType lockType = lockRule.getLockType();
         Optional<LockStrategy> lockStrategy = Optional.ofNullable(STRATEGY_MAP.get(lockType));
         if (lockStrategy.isPresent()) {
-            lockStrategy.get().unlock(rule);
+            lockStrategy.get().unlock(lockRule);
             return;
         }
         throw new LockException("未找到对应的锁策略类型: " + lockType);
     }
 
-    private boolean disable(Rule rule) {
-        return !Boolean.TRUE.equals(rule.getEnable());
+    private boolean disable(LockRule lockRule) {
+        return !Boolean.TRUE.equals(lockRule.getEnable());
     }
 }

@@ -1,7 +1,6 @@
 package io.github.kk01001.lock.manager;
 
 import cn.hutool.core.io.resource.ResourceUtil;
-import io.github.kk01001.lock.enums.LockType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,9 +12,19 @@ import java.util.Map;
  */
 public class LuaScriptManager {
 
-    private static final Map<LockType, String> CONFIG_MAP = new HashMap<>(1);
+    private static final Map<String, String> CONFIG_MAP = new HashMap<>(1);
 
     static {
-        CONFIG_MAP.put(LockType.LOCAL, ResourceUtil.readUtf8Str("lua/fixed_window.lua"));
+        CONFIG_MAP.put("semaphore-try-acquire", ResourceUtil.readUtf8Str("lua/semaphore-try-acquire.lua"));
+        CONFIG_MAP.put("semaphore-release", ResourceUtil.readUtf8Str("lua/semaphore-release.lua"));
     }
+
+    public static String getSemaphoreTryAcquire() {
+        return CONFIG_MAP.get("semaphore-try-acquire");
+    }
+
+    public static String getSemaphoreRelease() {
+        return CONFIG_MAP.get("semaphore-release");
+    }
+
 }

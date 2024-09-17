@@ -2,7 +2,7 @@ package io.github.kk01001.lock.core.impl;
 
 import io.github.kk01001.lock.core.LockStrategy;
 import io.github.kk01001.lock.enums.LockType;
-import io.github.kk01001.lock.model.Rule;
+import io.github.kk01001.lock.model.LockRule;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import java.util.concurrent.Semaphore;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SemaphoreLockStrategyImpl implements LockStrategy {
+public class SemaphoreStrategyImpl implements LockStrategy {
 
     private static final Map<String, Semaphore> MAP = new ConcurrentHashMap<>();
 
@@ -31,29 +31,29 @@ public class SemaphoreLockStrategyImpl implements LockStrategy {
 
     @SneakyThrows
     @Override
-    public void lock(Rule rule) {
-        Semaphore semaphore = getSemaphore(rule);
+    public void lock(LockRule lockRule) {
+        Semaphore semaphore = getSemaphore(lockRule);
         semaphore.acquire();
     }
 
     @SneakyThrows
     @Override
-    public boolean tryLock(Rule rule) {
-        Long timeout = rule.getTimeout();
-        Semaphore semaphore = getSemaphore(rule);
-        return semaphore.tryAcquire(timeout, rule.getTimeUnit());
+    public boolean tryLock(LockRule lockRule) {
+        Long timeout = lockRule.getTimeout();
+        Semaphore semaphore = getSemaphore(lockRule);
+        return semaphore.tryAcquire(timeout, lockRule.getTimeUnit());
     }
 
     @Override
-    public void unlock(Rule rule) {
-        Semaphore semaphore = getSemaphore(rule);
+    public void unlock(LockRule lockRule) {
+        Semaphore semaphore = getSemaphore(lockRule);
         semaphore.release();
     }
 
-    private Semaphore getSemaphore(Rule rule) {
-        String key = rule.getKey();
-        Integer permits = rule.getPermits();
-        Boolean fair = rule.getFair();
+    private Semaphore getSemaphore(LockRule lockRule) {
+        String key = lockRule.getKey();
+        Integer permits = lockRule.getPermits();
+        Boolean fair = lockRule.getFair();
         return MAP.computeIfAbsent(key, k -> new Semaphore(permits, fair));
     }
 }

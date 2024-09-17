@@ -2,7 +2,7 @@ package io.github.kk01001.lock.core.impl;
 
 import io.github.kk01001.lock.core.LockStrategy;
 import io.github.kk01001.lock.enums.LockType;
-import io.github.kk01001.lock.model.Rule;
+import io.github.kk01001.lock.model.LockRule;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -26,33 +26,33 @@ public class ReentrantLockStrategyImpl implements LockStrategy {
 
     @Override
     public LockType getType() {
-        return LockType.SEMAPHORE;
+        return LockType.REENTRANT_LOCK;
     }
 
     @SneakyThrows
     @Override
-    public void lock(Rule rule) {
-        ReentrantLock lock = getReentrantLock(rule);
+    public void lock(LockRule lockRule) {
+        ReentrantLock lock = getReentrantLock(lockRule);
         lock.lock();
     }
 
     @SneakyThrows
     @Override
-    public boolean tryLock(Rule rule) {
-        Long timeout = rule.getTimeout();
-        ReentrantLock lock = getReentrantLock(rule);
-        return lock.tryLock(timeout, rule.getTimeUnit());
+    public boolean tryLock(LockRule lockRule) {
+        Long timeout = lockRule.getTimeout();
+        ReentrantLock lock = getReentrantLock(lockRule);
+        return lock.tryLock(timeout, lockRule.getTimeUnit());
     }
 
     @Override
-    public void unlock(Rule rule) {
-        ReentrantLock lock = getReentrantLock(rule);
+    public void unlock(LockRule lockRule) {
+        ReentrantLock lock = getReentrantLock(lockRule);
         lock.unlock();
     }
 
-    private ReentrantLock getReentrantLock(Rule rule) {
-        String key = rule.getKey();
-        Boolean fair = rule.getFair();
+    private ReentrantLock getReentrantLock(LockRule lockRule) {
+        String key = lockRule.getKey();
+        Boolean fair = lockRule.getFair();
         return MAP.computeIfAbsent(key, k -> new ReentrantLock(fair));
     }
 }

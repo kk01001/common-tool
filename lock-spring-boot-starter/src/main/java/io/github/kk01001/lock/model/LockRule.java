@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Rule {
+public class LockRule {
 
     /**
      * 是否开启锁

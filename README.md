@@ -109,7 +109,7 @@ spring:
 ```yaml
 mybatis:
   dynamic:
-    table-rule:
+     table-lockRule:
       # 逻辑表名(不带后缀) : 真实表名模板
       logic_table_name: logic_table_name_{company_code}_{month}
 

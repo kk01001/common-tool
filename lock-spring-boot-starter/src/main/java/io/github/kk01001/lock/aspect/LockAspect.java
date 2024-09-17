@@ -3,7 +3,7 @@ package io.github.kk01001.lock.aspect;
 import cn.hutool.core.util.StrUtil;
 import io.github.kk01001.lock.core.LockFactory;
 import io.github.kk01001.lock.exception.LockException;
-import io.github.kk01001.lock.model.Rule;
+import io.github.kk01001.lock.model.LockRule;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -51,34 +51,34 @@ public class LockAspect {
         // 创建SpEL上下文
         EvaluationContext context = getEvaluationContext(joinPoint);
 
-        Rule rule = buildRule(lock, context);
+        LockRule lockRule = buildRule(lock, context);
 
         try {
             // 阻塞
-            if (Boolean.TRUE.equals(rule.getBlock())) {
-                lockFactory.lock(rule);
+            if (Boolean.TRUE.equals(lockRule.getBlock())) {
+                lockFactory.lock(lockRule);
                 return joinPoint.proceed();
             }
 
             // 非阻塞
-            boolean access = lockFactory.tryLock(rule);
+            boolean access = lockFactory.tryLock(lockRule);
             if (!access) {
                 throw new LockException("获取锁失败，请稍后再试");
             }
             return joinPoint.proceed();
         } finally {
-            lockFactory.unlock(rule);
+            lockFactory.unlock(lockRule);
         }
     }
 
-    private Rule buildRule(Lock lock, EvaluationContext context) {
+    private LockRule buildRule(Lock lock, EvaluationContext context) {
         String ruledFunction = lock.ruleFunction();
-        Rule rule = parseExpression(ruledFunction, context, Rule.class);
-        if (Objects.nonNull(rule)) {
-            return rule;
+        LockRule lockRule = parseExpression(ruledFunction, context, LockRule.class);
+        if (Objects.nonNull(lockRule)) {
+            return lockRule;
         }
 
-        return Rule.builder()
+        return LockRule.builder()
                 .enable(lock.enable())
                 .block(lock.block())
                 .lockType(lock.type())

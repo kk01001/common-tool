@@ -7,8 +7,6 @@ package io.github.kk01001.lock.enums;
  */
 public enum LockType {
 
-    LOCAL,
-
     /**
      * 信号量
      */
@@ -36,6 +34,10 @@ public enum LockType {
 
     REDISSON_SPIN_LOCK,
 
-    REDISSON_READ_WRITE_LOCK
+    REDISSON_READ_WRITE_LOCK,
 
+    /**
+     * redis template 信号量
+     */
+    REDIS_TEMPLATE_SEMAPHORE,
 }
