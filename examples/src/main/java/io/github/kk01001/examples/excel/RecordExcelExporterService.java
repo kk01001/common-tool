@@ -28,27 +28,27 @@ public class RecordExcelExporterService extends AbstractExcelExporter<RecordQuer
     }
 
     @Override
-    protected Executor getExecutor() {
+    public Executor getExecutor() {
         return ThreadUtil.newExecutor(8);
     }
 
     @Override
-    protected Integer getBatchPageSize() {
+    public Integer getBatchPageSize() {
         return 100000;
     }
 
     @Override
-    protected Integer getMaxSheetCount() {
+    public Integer getMaxSheetCount() {
         return 500000;
     }
 
     @Override
-    protected Long getCount(RecordQueryDTO queryDTO) {
+    public Long getCount(RecordQueryDTO queryDTO) {
         return 2000000L;
     }
 
     @Override
-    protected List<RecordDTO> getDataPageList(RecordQueryDTO queryDTO, Integer batchPageSize, Integer start) {
+    public List<RecordDTO> getDataPageList(RecordQueryDTO queryDTO, Integer batchPageSize, Integer start) {
         List<RecordDTO> list = new ArrayList<>();
 
         for (int i = 0; i < batchPageSize; i++) {
@@ -69,27 +69,27 @@ public class RecordExcelExporterService extends AbstractExcelExporter<RecordQuer
     }
 
     @Override
-    protected Class<RecordDTO> getReturnClass() {
+    public Class<RecordDTO> getReturnClass() {
         return RecordDTO.class;
     }
 
     @Override
-    protected String getSheetName(Integer excelIndex) {
+    public String getSheetName(Integer excelIndex) {
         return String.format("excelSheet-%s", excelIndex);
     }
 
     @Override
-    protected String getFileDir(String uniqueId) {
+    public String getFileDir(String uniqueId) {
         return String.format("/home/temp/%s", uniqueId);
     }
 
     @Override
-    protected String getFileFullPath(String uniqueId, Integer excelIndex) {
+    public String getFileFullPath(String uniqueId, Integer excelIndex) {
         return String.format("/home/temp/%s/excel-%s.xlsx", uniqueId, excelIndex);
     }
 
     @Override
-    protected ExporterVO afterProcess(ExporterResultDTO exporterResultDTO) {
+    public ExporterVO afterProcess(ExporterResultDTO exporterResultDTO) {
         Integer excelCount = exporterResultDTO.getExcelCount();
         if (excelCount == 1) {
             File firstExcel = exporterResultDTO.getFirstExcel();

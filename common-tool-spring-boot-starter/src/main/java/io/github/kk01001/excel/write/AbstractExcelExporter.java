@@ -119,17 +119,17 @@ public abstract class AbstractExcelExporter<T, R> {
     /**
      * 线程池
      */
-    protected abstract Executor getExecutor();
+    public abstract Executor getExecutor();
 
     /**
      * 批量分页查询数量
      */
-    protected abstract Integer getBatchPageSize();
+    public abstract Integer getBatchPageSize();
 
     /**
      * 每个sheet多大数量
      */
-    protected abstract Integer getMaxSheetCount();
+    public abstract Integer getMaxSheetCount();
 
     /**
      * 查询总数
@@ -137,7 +137,7 @@ public abstract class AbstractExcelExporter<T, R> {
      * @param queryDTO 查询条件
      * @return 总数
      */
-    protected abstract Long getCount(T queryDTO);
+    public abstract Long getCount(T queryDTO);
 
     /**
      * 分页数据
@@ -147,14 +147,14 @@ public abstract class AbstractExcelExporter<T, R> {
      * @param start         开始偏移量
      * @return 分页数据
      */
-    protected abstract List<R> getDataPageList(T queryDTO, Integer batchPageSize, Integer start);
+    public abstract List<R> getDataPageList(T queryDTO, Integer batchPageSize, Integer start);
 
     /**
      * 数据类型class
      *
      * @return 数据类型class
      */
-    protected abstract Class<R> getReturnClass();
+    public abstract Class<R> getReturnClass();
 
     /**
      * shell的名称
@@ -162,7 +162,7 @@ public abstract class AbstractExcelExporter<T, R> {
      * @param excelIndex excel索引 1开始
      * @return shell的名称
      */
-    protected abstract String getSheetName(Integer excelIndex);
+    public abstract String getSheetName(Integer excelIndex);
 
     /**
      * 获取excel临时目录
@@ -170,7 +170,7 @@ public abstract class AbstractExcelExporter<T, R> {
      * @param uniqueId 当前导出唯一id 作为目录
      * @return excel文件绝对目录  /home/tmp/{uniqueId}
      */
-    protected abstract String getFileDir(String uniqueId);
+    public abstract String getFileDir(String uniqueId);
 
     /**
      * excel文件 临时存放目录
@@ -179,12 +179,12 @@ public abstract class AbstractExcelExporter<T, R> {
      * @param excelIndex excel索引 1开始
      * @return excel文件绝对目录  /home/tmp/{uniqueId}/{excelIndex}.xlsx
      */
-    protected abstract String getFileFullPath(String uniqueId, Integer excelIndex);
+    public abstract String getFileFullPath(String uniqueId, Integer excelIndex);
 
     /**
      * excel写入成功后的操作, excel暂存于磁盘
      */
-    protected abstract ExporterVO afterProcess(ExporterResultDTO exporterResultDTO);
+    public abstract ExporterVO afterProcess(ExporterResultDTO exporterResultDTO);
 
     /**
      * 每个分页索引 和 Excel的索引对应关系

@@ -64,6 +64,6 @@ public abstract class AbstractRedisRateLimiterStrategy {
         });
     }
 
-    protected abstract String getScript();
+    public abstract String getScript();
 
 }

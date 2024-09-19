@@ -46,7 +46,7 @@ public class RedisTokenBucketRateLimiterStrategyImpl extends AbstractRedisRateLi
     }
 
     @Override
-    protected String getScript() {
+    public String getScript() {
         return LuaScriptManager.getTokenBucketScript();
     }
 
