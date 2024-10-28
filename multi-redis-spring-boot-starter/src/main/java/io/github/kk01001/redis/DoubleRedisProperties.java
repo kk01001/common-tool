@@ -42,6 +42,30 @@ public class DoubleRedisProperties implements Serializable {
     private int idleConnectionTimeout = 10000;
 
     /**
+     * Defines whether to check synchronized slaves amount
+     * with actual slaves amount after lock acquisition.
+     * <p>
+     * Default is <code>true</code>.
+     *
+     * @param checkLockSyncedSlaves <code>true</code> if check required,
+     * <code>false</code> otherwise.
+     * @return config
+     */
+    private boolean checkLockSyncedSlaves = false;
+
+    /**
+     * Defines slaves synchronization timeout applied to each operation of {@link org.redisson.api.RLock},
+     * {@link org.redisson.api.RSemaphore}, {@link org.redisson.api.RPermitExpirableSemaphore} objects.
+     * <p>
+     * Default is <code>1000</code> milliseconds.
+     *
+     * @param timeout timeout in milliseconds
+     * @return config
+     */
+    private long slavesSyncTimeout = 1000;
+
+
+    /**
      * 本地集群
      */
     private Cluster cluster = new Cluster();
@@ -278,6 +302,22 @@ public class DoubleRedisProperties implements Serializable {
 
     public void setIdleConnectionTimeout(int idleConnectionTimeout) {
         this.idleConnectionTimeout = idleConnectionTimeout;
+    }
+
+    public boolean isCheckLockSyncedSlaves() {
+        return checkLockSyncedSlaves;
+    }
+
+    public void setCheckLockSyncedSlaves(boolean checkLockSyncedSlaves) {
+        this.checkLockSyncedSlaves = checkLockSyncedSlaves;
+    }
+
+    public long getSlavesSyncTimeout() {
+        return slavesSyncTimeout;
+    }
+
+    public void setSlavesSyncTimeout(long slavesSyncTimeout) {
+        this.slavesSyncTimeout = slavesSyncTimeout;
     }
 
     public Cluster getCluster() {

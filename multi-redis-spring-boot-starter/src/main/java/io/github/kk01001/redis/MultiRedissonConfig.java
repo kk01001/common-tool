@@ -56,6 +56,8 @@ public class MultiRedissonConfig {
             config.setTransportMode(TransportMode.EPOLL);
         }
         config.setNettyThreads(cluster.getNettyThreads());
+        config.setCheckLockSyncedSlaves(redisProperties.isCheckLockSyncedSlaves());
+        config.setSlavesSyncTimeout(redisProperties.getSlavesSyncTimeout());
         return Redisson.create(config);
     }
 
@@ -70,6 +72,8 @@ public class MultiRedissonConfig {
             config.setTransportMode(TransportMode.EPOLL);
         }
         config.setNettyThreads(cluster2.getNettyThreads());
+        config.setCheckLockSyncedSlaves(redisProperties.isCheckLockSyncedSlaves());
+        config.setSlavesSyncTimeout(redisProperties.getSlavesSyncTimeout());
         return Redisson.create(config);
     }
 
@@ -84,6 +88,8 @@ public class MultiRedissonConfig {
             config.setTransportMode(TransportMode.EPOLL);
         }
         config.setNettyThreads(cluster3.getNettyThreads());
+        config.setCheckLockSyncedSlaves(redisProperties.isCheckLockSyncedSlaves());
+        config.setSlavesSyncTimeout(redisProperties.getSlavesSyncTimeout());
         return Redisson.create(config);
     }
 
