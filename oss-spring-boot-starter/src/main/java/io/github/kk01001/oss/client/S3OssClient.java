@@ -3,6 +3,8 @@ package io.github.kk01001.oss.client;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
+import io.github.kk01001.oss.model.ChunkDTO;
+import io.github.kk01001.oss.model.ChunkMergeDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -74,6 +76,40 @@ public class S3OssClient implements OssClient {
     @SneakyThrows
     public PutObjectResult putObject(String bucketName, String objectName, InputStream stream) {
         return putObject(bucketName, objectName, stream, stream.available(), "application/octet-stream");
+    }
+
+    @Override
+    @SneakyThrows
+    public InitiateMultipartUploadResult initiateMultipartUpload(String bucketName, String objectName) {
+        InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, objectName);
+        return amazonS3.initiateMultipartUpload(initRequest);
+    }
+
+
+    @Override
+    @SneakyThrows
+    public UploadPartResult uploadPart(ChunkDTO chunk) {
+        try (InputStream in = chunk.getFile().getInputStream()) {
+            // 上传
+            UploadPartRequest uploadRequest = new UploadPartRequest()
+                    .withBucketName(chunk.getBucketName())
+                    .withKey(chunk.getObjectName())
+                    .withUploadId(chunk.getUploadId())
+                    .withInputStream(in)
+                    .withLastPart(chunk.getIsLastPart())
+                    .withPartNumber(chunk.getChunkNumber())
+                    .withPartSize(chunk.getCurrentChunkSize());
+            return amazonS3.uploadPart(uploadRequest);
+        }
+    }
+
+    @Override
+    public CompleteMultipartUploadResult completeMultipartUpload(ChunkMergeDTO chunkMerge) {
+        CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(chunkMerge.getBucketName(),
+                chunkMerge.getObjectName(),
+                chunkMerge.getUploadId(),
+                chunkMerge.getChunkList());
+        return amazonS3.completeMultipartUpload(compRequest);
     }
 
     /**

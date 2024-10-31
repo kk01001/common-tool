@@ -1,10 +1,9 @@
 package io.github.kk01001.oss.client;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.PutObjectResult;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.services.s3.model.*;
+import io.github.kk01001.oss.model.ChunkDTO;
+import io.github.kk01001.oss.model.ChunkMergeDTO;
 
 import java.io.InputStream;
 import java.time.Duration;
@@ -59,6 +58,31 @@ public interface OssClient {
      * @throws Exception 异常
      */
     PutObjectResult putObject(String bucketName, String objectName, InputStream stream) throws Exception;
+
+    /**
+     * 创建分配上传任务
+     *
+     * @param bucketName bucket名称
+     * @param objectName 文件名称
+     * @return InitiateMultipartUploadResult
+     */
+    InitiateMultipartUploadResult initiateMultipartUpload(String bucketName, String objectName);
+
+    /**
+     * 分片上传
+     *
+     * @param chunkDTO 分片信息
+     * @return UploadPartResult
+     */
+    UploadPartResult uploadPart(ChunkDTO chunkDTO);
+
+    /**
+     * 完成分片任务
+     *
+     * @param chunkMergeDTO 分片合并参数
+     * @return CompleteMultipartUploadResult
+     */
+    CompleteMultipartUploadResult completeMultipartUpload(ChunkMergeDTO chunkMergeDTO);
 
     /**
      * 获取文件
