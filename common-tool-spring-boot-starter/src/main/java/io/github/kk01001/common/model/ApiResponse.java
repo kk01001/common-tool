@@ -1,8 +1,11 @@
 package io.github.kk01001.common.model;
 
+import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+
+import java.util.Objects;
 
 /**
  * @author kk01001
@@ -81,6 +84,23 @@ public class ApiResponse<T> {
         response.setMessage("success");
         response.setMessage(message);
         response.setTs(System.currentTimeMillis());
+        return response;
+    }
+
+    /**
+     * 构建成功响应
+     *
+     * @param data 响应数据
+     * @param <T>  泛型类型
+     * @return ApiResponse实例
+     */
+    public static <T> ApiResponse<T> ok(T data) {
+        ApiResponse<T> response = new ApiResponse<>();
+        response.setCode(0);
+        response.setMessage("success");
+        response.setRequestId(IdUtil.fastSimpleUUID());
+        response.setTs(System.currentTimeMillis());
+        response.setData(data);
         return response;
     }
 
@@ -227,6 +247,23 @@ public class ApiResponse<T> {
      * 构建失败响应
      *
      * @param requestId 请求ID
+     * @param message   错误信息
+     * @param <T>       泛型类型
+     * @return ApiResponse实例
+     */
+    public static <T> ApiResponse<T> fail(String requestId, String message) {
+        ApiResponse<T> response = new ApiResponse<>();
+        response.setCode(400);
+        response.setMessage(message);
+        response.setRequestId(requestId);
+        response.setTs(System.currentTimeMillis());
+        return response;
+    }
+
+    /**
+     * 构建失败响应
+     *
+     * @param requestId 请求ID
      * @param message   消息
      * @param code      错误代码
      * @param <T>       泛型类型
@@ -279,4 +316,11 @@ public class ApiResponse<T> {
         return response;
     }
 
+    public static <T> Boolean isSuccess(ApiResponse<T> response) {
+        return Objects.nonNull(response) && 0 == response.getCode();
+    }
+
+    public Boolean isSuccess() {
+        return 0 == this.getCode();
+    }
 }
