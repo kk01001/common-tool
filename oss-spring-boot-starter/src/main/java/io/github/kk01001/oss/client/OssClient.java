@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.*;
 import io.github.kk01001.oss.model.ChunkDTO;
 import io.github.kk01001.oss.model.ChunkMergeDTO;
 
+import java.io.File;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.List;
@@ -44,10 +45,10 @@ public interface OssClient {
      * @param bucketName  bucket名称
      * @param objectName  文件名称
      * @param stream      文件流
-     * @param contextType 文件类型
+     * @param contentType 文件类型
      * @throws Exception 异常
      */
-    PutObjectResult putObject(String bucketName, String objectName, InputStream stream, String contextType) throws Exception;
+    PutObjectResult putObject(String bucketName, String objectName, InputStream stream, String contentType) throws Exception;
 
     /**
      * 上传文件
@@ -58,6 +59,16 @@ public interface OssClient {
      * @throws Exception 异常
      */
     PutObjectResult putObject(String bucketName, String objectName, InputStream stream) throws Exception;
+
+    /**
+     * 上传文件
+     *
+     * @param bucketName bucket名称
+     * @param objectName 文件名称
+     * @param file       文件
+     * @throws Exception 异常
+     */
+    PutObjectResult putObject(String bucketName, String objectName, File file) throws Exception;
 
     /**
      * 创建分配上传任务

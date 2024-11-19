@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.Duration;
@@ -64,8 +65,8 @@ public class S3OssClient implements OssClient {
      */
     @Override
     @SneakyThrows
-    public PutObjectResult putObject(String bucketName, String objectName, InputStream stream, String contextType) {
-        return putObject(bucketName, objectName, stream, stream.available(), contextType);
+    public PutObjectResult putObject(String bucketName, String objectName, InputStream stream, String contentType) {
+        return putObject(bucketName, objectName, stream, stream.available(), contentType);
     }
 
     /**
@@ -75,7 +76,12 @@ public class S3OssClient implements OssClient {
     @Override
     @SneakyThrows
     public PutObjectResult putObject(String bucketName, String objectName, InputStream stream) {
-        return putObject(bucketName, objectName, stream, stream.available(), "application/octet-stream");
+        return putObject(bucketName, objectName, stream, stream.available(), getDefaultContentType(objectName));
+    }
+
+    @Override
+    public PutObjectResult putObject(String bucketName, String objectName, File file) {
+        return amazonS3.putObject(bucketName, objectName, file);
     }
 
     @Override
@@ -155,19 +161,6 @@ public class S3OssClient implements OssClient {
         return objectListing.getObjectSummaries();
     }
 
-    @SneakyThrows
-    private PutObjectResult putObject(String bucketName, String objectName, InputStream stream, long size,
-                                      String contextType) {
-
-        byte[] bytes = IOUtils.toByteArray(stream);
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(size);
-        objectMetadata.setContentType(contextType);
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-        // 上传
-        return amazonS3.putObject(bucketName, objectName, byteArrayInputStream, objectMetadata);
-    }
-
     @Override
     public String getContentType(String format) {
         switch (format.toLowerCase()) {
@@ -194,5 +187,28 @@ public class S3OssClient implements OssClient {
     @Override
     public AmazonS3 getS3Client() {
         return amazonS3;
+    }
+
+    @SneakyThrows
+    private PutObjectResult putObject(String bucketName, String objectName, InputStream stream, long size,
+                                      String contentType) {
+
+        byte[] bytes = IOUtils.toByteArray(stream);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(size);
+        objectMetadata.setContentType(contentType);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        // 上传
+        return amazonS3.putObject(bucketName, objectName, byteArrayInputStream, objectMetadata);
+    }
+
+    private String getFileExtension(String path) {
+        int dotIndex = path.lastIndexOf('.');
+        return (dotIndex != -1) ? path.substring(dotIndex + 1).toLowerCase() : "";
+    }
+
+    private String getDefaultContentType(String objectName) {
+        String fileExtension = getFileExtension(objectName);
+        return getContentType(fileExtension);
     }
 }
