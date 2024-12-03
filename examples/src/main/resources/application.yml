@@ -1,6 +1,7 @@
 spring:
   profiles:
-    active: local
+    active: dev
 server:
   servlet:
     context-path: /examples
+  port: 8080

@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  * date 2022-09-19 22:27:00
  */
 @Slf4j
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(OssProperties.class)
 @ConditionalOnProperty(prefix = "oss", name = "enable", havingValue = "true")
 public class OssConfiguration {

@@ -8,7 +8,7 @@ import io.github.kk01001.lock.model.LockRule;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnClass(RedisTemplate.class)
+@ConditionalOnBean(RedisTemplate.class)
 public class RedisTemplateSemaphoreStrategyImpl implements LockStrategy {
 
     private final RedisTemplate<String, Object> redisTemplate;

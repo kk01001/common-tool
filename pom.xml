@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.kk01001</groupId>
     <artifactId>common-tool</artifactId>
-    <version>2.1.8</version>
+    <version>2.1.9</version>
     <name>common-tool</name>
     <description>通用工具</description>
 
@@ -22,6 +22,7 @@
         <module>dynamic-mq-spring-boot-starter</module>
         <module>rate-limiter-spring-boot-starter</module>
         <module>lock-spring-boot-starter</module>
+        <module>idempotent-spring-boot-starter</module>
     </modules>
 
     <properties>
