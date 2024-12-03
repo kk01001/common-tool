@@ -18,8 +18,6 @@ import org.springframework.core.env.Environment;
  */
 public class ApplicationInfoInitialize implements ApplicationListener<ApplicationReadyEvent> {
 
-    public static final String SERVER_IP = NetworkUtil.getLocalIp();
-
     private static final String SCHEME = "http";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationInfoInitialize.class);
@@ -28,7 +26,7 @@ public class ApplicationInfoInitialize implements ApplicationListener<Applicatio
     public void onApplicationEvent(ApplicationReadyEvent event) {
         ConfigurableApplicationContext applicationContext = event.getApplicationContext();
         Environment env = applicationContext.getEnvironment();
-        String ip = SERVER_IP;
+        String ip = NetworkUtil.LOCAL_SERVER_IP;
         String port = env.getProperty("server.port");
         String path = Convert.toStr(env.getProperty("server.servlet.context-path"), "");
         String nacosServer = env.getProperty("NACOS_SERVER");

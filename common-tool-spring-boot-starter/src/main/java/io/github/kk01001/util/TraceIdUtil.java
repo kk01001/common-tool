@@ -29,18 +29,29 @@ public class TraceIdUtil {
      * 构建traceId
      */
     public static String buildTraceId(Object... params) {
+        return buildTraceId(StrUtil.AT, params);
+    }
+
+    /**
+     * 构建traceId
+     */
+    public static String buildTraceId(String splitter, Object... params) {
         StringBuilder builder = new StringBuilder();
         int length = params.length;
         for (int i = 0; i < length; i++) {
             builder.append(params[i]);
             if (i != length - 1) {
-                builder.append(StrUtil.AT);
+                builder.append(splitter);
             }
         }
         return builder.toString();
     }
 
     public static void buildAndSetTraceId(Object... params) {
+        buildAndSetTraceId(StrUtil.SPACE, params);
+    }
+
+    public static void buildAndSetTraceId(String splitter, Object... params) {
         StringBuilder builder = new StringBuilder();
         int length = params.length;
         for (int i = 0; i < length; i++) {

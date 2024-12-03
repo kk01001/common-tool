@@ -6,6 +6,8 @@
 
 - [idempotent] add idempotent-spring-boot-starter
 - [common] add TransactionUtils
+- [common] TraceIdUtil添加方法
+- [common] NetworkUtil添加方法
 
 ## upgrade
 

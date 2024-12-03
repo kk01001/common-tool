@@ -25,7 +25,7 @@ public class CommonToolConfiguration {
 
     @Bean
     public IdWorkerUtil idWorkerUtil() {
-        String localIp = NetworkUtil.getLocalIp();
+        String localIp = NetworkUtil.LOCAL_SERVER_IP;
         long value = Ipv4Util.ipv4ToLong(localIp);
         long workerId = value % 1024;
         log.info("init Id Worker, localIp: {}, workerId: {}", localIp, workerId);
