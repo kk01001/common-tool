@@ -4,9 +4,13 @@
 
 ## feat
 
-- add idempotent-spring-boot-starter
+- [idempotent] add idempotent-spring-boot-starter
+- [common] add TransactionUtils
 
 ## upgrade
+
+- xxl-job-core 2.4.1 -> 2.4.2
+- redisson-spring-boot-starter 3.35.0 -> 3.39.0
 
 # 2.1.8
 
