@@ -5,9 +5,11 @@ import io.github.kk01001.core.ApplicationInfoInitialize;
 import io.github.kk01001.id.IdWorkerUtil;
 import io.github.kk01001.util.NetworkUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Role;
 
 /**
  * @author kk01001
@@ -16,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @ComponentScan(basePackages = "io.github.kk01001")
 @Configuration(proxyBeanMethods = false)
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class CommonToolConfiguration {
 
     @Bean
