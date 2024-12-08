@@ -8,6 +8,7 @@
 - [common] add TransactionUtils
 - [common] TraceIdUtil添加方法
 - [common] NetworkUtil添加方法
+- [ip2region] add ip2region-spring-boot-starter
 
 ## upgrade
 
