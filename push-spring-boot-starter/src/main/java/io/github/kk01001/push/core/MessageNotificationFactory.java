@@ -19,7 +19,7 @@ public class MessageNotificationFactory {
 
     private final List<MessageNotification> messageNotifications;
 
-    public <T> boolean unicast(NotificationType type, T requestData) {
+    public <T> boolean unicast(NotificationType type, String deviceToken, T requestData) {
         Optional<MessageNotification> optional = messageNotifications.stream()
                 .filter(messageNotification -> messageNotification.support(type))
                 .findFirst();
@@ -27,7 +27,7 @@ public class MessageNotificationFactory {
             throw new RuntimeException("unsupported notification type.");
         }
 
-        return optional.get().unicast(requestData);
+        return optional.get().unicast(deviceToken, requestData);
     }
 
     public boolean simpleUnicast(NotificationType type, SimpleNotificationRequest request) {
@@ -39,6 +39,5 @@ public class MessageNotificationFactory {
         }
         return optional.get().simpleUnicast(request);
     }
-
 
 }
