@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+import lombok.SneakyThrows;
 import org.redisson.api.*;
 import org.redisson.client.codec.Codec;
 import org.redisson.client.protocol.ScoredEntry;
@@ -20,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -82,159 +84,154 @@ public class RedissonUtil {
         return REDISSON_CLIENT_MAP.get(location);
     }
 
-    /**
-     * set
-     */
-    public <V> Boolean set(String key, V data) {
+    private <T> T write(Supplier<T> action, Runnable backAction, String actionName) {
+        T result = null;
         try {
-            redissonClient.getBucket(key).set(data);
-            if (redisProperties.getCluster2().getActive()) {
-                otherExecutor.execute(() -> {
-                    try {
-                        redissonClient2.getBucket(key).set(data);
-                    } catch (Exception e) {
-                        LOGGER.error("异地 redisson setString操作异常: ", e);
-                    }
-                });
+            result = action.get();
+            if (Boolean.TRUE.equals(redisProperties.getCluster2().getActive())) {
+                try {
+                    backAction.run();
+                } catch (Exception e) {
+                    LOGGER.error("{}, 异地redis异常:", actionName, e);
+                }
             }
         } catch (Exception e) {
-            LOGGER.error("redisson setString操作异常: ", e);
-            return false;
+            LOGGER.error("redisson {}, 操作异常: ", actionName, e);
         }
-        return true;
+        return result;
+    }
+
+    // --------------------- string write
+
+    /**
+     * set
+     *
+     * @param key  键
+     * @param data 数据对象
+     */
+    public <V> Boolean set(String key, V data) {
+        return write(() -> {
+                    redissonClient.getBucket(key).set(data);
+                    return true;
+                },
+                () -> {
+                    redissonClient2.getBucket(key).set(data);
+                }, "setBucket");
+    }
+
+    /**
+     * set 并设置有效期
+     *
+     * @param key        键
+     * @param data       值
+     * @param expireTime 超时时间
+     * @return true/false
+     */
+    public <V> Boolean set(String key, V data, Duration expireTime) {
+        return write(() -> {
+                    redissonClient.getBucket(key).set(data, expireTime);
+                    return true;
+                },
+                () -> {
+                    redissonClient2.getBucket(key).set(data, expireTime);
+                }, "setBucket");
     }
 
     /**
      * set 序列化对象为json
      */
+    @SneakyThrows
     public Boolean setSerialize(String key, Object data) {
-        try {
-            String json = objectMapper.writeValueAsString(data);
-            redissonClient.getBucket(key).set(json);
-            if (redisProperties.getCluster2().getActive()) {
-                otherExecutor.execute(() -> {
-                    try {
-                        redissonClient2.getBucket(key).set(json);
-                    } catch (Exception e) {
-                        LOGGER.error("异地 redisson setString操作异常: ", e);
-                    }
-                });
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson setString操作异常: ", e);
-            return false;
-        }
-        return true;
+        String json = objectMapper.writeValueAsString(data);
+        return write(() -> {
+                    redissonClient.getBucket(key).set(json);
+                    return true;
+                },
+                () -> {
+                    redissonClient2.getBucket(key).set(json);
+                }, "setSerialize");
+    }
+
+
+    /**
+     * string 删除key
+     */
+    public boolean delKey(String key) {
+        return write(() -> {
+                    redissonClient.getBucket(key).unlink();
+                    return true;
+                },
+                () -> {
+                    redissonClient2.getBucket(key).unlink();
+                }, "delKey");
     }
 
     /**
-     * string set duration
-     *
-     * @param key      键
-     * @param data     值
-     * @param duration 超时时间
-     * @return true/false
+     * 设置锁
+     * 过期时间单位 分钟
      */
-    public <V> Boolean set(String key, V data, Duration duration) {
-        try {
-            redissonClient.getBucket(key).set(data, duration);
-            if (redisProperties.getCluster2().getActive()) {
-                otherExecutor.execute(() -> {
-                    try {
-                        redissonClient2.getBucket(key).set(data, duration);
-                    } catch (Exception e) {
-                        LOGGER.error("redisson setString操作异常: ", e);
-                    }
-                });
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson setString操作异常: ", e);
-            return false;
-        }
-        return true;
+    public <V> boolean setNx(String key, V value, Duration duration) {
+        RBucket<V> bucket = redissonClient.getBucket(key);
+        return bucket.setIfAbsent(value, duration);
     }
 
     /**
-     * string set ttl
-     *
-     * @param key        键
-     * @param data       值
-     * @param timeToLive 超时时间
-     * @param timeUnit   时间单位
-     * @return true/false
+     * 设置key 过期时间
+     * 过期时间单位 s
      */
-    public <V> Boolean set(String key, V data, long timeToLive, TimeUnit timeUnit) {
-        try {
-            redissonClient.getBucket(key).set(data, timeToLive, timeUnit);
-            if (redisProperties.getCluster2().getActive()) {
-                otherExecutor.execute(() -> {
-                    try {
-                        redissonClient2.getBucket(key).set(data, timeToLive, timeUnit);
-                    } catch (Exception e) {
-                        LOGGER.error("redisson setString操作异常: ", e);
-                    }
-                });
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson setString操作异常: ", e);
-            return false;
-        }
-        return true;
+    public boolean setExpire(String key, Duration duration) {
+        return write(() -> {
+                    redissonClient.getBucket(key).expire(duration);
+                    return true;
+                },
+                () -> {
+                    redissonClient2.getBucket(key).expire(duration);
+                }, "expire key");
     }
 
-    /**
-     * string set
-     *
-     * @param key  键
-     * @param data 值
-     * @return true/false
-     */
-    public Boolean setString(String key, String data) {
-        try {
-            try {
-                redissonClient.getBucket(key).set(data);
-            } catch (Exception e) {
-                LOGGER.error("redisson setString操作异常: ", e);
-            }
-            if (redisProperties.getCluster2().getActive()) {
-                otherExecutor.execute(() -> {
-                    redissonClient2.getBucket(key).set(data);
-                });
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson setString操作异常: ", e);
-            return false;
-        }
-        return true;
-    }
 
     /**
-     * string set ttl
+     * string 递增计数
      *
-     * @param key        键
-     * @param data       值
-     * @param timeToLive 超时时间
-     * @param timeUnit   时间单位
-     * @return true/false
+     * @param key 键
      */
-    public Boolean setString(String key, String data, long timeToLive, TimeUnit timeUnit) {
-        try {
-            try {
-                redissonClient.getBucket(key).set(data, timeToLive, timeUnit);
-            } catch (Exception e) {
-                LOGGER.error("redisson setString操作异常: ", e);
-            }
-            if (redisProperties.getCluster2().getActive()) {
-                otherExecutor.execute(() -> {
-                    redissonClient2.getBucket(key).set(data, timeToLive, timeUnit);
-                });
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson setString操作异常: ", e);
-            return false;
-        }
-        return true;
+    public long increment(String key, Duration duration) {
+        return write(() -> {
+                    RAtomicLong atomicLong = redissonClient.getAtomicLong(key);
+                    long added = atomicLong.addAndGet(1);
+                    atomicLong.expireIfNotSet(duration);
+                    return added;
+                },
+                () -> {
+                    RAtomicLong atomicLong = redissonClient2.getAtomicLong(key);
+                    atomicLong.addAndGet(1);
+                    atomicLong.expireIfNotSet(duration);
+                }, "AtomicLong Increment");
     }
+
+    public long incrementLocal(String key, Duration duration) {
+        return write(() -> {
+                    RAtomicLong atomicLong = redissonClient.getAtomicLong(key);
+                    long added = atomicLong.addAndGet(1);
+                    atomicLong.expireIfNotSet(duration);
+                    return added;
+                },
+                () -> {
+                }, "AtomicLong Only Local Increment");
+    }
+
+    public long decrement(String key) {
+        return write(() -> {
+                    RAtomicLong atomicLong = redissonClient.getAtomicLong(key);
+                    return atomicLong.decrementAndGet();
+                },
+                () -> {
+                    RAtomicLong atomicLong = redissonClient2.getAtomicLong(key);
+                    atomicLong.decrementAndGet();
+                }, "AtomicLong Decrement");
+    }
+
+    // -------------- string read
 
     /**
      * 获取整个string并转对象
@@ -270,213 +267,95 @@ public class RedissonUtil {
         return bucket.get();
     }
 
-    public String getString(String key) {
-        RBucket<String> bucket = redissonClient.getBucket(key);
-        return bucket.get();
-    }
-
-    public String getStringOfBack(String key) {
-        if (redissonClient2 == null) {
-            return "";
-        }
-        RBucket<String> bucket = redissonClient2.getBucket(key);
-        return bucket.get();
-    }
-
-    public String getString(String location, String key) {
-        RedissonClient redissonClient = REDISSON_CLIENT_MAP.get(location);
-        RBucket<String> bucket = redissonClient.getBucket(key);
-        return bucket.get();
-    }
-
     public Boolean isExistString(String key) {
         return redissonClient.getBucket(key).isExists();
     }
 
-    public Boolean isExistString(String location, String key) {
-        RedissonClient redissonClient = REDISSON_CLIENT_MAP.get(location);
-        return redissonClient.getBucket(key).isExists();
+    // --------------- list write
+
+    public <T> boolean addAllList(String key, List<T> list) {
+        return write(() -> {
+                    RList<T> rList = redissonClient.getList(key);
+                    return rList.addAll(list);
+                },
+                () -> {
+                    RList<T> rList = redissonClient2.getList(key);
+                    rList.addAll(list);
+                }, "addAllList");
     }
 
-    /**
-     * string 递增计数
-     *
-     * @param key 键
-     */
-    public long increment(String key, Duration duration) {
-        long value = 0L;
-        try {
-            RAtomicLong atomicLong = redissonClient.getAtomicLong(key);
-            value = atomicLong.addAndGet(1);
-            if (value < 10) {
-                atomicLong.expire(duration);
-            }
-            if (redisProperties.getCluster2().getActive()) {
-                otherExecutor.execute(() -> {
-                    try {
-                        RAtomicLong rAtomicLong = redissonClient2.getAtomicLong(key);
-                        long added = rAtomicLong.addAndGet(1);
-                        if (added < 10) {
-                            rAtomicLong.expire(duration);
-                        }
-                    } catch (Exception e) {
-                        LOGGER.error("redisson other RAtomicLong increment 操作异常: ", e);
-                    }
-                });
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson RAtomicLong increment 操作异常: ", e);
-        }
-        return value;
+    public <T> boolean addList(String key, T item, Duration duration) {
+        return write(() -> {
+                    RList<T> rList = redissonClient.getList(key);
+                    boolean add = rList.add(item);
+                    rList.expireIfNotSet(duration);
+                    return true;
+                },
+                () -> {
+                    RList<T> rList = redissonClient2.getList(key);
+                    rList.add(item);
+                    rList.expireIfNotSet(duration);
+                }, "addList");
     }
 
-    public long increment(String key, Duration duration, Boolean enableBack) {
-        long value = 0L;
-        try {
-            RAtomicLong atomicLong = redissonClient.getAtomicLong(key);
-            value = atomicLong.addAndGet(1);
-            if (value < 10) {
-                atomicLong.expire(duration);
-            }
-            if (redisProperties.getCluster2().getActive() && Boolean.TRUE.equals(enableBack)) {
-                otherExecutor.execute(() -> {
-                    try {
-                        RAtomicLong rAtomicLong = redissonClient2.getAtomicLong(key);
-                        long added = rAtomicLong.addAndGet(1);
-                        if (added < 10) {
-                            rAtomicLong.expire(duration);
-                        }
-                    } catch (Exception e) {
-                        LOGGER.error("redisson other RAtomicLong increment 操作异常: ", e);
-                    }
-                });
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson RAtomicLong increment 操作异常: ", e);
-        }
-        return value;
+    public <T> boolean removeList(String key, T value) {
+        return write(() -> {
+                    RList<T> rList = redissonClient.getList(key);
+                    return rList.remove(value);
+                },
+                () -> {
+                    RList<T> rList = redissonClient2.getList(key);
+                    rList.remove(value);
+                }, "removeList");
     }
 
-    public void decrement(String key) {
-        try {
-            redissonClient.getLongAdder(key).decrement();
-            if (redisProperties.getCluster2().getActive()) {
-                redissonClient2.getLongAdder(key).decrement();
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson LongAdder decrement 操作异常: ", e);
-        }
-    }
+    // --------------- list read
 
-    // list
 
-    public List<Object> getList(String key) {
-        RList<Object> list = redissonClient.getList(key);
-        return list.range(0, -1);
-    }
-
-    public List<String> readAllList(String key) {
-        RList<String> list = redissonClient.getList(key);
+    public <T> List<T> readAllList(String key) {
+        RList<T> list = redissonClient.getList(key);
         return list.readAll();
     }
 
-    public void setList(String key, List<Object> objectList) {
-        try {
-            redissonClient.getList(key).addAllAsync(objectList);
-            if (redisProperties.getCluster2().getActive()) {
-                redissonClient2.getList(key).addAllAsync(objectList);
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson setList 操作异常: ", e);
-        }
-    }
-
-    public boolean setList(String key, String item, Duration duration) {
-        try {
-            RList<Object> list = redissonClient.getList(key);
-            list.add(item);
-            list.expire(duration);
-            if (redisProperties.getCluster2().getActive()) {
-                otherExecutor.execute(() -> {
-                    try {
-                        RList<Object> rList = redissonClient2.getList(key);
-                        rList.add(item);
-                        rList.expire(duration);
-                    } catch (Exception e) {
-                        LOGGER.error("other redisson setList操作异常: ", e);
-                    }
-                });
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson setList 操作异常: ", e);
-            return false;
-        }
-        return true;
-    }
-
-    public void setListString(String key, List<String> stringList) {
-        try {
-            try {
-                redissonClient.getList(key).addAll(stringList);
-            } catch (Exception e) {
-                LOGGER.error("redisson setList 操作异常: ", e);
-            }
-            if (redisProperties.getCluster2().getActive()) {
-                redissonClient2.getList(key).addAllAsync(stringList);
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson setList 操作异常: ", e);
-        }
-    }
-
-    public Boolean containList(String key, Object object) {
-        RList<Object> list = redissonClient.getList(key);
+    public <T> boolean containList(String key, T object) {
+        RList<T> list = redissonClient.getList(key);
         return list.contains(object);
     }
 
-    public void removeList(String key, String value) {
-        redissonClient.getList(key).remove(value);
-        if (redisProperties.getCluster2().getActive()) {
-            redissonClient2.getList(key).remove(value);
-        }
+    // --------------- deque write
+
+    public boolean delDeque(String key) {
+        return write(() -> redissonClient.getDeque(key).unlink(),
+                () -> redissonClient2.getDeque(key).unlink(),
+                "delDeque");
     }
 
-    public Boolean delDeque(String key) {
-        boolean del;
-        try {
-            del = redissonClient.getDeque(key).unlink();
-            if (redisProperties.getCluster2().getActive()) {
-                redissonClient2.getDeque(key).unlink();
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson deque del 操作异常: ", e);
-            return false;
-        }
-        return del;
-    }
-
-    public boolean setDequeString(String key, List<String> stringList) {
-        boolean success = false;
-        try {
-            try {
-                success = redissonClient.getDeque(key).addAll(stringList);
-            } catch (Exception e) {
-                LOGGER.error("redisson setList 操作异常: ", e);
-            }
-            if (redisProperties.getCluster2().getActive()) {
-                redissonClient2.getDeque(key).addAll(stringList);
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson setList 操作异常: ", e);
-        }
-        return success;
+    public <T> boolean addAllDeque(String key, List<T> list) {
+        return write(() -> {
+                    RList<T> rList = redissonClient.getList(key);
+                    return rList.addAll(list);
+                },
+                () -> {
+                    RList<T> rList = redissonClient2.getList(key);
+                    rList.addAll(list);
+                }, "addAllDeque");
     }
 
     /**
-     * 取出双向list 第一个元素
+     * 双向list 添加元素到最后一个
+     */
+    public <T> boolean offerLastDeque(String key, T value) {
+        return write(() -> redissonClient.getDeque(key).offerLast(value),
+                () -> redissonClient2.getDeque(key).offerLast(value),
+                "offerLastDeque");
+    }
+
+    // --------------- deque read
+
+    /**
+     * TODO 取出双向list 第一个元素
      */
     public String getDequeFirst(String key) {
-
         RDeque<String> deque = redissonClient.getDeque(key);
         // 取第一个
         String first = deque.pollFirst();
@@ -501,181 +380,28 @@ public class RedissonUtil {
         return redissonClient.getDeque(key).isExists();
     }
 
-    /**
-     * 双向list 添加元素到最后一个
-     */
-    public boolean offerLastDeque(String key, String value) {
-        RDeque<Object> deque = redissonClient.getDeque(key);
-        boolean offerLast = deque.offerLast(value);
-        if (redisProperties.getCluster2().getActive()) {
-            otherExecutor.execute(() -> {
-                try {
-                    RDeque<Object> rDeque = redissonClient2.getDeque(key);
-                    rDeque.offerLast(value);
-                } catch (Exception e) {
-                    LOGGER.error("other redisson offerLastDeque offerLast 操作异常: ", e);
-                }
-            });
-        }
-        return offerLast;
-    }
-
     public Boolean containDeque(String key, String value) {
         RDeque<String> deque = redissonClient.getDeque(key);
         return deque.contains(value);
     }
 
-    /**
-     * deque 设置值
-     */
-    public Boolean setDeque(String key, List<String> stringList) {
-        boolean addAll;
-        try {
-            addAll = redissonClient.getDeque(key).addAll(stringList);
-            if (redisProperties.getCluster2().getActive()) {
-                redissonClient2.getDeque(key).addAll(stringList);
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson deque addAll 操作异常: ", e);
-            return false;
-        }
-        return addAll;
-    }
-
-    public Set<String> getSet(String key) {
-        RSet<String> set = redissonClient.getSet(key);
-        return set.readAll();
-    }
-
-    public Set<String> getSet(String location, String key) {
-        RedissonClient redissonClient = REDISSON_CLIENT_MAP.get(location);
-        RSet<String> set = redissonClient.getSet(key);
-        return set.readAll();
-    }
-
-    public Set<String> getSetString(String key) {
-        RSet<String> set = redissonClient.getSet(key);
-        return set.readAll();
-    }
-
-    public Set<String> getSetStringBatch(String... key) {
-
-        RBatch batch = redissonClient.createBatch();
-        for (String s : key) {
-            batch.getSet(s).readAllAsync();
-        }
-        BatchResult<?> execute = batch.execute();
-        List<?> responses = execute.getResponses();
-        Set<String> result = new HashSet<>();
-        for (Object res : responses) {
-            Set<String> set = (Set<String>) res;
-            result.addAll(set);
-        }
-        return result;
-    }
-
-    /**
-     * 从set随机取出count个元素
-     */
-    public Set<Object> getRandomSetByCount(String key, int count) {
-        return redissonClient.getSet(key).random(count);
-    }
-
-    public Integer getSetCount(String key) {
-        RSet<Object> set = redissonClient.getSet(key);
-        return set.size();
-    }
-
-    public Object getSetRandom(String key) {
-        return redissonClient.getSet(key).random();
-    }
-
-    /**
-     * set 随机移出一个元素
-     */
-    public String removeSetRandom(String key) {
-        String random = "";
-        try {
-            try {
-                random = String.valueOf(redissonClient.getSet(key).removeRandom());
-            } catch (Exception e) {
-                LOGGER.error("redisson removeSetRandom 操作异常: ", e);
-            }
-            if (redisProperties.getCluster2().getActive()) {
-                if (StringUtils.hasLength(random)) {
-                    String finalRandom = random;
-                    otherExecutor.execute(() -> {
-                        try {
-                            redissonClient2.getSet(key).remove(finalRandom);
-                        } catch (Exception e) {
-                            LOGGER.error("异地redis异常: {}", e.getMessage());
-                        }
-                    });
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson removeSetRandom 操作异常: ", e);
-        }
-        return random;
-    }
-
-    public Set<Object> removeSetRandomByCount(String key, Integer count) {
-        Set<Object> objects = null;
-        try {
-            try {
-                objects = redissonClient.getSet(key).removeRandom(count);
-            } catch (Exception e) {
-                LOGGER.error("redisson removeSetRandom 操作异常: ", e);
-            }
-            if (redisProperties.getCluster2().getActive()) {
-                if (!CollectionUtils.isEmpty(objects)) {
-                    Set<Object> finalObjects = objects;
-                    otherExecutor.execute(() -> {
-                        try {
-                            redissonClient2.getSet(key).removeAll(finalObjects);
-                        } catch (Exception e) {
-                            LOGGER.error("异地redis异常: {}", e.getMessage());
-                        }
-                    });
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson removeSetRandom 操作异常: ", e);
-        }
-        return objects;
-    }
+    // ---------------- set write
 
     /**
      * set 添加元素
      */
-    public <V> Boolean addAllSet(String key, Duration expire, V... value) {
-        if (Objects.isNull(value)) {
-            return false;
-        }
-        boolean add = false;
-        try {
-            try {
-                RSet<V> set = redissonClient.getSet(key);
-                add = set.addAll(Arrays.asList(value));
-                set.expire(expire);
-            } catch (Exception e) {
-                LOGGER.error("redisson addSet 操作异常: ", e);
-            }
-            if (redisProperties.getCluster2().getActive()) {
-                otherExecutor.execute(() -> {
-                    try {
-                        RSet<V> rSet = redissonClient2.getSet(key);
-                        rSet.addAll(Arrays.asList(value));
-                        rSet.expire(expire);
-                    } catch (Exception e) {
-                        LOGGER.error("异地redis异常: {}", e.getMessage());
-                    }
-                });
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson addSet 操作异常: ", e);
-        }
-        return add;
+    public <T> boolean addAllSet(String key, Duration expire, Set<T> set) {
+        return write(() -> {
+                    RSet<T> rSet = redissonClient.getSet(key);
+                    boolean added = rSet.addAll(set);
+                    rSet.expireIfNotSet(expire);
+                    return added;
+                },
+                () -> {
+                    RSet<T> rSet = redissonClient2.getSet(key);
+                    rSet.addAll(set);
+                    rSet.expireIfNotSet(expire);
+                }, "addAllSet");
     }
 
     /**
@@ -734,6 +460,62 @@ public class RedissonUtil {
         return add;
     }
 
+
+    /**
+     * set 随机移出一个元素
+     */
+    public String removeSetRandom(String key) {
+        String random = "";
+        try {
+            try {
+                random = String.valueOf(redissonClient.getSet(key).removeRandom());
+            } catch (Exception e) {
+                LOGGER.error("redisson removeSetRandom 操作异常: ", e);
+            }
+            if (redisProperties.getCluster2().getActive()) {
+                if (StringUtils.hasLength(random)) {
+                    String finalRandom = random;
+                    otherExecutor.execute(() -> {
+                        try {
+                            redissonClient2.getSet(key).remove(finalRandom);
+                        } catch (Exception e) {
+                            LOGGER.error("异地redis异常: {}", e.getMessage());
+                        }
+                    });
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("redisson removeSetRandom 操作异常: ", e);
+        }
+        return random;
+    }
+
+    public Set<Object> removeSetRandomByCount(String key, Integer count) {
+        Set<Object> objects = null;
+        try {
+            try {
+                objects = redissonClient.getSet(key).removeRandom(count);
+            } catch (Exception e) {
+                LOGGER.error("redisson removeSetRandom 操作异常: ", e);
+            }
+            if (redisProperties.getCluster2().getActive()) {
+                if (!CollectionUtils.isEmpty(objects)) {
+                    Set<Object> finalObjects = objects;
+                    otherExecutor.execute(() -> {
+                        try {
+                            redissonClient2.getSet(key).removeAll(finalObjects);
+                        } catch (Exception e) {
+                            LOGGER.error("异地redis异常: {}", e.getMessage());
+                        }
+                    });
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("redisson removeSetRandom 操作异常: ", e);
+        }
+        return objects;
+    }
+
     public Boolean removeSet(String key, String object) {
         boolean success = false;
         try {
@@ -759,6 +541,33 @@ public class RedissonUtil {
         }
         return success;
     }
+
+
+    // ---------------- set read
+
+    public <T> Set<T> readAllSet(String key) {
+        RSet<T> set = redissonClient.getSet(key);
+        return set.readAll();
+    }
+
+    /**
+     * 从set随机取出count个元素
+     */
+    public <T> Set<T> getSetRandomCount(String key, int count) {
+        RSet<T> rSet = redissonClient.getSet(key);
+        return rSet.random(count);
+    }
+
+    public <T> int getSetSize(String key) {
+        RSet<T> set = redissonClient.getSet(key);
+        return set.size();
+    }
+
+    public <T> T getSetRandom(String key) {
+        RSet<T> rSet = redissonClient.getSet(key);
+        return rSet.random();
+    }
+
 
     public Boolean containsSet(String key, Object object) {
         RSet<Object> set = redissonClient.getSet(key);
@@ -972,15 +781,18 @@ public class RedissonUtil {
         }
     }
 
-    public void setHash(String key, Map<String, Object> dataMap) {
-        try {
-            redissonClient.getMap(key).putAll(dataMap, 100);
-            if (redisProperties.getCluster2().getActive()) {
-                redissonClient2.getMap(key).putAll(dataMap, 100);
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson setHash Map 操作异常: ", e);
+    public boolean setHash(String key, Map<String, Object> dataMap) {
+        redissonClient.getMap(key).putAll(dataMap, 100);
+        if (redisProperties.getCluster2().getActive()) {
+            otherExecutor.execute(() -> {
+                try {
+                    redissonClient2.getMap(key).putAll(dataMap, 100);
+                } catch (Exception e) {
+                    LOGGER.error("back redis setHash error: ", e);
+                }
+            });
         }
+        return true;
     }
 
     /**
@@ -1484,71 +1296,6 @@ public class RedissonUtil {
     public Boolean existSet(String key) {
         long l = redissonClient.getSet(key).remainTimeToLive();
         return -2 == l;
-    }
-
-    /**
-     * 删除key
-     */
-    public Boolean delKey(String key) {
-        boolean success = false;
-        try {
-            try {
-                success = redissonClient.getBucket(key).unlink();
-            } catch (Exception e) {
-                LOGGER.error("redisson delKey 操作异常: ", e);
-            }
-            if (redisProperties.getCluster2().getActive()) {
-                otherExecutor.execute(() -> {
-                    try {
-                        redissonClient2.getBucket(key).unlink();
-                    } catch (Exception e) {
-                        LOGGER.error("异地redis delKey异常: {}", e.getMessage());
-                    }
-                });
-            }
-        } catch (Exception e) {
-            LOGGER.error("redisson delKey 操作异常: ", e);
-        }
-        return success;
-    }
-
-    /**
-     * 设置锁
-     * 过期时间单位 分钟
-     */
-    public <V> boolean setNx(String key, V value, Duration duration) {
-        RBucket<V> bucket = redissonClient.getBucket(key);
-        return bucket.setIfAbsent(value, duration);
-    }
-
-    /**
-     * 设置key 过期时间
-     * 过期时间单位 s
-     */
-    public boolean setTTL(String key, long expire) {
-        boolean bool = redissonClient.getBucket(key).expire(expire, TimeUnit.SECONDS);
-        if (redisProperties.getCluster2().getActive()) {
-            redissonClient2.getBucket(key).expire(expire, TimeUnit.SECONDS);
-        }
-        return bool;
-    }
-
-    /**
-     * 设置key 过期时间
-     * 过期时间单位 s
-     */
-    public boolean setTTL(String key, Duration duration) {
-        boolean bool = redissonClient.getBucket(key).expire(duration);
-        if (redisProperties.getCluster2().getActive()) {
-            otherExecutor.execute(() -> {
-                try {
-                    redissonClient2.getBucket(key).expire(duration);
-                } catch (Exception e) {
-                    LOGGER.error("异地redis异常: {}", e.getMessage());
-                }
-            });
-        }
-        return bool;
     }
 
     public Long getTtl(String key) {

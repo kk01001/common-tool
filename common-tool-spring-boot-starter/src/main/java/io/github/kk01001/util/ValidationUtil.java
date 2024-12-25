@@ -1,8 +1,8 @@
 package io.github.kk01001.util;
 
+import cn.hutool.extra.spring.SpringUtil;
 import io.github.kk01001.exception.ParamsException;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.springframework.util.CollectionUtils;
 
@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class ValidationUtil {
 
-    private static final Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
+    private static final Validator VALIDATOR = SpringUtil.getBean(Validator.class);
 
     /**
      * 验证数据
