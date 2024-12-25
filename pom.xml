@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.kk01001</groupId>
     <artifactId>common-tool</artifactId>
-    <version>2.1.9</version>
+    <version>2.2.3-Bata</version>
     <name>common-tool</name>
     <description>通用工具</description>
 
@@ -24,6 +24,7 @@
         <module>lock-spring-boot-starter</module>
         <module>idempotent-spring-boot-starter</module>
         <module>ip2region-spring-boot-starter</module>
+        <module>push-spring-boot-starter</module>
     </modules>
 
     <properties>
