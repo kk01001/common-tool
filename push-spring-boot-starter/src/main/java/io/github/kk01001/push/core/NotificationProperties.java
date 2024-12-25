@@ -37,6 +37,8 @@ public class NotificationProperties {
     @Data
     public static class Fcm {
 
+        private Boolean enabled = true;
+
         private String googleGetTokenUrl = "https://180.255.66.106:10444/googleapis/aouth2/token?grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion={}";
 
         private String googleFcmSendUrl = "https://180.255.66.106:10444/v1/projects/{}/messages:send";
@@ -50,6 +52,8 @@ public class NotificationProperties {
 
     @Data
     public static class APNS {
+
+        private Boolean enabled = true;
 
         private String notificationUrl = "https://api.sandbox.push.apple.com:443/3/device/{}";
 
