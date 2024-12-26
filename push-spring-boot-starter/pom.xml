@@ -38,7 +38,7 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-json</artifactId>
             <optional>true</optional>
         </dependency>
 
@@ -67,15 +67,10 @@
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
             <version>4.4.0</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -83,5 +78,6 @@
             <artifactId>okhttp</artifactId>
             <version>4.9.3</version>
         </dependency>
+
     </dependencies>
 </project>

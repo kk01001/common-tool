@@ -11,5 +11,7 @@ public enum NotificationType {
 
     APNS,
 
-    UMENG
+    UMENG,
+
+    JIGUANG
 }

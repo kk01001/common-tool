@@ -16,6 +16,8 @@ public class NotificationProperties {
 
     private Umneg umneg = new Umneg();
 
+    private JiGuang jiguang = new JiGuang();
+
     private Fcm fcm = new Fcm();
 
     private APNS apns = new APNS();
@@ -26,6 +28,20 @@ public class NotificationProperties {
         private Boolean enabled = true;
 
         private String url = "https://msgapi.umeng.com/api/send";
+
+        private String appKey;
+
+        private String appMasterSecret;
+
+        private Integer timeout = 3000;
+    }
+
+    @Data
+    public static class JiGuang {
+
+        private Boolean enabled = true;
+
+        private String url = "https://api.jpush.cn/v3/push";
 
         private String appKey;
 
