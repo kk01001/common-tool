@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: dev,robot
 server:
   servlet:
     context-path: /examples

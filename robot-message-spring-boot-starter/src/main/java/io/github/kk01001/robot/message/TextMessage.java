@@ -54,7 +54,23 @@ public class TextMessage implements RobotMessage {
             at.put("isAtAll", atAll);
             message.put("at", at);
         }
-        
+
         return message;
     }
-} 
+
+    @Override
+    public Map<String, Object> toMessageMap(String robotType) {
+        if ("dingtalk".equals(robotType)) {
+            return toMessageMap();
+        }
+        Map<String, Object> message = new HashMap<>();
+        message.put("msgtype", "text");
+
+        Map<String, Object> text = new HashMap<>();
+        text.put("content", content);
+        text.put("mentioned_mobile_list", atMobiles);
+        text.put("mentioned_list", atUserIds);
+        message.put("text", text);
+        return message;
+    }
+}

@@ -39,4 +39,18 @@ public class MarkdownMessage implements RobotMessage {
         
         return message;
     }
-} 
+
+    @Override
+    public Map<String, Object> toMessageMap(String robotType) {
+        if ("dingtalk".equals(robotType)) {
+            return toMessageMap();
+        }
+        Map<String, Object> message = new HashMap<>();
+        message.put("msgtype", "markdown");
+
+        Map<String, Object> text = new HashMap<>();
+        text.put("content", content);
+        message.put("markdown", text);
+        return message;
+    }
+}

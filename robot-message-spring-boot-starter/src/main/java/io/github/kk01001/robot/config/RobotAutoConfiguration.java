@@ -36,7 +36,6 @@ public class RobotAutoConfiguration {
      * 创建机器人客户端映射
      */
     @Bean
-    @ConditionalOnMissingBean
     public Map<String, RobotClient> robotClients(
             RobotProperties properties,
             RestTemplate restTemplate) {

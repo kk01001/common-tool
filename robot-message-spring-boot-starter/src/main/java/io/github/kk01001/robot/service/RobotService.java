@@ -32,7 +32,7 @@ public class RobotService {
      * @param message 要发送的消息
      */
     public void sendMessage(String robotId, RobotMessage message) {
-        var client = robotClients.get(robotId);
+        RobotClient client = robotClients.get(robotId);
         if (client == null) {
             throw new IllegalArgumentException("Robot not found: " + robotId);
         }

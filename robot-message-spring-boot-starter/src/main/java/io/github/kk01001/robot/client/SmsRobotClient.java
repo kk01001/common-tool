@@ -40,6 +40,11 @@ public class SmsRobotClient implements RobotClient {
     }
 
     @Override
+    public String getRobotType() {
+        return "sms";
+    }
+
+    @Override
     public void sendMessage(RobotMessage message) {
         try {
             if (!(message instanceof SmsMessage)) {

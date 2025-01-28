@@ -17,7 +17,7 @@ import java.util.Base64;
  */
 @Slf4j
 public class DingTalkRobotClient implements RobotClient {
-    
+
     /**
      * 钉钉机器人webhook地址
      */
@@ -38,14 +38,19 @@ public class DingTalkRobotClient implements RobotClient {
         this.secret = secret;
         this.restTemplate = restTemplate;
     }
-    
+
+    @Override
+    public String getRobotType() {
+        return "dingtalk";
+    }
+
     @Override
     public void sendMessage(RobotMessage message) {
         String url = generateSignedUrl();
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(
                 url,
-                message.toMessageMap(), 
+                    message.toMessageMap(getRobotType()),
                 String.class
             );
             log.info("DingTalk robot response: {}", response.getBody());

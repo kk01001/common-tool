@@ -27,4 +27,9 @@ public class ImageMessage implements RobotMessage {
         
         return message;
     }
-} 
+
+    @Override
+    public Map<String, Object> toMessageMap(String robotType) {
+        return toMessageMap();
+    }
+}

@@ -27,6 +27,11 @@ public class EmailRobotClient implements RobotClient {
      */
     private final String senderEmailAddress;
 
+    @Override
+    public String getRobotType() {
+        return "email";
+    }
+
     /**
      * 创建邮件机器人客户端
      *

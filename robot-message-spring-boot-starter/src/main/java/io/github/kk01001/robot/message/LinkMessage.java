@@ -31,4 +31,9 @@ public class LinkMessage implements RobotMessage {
         
         return message;
     }
-} 
+
+    @Override
+    public Map<String, Object> toMessageMap(String robotType) {
+        return Map.of();
+    }
+}

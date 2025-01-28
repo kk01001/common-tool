@@ -19,7 +19,7 @@ public class RobotController {
      * 发送文本消息
      */
     @PostMapping("/{robotId}/text")
-    public void sendTextMessage(@PathVariable String robotId, @RequestBody TextMessage message) {
+    public void sendTextMessage(@PathVariable("robotId") String robotId, @RequestBody TextMessage message) {
         robotService.sendMessage(robotId, message);
     }
 
@@ -27,7 +27,7 @@ public class RobotController {
      * 发送Markdown消息
      */
     @PostMapping("/{robotId}/markdown")
-    public void sendMarkdownMessage(@PathVariable String robotId, @RequestBody MarkdownMessage message) {
+    public void sendMarkdownMessage(@PathVariable("robotId") String robotId, @RequestBody MarkdownMessage message) {
         robotService.sendMessage(robotId, message);
     }
 
@@ -35,7 +35,7 @@ public class RobotController {
      * 发送链接消息
      */
     @PostMapping("/{robotId}/link")
-    public void sendLinkMessage(@PathVariable String robotId, @RequestBody LinkMessage message) {
+    public void sendLinkMessage(@PathVariable("robotId") String robotId, @RequestBody LinkMessage message) {
         robotService.sendMessage(robotId, message);
     }
 
@@ -43,7 +43,7 @@ public class RobotController {
      * 发送图片消息
      */
     @PostMapping("/{robotId}/image")
-    public void sendImageMessage(@PathVariable String robotId, @RequestBody ImageMessage message) {
+    public void sendImageMessage(@PathVariable("robotId") String robotId, @RequestBody ImageMessage message) {
         robotService.sendMessage(robotId, message);
     }
 
@@ -51,7 +51,7 @@ public class RobotController {
      * 发送卡片消息
      */
     @PostMapping("/{robotId}/action-card")
-    public void sendActionCardMessage(@PathVariable String robotId, @RequestBody ActionCardMessage message) {
+    public void sendActionCardMessage(@PathVariable("robotId") String robotId, @RequestBody ActionCardMessage message) {
         robotService.sendMessage(robotId, message);
     }
 
@@ -59,7 +59,7 @@ public class RobotController {
      * 发送图文消息
      */
     @PostMapping("/{robotId}/feed-card")
-    public void sendFeedCardMessage(@PathVariable String robotId, @RequestBody FeedCardMessage message) {
+    public void sendFeedCardMessage(@PathVariable("robotId") String robotId, @RequestBody FeedCardMessage message) {
         robotService.sendMessage(robotId, message);
     }
 
@@ -70,7 +70,7 @@ public class RobotController {
      * @param message 邮件消息内容
      */
     @PostMapping("/{robotId}/email")
-    public void sendEmailMessage(@PathVariable String robotId, @RequestBody EmailMessage message) {
+    public void sendEmailMessage(@PathVariable("robotId") String robotId, @RequestBody EmailMessage message) {
         robotService.sendMessage(robotId, message);
     }
 
@@ -81,7 +81,7 @@ public class RobotController {
      * @param message 短信消息内容
      */
     @PostMapping("/{robotId}/sms")
-    public void sendSmsMessage(@PathVariable String robotId, @RequestBody SmsMessage message) {
+    public void sendSmsMessage(@PathVariable("robotId") String robotId, @RequestBody SmsMessage message) {
         robotService.sendMessage(robotId, message);
     }
 } 

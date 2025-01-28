@@ -1,3 +1,8 @@
+# 2.3.0
+
+## feat
+
+- add robot-message-spring-boot-starter; 钉钉机器人, 企业微信机器人, 邮箱, 短信
 # 2.1.9
 
 ## fix

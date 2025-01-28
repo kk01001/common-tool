@@ -1,6 +1,7 @@
 package io.github.kk01001.robot.message;
 
 import lombok.Data;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class SmsMessage implements RobotMessage {
     public String getType() {
         return "sms";
     }
-    
+
     @Override
     public Map<String, Object> toMessageMap() {
         Map<String, Object> message = new HashMap<>();
@@ -52,4 +53,9 @@ public class SmsMessage implements RobotMessage {
         
         return message;
     }
-} 
+
+    @Override
+    public Map<String, Object> toMessageMap(String robotType) {
+        return Map.of();
+    }
+}

@@ -13,10 +13,17 @@ public interface RobotMessage {
      * @return 消息类型标识符
      */
     String getType();
-    
+
     /**
      * 将消息转换为Map格式
      * @return 包含消息内容的Map对象
      */
     Map<String, Object> toMessageMap();
+
+    /**
+     * 将消息转换为Map格式
+     *
+     * @return 包含消息内容的Map对象
+     */
+    Map<String, Object> toMessageMap(String robotType);
 } 

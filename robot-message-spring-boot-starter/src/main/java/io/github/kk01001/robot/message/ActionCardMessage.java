@@ -46,4 +46,9 @@ public class ActionCardMessage implements RobotMessage {
         message.put("actionCard", actionCard);
         return message;
     }
-} 
+
+    @Override
+    public Map<String, Object> toMessageMap(String robotType) {
+        return Map.of();
+    }
+}

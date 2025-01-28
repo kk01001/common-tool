@@ -30,13 +30,18 @@ public class WeChatRobotClient implements RobotClient {
         this.webhook = webhook;
         this.restTemplate = restTemplate;
     }
-    
+
+    @Override
+    public String getRobotType() {
+        return "wechat";
+    }
+
     @Override
     public void sendMessage(RobotMessage message) {
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(
                 webhook,
-                message.toMessageMap(),
+                    message.toMessageMap(getRobotType()),
                 String.class
             );
             log.info("WeChat robot response: {}", response.getBody());
