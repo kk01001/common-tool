@@ -55,6 +55,7 @@ public class RobotAutoConfiguration {
         properties.getWechat().forEach((id, config) -> {
             clients.put(id, new WeChatRobotClient(
                 config.getWebhook(),
+                    config.getKey(),
                 restTemplate
             ));
         });

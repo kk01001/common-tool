@@ -133,4 +133,11 @@ public class RobotProperties {
          */
         private String templateId;
     }
+
+    /**
+     * wechat 根据key 获取对应的配置
+     */
+    public WeChatRobotConfig getWeChatRobotConfig(String key) {
+        return wechat.get(key);
+    }
 } 

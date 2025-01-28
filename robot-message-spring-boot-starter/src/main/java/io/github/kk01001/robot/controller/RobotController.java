@@ -84,4 +84,37 @@ public class RobotController {
     public void sendSmsMessage(@PathVariable("robotId") String robotId, @RequestBody SmsMessage message) {
         robotService.sendMessage(robotId, message);
     }
+
+    /**
+     * 发送新闻消息
+     * 
+     * @param robotId 机器人ID
+     * @param message 新闻消息内容
+     */
+    @PostMapping("/{robotId}/news")
+    public void sendNewsMessage(@PathVariable("robotId") String robotId, @RequestBody NewsMessage message) {
+        robotService.sendMessage(robotId, message);
+    }
+
+    /**
+     * 发送文件消息
+     * 
+     * @param robotId 机器人ID
+     * @param message 文件消息内容
+     */
+    @PostMapping("/{robotId}/file")
+    public void sendFileMessage(@PathVariable("robotId") String robotId, @RequestBody FileMessage message) {
+        robotService.sendMessage(robotId, message);
+    }
+
+    /**
+     * 发送语音消息
+     * 
+     * @param robotId 机器人ID
+     * @param message 语音消息内容
+     */
+    @PostMapping("/{robotId}/voice")
+    public void sendVoiceMessage(@PathVariable("robotId") String robotId, @RequestBody VoiceMessage message) {
+        robotService.sendMessage(robotId, message);
+    }
 } 

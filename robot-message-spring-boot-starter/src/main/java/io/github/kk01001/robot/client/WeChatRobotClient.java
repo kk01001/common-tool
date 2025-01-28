@@ -16,18 +16,24 @@ public class WeChatRobotClient implements RobotClient {
      * 企业微信机器人webhook地址
      */
     private final String webhook;
-    
+
+    /**
+     * 企业微信机器人key
+     */
+    private final String key;
+
     /**
      * HTTP请求客户端
      */
     private final RestTemplate restTemplate;
-    
-    public WeChatRobotClient(String webhook, RestTemplate restTemplate) {
+
+    public WeChatRobotClient(String webhook, String key, RestTemplate restTemplate) {
         // webhook格式: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx
         if (!webhook.contains("key=")) {
             throw new IllegalArgumentException("WeChat webhook must contain key parameter");
         }
         this.webhook = webhook;
+        this.key = key;
         this.restTemplate = restTemplate;
     }
 
@@ -45,7 +51,7 @@ public class WeChatRobotClient implements RobotClient {
                 String.class
             );
             log.info("WeChat robot response: {}", response.getBody());
-            
+
             if (response.getBody() != null && response.getBody().contains("\"errcode\":0")) {
                 log.debug("Message sent successfully");
             } else {
