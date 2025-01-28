@@ -1,0 +1,88 @@
+robot:
+  # 钉钉机器人配置
+  dingtalk:
+    robot1:  # 钉钉机器人1
+      webhook: https://oapi.dingtalk.com/robot/send?access_token=xxx
+      secret: SECxxx  # 安全设置的签名密钥
+    robot2:  # 钉钉机器人2
+      webhook: https://oapi.dingtalk.com/robot/send?access_token=yyy
+      secret: SECyyy
+
+  # 企业微信机器人配置
+  wechat:
+    robot3:  # 企业微信机器人1
+      webhook: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx
+    robot4:  # 企业微信机器人2
+      webhook: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=yyy
+
+  # 邮件机器人配置
+  email:
+    mail1:  # QQ邮箱配置
+      host: smtp.qq.com
+      port: 465
+      username: xxx@qq.com
+      password: abcdefghijk  # 邮箱授权码
+      from: xxx@qq.com
+      ssl: true
+    mail2:  # 163邮箱配置
+      host: smtp.163.com
+      port: 465
+      username: xxx@163.com
+      password: abcdefghijk  # 邮箱授权码
+      from: xxx@163.com
+      ssl: true
+
+  # 短信机器人配置
+  sms:
+    sms1:  # 阿里云短信配置
+      provider: aliyun
+      endpoint: https://dysmsapi.aliyuncs.com
+      accessKey: LTAI5xxx  # 阿里云AccessKey
+      secretKey: xxxx  # 阿里云SecretKey
+      signName: 测试签名
+      templateId: SMS_123456789
+    sms2:  # 腾讯云短信配置
+      provider: tencent
+      endpoint: https://sms.tencentcloudapi.com
+      accessKey: AKIDxxx  # 腾讯云SecretId
+      secretKey: xxxx  # 腾讯云SecretKey
+      signName: 测试签名
+      templateId: 123456
+
+# Nacos动态配置示例（在Nacos配置中心配置）
+sms:
+  scripts:
+    aliyun: |
+      // 阿里云短信发送脚本
+      def sendSms() {
+          def requestUrl = params.endpoint
+          def requestBody = [
+              AccessKeyId: params.accessKey,
+              SignName: params.signName,
+              TemplateCode: params.templateId,
+              PhoneNumbers: params.phoneNumbers.join(','),
+              TemplateParam: params.templateParams ? new groovy.json.JsonBuilder(params.templateParams).toString() : ''
+          ]
+          
+          def response = restTemplate.postForEntity(requestUrl, requestBody, String.class)
+          return response.body
+      }
+      return sendSms()
+      
+    tencent: |
+      // 腾讯云短信发送脚本
+      def sendSms() {
+          def requestUrl = params.endpoint
+          def requestBody = [
+              SecretId: params.accessKey,
+              SecretKey: params.secretKey,
+              SmsSdkAppId: params.templateId,
+              SignName: params.signName,
+              PhoneNumberSet: params.phoneNumbers,
+              TemplateParamSet: params.templateParams.values() as List
+          ]
+          
+          def response = restTemplate.postForEntity(requestUrl, requestBody, String.class)
+          return response.body
+      }
+      return sendSms()
