@@ -32,14 +32,14 @@ robot:
 
   # 短信机器人配置
   sms:
-    sms1: # 阿里云短信配置
+    aliyun: # 阿里云短信配置
       provider: aliyun
       endpoint: https://dysmsapi.aliyuncs.com
       accessKey: LTAI5xxx  # 阿里云AccessKey
       secretKey: xxxx  # 阿里云SecretKey
       signName: 测试签名
       templateId: SMS_123456789
-    sms2: # 腾讯云短信配置
+    tencent: # 腾讯云短信配置
       provider: tencent
       endpoint: https://sms.tencentcloudapi.com
       accessKey: AKIDxxx  # 腾讯云SecretId

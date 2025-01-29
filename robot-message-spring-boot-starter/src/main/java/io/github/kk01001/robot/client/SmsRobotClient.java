@@ -3,6 +3,8 @@ package io.github.kk01001.robot.client;
 import io.github.kk01001.robot.message.RobotMessage;
 import io.github.kk01001.robot.message.SmsMessage;
 import io.github.kk01001.robot.script.GroovyScriptExecutor;
+import io.github.kk01001.robot.config.SmsScriptProperties;
+import io.github.kk01001.robot.script.ScriptExecuteResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,8 +29,9 @@ public class SmsRobotClient implements RobotClient {
     private final Map<String, Object> configParams;
 
     public SmsRobotClient(String endpoint, String accessKey, String secretKey, 
-                         String signName, String templateId, RestTemplate restTemplate) {
-        this.scriptExecutor = new GroovyScriptExecutor(restTemplate);
+                         String signName, String templateId, RestTemplate restTemplate,
+                         SmsScriptProperties scriptProperties) {
+        this.scriptExecutor = new GroovyScriptExecutor(restTemplate, scriptProperties);
         
         // 初始化配置参数
         this.configParams = new HashMap<>();
@@ -47,11 +50,10 @@ public class SmsRobotClient implements RobotClient {
     @Override
     public void sendMessage(RobotMessage message) {
         try {
-            if (!(message instanceof SmsMessage)) {
+            if (!(message instanceof SmsMessage smsMessage)) {
                 throw new IllegalArgumentException("消息类型必须是SmsMessage");
             }
-            
-            SmsMessage smsMessage = (SmsMessage) message;
+
             String provider = smsMessage.getProvider();
             if (provider == null || provider.isEmpty()) {
                 throw new IllegalArgumentException("短信提供商不能为空");
@@ -64,21 +66,15 @@ public class SmsRobotClient implements RobotClient {
             scriptParams.put("content", smsMessage.getContent());
             scriptParams.put("provider", provider);
             // 执行对应提供商的脚本
-            Object result = scriptExecutor.executeScript(provider, scriptParams);
-            log.info("SMS sent result: {}", result);
+            ScriptExecuteResult result = scriptExecutor.executeScript(provider, scriptParams);
+            log.info("SMS sent result: {}", result.getResult());
+            
+            if (!result.isSuccess()) {
+                throw new RuntimeException("Failed to send SMS: " + result.getFailMessage());
+            }
         } catch (Exception e) {
             log.error("Failed to send SMS", e);
             throw new RuntimeException("Failed to send SMS", e);
         }
-    }
-    
-    /**
-     * 更新短信提供商的脚本
-     *
-     * @param provider 提供商标识
-     * @param script Groovy脚本内容
-     */
-    public void updateScript(String provider, String script) {
-        scriptExecutor.updateScript(provider, script);
     }
 } 

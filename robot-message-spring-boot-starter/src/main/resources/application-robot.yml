@@ -37,15 +37,15 @@ robot:
     sms1:  # 阿里云短信配置
       provider: aliyun
       endpoint: https://dysmsapi.aliyuncs.com
-      accessKey: LTAI5xxx  # 阿里云AccessKey
-      secretKey: xxxx  # 阿里云SecretKey
+      accessKey: LTAI5xxx
+      secretKey: xxxx
       signName: 测试签名
       templateId: SMS_123456789
     sms2:  # 腾讯云短信配置
       provider: tencent
       endpoint: https://sms.tencentcloudapi.com
-      accessKey: AKIDxxx  # 腾讯云SecretId
-      secretKey: xxxx  # 腾讯云SecretKey
+      accessKey: AKIDxxx
+      secretKey: xxxx
       signName: 测试签名
       templateId: 123456
 
@@ -64,8 +64,18 @@ sms:
               TemplateParam: params.templateParams ? new groovy.json.JsonBuilder(params.templateParams).toString() : ''
           ]
           
-          def response = restTemplate.postForEntity(requestUrl, requestBody, String.class)
-          return response.body
+          try {
+              def response = restTemplate.postForEntity(requestUrl, requestBody, String.class)
+              def responseBody = new groovy.json.JsonSlurper().parseText(response.body)
+              
+              if (responseBody.Code == 'OK') {
+                  return ScriptExecuteResult.success(responseBody)
+              } else {
+                  return ScriptExecuteResult.fail(responseBody.Message ?: '未知错误', responseBody)
+              }
+          } catch (Exception e) {
+              return ScriptExecuteResult.fail(e.message ?: '未知异常', e)
+          }
       }
       return sendSms()
       
@@ -82,7 +92,17 @@ sms:
               TemplateParamSet: params.templateParams.values() as List
           ]
           
-          def response = restTemplate.postForEntity(requestUrl, requestBody, String.class)
-          return response.body
+          try {
+              def response = restTemplate.postForEntity(requestUrl, requestBody, String.class)
+              def responseBody = new groovy.json.JsonSlurper().parseText(response.body)
+              
+              if (responseBody.Response?.Error) {
+                  return ScriptExecuteResult.fail(responseBody.Response.Error.Message, responseBody)
+              } else {
+                  return ScriptExecuteResult.success(responseBody)
+              }
+          } catch (Exception e) {
+              return ScriptExecuteResult.fail(e.message)
+          }
       }
       return sendSms()

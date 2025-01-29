@@ -109,6 +109,11 @@ public class RobotProperties {
     @Data
     public static class SmsRobotConfig {
         /**
+         * 短信提供商
+         */
+        private String provider;
+        
+        /**
          * 短信服务商接口地址
          */
         private String endpoint;

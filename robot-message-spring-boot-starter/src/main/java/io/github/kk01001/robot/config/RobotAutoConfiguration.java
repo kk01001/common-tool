@@ -19,7 +19,10 @@ import java.util.Map;
  */
 @ComponentScan(basePackages = "io.github.kk01001.robot")
 @Configuration
-@EnableConfigurationProperties(RobotProperties.class)
+@EnableConfigurationProperties({
+    RobotProperties.class,
+    SmsScriptProperties.class
+})
 @ConditionalOnClass(RestTemplate.class)
 public class RobotAutoConfiguration {
 
@@ -38,6 +41,7 @@ public class RobotAutoConfiguration {
     @Bean
     public Map<String, RobotClient> robotClients(
             RobotProperties properties,
+            SmsScriptProperties scriptProperties,
             RestTemplate restTemplate) {
             
         var clients = new HashMap<String, RobotClient>();
@@ -80,7 +84,8 @@ public class RobotAutoConfiguration {
                 config.getSecretKey(),
                 config.getSignName(),
                 config.getTemplateId(),
-                restTemplate
+                restTemplate,
+                scriptProperties
             ));
         });
         
