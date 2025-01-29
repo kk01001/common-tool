@@ -65,8 +65,8 @@ sms:
           ]
           
           try {
-              def response = restTemplate.postForEntity(requestUrl, requestBody, String.class)
-              def responseBody = new groovy.json.JsonSlurper().parseText(response.body)
+              def response = httpUtil.post(requestUrl, new groovy.json.JsonBuilder(requestBody).toString())
+              def responseBody = new groovy.json.JsonSlurper().parseText(response)
               
               if (responseBody.Code == 'OK') {
                   return ScriptExecuteResult.success(responseBody)
@@ -93,8 +93,8 @@ sms:
           ]
           
           try {
-              def response = restTemplate.postForEntity(requestUrl, requestBody, String.class)
-              def responseBody = new groovy.json.JsonSlurper().parseText(response.body)
+              def response = httpUtil.post(requestUrl, new groovy.json.JsonBuilder(requestBody).toString())
+              def responseBody = new groovy.json.JsonSlurper().parseText(response)
               
               if (responseBody.Response?.Error) {
                   return ScriptExecuteResult.fail(responseBody.Response.Error.Message, responseBody)

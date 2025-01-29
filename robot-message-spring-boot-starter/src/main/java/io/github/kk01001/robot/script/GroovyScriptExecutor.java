@@ -1,11 +1,12 @@
 package io.github.kk01001.robot.script;
 
+import cn.hutool.http.HttpUtil;
 import io.github.kk01001.robot.config.SmsScriptProperties;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -14,13 +15,9 @@ import java.util.Map;
  * 负责执行Groovy脚本
  */
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class GroovyScriptExecutor {
-    
-    /**
-     * HTTP请求客户端
-     */
-    private final RestTemplate restTemplate;
     
     /**
      * 短信脚本配置
@@ -44,7 +41,7 @@ public class GroovyScriptExecutor {
             // 创建Binding对象，传入参数
             Binding binding = new Binding();
             binding.setVariable("params", params);
-            binding.setVariable("restTemplate", restTemplate);
+            binding.setVariable("httpUtil", HttpUtil.class);
             binding.setVariable("ScriptExecuteResult", ScriptExecuteResult.class);
             
             // 创建GroovyShell并执行脚本

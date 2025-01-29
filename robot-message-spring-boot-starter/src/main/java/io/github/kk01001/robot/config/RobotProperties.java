@@ -1,7 +1,10 @@
 package io.github.kk01001.robot.config;
 
+import io.github.kk01001.robot.client.*;
 import lombok.Data;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +14,12 @@ import java.util.Map;
  * 用于配置不同类型机器人的参数
  */
 @Data
+@RefreshScope
 @ConfigurationProperties(prefix = "robot")
-public class RobotProperties {
-    
+public class RobotProperties implements InitializingBean {
+
+    private final Map<String, RobotClient> robotClients = new HashMap<>();
+
     /**
      * 钉钉机器人配置
      * key: 机器人ID
@@ -139,10 +145,75 @@ public class RobotProperties {
         private String templateId;
     }
 
+    @Override
+    public void afterPropertiesSet() {
+        refreshRobotClients();
+    }
+
+    /**
+     * 刷新机器人客户端
+     */
+    private synchronized void refreshRobotClients() {
+        try {
+            // 清空现有客户端
+            robotClients.clear();
+
+            // 重新创建钉钉机器人客户端
+            getDingtalk().forEach((id, config) -> {
+                robotClients.put(id, new DingTalkRobotClient(
+                        config.getWebhook(),
+                        config.getSecret()
+                ));
+            });
+
+            // 重新创建微信机器人客户端
+            getWechat().forEach((id, config) -> {
+                robotClients.put(id, new WeChatRobotClient(
+                        config.getWebhook(),
+                        config.getKey()
+                ));
+            });
+
+            // 重新创建邮件机器人客户端
+            getEmail().forEach((id, config) -> {
+                robotClients.put(id, new EmailRobotClient(
+                        config.getHost(),
+                        config.getPort(),
+                        config.getUsername(),
+                        config.getPassword(),
+                        config.getFrom(),
+                        config.getSsl()
+                ));
+            });
+
+            // 重新创建短信机器人客户端
+            getSms().forEach((id, config) -> {
+                robotClients.put(id, new SmsRobotClient(
+                        config.getEndpoint(),
+                        config.getAccessKey(),
+                        config.getSecretKey(),
+                        config.getSignName(),
+                        config.getTemplateId()
+                ));
+            });
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to refresh robot clients", e);
+        }
+    }
+
     /**
      * wechat 根据key 获取对应的配置
      */
     public WeChatRobotConfig getWeChatRobotConfig(String key) {
         return wechat.get(key);
+    }
+
+    /**
+     * 获取机器人客户端映射
+     *
+     * @return 机器人客户端映射
+     */
+    public Map<String, RobotClient> getRobotClients() {
+        return robotClients;
     }
 } 

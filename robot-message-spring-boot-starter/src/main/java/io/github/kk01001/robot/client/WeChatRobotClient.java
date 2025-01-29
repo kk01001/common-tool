@@ -1,9 +1,9 @@
 package io.github.kk01001.robot.client;
 
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONUtil;
 import io.github.kk01001.robot.message.RobotMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * 企业微信机器人客户端
@@ -22,19 +22,13 @@ public class WeChatRobotClient implements RobotClient {
      */
     private final String key;
 
-    /**
-     * HTTP请求客户端
-     */
-    private final RestTemplate restTemplate;
-
-    public WeChatRobotClient(String webhook, String key, RestTemplate restTemplate) {
+    public WeChatRobotClient(String webhook, String key) {
         // webhook格式: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx
         if (!webhook.contains("key=")) {
             throw new IllegalArgumentException("WeChat webhook must contain key parameter");
         }
         this.webhook = webhook;
         this.key = key;
-        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -45,18 +39,17 @@ public class WeChatRobotClient implements RobotClient {
     @Override
     public void sendMessage(RobotMessage message) {
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity(
+            String response = HttpUtil.post(
                 webhook,
-                    message.toMessageMap(getRobotType()),
-                String.class
+                JSONUtil.toJsonStr(message.toMessageMap(getRobotType()))
             );
-            log.info("WeChat robot response: {}", response.getBody());
+            log.info("WeChat robot response: {}", response);
 
-            if (response.getBody() != null && response.getBody().contains("\"errcode\":0")) {
+            if (response != null && response.contains("\"errcode\":0")) {
                 log.debug("Message sent successfully");
             } else {
-                log.error("Failed to send message, response: {}", response.getBody());
-                throw new RuntimeException("Failed to send message: " + response.getBody());
+                log.error("Failed to send message, response: {}", response);
+                throw new RuntimeException("Failed to send message: " + response);
             }
         } catch (Exception e) {
             log.error("Failed to send message to WeChat", e);

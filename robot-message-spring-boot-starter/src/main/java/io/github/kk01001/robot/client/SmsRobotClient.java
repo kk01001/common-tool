@@ -1,12 +1,11 @@
 package io.github.kk01001.robot.client;
 
+import cn.hutool.extra.spring.SpringUtil;
 import io.github.kk01001.robot.message.RobotMessage;
 import io.github.kk01001.robot.message.SmsMessage;
 import io.github.kk01001.robot.script.GroovyScriptExecutor;
-import io.github.kk01001.robot.config.SmsScriptProperties;
 import io.github.kk01001.robot.script.ScriptExecuteResult;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,10 +27,9 @@ public class SmsRobotClient implements RobotClient {
      */
     private final Map<String, Object> configParams;
 
-    public SmsRobotClient(String endpoint, String accessKey, String secretKey, 
-                         String signName, String templateId, RestTemplate restTemplate,
-                         SmsScriptProperties scriptProperties) {
-        this.scriptExecutor = new GroovyScriptExecutor(restTemplate, scriptProperties);
+    public SmsRobotClient(String endpoint, String accessKey, String secretKey,
+                          String signName, String templateId) {
+        this.scriptExecutor = SpringUtil.getBean(GroovyScriptExecutor.class);
         
         // 初始化配置参数
         this.configParams = new HashMap<>();
@@ -65,6 +63,7 @@ public class SmsRobotClient implements RobotClient {
             scriptParams.put("templateParams", smsMessage.getTemplateParams());
             scriptParams.put("content", smsMessage.getContent());
             scriptParams.put("provider", provider);
+
             // 执行对应提供商的脚本
             ScriptExecuteResult result = scriptExecutor.executeScript(provider, scriptParams);
             log.info("SMS sent result: {}", result.getResult());

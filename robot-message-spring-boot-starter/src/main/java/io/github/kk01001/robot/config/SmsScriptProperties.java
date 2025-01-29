@@ -2,6 +2,7 @@ package io.github.kk01001.robot.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map;
  * 用于配置不同短信提供商的Groovy脚本
  */
 @Data
+@RefreshScope
 @ConfigurationProperties(prefix = "sms")
 public class SmsScriptProperties {
     

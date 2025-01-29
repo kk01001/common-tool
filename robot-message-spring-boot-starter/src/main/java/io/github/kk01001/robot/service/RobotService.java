@@ -1,11 +1,11 @@
 package io.github.kk01001.robot.service;
 
 import io.github.kk01001.robot.client.RobotClient;
+import io.github.kk01001.robot.config.RobotProperties;
 import io.github.kk01001.robot.message.RobotMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 /**
  * 机器人服务
@@ -13,26 +13,21 @@ import java.util.Map;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RobotService {
 
     /**
-     * 机器人客户端映射
-     * key: 机器人ID
-     * value: 对应的机器人客户端实现
+     * 机器人配置属性
      */
-    private final Map<String, RobotClient> robotClients;
-    
-    public RobotService(Map<String, RobotClient> robotClients) {
-        this.robotClients = robotClients;
-    }
-    
+    private final RobotProperties robotProperties;
+
     /**
      * 发送消息
      * @param robotId 机器人ID
      * @param message 要发送的消息
      */
     public void sendMessage(String robotId, RobotMessage message) {
-        RobotClient client = robotClients.get(robotId);
+        RobotClient client = robotProperties.getRobotClients().get(robotId);
         if (client == null) {
             throw new IllegalArgumentException("Robot not found: " + robotId);
         }

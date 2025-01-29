@@ -1,17 +1,13 @@
 package io.github.kk01001.robot.service;
 
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.json.JSONUtil;
 import io.github.kk01001.robot.config.RobotProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
@@ -23,10 +19,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MediaUploadService {
 
-    private final RestTemplate restTemplate;
-
     private final RobotProperties robotProperties;
-
+    
     private static final String UPLOAD_URL = "https://qyapi.weixin.qq.com/cgi-bin/webhook/upload_media";
 
     /**
@@ -45,36 +39,26 @@ public class MediaUploadService {
                 throw new IllegalArgumentException("Invalid robotId: " + robotId);
             }
             String key = config.getKey();
+            
             // 构建请求URL
             String url = String.format("%s?key=%s&type=%s", UPLOAD_URL, key, type);
-
-            // 设置请求头
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-            // 构建文件资源
-            ByteArrayResource fileResource = new ByteArrayResource(fileContent) {
-                @Override
-                public String getFilename() {
-                    return filename;
+            
+            // 发送multipart请求
+            try (HttpResponse response = HttpRequest.post(url)
+                .form("media", fileContent, filename)
+                .execute()) {
+                
+                String body = response.body();
+                Map<String, Object> result = JSONUtil.parseObj(body);
+                
+                // 处理响应
+                if ("0".equals(String.valueOf(result.get("errcode")))) {
+                    log.info("Media uploaded successfully: {}", result);
+                    return result;
+                } else {
+                    log.error("Failed to upload media: {}", result);
+                    throw new RuntimeException("Failed to upload media: " + result);
                 }
-            };
-
-            // 构建multipart请求体
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("media", fileResource);
-
-            // 发送请求
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, requestEntity, Map.class);
-
-            // 处理响应
-            if (response.getBody() != null && "0".equals(String.valueOf(response.getBody().get("errcode")))) {
-                log.info("Media uploaded successfully: {}", response.getBody());
-                return response.getBody();
-            } else {
-                log.error("Failed to upload media: {}", response.getBody());
-                throw new RuntimeException("Failed to upload media: " + response.getBody());
             }
         } catch (Exception e) {
             log.error("Error uploading media", e);
