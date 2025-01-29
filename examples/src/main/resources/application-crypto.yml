@@ -1,0 +1,5 @@
+common:
+  params:
+    crypto:
+      type: AES
+      key: yourKey123456

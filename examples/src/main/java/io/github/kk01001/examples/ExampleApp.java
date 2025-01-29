@@ -1,6 +1,7 @@
 package io.github.kk01001.examples;
 
 import io.github.kk01001.common.log.annotation.EnableOperationLog;
+import io.github.kk01001.crypto.annotation.EnableParamsCrypto;
 import io.github.kk01001.examples.log.CustomOperationLogHandler;
 import io.github.kk01001.examples.log.SecurityOperatorInfoProvider;
 import org.springframework.boot.SpringApplication;
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         handler = CustomOperationLogHandler.class,
         provider = SecurityOperatorInfoProvider.class
 )
+@EnableParamsCrypto
 @SpringBootApplication
 public class ExampleApp {
 
