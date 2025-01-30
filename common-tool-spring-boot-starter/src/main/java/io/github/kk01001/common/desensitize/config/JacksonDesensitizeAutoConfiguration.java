@@ -1,8 +1,8 @@
 package io.github.kk01001.common.desensitize.config;
 
-import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.github.kk01001.common.desensitize.handler.DesensitizeHandlerFactory;
+import io.github.kk01001.common.desensitize.jackson.DesensitizeModule;
 import io.github.kk01001.common.desensitize.jackson.DesensitizeSerializer;
 import io.github.kk01001.common.desensitize.properties.DesensitizeProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,9 +20,9 @@ public class JacksonDesensitizeAutoConfiguration {
      */
     @Bean
     @ConditionalOnProperty(prefix = "desensitize", name = "enable-jackson", havingValue = "true", matchIfMissing = true)
-    public Module desensitizeModule(DesensitizeHandlerFactory handlerFactory) {
+    public DesensitizeModule desensitizeModule(DesensitizeHandlerFactory handlerFactory) {
         SimpleModule module = new SimpleModule();
         module.addSerializer(String.class, new DesensitizeSerializer(handlerFactory));
-        return module;
+        return new DesensitizeModule(module);
     }
 } 
