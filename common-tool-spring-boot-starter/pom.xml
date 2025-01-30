@@ -110,6 +110,12 @@
             <version>1.70</version>
             <optional>true</optional>
         </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
 </project>
