@@ -1,0 +1,6 @@
+i18n:
+  enabled: true
+  default-locale: zh_CN
+  basename: i18n/messages
+  cache-seconds: 3600
+  provider: memory  # 使用内存提供者
