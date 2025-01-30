@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev,robot,crypto,docs
+    active: dev,robot,crypto,docs,desensitize
 server:
   servlet:
     context-path: /examples
