@@ -1,0 +1,14 @@
+swagger:
+  enabled: true
+  basic-auth: true  # 开启Basic认证
+  username: admin   # Basic认证用户名
+  password: 123456  # Basic认证密码
+  title: "测试接口文档"
+  description: "这是一个测试文档"
+  version: "1.0.0"
+  contact-name: "作者"
+  contact-email: "example@example.com"
+  contact-url: "https://github.com/example"
+
+knife4j:
+  enable: false
