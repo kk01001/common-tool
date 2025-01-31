@@ -1,10 +1,18 @@
 spring:
   profiles:
     active: dev,robot,crypto,docs,desensitize,dict
+
 server:
   servlet:
     context-path: /examples
+    multipart:
+      max-file-size: -1        # 单个文件大小限制
+      max-request-size: -1     # 总请求大小限制
+      enabled: true
   port: 8080
+  tomcat:
+    max-http-form-post-size: -1
+    max-swallow-size: -1
 excel:
   thread-pool:
     max-parallelism: 10  # 最大并行度
@@ -13,3 +21,5 @@ excel:
     max-sheets-per-file: 10     # 每个文件最大sheet数
     fetch-size: 100000          # 每次查询数据量，调大一些
     temp-dir: /home/temp/excel       # 临时目录
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml

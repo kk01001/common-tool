@@ -15,7 +15,7 @@ public class ExcelThreadPoolConfig {
     @Bean("excelThreadPool")
     public ExecutorService excelThreadPool() {
         ThreadFactory namedThreadFactory = Thread.ofVirtual()
-                .name("excelThreadPool-", 0)
+                .name("excel-pool-", 0)
                 .factory();
        return Executors.newThreadPerTaskExecutor(namedThreadFactory);
     }

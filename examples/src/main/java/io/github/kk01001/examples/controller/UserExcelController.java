@@ -5,6 +5,8 @@ import io.github.kk01001.examples.service.UserExcelService;
 import io.github.kk01001.excel.core.ExportContext;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserExcelController {
 
     private final UserExcelService userExcelService;
+    private static final Logger log = LoggerFactory.getLogger(UserExcelController.class);
 
     /**
      * 导出用户数据

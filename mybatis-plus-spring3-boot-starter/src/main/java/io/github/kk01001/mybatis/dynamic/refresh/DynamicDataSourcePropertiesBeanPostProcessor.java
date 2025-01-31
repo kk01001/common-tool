@@ -1,6 +1,5 @@
 package io.github.kk01001.mybatis.dynamic.refresh;
 
-import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -20,12 +19,8 @@ public class DynamicDataSourcePropertiesBeanPostProcessor implements BeanPostPro
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        System.out.println(beanName);
         if (bean instanceof DynamicDataSourceProperties properties) {
             dataSourceRefresher.refreshDataSourceIfNeeded(properties);
-        }
-        if (bean instanceof DynamicRoutingDataSource) {
-            System.out.println("111");
         }
         return bean;
     }

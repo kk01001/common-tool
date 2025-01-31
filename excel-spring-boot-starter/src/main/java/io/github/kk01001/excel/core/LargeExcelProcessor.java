@@ -178,11 +178,12 @@ public class LargeExcelProcessor<T> extends AbstractExcelProcessor<T> {
                                 List<Integer> pages,
                                 int excelIndex,
                                 int fetchSize) throws IOException {
-        try (ExcelWriter excelWriter = FastExcel.write(excelFile, entityClass).build()) {
+        try (ExcelWriter excelWriter = FastExcel.write(excelFile, entityClass)
+                .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
+                .build()) {
             String sheetName = getSheetName(context.getSheetName(), excelIndex);
             // 这里注意 如果同一个sheet只要创建一次
             WriteSheet writeSheet = EasyExcel.writerSheet(sheetName)
-                    .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
                     .build();
 
             // 遍历每一页数据
