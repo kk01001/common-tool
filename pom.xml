@@ -27,6 +27,7 @@
         <module>push-spring-boot-starter</module>
         <module>robot-message-spring-boot-starter</module>
         <module>docs-spring-boot-starter</module>
+        <module>excel-spring-boot-starter</module>
     </modules>
 
     <properties>

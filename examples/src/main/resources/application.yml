@@ -5,3 +5,11 @@ server:
   servlet:
     context-path: /examples
   port: 8080
+excel:
+  thread-pool:
+    max-parallelism: 10  # 最大并行度
+  export:
+    max-rows-per-sheet: 1000000  # 每个sheet最大行数
+    max-sheets-per-file: 10     # 每个文件最大sheet数
+    fetch-size: 100000          # 每次查询数据量，调大一些
+    temp-dir: /home/temp/excel       # 临时目录

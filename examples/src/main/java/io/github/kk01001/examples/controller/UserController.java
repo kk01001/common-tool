@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/user")
@@ -54,25 +56,31 @@ public class UserController {
         userService.save(user);
         return user;
     }
+
     
     /**
      * 批量生成测试数据
      */
     @PostMapping("/batch")
     public boolean batchSave(@RequestParam(defaultValue = "10") Integer count) {
-        List<User> users = new ArrayList<>();
-        Random random = new Random();
-        
-        for (int i = 0; i < count; i++) {
-            User user = new User();
-            user.setUsername("test" + i);
-            user.setStatus(STATUS_ARRAY[random.nextInt(STATUS_ARRAY.length)]);
-            user.setType(TYPE_ARRAY[random.nextInt(TYPE_ARRAY.length)]);
-            user.setEmail("test" + i + "@example.com");
-            users.add(user);
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+        for (int i = 0; i < 100; i++) {
+            executor.execute(() -> {
+                List<User> users = new ArrayList<>();
+                Random random = new Random();
+                for (int j = 0; j < count; j++) {
+                    User user = new User();
+                    user.setUsername("test" + j);
+                    user.setStatus(STATUS_ARRAY[random.nextInt(STATUS_ARRAY.length)]);
+                    user.setType(TYPE_ARRAY[random.nextInt(TYPE_ARRAY.length)]);
+                    user.setEmail("test" + j + "@example.com");
+                    users.add(user);
+                }
+                userService.saveBatch(users);
+            });
         }
-        
-        return userService.saveBatch(users);
+
+        return true;
     }
     
     /**
