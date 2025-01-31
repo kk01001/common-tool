@@ -89,6 +89,12 @@
 
         <dependency>
             <groupId>io.github.kk01001</groupId>
+            <artifactId>netty-spring-boot-starter</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.kk01001</groupId>
             <artifactId>lock-spring-boot-starter</artifactId>
             <version>2.3.0</version>
         </dependency>

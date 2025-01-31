@@ -28,6 +28,7 @@
         <module>robot-message-spring-boot-starter</module>
         <module>docs-spring-boot-starter</module>
         <module>excel-spring-boot-starter</module>
+        <module>netty-spring-boot-starter</module>
     </modules>
 
     <properties>

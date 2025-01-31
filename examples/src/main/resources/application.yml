@@ -1,6 +1,9 @@
 spring:
   profiles:
     active: dev,robot,crypto,docs,desensitize,dict
+  redis:
+    host: localhost
+    port: 6379
 
 server:
   servlet:
@@ -8,6 +11,10 @@ server:
     multipart:
       max-file-size: -1        # 单个文件大小限制
       max-request-size: -1     # 总请求大小限制
+      enabled: true
+    encoding:
+      charset: UTF-8
+      force: true
       enabled: true
   port: 8080
   tomcat:
@@ -23,3 +30,21 @@ excel:
     temp-dir: /home/temp/excel       # 临时目录
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
+
+netty:
+  websocket:
+    port: 9081
+    path: /chat
+    # 配置子协议
+    #    subprotocols:
+    #      - v1.protocol.example.com
+    #      - v2.protocol.example.com
+    # 其他配置
+    boss-threads: 1
+    worker-threads: 4
+    max-frame-size: 65536
+    session-timeout: 30m  # 30分钟
+    cluster:
+      enabled: true
+      topic: ws:chat
+      session-timeout: 1h  # 1小时

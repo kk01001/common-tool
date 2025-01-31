@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket聊天室</title>
+    <style>
+        #messageArea {
+            width: 500px;
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        #messageInput {
+            width: 400px;
+            padding: 5px;
+        }
+        .system-message {
+            color: #666;
+            font-style: italic;
+        }
+        .user-message {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <h2>WebSocket聊天室</h2>
+    <div id="messageArea"></div>
+    <input type="text" id="messageInput" placeholder="输入消息...">
+    <button onclick="sendMessage()">发送</button>
+
+    <script>
+        let ws;
+        const messageArea = document.getElementById('messageArea');
+        const messageInput = document.getElementById('messageInput');
+
+        function connect() {
+            // 根据实际部署修改WebSocket地址
+            ws = new WebSocket('ws://localhost:9081/chat');
+
+            ws.onopen = function() {
+                appendMessage('系统消息：连接成功', true);
+            };
+
+            ws.onmessage = function(event) {
+                appendMessage(event.data, false);
+            };
+
+            ws.onclose = function() {
+                appendMessage('系统消息：连接断开', true);
+                // 尝试重连
+                setTimeout(connect, 3000);
+            };
+
+            ws.onerror = function(error) {
+                appendMessage('系统消息：发生错误', true);
+                console.error('WebSocket错误:', error);
+            };
+        }
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(message);
+                messageInput.value = '';
+            }
+        }
+
+        function appendMessage(message, isSystem) {
+            const div = document.createElement('div');
+            div.className = isSystem ? 'system-message' : 'user-message';
+            div.textContent = message;
+            messageArea.appendChild(div);
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+
+        // 按Enter发送消息
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // 连接WebSocket
+        connect();
+    </script>
+</body>
+</html> 
