@@ -1,58 +1,55 @@
 package io.github.kk01001.common.dict;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DictCache {
-
+    
     private static DictLoader dictLoader;
-
+    
     private static final Map<String, Map<String, String>> CACHE = new ConcurrentHashMap<>();
-
-    /**
-     * 初始化字典加载器
-     */
+    
     public static void init(DictLoader loader) {
         dictLoader = loader;
+        // 初始化时加载所有字典
+        refreshAll();
     }
-
-    /**
-     * 获取字典文本
-     */
-    public static String getDictText(String type, String code) {
-        if (!StringUtils.hasText(type) || !StringUtils.hasText(code)) {
+    
+    public static String getDictText(String type, String value) {
+        if (value == null) {
             return null;
         }
-        return CACHE.computeIfAbsent(type, key -> {
-            Map<String, String> dict = dictLoader.loadDict(key);
-            refresh(type, dict);
-            log.debug("Dictionary loaded for type: {}, size: {}", key, dict.size());
-            return dict;
-        }).get(code);
+        
+        // 先从缓存获取
+        Map<String, String> dictMap = CACHE.get(type);
+        if (dictMap == null) {
+            // 如果缓存中没有，则从加载器加载
+            dictMap = dictLoader.loadDict(type);
+            if (dictMap != null) {
+                CACHE.put(type, dictMap);
+            } else {
+                return value;
+            }
+        }
+        
+        // 返回翻译后的文本，如果没有找到则返回原值
+        return dictMap.getOrDefault(value, value);
     }
-
-    /**
-     * 刷新指定类型的字典缓存
-     */
+    
     public static void refresh(String type, Map<String, String> dict) {
         CACHE.put(type, dict);
-        log.debug("Dictionary cache refreshed for type: {}, size: {}", type, dict.size());
     }
-
-    /**
-     * 刷新所有字典缓存
-     */
+    
     public static void refreshAll() {
-        CACHE.clear();
-        Map<String, Map<String, String>> allDict = dictLoader.loadAllDict();
-        CACHE.putAll(allDict);
-        log.debug("All dictionary cache refreshed, types: {}", allDict.keySet());
+        if (dictLoader != null) {
+            Map<String, Map<String, String>> allDict = dictLoader.loadAllDict();
+            if (allDict != null) {
+                CACHE.clear();
+                CACHE.putAll(allDict);
+            }
+        }
     }
 } 

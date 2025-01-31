@@ -25,6 +25,7 @@ public class GlobalExceptionHandler implements Ordered {
      */
     @ExceptionHandler(Exception.class)
     public ApiResponse<?> errorHandler(Exception e) {
+        log.error(e.getMessage(), e);
         return ApiResponse.failOfMessage(e.getMessage(), 500);
     }
 
