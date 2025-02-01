@@ -91,6 +91,13 @@ public class WebSocketSession {
     }
 
     /**
+     * 给指定会话发送消息
+     */
+    public void sendToSession(String sessionId, String message) {
+        sessionManager.sendToSession(path, sessionId, message);
+    }
+
+    /**
      * 关闭会话
      */
     public void close() {

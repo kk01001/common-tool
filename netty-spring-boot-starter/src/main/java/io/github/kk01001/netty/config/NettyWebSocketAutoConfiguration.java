@@ -5,6 +5,7 @@ import io.github.kk01001.netty.cluster.ClusterMessageHandler;
 import io.github.kk01001.netty.cluster.DefaultClusterMessageHandler;
 import io.github.kk01001.netty.cluster.RedisWebSocketClusterManager;
 import io.github.kk01001.netty.cluster.WebSocketClusterManager;
+import io.github.kk01001.netty.message.MessageDispatcher;
 import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
 import io.github.kk01001.netty.server.NettyWebSocketServer;
 import io.github.kk01001.netty.session.WebSocketSessionManager;
@@ -13,6 +14,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -50,10 +52,11 @@ public class NettyWebSocketAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "netty.websocket.cluster.enabled", havingValue = "true", matchIfMissing = true)
-    public WebSocketSessionManager webSocketSessionManager(
+    public MessageDispatcher messageDispatcher(
             ScheduledExecutorService scheduler,
-            NettyWebSocketProperties properties) {
-        return new WebSocketSessionManager(scheduler, properties);
+            NettyWebSocketProperties properties,
+            ApplicationEventPublisher eventPublisher) {
+        return new WebSocketSessionManager(scheduler, properties, eventPublisher);
     }
     
     @Bean
@@ -64,10 +67,10 @@ public class NettyWebSocketAutoConfiguration {
             ObjectMapper objectMapper,
             NettyWebSocketProperties properties,
             RedisMessageListenerContainer listenerContainer,
-            ClusterMessageHandler messageHandler,
+            ClusterMessageHandler clusterMessageHandler,
             ScheduledExecutorService scheduler) {
         return new RedisWebSocketClusterManager(
-                redisTemplate, objectMapper, properties, listenerContainer, messageHandler, scheduler);
+                redisTemplate, objectMapper, properties, listenerContainer, clusterMessageHandler, scheduler);
     }
     
     @Bean
@@ -78,9 +81,9 @@ public class NettyWebSocketAutoConfiguration {
     @Bean
     public NettyWebSocketServer nettyWebSocketServer(
             WebSocketEndpointRegistry registry,
-            WebSocketSessionManager sessionManager,
+            MessageDispatcher messageDispatcher,
             NettyWebSocketProperties properties) {
-        return new NettyWebSocketServer(registry, sessionManager, properties);
+        return new NettyWebSocketServer(registry, (WebSocketSessionManager) messageDispatcher, properties);
     }
     
     @Bean
@@ -100,7 +103,7 @@ public class NettyWebSocketAutoConfiguration {
     @Bean
     @ConditionalOnProperty(name = "netty.websocket.cluster.enabled", havingValue = "true")
     @ConditionalOnMissingBean
-    public ClusterMessageHandler clusterMessageHandler(WebSocketSessionManager sessionManager) {
-        return new DefaultClusterMessageHandler(sessionManager);
+    public ClusterMessageHandler clusterMessageHandler(MessageDispatcher messageDispatcher) {
+        return new DefaultClusterMessageHandler(messageDispatcher);
     }
 }

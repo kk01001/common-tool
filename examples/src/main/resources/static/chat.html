@@ -23,18 +23,41 @@
         .user-message {
             color: #000;
         }
+        .private-message {
+            color: #0066cc;
+            font-weight: bold;
+        }
+        #sessionInfo {
+            margin-bottom: 10px;
+            color: #666;
+        }
+        #targetSessionId {
+            width: 200px;
+            padding: 5px;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <h2>WebSocket聊天室</h2>
+    <div id="sessionInfo">
+        我的ID: <span id="mySessionId">正在连接...</span>
+        <button onclick="copySessionId()">复制ID</button>
+    </div>
+    <div>
+        发送给: <input type="text" id="targetSessionId" placeholder="输入目标用户ID，为空则广播">
+    </div>
     <div id="messageArea"></div>
     <input type="text" id="messageInput" placeholder="输入消息...">
     <button onclick="sendMessage()">发送</button>
 
     <script>
         let ws;
+        let mySessionId;
         const messageArea = document.getElementById('messageArea');
         const messageInput = document.getElementById('messageInput');
+        const targetSessionInput = document.getElementById('targetSessionId');
+        const mySessionIdSpan = document.getElementById('mySessionId');
 
         function connect() {
             // 根据实际部署修改WebSocket地址
@@ -45,11 +68,54 @@
             };
 
             ws.onmessage = function(event) {
-                appendMessage(event.data, false);
+                try {
+                    const message = JSON.parse(event.data);
+                    switch (message.type) {
+                        case 'JOIN':
+                            if (!mySessionId) {
+                                mySessionId = message.fromSessionId;
+                                mySessionIdSpan.textContent = mySessionId;
+                            }
+                            appendMessage(`系统消息：用户 ${message.fromSessionId} ${message.content}`, true);
+                            break;
+                            
+                        case 'LEAVE':
+                            appendMessage(`系统消息：用户 ${message.fromSessionId} ${message.content}`, true);
+                            break;
+                            
+                        case 'BROADCAST':
+                            const isSelf = message.fromSessionId === mySessionId;
+                            const time = new Date(message.timestamp).toLocaleTimeString();
+                            if (isSelf) {
+                                appendMessage(`我说：${message.content}`, false);
+                            } else {
+                                appendMessage(`[${time}] 用户 ${message.fromSessionId} 说：${message.content}`, false);
+                            }
+                            break;
+                            
+                        case 'PRIVATE':
+                            const isPrivateSelf = message.fromSessionId === mySessionId;
+                            if (isPrivateSelf) {
+                                appendMessage(`我对 ${message.toSessionId} 说：${message.content}`, false, true);
+                            } else {
+                                appendMessage(`用户 ${message.fromSessionId} 对我说：${message.content}`, false, true);
+                            }
+                            break;
+                            
+                        case 'SYSTEM':
+                            appendMessage(`系统消息：${message.content}`, true);
+                            break;
+                    }
+                } catch (e) {
+                    console.error('处理消息失败:', e);
+                    appendMessage(event.data, false);
+                }
             };
 
             ws.onclose = function() {
                 appendMessage('系统消息：连接断开', true);
+                mySessionId = null;
+                mySessionIdSpan.textContent = '已断开';
                 // 尝试重连
                 setTimeout(connect, 3000);
             };
@@ -62,18 +128,38 @@
 
         function sendMessage() {
             const message = messageInput.value.trim();
+            const targetId = targetSessionInput.value.trim();
+            
             if (message && ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(message);
+                if (targetId) {
+                    ws.send(`@${targetId}:${message}`);
+                } else {
+                    ws.send(message);
+                }
                 messageInput.value = '';
             }
         }
 
-        function appendMessage(message, isSystem) {
+        function appendMessage(message, isSystem, isPrivate) {
             const div = document.createElement('div');
-            div.className = isSystem ? 'system-message' : 'user-message';
-            div.textContent = message;
+            div.className = isSystem ? 'system-message' : 
+                           isPrivate ? 'private-message' : 'user-message';
+            if (!message.startsWith('我') && !isSystem && !message.includes('说：')) {
+                const time = new Date().toLocaleTimeString();
+                div.textContent = `[${time}] ${message}`;
+            } else {
+                div.textContent = message;
+            }
             messageArea.appendChild(div);
             messageArea.scrollTop = messageArea.scrollHeight;
+        }
+
+        function copySessionId() {
+            if (mySessionId) {
+                navigator.clipboard.writeText(mySessionId)
+                    .then(() => alert('ID已复制到剪贴板'))
+                    .catch(err => alert('复制失败: ' + err));
+            }
         }
 
         // 按Enter发送消息

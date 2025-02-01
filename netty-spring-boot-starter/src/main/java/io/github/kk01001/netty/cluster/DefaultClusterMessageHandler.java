@@ -1,7 +1,6 @@
 package io.github.kk01001.netty.cluster;
 
-import io.github.kk01001.netty.session.WebSocketSession;
-import io.github.kk01001.netty.session.WebSocketSessionManager;
+import io.github.kk01001.netty.message.MessageDispatcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,19 +8,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class DefaultClusterMessageHandler implements ClusterMessageHandler {
     
-    private final WebSocketSessionManager sessionManager;
+    private final MessageDispatcher messageDispatcher;
     
     @Override
     public void handleBroadcastMessage(String path, String message) {
-        sessionManager.broadcast(path, message);
+        messageDispatcher.broadcast(path, message);
     }
     
     @Override
     public void handlePrivateMessage(String path, String targetSessionId, String message) {
-        WebSocketSession session = sessionManager.getSession(path, targetSessionId);
-        if (session != null && session.isActive()) {
-            session.sendMessage(message);
-        }
+        messageDispatcher.sendToSession(path, targetSessionId, message);
     }
     
     @Override

@@ -2,9 +2,11 @@ package io.github.kk01001.netty.cluster;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.kk01001.netty.config.NettyWebSocketProperties;
+import io.github.kk01001.netty.event.WebSocketMessageEvent;
 import io.github.kk01001.netty.session.WebSocketSession;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -18,7 +20,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class RedisWebSocketClusterManager implements WebSocketClusterManager {
+public class RedisWebSocketClusterManager implements WebSocketClusterManager, ApplicationListener<WebSocketMessageEvent> {
     
     private static final String SESSION_KEY_PREFIX = "ws:session:";
     private static final String NODE_KEY_PREFIX = "ws:node:";
@@ -221,6 +223,16 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     
     private String getBroadcastChannel(String path) {
         return BROADCAST_CHANNEL_PREFIX + path;
+    }
+
+    @Override
+    public void onApplicationEvent(WebSocketMessageEvent event) {
+        // 处理消息事件
+        if (event.getTargetSessionId() != null) {
+            broadcast(event.getPath(), event.getMessage(), event.getTargetSessionId());
+        } else {
+            broadcast(event.getPath(), event.getMessage(), null);
+        }
     }
     
     @Data

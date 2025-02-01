@@ -48,3 +48,10 @@ netty:
       enabled: true
       topic: ws:chat
       session-timeout: 1h  # 1小时
+
+logging:
+  level:
+    io:
+      github:
+        kk01001:
+          netty: debug
