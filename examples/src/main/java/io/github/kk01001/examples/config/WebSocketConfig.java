@@ -5,6 +5,8 @@ import io.github.kk01001.netty.config.ChannelOptionCustomizer;
 import io.github.kk01001.netty.config.WebSocketPipelineConfigurer;
 import io.github.kk01001.netty.filter.MessageFilter;
 import io.github.kk01001.netty.filter.SensitiveWordFilter;
+import io.github.kk01001.netty.filter.MessageSizeFilter;
+import io.github.kk01001.netty.filter.MessageRateLimiter;
 import io.github.kk01001.netty.session.WebSocketSession;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -86,6 +88,16 @@ public class WebSocketConfig {
         sensitiveWords.add("敏感词1");
         sensitiveWords.add("敏感词2");
         return new SensitiveWordFilter(sensitiveWords);
+    }
+
+    @Bean
+    public MessageFilter messageSizeFilter() {
+        return new MessageSizeFilter(4096); // 4KB
+    }
+
+    @Bean
+    public MessageFilter messageRateLimiter() {
+        return new MessageRateLimiter(10); // 每秒10条消息
     }
 
     @Bean

@@ -8,6 +8,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -47,9 +48,11 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
         // 处理文本消息
         if (frame instanceof TextWebSocketFrame textFrame) {
             String message = textFrame.text();
-
+            
             // 应用消息过滤器
             if (messageFilters != null) {
+                // 按优先级排序
+                messageFilters.sort(Comparator.comparingInt(MessageFilter::getOrder));
                 for (MessageFilter filter : messageFilters) {
                     if (!filter.doFilter(session, message)) {
                         log.debug("消息被过滤: sessionId={}, message={}", session.getId(), message);
@@ -57,7 +60,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
                     }
                 }
             }
-
+            
             log.debug("收到文本消息: sessionId={}, message={}", session.getId(), message);
             registry.handleMessage(session, message);
             return;
