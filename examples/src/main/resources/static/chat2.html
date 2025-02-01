@@ -115,7 +115,9 @@
                 appendMessage('请输入token', 'error-message');
                 return;
             }
-            
+
+            // 根据是否启用SSL使用不同的协议
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             ws = new WebSocket(`ws://localhost:9081/chat?token=${token}`);
             
             ws.onopen = function() {
@@ -132,6 +134,9 @@
                 }
 
                 try {
+                    if ("pong" === event.data) {
+                        return;
+                    }
                     const message = JSON.parse(event.data);
                     switch (message.type) {
                         case 'JOIN':
@@ -188,8 +193,10 @@
             
             if (ws && ws.readyState === WebSocket.OPEN) {
                 if (targetId) {
+                    // 私聊消息
                     ws.send(`@${targetId}:${message}`);
                 } else {
+                    // 广播消息
                     ws.send(message);
                 }
                 messageInput.value = '';

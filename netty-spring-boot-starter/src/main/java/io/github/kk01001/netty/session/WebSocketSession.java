@@ -83,7 +83,7 @@ public class WebSocketSession {
     }
 
     /**
-     * 广播消息给同路径的其他会话
+     * 广播消息给同路径的其他会话（不包括自己）
      */
     public void broadcast(String message) {
         sessionManager.broadcast(path, message, session -> !session.getId().equals(this.id));

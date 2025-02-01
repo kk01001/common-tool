@@ -31,6 +31,10 @@ public class ChatEndpoint {
         log.info("收到消息: sessionId={}, message={}", session.getId(), message);
 
         try {
+            if ("ping".equals(message)) {
+                session.sendMessage("pong");
+                return;
+            }
             if (message.startsWith("@")) {
                 // 处理私聊消息
                 int idx = message.indexOf(":");

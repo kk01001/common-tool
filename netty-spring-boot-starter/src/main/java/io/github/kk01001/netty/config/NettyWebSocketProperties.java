@@ -58,6 +58,11 @@ public class NettyWebSocketProperties {
      */
     private Heartbeat heartbeat = new Heartbeat();
     
+    /**
+     * SSL配置
+     */
+    private Ssl ssl = new Ssl();
+    
     @Data
     public static class Cluster {
         /**
@@ -92,5 +97,28 @@ public class NettyWebSocketProperties {
          * 写空闲超时时间(秒)
          */
         private int writerIdleTime = 30;
+    }
+    
+    @Data
+    public static class Ssl {
+        /**
+         * 是否启用SSL
+         */
+        private boolean enabled = false;
+        
+        /**
+         * 证书路径
+         */
+        private String certPath;
+        
+        /**
+         * 私钥路径
+         */
+        private String keyPath;
+        
+        /**
+         * 私钥密码
+         */
+        private String keyPassword;
     }
 } 

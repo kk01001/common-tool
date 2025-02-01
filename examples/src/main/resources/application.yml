@@ -1,9 +1,6 @@
 spring:
   profiles:
     active: dev,robot,crypto,docs,desensitize,dict
-  redis:
-    host: localhost
-    port: 6379
 
 server:
   servlet:
@@ -53,11 +50,13 @@ netty:
       enabled: true
       reader-idle-time: 60  # 60秒没收到数据就断开连接
       writer-idle-time: 30  # 30秒发送一次心跳包
+    ssl:
+      enabled: false
+      # openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.crt
+      cert-path: /Users/lin/home/code/github/common-tool/examples/src/main/resources/ssl/server.crt
+      key-path: /Users/lin/home/code/github/common-tool/examples/src/main/resources/ssl/server.key
+#      key-password: your-password
 
 logging:
   level:
-    io:
-      github:
-        kk01001:
-          netty: debug
     io.github.kk01001.netty: debug

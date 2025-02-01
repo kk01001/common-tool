@@ -20,6 +20,11 @@ import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
+import javax.net.ssl.SSLEngine;
+import java.io.File;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +41,7 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel serverChannel;
+    private SslContext sslContext;
     
     public NettyWebSocketServer(
             WebSocketEndpointRegistry registry,
@@ -58,12 +64,27 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
     
     @Override
     public void afterPropertiesSet() throws Exception {
+        // 初始化SSL上下文
+        if (properties.getSsl().isEnabled()) {
+            initSslContext();
+        }
         start();
     }
     
     @Override
     public void destroy() throws Exception {
         stop();
+    }
+    
+    private void initSslContext() throws Exception {
+        File certFile = new File(properties.getSsl().getCertPath());
+        File keyFile = new File(properties.getSsl().getKeyPath());
+        String keyPassword = properties.getSsl().getKeyPassword();
+        
+        sslContext = SslContextBuilder.forServer(certFile, keyFile, keyPassword)
+                .build();
+        
+        log.info("SSL上下文初始化成功");
     }
     
     /**
@@ -81,6 +102,13 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
                         @Override
                         protected void initChannel(SocketChannel ch) {
                             ChannelPipeline pipeline = ch.pipeline();
+                            
+                            // 添加SSL处理器
+                            if (properties.getSsl().isEnabled() && sslContext != null) {
+                                SSLEngine engine = sslContext.newEngine(ch.alloc());
+                                engine.setUseClientMode(false);
+                                pipeline.addFirst("ssl", new SslHandler(engine));
+                            }
                             
                             // HTTP编解码
                             pipeline.addLast(new HttpServerCodec());

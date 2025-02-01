@@ -10,4 +10,9 @@ public class ChatController {
     public String chat() {
         return "forward:/chat.html";
     }
+
+    @GetMapping(value = "/chat2", produces = "text/html;charset=UTF-8")
+    public String chat2() {
+        return "forward:/chat2.html";
+    }
 } 
