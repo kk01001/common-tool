@@ -1,6 +1,8 @@
 package io.github.kk01001.netty.server;
 
+import io.github.kk01001.netty.auth.WebSocketAuthenticator;
 import io.github.kk01001.netty.config.NettyWebSocketProperties;
+import io.github.kk01001.netty.handler.WebSocketAuthHandshakeHandler;
 import io.github.kk01001.netty.handler.WebSocketHandler;
 import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
 import io.github.kk01001.netty.session.WebSocketSession;
@@ -12,7 +14,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -26,6 +27,8 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
     private final WebSocketEndpointRegistry registry;
     private final WebSocketSessionManager sessionManager;
     private final NettyWebSocketProperties properties;
+    private final WebSocketAuthenticator authenticator;
+    private final WebSocketAuthHandshakeHandler handshakeHandler;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel serverChannel;
@@ -33,10 +36,19 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
     public NettyWebSocketServer(
             WebSocketEndpointRegistry registry,
             WebSocketSessionManager sessionManager,
-            NettyWebSocketProperties properties) {
+            NettyWebSocketProperties properties,
+            WebSocketAuthenticator authenticator) {
         this.registry = registry;
         this.sessionManager = sessionManager;
         this.properties = properties;
+        this.authenticator = authenticator;
+        this.handshakeHandler = new WebSocketAuthHandshakeHandler(
+                properties.getPath(),
+                String.join(",", properties.getSubprotocols()),
+                true,
+                properties.getMaxFrameSize(),
+                authenticator
+        );
     }
     
     @Override
@@ -71,21 +83,23 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
                             pipeline.addLast(new ChunkedWriteHandler());
                             // HTTP消息聚合
                             pipeline.addLast(new HttpObjectAggregator(properties.getMaxFrameSize()));
-                            
-                            // WebSocket协议处理
-                            pipeline.addLast(new WebSocketServerProtocolHandler(properties.getPath(), 
-                                    String.join(",", properties.getSubprotocols()), 
-                                    true, 
-                                    properties.getMaxFrameSize()));
+
+                            // WebSocket握手和鉴权处理
+                            pipeline.addLast(handshakeHandler);
                             
                             // 创建会话
                             String sessionId = UUID.randomUUID().toString();
+                            String userId = null;
+                            if (properties.isAuthEnabled()) {
+                                userId = ch.attr(WebSocketAuthHandshakeHandler.USER_ID_ATTR).get();
+                            }
                             WebSocketSession session = new WebSocketSession(
                                     sessionId, 
                                     ch, 
                                     properties.getPath(),
                                     ch.remoteAddress().toString(),
-                                    sessionManager
+                                    sessionManager,
+                                    userId
                             );
                             sessionManager.addSession(properties.getPath(), session);
                             

@@ -35,6 +35,7 @@ netty:
   websocket:
     port: 9081
     path: /chat
+    auth-enabled: true  # 启用鉴权
     # 配置子协议
     #    subprotocols:
     #      - v1.protocol.example.com
@@ -55,3 +56,4 @@ logging:
       github:
         kk01001:
           netty: debug
+    io.github.kk01001.netty: debug

@@ -51,12 +51,18 @@ public class WebSocketSession {
      */
     private volatile long lastActiveTime = System.currentTimeMillis();
     
-    public WebSocketSession(String id, Channel channel, String path, String uri, WebSocketSessionManager sessionManager) {
+    /**
+     * 用户ID
+     */
+    private final String userId;
+    
+    public WebSocketSession(String id, Channel channel, String path, String uri, WebSocketSessionManager sessionManager, String userId) {
         this.id = id;
         this.channel = channel;
         this.path = path;
         this.uri = uri;
         this.sessionManager = sessionManager;
+        this.userId = userId;
     }
     
     /**

@@ -60,8 +60,8 @@
         const mySessionIdSpan = document.getElementById('mySessionId');
 
         function connect() {
-            // 根据实际部署修改WebSocket地址
-            ws = new WebSocket('ws://localhost:9081/chat');
+            const token = getToken(); // 获取token的方法
+            ws = new WebSocket(`ws://localhost:9081/chat?token=${token}`);
 
             ws.onopen = function() {
                 appendMessage('系统消息：连接成功', true);

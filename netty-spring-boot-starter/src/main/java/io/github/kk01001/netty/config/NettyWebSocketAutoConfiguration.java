@@ -1,6 +1,8 @@
 package io.github.kk01001.netty.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.kk01001.netty.auth.DefaultWebSocketAuthenticator;
+import io.github.kk01001.netty.auth.WebSocketAuthenticator;
 import io.github.kk01001.netty.cluster.ClusterMessageHandler;
 import io.github.kk01001.netty.cluster.DefaultClusterMessageHandler;
 import io.github.kk01001.netty.cluster.RedisWebSocketClusterManager;
@@ -20,6 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -79,11 +82,22 @@ public class NettyWebSocketAutoConfiguration {
     }
     
     @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(name = "netty.websocket.auth-enabled", havingValue = "true")
+    public WebSocketAuthenticator webSocketAuthenticator() {
+        return new DefaultWebSocketAuthenticator();
+    }
+    
+    @Bean
     public NettyWebSocketServer nettyWebSocketServer(
             WebSocketEndpointRegistry registry,
             MessageDispatcher messageDispatcher,
-            NettyWebSocketProperties properties) {
-        return new NettyWebSocketServer(registry, (WebSocketSessionManager) messageDispatcher, properties);
+            NettyWebSocketProperties properties,
+            @Autowired(required = false) WebSocketAuthenticator authenticator) {
+        return new NettyWebSocketServer(registry, 
+                (WebSocketSessionManager)messageDispatcher, 
+                properties, 
+                authenticator);
     }
     
     @Bean

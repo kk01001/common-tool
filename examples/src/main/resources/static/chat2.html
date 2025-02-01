@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket聊天室</title>
+    <style>
+        .container {
+            width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .auth-section {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        
+        .chat-section {
+            display: none;  /* 默认隐藏聊天区域 */
+        }
+        
+        #messageArea {
+            height: 300px;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            padding: 10px;
+            overflow-y: auto;
+            background: #fff;
+        }
+        
+        .input-group {
+            margin: 10px 0;
+        }
+        
+        input[type="text"] {
+            width: 200px;
+            padding: 5px;
+            margin-right: 10px;
+        }
+        
+        button {
+            padding: 5px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        .system-message {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .user-message {
+            color: #000;
+        }
+        
+        .private-message {
+            color: #0066cc;
+            font-weight: bold;
+        }
+        
+        .error-message {
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 鉴权区域 -->
+        <div class="auth-section" id="authSection">
+            <div class="input-group">
+                <input type="text" id="tokenInput" placeholder="请输入token">
+                <button onclick="connect()">连接</button>
+            </div>
+        </div>
+        
+        <!-- 聊天区域 -->
+        <div class="chat-section" id="chatSection">
+            <div>当前用户ID: <span id="currentUserId">未连接</span></div>
+            <div id="messageArea"></div>
+            <div class="input-group">
+                <input type="text" id="targetSessionId" placeholder="目标用户ID（为空则广播）">
+            </div>
+            <div class="input-group">
+                <input type="text" id="messageInput" placeholder="请输入消息">
+                <button onclick="sendMessage()">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws;
+        const authSection = document.getElementById('authSection');
+        const chatSection = document.getElementById('chatSection');
+        const tokenInput = document.getElementById('tokenInput');
+        const messageArea = document.getElementById('messageArea');
+        const messageInput = document.getElementById('messageInput');
+        const targetSessionId = document.getElementById('targetSessionId');
+        const currentUserId = document.getElementById('currentUserId');
+        
+        function connect() {
+            const token = tokenInput.value.trim();
+            if (!token) {
+                appendMessage('请输入token', 'error-message');
+                return;
+            }
+            
+            ws = new WebSocket(`ws://localhost:9081/chat?token=${token}`);
+            
+            ws.onopen = function() {
+                appendMessage('连接成功', 'system-message');
+                authSection.style.display = 'none';
+                chatSection.style.display = 'block';
+                currentUserId.textContent = token;  // 使用token作为用户ID
+            };
+            
+            ws.onmessage = function(event) {
+                try {
+                    const message = JSON.parse(event.data);
+                    switch (message.type) {
+                        case 'JOIN':
+                            appendMessage(`用户 ${message.fromSessionId} ${message.content}`, 'system-message');
+                            break;
+                        case 'LEAVE':
+                            appendMessage(`用户 ${message.fromSessionId} ${message.content}`, 'system-message');
+                            break;
+                        case 'BROADCAST':
+                            const isSelf = message.fromSessionId === token;
+                            const time = new Date(message.timestamp).toLocaleTimeString();
+                            if (isSelf) {
+                                appendMessage(`我说：${message.content}`, 'user-message');
+                            } else {
+                                appendMessage(`[${time}] 用户 ${message.fromSessionId} 说：${message.content}`, 'user-message');
+                            }
+                            break;
+                        case 'PRIVATE':
+                            const isPrivateSelf = message.fromSessionId === token;
+                            if (isPrivateSelf) {
+                                appendMessage(`我对 ${message.toSessionId} 说：${message.content}`, 'private-message');
+                            } else {
+                                appendMessage(`用户 ${message.fromSessionId} 对我说：${message.content}`, 'private-message');
+                            }
+                            break;
+                    }
+                } catch (e) {
+                    console.error('处理消息失败:', e);
+                    appendMessage(event.data, 'user-message');
+                }
+            };
+            
+            ws.onclose = function() {
+                appendMessage('连接已断开', 'system-message');
+                authSection.style.display = 'block';
+                chatSection.style.display = 'none';
+                currentUserId.textContent = '未连接';
+            };
+            
+            ws.onerror = function(error) {
+                appendMessage('连接错误', 'error-message');
+                console.error('WebSocket错误:', error);
+            };
+        }
+        
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            const targetId = targetSessionId.value.trim();
+            
+            if (!message) {
+                return;
+            }
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                if (targetId) {
+                    ws.send(`@${targetId}:${message}`);
+                } else {
+                    ws.send(message);
+                }
+                messageInput.value = '';
+            } else {
+                appendMessage('未连接到服务器', 'error-message');
+            }
+        }
+        
+        function appendMessage(message, className) {
+            const div = document.createElement('div');
+            div.className = className;
+            div.textContent = message;
+            messageArea.appendChild(div);
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+        
+        // 按Enter发送消息
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html> 

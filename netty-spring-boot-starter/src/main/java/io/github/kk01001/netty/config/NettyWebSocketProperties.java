@@ -48,6 +48,11 @@ public class NettyWebSocketProperties {
      */
     private Duration sessionTimeout = Duration.ofMinutes(30);
     
+    /**
+     * 是否启用鉴权
+     */
+    private boolean authEnabled = false;
+    
     @Data
     public static class Cluster {
         /**
