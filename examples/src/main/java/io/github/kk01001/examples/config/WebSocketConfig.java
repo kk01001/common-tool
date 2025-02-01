@@ -3,6 +3,8 @@ package io.github.kk01001.examples.config;
 import io.github.kk01001.netty.auth.WebSocketAuthenticator;
 import io.github.kk01001.netty.config.ChannelOptionCustomizer;
 import io.github.kk01001.netty.config.WebSocketPipelineConfigurer;
+import io.github.kk01001.netty.filter.MessageFilter;
+import io.github.kk01001.netty.filter.SensitiveWordFilter;
 import io.github.kk01001.netty.session.WebSocketSession;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -11,7 +13,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Configuration
 public class WebSocketConfig {
@@ -72,6 +76,25 @@ public class WebSocketConfig {
             public void customizeChildOptions(ServerBootstrap bootstrap) {
                 bootstrap.childOption(ChannelOption.WRITE_BUFFER_WATER_MARK,
                         new WriteBufferWaterMark(32768, 65536));
+            }
+        };
+    }
+
+    @Bean
+    public MessageFilter sensitiveWordFilter() {
+        Set<String> sensitiveWords = new HashSet<>();
+        sensitiveWords.add("敏感词1");
+        sensitiveWords.add("敏感词2");
+        return new SensitiveWordFilter(sensitiveWords);
+    }
+
+    @Bean
+    public MessageFilter customFilter() {
+        return new MessageFilter() {
+            @Override
+            public boolean doFilter(WebSocketSession session, String message) {
+                // 自定义过滤逻辑
+                return true;
             }
         };
     }

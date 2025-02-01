@@ -1,11 +1,14 @@
 package io.github.kk01001.netty.handler;
 
+import io.github.kk01001.netty.filter.MessageFilter;
 import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
 import io.github.kk01001.netty.session.WebSocketSession;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.*;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 /**
  * WebSocket消息处理器
@@ -15,11 +18,16 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
     
     private final WebSocketEndpointRegistry registry;
     private final WebSocketSession session;
-    
-    public WebSocketHandler(WebSocketEndpointRegistry registry, WebSocketSession session) {
+    private final List<MessageFilter> messageFilters;
+
+    public WebSocketHandler(
+            WebSocketEndpointRegistry registry,
+            WebSocketSession session,
+            List<MessageFilter> messageFilters) {
         super();
         this.registry = registry;
         this.session = session;
+        this.messageFilters = messageFilters;
     }
     
     @Override
@@ -37,8 +45,19 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
      */
     private void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
         // 处理文本消息
-        if (frame instanceof TextWebSocketFrame) {
-            String message = ((TextWebSocketFrame) frame).text();
+        if (frame instanceof TextWebSocketFrame textFrame) {
+            String message = textFrame.text();
+
+            // 应用消息过滤器
+            if (messageFilters != null) {
+                for (MessageFilter filter : messageFilters) {
+                    if (!filter.doFilter(session, message)) {
+                        log.debug("消息被过滤: sessionId={}, message={}", session.getId(), message);
+                        return;
+                    }
+                }
+            }
+
             log.debug("收到文本消息: sessionId={}, message={}", session.getId(), message);
             registry.handleMessage(session, message);
             return;

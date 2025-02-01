@@ -7,6 +7,7 @@ import io.github.kk01001.netty.cluster.ClusterMessageHandler;
 import io.github.kk01001.netty.cluster.DefaultClusterMessageHandler;
 import io.github.kk01001.netty.cluster.RedisWebSocketClusterManager;
 import io.github.kk01001.netty.cluster.WebSocketClusterManager;
+import io.github.kk01001.netty.filter.MessageFilter;
 import io.github.kk01001.netty.message.MessageDispatcher;
 import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
 import io.github.kk01001.netty.server.NettyWebSocketServer;
@@ -22,13 +23,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
-import java.util.List;
-import java.util.ArrayList;
 
 @Slf4j
 @Configuration
@@ -101,7 +101,13 @@ public class NettyWebSocketAutoConfiguration {
     public List<ChannelOptionCustomizer> channelOptionCustomizers() {
         return new ArrayList<>();
     }
-    
+
+    @Bean
+    @ConditionalOnMissingBean
+    public List<MessageFilter> messageFilters() {
+        return new ArrayList<>();
+    }
+
     @Bean
     @ConditionalOnMissingBean
     public NettyWebSocketServer nettyWebSocketServer(
@@ -110,14 +116,16 @@ public class NettyWebSocketAutoConfiguration {
             NettyWebSocketProperties properties,
             WebSocketAuthenticator authenticator,
             List<WebSocketPipelineConfigurer> pipelineConfigurers,
-            List<ChannelOptionCustomizer> optionCustomizers) {
+            List<ChannelOptionCustomizer> optionCustomizers,
+            List<MessageFilter> messageFilters) {
         return new NettyWebSocketServer(
                 registry, 
                 sessionManager, 
                 properties, 
                 authenticator,
                 pipelineConfigurers,
-                optionCustomizers);
+                optionCustomizers,
+                messageFilters);
     }
     
     @Bean

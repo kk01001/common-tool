@@ -1,9 +1,10 @@
 package io.github.kk01001.netty.server;
 
 import io.github.kk01001.netty.auth.WebSocketAuthenticator;
+import io.github.kk01001.netty.config.ChannelOptionCustomizer;
 import io.github.kk01001.netty.config.NettyWebSocketProperties;
 import io.github.kk01001.netty.config.WebSocketPipelineConfigurer;
-import io.github.kk01001.netty.config.ChannelOptionCustomizer;
+import io.github.kk01001.netty.filter.MessageFilter;
 import io.github.kk01001.netty.handler.WebSocketAuthHandshakeHandler;
 import io.github.kk01001.netty.handler.WebSocketHandler;
 import io.github.kk01001.netty.handler.WebSocketHeartbeatHandler;
@@ -44,6 +45,7 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
     private final WebSocketHeartbeatHandler heartbeatHandler;
     private final List<WebSocketPipelineConfigurer> pipelineConfigurers;
     private final List<ChannelOptionCustomizer> optionCustomizers;
+    private final List<MessageFilter> messageFilters;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel serverChannel;
@@ -55,13 +57,15 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
             NettyWebSocketProperties properties,
             WebSocketAuthenticator authenticator,
             List<WebSocketPipelineConfigurer> pipelineConfigurers,
-            List<ChannelOptionCustomizer> optionCustomizers) {
+            List<ChannelOptionCustomizer> optionCustomizers,
+            List<MessageFilter> messageFilters) {
         this.registry = registry;
         this.sessionManager = sessionManager;
         this.properties = properties;
         this.authenticator = authenticator;
         this.pipelineConfigurers = pipelineConfigurers;
         this.optionCustomizers = optionCustomizers;
+        this.messageFilters = messageFilters;
         this.handshakeHandler = new WebSocketAuthHandshakeHandler(
                 properties.getPath(),
                 String.join(",", properties.getSubprotocols()),
@@ -167,7 +171,7 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
                             }
                             
                             // 业务处理
-                            pipeline.addLast("webSocketHandler", new WebSocketHandler(registry, session));
+                            pipeline.addLast("webSocketHandler", new WebSocketHandler(registry, session, messageFilters));
                         }
                     });
             
