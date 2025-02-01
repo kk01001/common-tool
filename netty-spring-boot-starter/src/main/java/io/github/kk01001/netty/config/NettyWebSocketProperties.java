@@ -4,6 +4,9 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import io.netty.channel.ChannelOption;
 
 @Data
 @ConfigurationProperties(prefix = "netty.websocket")
@@ -63,6 +66,16 @@ public class NettyWebSocketProperties {
      */
     private Ssl ssl = new Ssl();
     
+    /**
+     * ServerBootstrap的option配置
+     */
+    private ChannelConfig serverOptions = new ChannelConfig();
+    
+    /**
+     * ServerBootstrap的childOption配置
+     */
+    private ChannelConfig childOptions = new ChannelConfig();
+    
     @Data
     public static class Cluster {
         /**
@@ -120,5 +133,38 @@ public class NettyWebSocketProperties {
          * 私钥密码
          */
         private String keyPassword;
+    }
+    
+    @Data
+    public static class ChannelConfig {
+        /**
+         * TCP连接队列大小
+         */
+        private int soBacklog = 128;
+        
+        /**
+         * 是否开启TCP keepalive
+         */
+        private boolean soKeepalive = true;
+        
+        /**
+         * 是否开启Nagle算法
+         */
+        private boolean tcpNodelay = true;
+        
+        /**
+         * 接收缓冲区大小
+         */
+        private int soRcvbuf = 65536;
+        
+        /**
+         * 发送缓冲区大小
+         */
+        private int soSndbuf = 65536;
+        
+        /**
+         * 其他自定义选项
+         */
+        private Map<String, Object> options = new HashMap<>();
     }
 } 

@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
+import java.util.List;
+import java.util.ArrayList;
 
 @Slf4j
 @Configuration
@@ -89,15 +91,33 @@ public class NettyWebSocketAutoConfiguration {
     }
     
     @Bean
+    @ConditionalOnMissingBean
+    public List<WebSocketPipelineConfigurer> webSocketPipelineConfigurers() {
+        return new ArrayList<>();
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public List<ChannelOptionCustomizer> channelOptionCustomizers() {
+        return new ArrayList<>();
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
     public NettyWebSocketServer nettyWebSocketServer(
             WebSocketEndpointRegistry registry,
-            MessageDispatcher messageDispatcher,
+            WebSocketSessionManager sessionManager,
             NettyWebSocketProperties properties,
-            @Autowired(required = false) WebSocketAuthenticator authenticator) {
-        return new NettyWebSocketServer(registry, 
-                (WebSocketSessionManager)messageDispatcher, 
+            WebSocketAuthenticator authenticator,
+            List<WebSocketPipelineConfigurer> pipelineConfigurers,
+            List<ChannelOptionCustomizer> optionCustomizers) {
+        return new NettyWebSocketServer(
+                registry, 
+                sessionManager, 
                 properties, 
-                authenticator);
+                authenticator,
+                pipelineConfigurers,
+                optionCustomizers);
     }
     
     @Bean

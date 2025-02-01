@@ -2,6 +2,8 @@ package io.github.kk01001.netty.server;
 
 import io.github.kk01001.netty.auth.WebSocketAuthenticator;
 import io.github.kk01001.netty.config.NettyWebSocketProperties;
+import io.github.kk01001.netty.config.WebSocketPipelineConfigurer;
+import io.github.kk01001.netty.config.ChannelOptionCustomizer;
 import io.github.kk01001.netty.handler.WebSocketAuthHandshakeHandler;
 import io.github.kk01001.netty.handler.WebSocketHandler;
 import io.github.kk01001.netty.handler.WebSocketHeartbeatHandler;
@@ -15,17 +17,19 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SslHandler;
+
 import javax.net.ssl.SSLEngine;
 import java.io.File;
-
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +42,8 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
     private final WebSocketAuthenticator authenticator;
     private final WebSocketAuthHandshakeHandler handshakeHandler;
     private final WebSocketHeartbeatHandler heartbeatHandler;
+    private final List<WebSocketPipelineConfigurer> pipelineConfigurers;
+    private final List<ChannelOptionCustomizer> optionCustomizers;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel serverChannel;
@@ -47,11 +53,15 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
             WebSocketEndpointRegistry registry,
             WebSocketSessionManager sessionManager,
             NettyWebSocketProperties properties,
-            WebSocketAuthenticator authenticator) {
+            WebSocketAuthenticator authenticator,
+            List<WebSocketPipelineConfigurer> pipelineConfigurers,
+            List<ChannelOptionCustomizer> optionCustomizers) {
         this.registry = registry;
         this.sessionManager = sessionManager;
         this.properties = properties;
         this.authenticator = authenticator;
+        this.pipelineConfigurers = pipelineConfigurers;
+        this.optionCustomizers = optionCustomizers;
         this.handshakeHandler = new WebSocketAuthHandshakeHandler(
                 properties.getPath(),
                 String.join(",", properties.getSubprotocols()),
@@ -146,14 +156,33 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
                                     userId
                             );
                             sessionManager.addSession(properties.getPath(), session);
+
+                            // 调用自定义Pipeline配置
+                            if (pipelineConfigurers != null) {
+                                // 按优先级排序
+                                pipelineConfigurers.sort(Comparator.comparingInt(WebSocketPipelineConfigurer::getOrder));
+                                for (WebSocketPipelineConfigurer configurer : pipelineConfigurers) {
+                                    configurer.configurePipeline(pipeline, session);
+                                }
+                            }
                             
                             // 业务处理
-                            pipeline.addLast(new WebSocketHandler(registry, session));
+                            pipeline.addLast("webSocketHandler", new WebSocketHandler(registry, session));
                         }
-                    })
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+                    });
             
+            // 应用默认选项
+            applyDefaultOptions(bootstrap);
+            
+            // 应用自定义选项
+            if (optionCustomizers != null) {
+                optionCustomizers.sort(Comparator.comparingInt(ChannelOptionCustomizer::getOrder));
+                for (ChannelOptionCustomizer customizer : optionCustomizers) {
+                    customizer.customizeServerOptions(bootstrap);
+                    customizer.customizeChildOptions(bootstrap);
+                }
+            }
+
             // 绑定端口
             ChannelFuture future = bootstrap.bind(properties.getPort()).sync();
             serverChannel = future.channel();
@@ -170,6 +199,17 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
             stop();
             throw e;
         }
+    }
+    
+    private void applyDefaultOptions(ServerBootstrap bootstrap) {
+        // 应用服务端选项
+        bootstrap.option(ChannelOption.SO_BACKLOG, properties.getServerOptions().getSoBacklog());
+        
+        // 应用客户端选项
+        bootstrap.childOption(ChannelOption.SO_KEEPALIVE, properties.getChildOptions().isSoKeepalive())
+                .childOption(ChannelOption.TCP_NODELAY, properties.getChildOptions().isTcpNodelay())
+                .childOption(ChannelOption.SO_RCVBUF, properties.getChildOptions().getSoRcvbuf())
+                .childOption(ChannelOption.SO_SNDBUF, properties.getChildOptions().getSoSndbuf());
     }
     
     /**

@@ -56,6 +56,16 @@ netty:
       cert-path: /Users/lin/home/code/github/common-tool/examples/src/main/resources/ssl/server.crt
       key-path: /Users/lin/home/code/github/common-tool/examples/src/main/resources/ssl/server.key
 #      key-password: your-password
+    server-options:
+      so-backlog: 1024
+    child-options:
+      so-keepalive: true
+      tcp-nodelay: true
+      so-rcvbuf: 131072
+      so-sndbuf: 131072
+      options:
+        WRITE_BUFFER_WATER_MARK_HIGH: 65536
+        WRITE_BUFFER_WATER_MARK_LOW: 32768
 
 logging:
   level:
