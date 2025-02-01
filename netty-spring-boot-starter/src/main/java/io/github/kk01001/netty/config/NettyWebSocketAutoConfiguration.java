@@ -12,6 +12,9 @@ import io.github.kk01001.netty.message.MessageDispatcher;
 import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
 import io.github.kk01001.netty.server.NettyWebSocketServer;
 import io.github.kk01001.netty.session.WebSocketSessionManager;
+import io.github.kk01001.netty.trace.MessageTracer;
+import io.github.kk01001.netty.trace.MetricsMessageTracer;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -117,7 +120,8 @@ public class NettyWebSocketAutoConfiguration {
             WebSocketAuthenticator authenticator,
             List<WebSocketPipelineConfigurer> pipelineConfigurers,
             List<ChannelOptionCustomizer> optionCustomizers,
-            List<MessageFilter> messageFilters) {
+            List<MessageFilter> messageFilters,
+            MessageTracer messageTracer) {
         return new NettyWebSocketServer(
                 registry, 
                 sessionManager, 
@@ -125,7 +129,8 @@ public class NettyWebSocketAutoConfiguration {
                 authenticator,
                 pipelineConfigurers,
                 optionCustomizers,
-                messageFilters);
+                messageFilters,
+                messageTracer);
     }
     
     @Bean
@@ -147,5 +152,11 @@ public class NettyWebSocketAutoConfiguration {
     @ConditionalOnMissingBean
     public ClusterMessageHandler clusterMessageHandler(MessageDispatcher messageDispatcher) {
         return new DefaultClusterMessageHandler(messageDispatcher);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public MessageTracer messageTracer(MeterRegistry registry, NettyWebSocketProperties properties) {
+        return new MetricsMessageTracer(registry, properties);
     }
 }

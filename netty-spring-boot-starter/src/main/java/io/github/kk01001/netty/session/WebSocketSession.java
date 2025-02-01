@@ -1,9 +1,10 @@
 package io.github.kk01001.netty.session;
 
+import io.github.kk01001.netty.trace.MessageTracer;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,30 +58,35 @@ public class WebSocketSession {
      * 用户ID
      */
     private final String userId;
-    
-    public WebSocketSession(String id, Channel channel, String path, String uri, WebSocketSessionManager sessionManager, String userId) {
+
+    private final MessageTracer messageTracer;
+
+    public WebSocketSession(String id,
+                            Channel channel,
+                            String path,
+                            String uri,
+                            WebSocketSessionManager sessionManager,
+                            String userId,
+                            MessageTracer messageTracer) {
         this.id = id;
         this.channel = channel;
         this.path = path;
         this.uri = uri;
         this.sessionManager = sessionManager;
         this.userId = userId;
+        this.messageTracer = messageTracer;
     }
     
     /**
      * 发送消息
      */
     public void sendMessage(String message) {
-        try {
-            if (channel.isActive()) {
-                channel.writeAndFlush(new TextWebSocketFrame(message));
-                updateLastActiveTime();
-            } else {
-                log.warn("Channel已关闭，无法发送消息: sessionId={}", id);
-            }
-        } catch (Exception e) {
-            log.error("发送消息失败: sessionId={}", id, e);
-            throw new RuntimeException("发送消息失败", e);
+        if (isActive()) {
+            messageTracer.traceSend(this, message);
+            channel.writeAndFlush(new TextWebSocketFrame(message));
+            updateLastActiveTime();
+        } else {
+            log.warn("Channel已关闭，无法发送消息: sessionId={}", id);
         }
     }
 

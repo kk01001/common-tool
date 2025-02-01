@@ -3,6 +3,8 @@ package io.github.kk01001.netty.handler;
 import io.github.kk01001.netty.filter.MessageFilter;
 import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
 import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.kk01001.netty.trace.MessageTracer;
+import io.micrometer.core.instrument.Timer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.*;
@@ -20,22 +22,28 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
     private final WebSocketEndpointRegistry registry;
     private final WebSocketSession session;
     private final List<MessageFilter> messageFilters;
+    private final MessageTracer messageTracer;
 
     public WebSocketHandler(
             WebSocketEndpointRegistry registry,
             WebSocketSession session,
-            List<MessageFilter> messageFilters) {
+            List<MessageFilter> messageFilters,
+            MessageTracer messageTracer) {
         super();
         this.registry = registry;
         this.session = session;
         this.messageFilters = messageFilters;
+        this.messageTracer = messageTracer;
     }
     
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) {
         try {
+            Timer.Sample sample = Timer.start();
             handleWebSocketFrame(ctx, frame);
+            sample.stop(messageTracer.getMessageLatencyTimer());
         } catch (Exception e) {
+            messageTracer.traceError(session, e);
             log.error("处理WebSocket消息失败: sessionId={}", session.getId(), e);
             registry.handleError(session, e);
         }
@@ -48,6 +56,9 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
         // 处理文本消息
         if (frame instanceof TextWebSocketFrame textFrame) {
             String message = textFrame.text();
+            
+            // 记录接收消息
+            messageTracer.traceReceive(session, message);
             
             // 应用消息过滤器
             if (messageFilters != null) {
@@ -109,6 +120,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) {
         try {
+            messageTracer.traceConnect(session);
             log.debug("WebSocket连接建立: sessionId={}, remoteAddress={}", 
                     session.getId(), ctx.channel().remoteAddress());
             registry.handleOpen(session);
@@ -121,6 +133,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) {
         try {
+            messageTracer.traceDisconnect(session);
             log.debug("WebSocket连接关闭: sessionId={}", session.getId());
             registry.handleClose(session);
         } catch (Exception e) {

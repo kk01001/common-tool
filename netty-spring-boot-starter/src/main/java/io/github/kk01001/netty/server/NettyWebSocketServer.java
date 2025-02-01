@@ -11,6 +11,7 @@ import io.github.kk01001.netty.handler.WebSocketHeartbeatHandler;
 import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
 import io.github.kk01001.netty.session.WebSocketSession;
 import io.github.kk01001.netty.session.WebSocketSessionManager;
+import io.github.kk01001.netty.trace.MessageTracer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -46,6 +47,7 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
     private final List<WebSocketPipelineConfigurer> pipelineConfigurers;
     private final List<ChannelOptionCustomizer> optionCustomizers;
     private final List<MessageFilter> messageFilters;
+    private final MessageTracer messageTracer;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel serverChannel;
@@ -58,7 +60,7 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
             WebSocketAuthenticator authenticator,
             List<WebSocketPipelineConfigurer> pipelineConfigurers,
             List<ChannelOptionCustomizer> optionCustomizers,
-            List<MessageFilter> messageFilters) {
+            List<MessageFilter> messageFilters, MessageTracer messageTracer) {
         this.registry = registry;
         this.sessionManager = sessionManager;
         this.properties = properties;
@@ -66,6 +68,7 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
         this.pipelineConfigurers = pipelineConfigurers;
         this.optionCustomizers = optionCustomizers;
         this.messageFilters = messageFilters;
+        this.messageTracer = messageTracer;
         this.handshakeHandler = new WebSocketAuthHandshakeHandler(
                 properties.getPath(),
                 String.join(",", properties.getSubprotocols()),
@@ -157,7 +160,8 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
                                     properties.getPath(),
                                     ch.remoteAddress().toString(),
                                     sessionManager,
-                                    userId
+                                    userId,
+                                    messageTracer
                             );
                             sessionManager.addSession(properties.getPath(), session);
 
@@ -171,7 +175,7 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
                             }
                             
                             // 业务处理
-                            pipeline.addLast("webSocketHandler", new WebSocketHandler(registry, session, messageFilters));
+                            pipeline.addLast("webSocketHandler", new WebSocketHandler(registry, session, messageFilters, messageTracer));
                         }
                     });
             

@@ -70,3 +70,16 @@ netty:
 logging:
   level:
     io.github.kk01001.netty: debug
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
