@@ -2,6 +2,8 @@ package io.github.kk01001.netty.session;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -152,4 +154,21 @@ public class WebSocketSession {
         attributes.remove(key);
     }
 
+    /**
+     * 发送ping消息
+     */
+    public void sendPing() {
+        if (isActive()) {
+            channel.writeAndFlush(new PingWebSocketFrame());
+        }
+    }
+    
+    /**
+     * 发送pong响应
+     */
+    public void sendPong() {
+        if (isActive()) {
+            channel.writeAndFlush(new PongWebSocketFrame());
+        }
+    }
 }

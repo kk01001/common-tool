@@ -129,39 +129,33 @@
             };
             
             ws.onmessage = function(event) {
-                if (event.data instanceof Blob) {
+                if (event.data === 'pong') {
+                    // 收到pong响应
                     return;
                 }
 
                 try {
-                    if ("pong" === event.data) {
-                        return;
-                    }
-                    const message = JSON.parse(event.data);
-                    switch (message.type) {
-                        case 'JOIN':
-                            appendMessage(`用户 ${message.fromSessionId} ${message.content}`, 'system-message');
-                            break;
-                        case 'LEAVE':
-                            appendMessage(`用户 ${message.fromSessionId} ${message.content}`, 'system-message');
-                            break;
-                        case 'BROADCAST':
-                            const isSelf = message.fromSessionId === token;
-                            const time = new Date(message.timestamp).toLocaleTimeString();
-                            if (isSelf) {
-                                appendMessage(`我说：${message.content}`, 'user-message');
-                            } else {
-                                appendMessage(`[${time}] 用户 ${message.fromSessionId} 说：${message.content}`, 'user-message');
-                            }
-                            break;
-                        case 'PRIVATE':
-                            const isPrivateSelf = message.fromSessionId === token;
-                            if (isPrivateSelf) {
-                                appendMessage(`我对 ${message.toSessionId} 说：${message.content}`, 'private-message');
-                            } else {
-                                appendMessage(`用户 ${message.fromSessionId} 对我说：${message.content}`, 'private-message');
-                            }
-                            break;
+                    if ("JOIN" === event.data) {
+                        appendMessage(`用户 ${event.data}`, 'system-message');
+                    } else if ("LEAVE" === event.data) {
+                        appendMessage(`用户 ${event.data}`, 'system-message');
+                    } else if ("BROADCAST" === event.data) {
+                        const isSelf = event.data === token;
+                        const time = new Date(event.timestamp).toLocaleTimeString();
+                        if (isSelf) {
+                            appendMessage(`我说：${event.content}`, 'user-message');
+                        } else {
+                            appendMessage(`[${time}] 用户 ${event.data} 说：${event.content}`, 'user-message');
+                        }
+                    } else if ("PRIVATE" === event.data) {
+                        const isPrivateSelf = event.data === token;
+                        if (isPrivateSelf) {
+                            appendMessage(`我对 ${event.toSessionId} 说：${event.content}`, 'private-message');
+                        } else {
+                            appendMessage(`用户 ${event.data} 对我说：${event.content}`, 'private-message');
+                        }
+                    } else {
+                        appendMessage(event.data, 'user-message');
                     }
                 } catch (e) {
                     console.error('处理消息失败:', e);
@@ -214,11 +208,12 @@
         }
 
         function startHeartbeat() {
+            // 每30秒发送一次ping
             heartbeatTimer = setInterval(() => {
                 if (ws && ws.readyState === WebSocket.OPEN) {
-                    ws.send('ping');
+                    sendPing();
                 }
-            }, 5000);
+            }, 3000);
         }
 
         function stopHeartbeat() {
@@ -234,6 +229,15 @@
                 sendMessage();
             }
         });
+
+        // 发送ping消息
+        function sendPing() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                // 发送一个长度为2字节的ping帧
+                const pingData = new Uint8Array([0x9, 0x0]); // 0x9表示ping帧
+                ws.send(pingData.buffer);
+            }
+        }
     </script>
 </body>
 </html> 

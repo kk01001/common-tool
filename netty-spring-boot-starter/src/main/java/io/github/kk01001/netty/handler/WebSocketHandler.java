@@ -44,10 +44,25 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
             return;
         }
         
+        // 处理二进制消息
+        if (frame instanceof BinaryWebSocketFrame) {
+            // 检查是否是ping帧(0x9)
+            if (frame.content().readableBytes() >= 1) {
+                byte firstByte = frame.content().getByte(0);
+                if ((firstByte & 0xFF) == 0x9) {
+                    log.debug("收到二进制Ping消息: sessionId={}", session.getId());
+                    session.sendPong();
+                    return;
+                }
+            }
+            log.debug("收到二进制消息: sessionId={}", session.getId());
+            return;
+        }
+        
         // 处理Ping消息
         if (frame instanceof PingWebSocketFrame) {
             log.debug("收到Ping消息: sessionId={}", session.getId());
-            ctx.writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
+            session.sendPong();
             return;
         }
         
@@ -61,13 +76,6 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
         if (frame instanceof CloseWebSocketFrame) {
             log.debug("收到关闭消息: sessionId={}", session.getId());
             ctx.close();
-            return;
-        }
-        
-        // 处理二进制消息
-        if (frame instanceof BinaryWebSocketFrame) {
-            log.debug("收到二进制消息: sessionId={}", session.getId());
-            // 暂不处理二进制消息
             return;
         }
         
@@ -126,6 +134,15 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
                     (WebSocketServerProtocolHandler.HandshakeComplete) evt;
             log.debug("WebSocket握手完成: sessionId={}, protocol={}", 
                     session.getId(), complete.selectedSubprotocol());
+        }
+    }
+
+    /**
+     * 发送ping消息
+     */
+    public void sendPing() {
+        if (session.isActive()) {
+            session.getChannel().writeAndFlush(new PingWebSocketFrame());
         }
     }
 } 
