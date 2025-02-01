@@ -53,6 +53,11 @@ public class NettyWebSocketProperties {
      */
     private boolean authEnabled = false;
     
+    /**
+     * 心跳配置
+     */
+    private Heartbeat heartbeat = new Heartbeat();
+    
     @Data
     public static class Cluster {
         /**
@@ -69,5 +74,23 @@ public class NettyWebSocketProperties {
          * 集群会话超时时间
          */
         private Duration sessionTimeout = Duration.ofHours(1);
+    }
+    
+    @Data
+    public static class Heartbeat {
+        /**
+         * 是否启用心跳
+         */
+        private boolean enabled = true;
+        
+        /**
+         * 读空闲超时时间(秒)
+         */
+        private int readerIdleTime = 60;
+        
+        /**
+         * 写空闲超时时间(秒)
+         */
+        private int writerIdleTime = 30;
     }
 } 

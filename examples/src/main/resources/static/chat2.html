@@ -100,6 +100,7 @@
 
     <script>
         let ws;
+        let heartbeatTimer;
         const authSection = document.getElementById('authSection');
         const chatSection = document.getElementById('chatSection');
         const tokenInput = document.getElementById('tokenInput');
@@ -121,10 +122,15 @@
                 appendMessage('连接成功', 'system-message');
                 authSection.style.display = 'none';
                 chatSection.style.display = 'block';
-                currentUserId.textContent = token;  // 使用token作为用户ID
+                currentUserId.textContent = token;
+                startHeartbeat();
             };
             
             ws.onmessage = function(event) {
+                if (event.data instanceof Blob) {
+                    return;
+                }
+
                 try {
                     const message = JSON.parse(event.data);
                     switch (message.type) {
@@ -163,6 +169,7 @@
                 authSection.style.display = 'block';
                 chatSection.style.display = 'none';
                 currentUserId.textContent = '未连接';
+                stopHeartbeat();
             };
             
             ws.onerror = function(error) {
@@ -198,7 +205,22 @@
             messageArea.appendChild(div);
             messageArea.scrollTop = messageArea.scrollHeight;
         }
-        
+
+        function startHeartbeat() {
+            heartbeatTimer = setInterval(() => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send('ping');
+                }
+            }, 5000);
+        }
+
+        function stopHeartbeat() {
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+                heartbeatTimer = null;
+            }
+        }
+
         // 按Enter发送消息
         messageInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {

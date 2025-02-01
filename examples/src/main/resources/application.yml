@@ -49,6 +49,10 @@ netty:
       enabled: true
       topic: ws:chat
       session-timeout: 1h  # 1小时
+    heartbeat:
+      enabled: true
+      reader-idle-time: 60  # 60秒没收到数据就断开连接
+      writer-idle-time: 30  # 30秒发送一次心跳包
 
 logging:
   level:

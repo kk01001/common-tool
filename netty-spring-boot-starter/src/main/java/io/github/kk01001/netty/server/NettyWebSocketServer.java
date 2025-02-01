@@ -4,6 +4,7 @@ import io.github.kk01001.netty.auth.WebSocketAuthenticator;
 import io.github.kk01001.netty.config.NettyWebSocketProperties;
 import io.github.kk01001.netty.handler.WebSocketAuthHandshakeHandler;
 import io.github.kk01001.netty.handler.WebSocketHandler;
+import io.github.kk01001.netty.handler.WebSocketHeartbeatHandler;
 import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
 import io.github.kk01001.netty.session.WebSocketSession;
 import io.github.kk01001.netty.session.WebSocketSessionManager;
@@ -15,11 +16,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class NettyWebSocketServer implements InitializingBean, DisposableBean {
@@ -29,6 +32,7 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
     private final NettyWebSocketProperties properties;
     private final WebSocketAuthenticator authenticator;
     private final WebSocketAuthHandshakeHandler handshakeHandler;
+    private final WebSocketHeartbeatHandler heartbeatHandler;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel serverChannel;
@@ -49,6 +53,7 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
                 properties.getMaxFrameSize(),
                 authenticator
         );
+        this.heartbeatHandler = new WebSocketHeartbeatHandler();
     }
     
     @Override
@@ -86,6 +91,17 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
 
                             // WebSocket握手和鉴权处理
                             pipeline.addLast(handshakeHandler);
+                            
+                            // 心跳处理
+                            if (properties.getHeartbeat().isEnabled()) {
+                                pipeline.addLast(new IdleStateHandler(
+                                    properties.getHeartbeat().getReaderIdleTime(),
+                                    properties.getHeartbeat().getWriterIdleTime(),
+                                    0,
+                                    TimeUnit.SECONDS
+                                ));
+                                pipeline.addLast(heartbeatHandler);
+                            }
                             
                             // 创建会话
                             String sessionId = UUID.randomUUID().toString();
