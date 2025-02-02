@@ -234,8 +234,7 @@
         function sendPing() {
             if (ws && ws.readyState === WebSocket.OPEN) {
                 // 发送一个长度为2字节的ping帧
-                const pingData = new Uint8Array([0x9, 0x0]); // 0x9表示ping帧
-                ws.send(pingData.buffer);
+                ws.send("ping");
             }
         }
     </script>

@@ -4,161 +4,171 @@
     <meta charset="UTF-8">
     <title>WebSocket聊天室</title>
     <style>
+        .container {
+            width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
         #messageArea {
-            width: 500px;
             height: 300px;
-            overflow-y: auto;
             border: 1px solid #ccc;
-            margin-bottom: 10px;
+            margin: 10px 0;
             padding: 10px;
+            overflow-y: auto;
+            background: #fff;
         }
-        #messageInput {
-            width: 400px;
-            padding: 5px;
+        
+        .input-group {
+            margin: 10px 0;
         }
-        .system-message {
-            color: #666;
-            font-style: italic;
-        }
-        .user-message {
-            color: #000;
-        }
-        .private-message {
-            color: #0066cc;
-            font-weight: bold;
-        }
-        #sessionInfo {
-            margin-bottom: 10px;
-            color: #666;
-        }
-        #targetSessionId {
+        
+        input[type="text"] {
             width: 200px;
             padding: 5px;
             margin-right: 10px;
         }
+        
+        button {
+            padding: 5px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .system-message {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .user-message {
+            color: #000;
+        }
+        
+        .private-message {
+            color: #0066cc;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h2>WebSocket聊天室</h2>
-    <div id="sessionInfo">
-        我的ID: <span id="mySessionId">正在连接...</span>
-        <button onclick="copySessionId()">复制ID</button>
+    <div class="container">
+        <div>当前用户ID: <span id="currentUserId">未连接</span></div>
+        <div id="messageArea"></div>
+        <div class="input-group">
+            <input type="text" id="targetSessionId" placeholder="目标用户ID（为空则广播）">
+        </div>
+        <div class="input-group">
+            <input type="text" id="messageInput" placeholder="请输入消息">
+            <button onclick="sendMessage()">发送</button>
+        </div>
     </div>
-    <div>
-        发送给: <input type="text" id="targetSessionId" placeholder="输入目标用户ID，为空则广播">
-    </div>
-    <div id="messageArea"></div>
-    <input type="text" id="messageInput" placeholder="输入消息...">
-    <button onclick="sendMessage()">发送</button>
 
     <script>
         let ws;
-        let mySessionId;
+        let heartbeatTimer;
         const messageArea = document.getElementById('messageArea');
         const messageInput = document.getElementById('messageInput');
-        const targetSessionInput = document.getElementById('targetSessionId');
-        const mySessionIdSpan = document.getElementById('mySessionId');
-
+        const targetSessionId = document.getElementById('targetSessionId');
+        const currentUserId = document.getElementById('currentUserId');
+        
         function connect() {
-            const token = getToken(); // 获取token的方法
-            ws = new WebSocket(`ws://localhost:9081/chat?token=${token}`);
-
+            ws = new WebSocket('ws://localhost:19081/chat');
+            
             ws.onopen = function() {
-                appendMessage('系统消息：连接成功', true);
+                appendMessage('连接成功', 'system-message');
+                startHeartbeat();
             };
-
+            
             ws.onmessage = function(event) {
+                if (event.data === 'pong') {
+                    // 收到pong响应
+                    return;
+                }
+                
                 try {
                     const message = JSON.parse(event.data);
-                    switch (message.type) {
-                        case 'JOIN':
-                            if (!mySessionId) {
-                                mySessionId = message.fromSessionId;
-                                mySessionIdSpan.textContent = mySessionId;
-                            }
-                            appendMessage(`系统消息：用户 ${message.fromSessionId} ${message.content}`, true);
-                            break;
-                            
-                        case 'LEAVE':
-                            appendMessage(`系统消息：用户 ${message.fromSessionId} ${message.content}`, true);
-                            break;
-                            
-                        case 'BROADCAST':
-                            const isSelf = message.fromSessionId === mySessionId;
-                            const time = new Date(message.timestamp).toLocaleTimeString();
-                            if (isSelf) {
-                                appendMessage(`我说：${message.content}`, false);
-                            } else {
-                                appendMessage(`[${time}] 用户 ${message.fromSessionId} 说：${message.content}`, false);
-                            }
-                            break;
-                            
-                        case 'PRIVATE':
-                            const isPrivateSelf = message.fromSessionId === mySessionId;
-                            if (isPrivateSelf) {
-                                appendMessage(`我对 ${message.toSessionId} 说：${message.content}`, false, true);
-                            } else {
-                                appendMessage(`用户 ${message.fromSessionId} 对我说：${message.content}`, false, true);
-                            }
-                            break;
-                            
-                        case 'SYSTEM':
-                            appendMessage(`系统消息：${message.content}`, true);
-                            break;
+                    if (message.type === 'JOIN') {
+                        appendMessage(`用户 ${message.sessionId} 加入聊天室`, 'system-message');
+                        if (!currentUserId.textContent || currentUserId.textContent === '未连接') {
+                            currentUserId.textContent = message.sessionId;
+                        }
+                    } else if (message.type === 'LEAVE') {
+                        appendMessage(`用户 ${message.sessionId} 离开聊天室`, 'system-message');
+                    } else if (message.type === 'MESSAGE') {
+                        const isPrivate = message.targetSessionId != null;
+                        if (isPrivate) {
+                            appendMessage(`私聊消息 - ${message.sessionId}: ${message.content}`, 'private-message');
+                        } else {
+                            appendMessage(`${message.sessionId}: ${message.content}`, 'user-message');
+                        }
                     }
                 } catch (e) {
-                    console.error('处理消息失败:', e);
-                    appendMessage(event.data, false);
+                    appendMessage(event.data, 'user-message');
                 }
             };
-
+            
             ws.onclose = function() {
-                appendMessage('系统消息：连接断开', true);
-                mySessionId = null;
-                mySessionIdSpan.textContent = '已断开';
+                appendMessage('连接已断开', 'system-message');
+                currentUserId.textContent = '未连接';
+                stopHeartbeat();
                 // 尝试重连
                 setTimeout(connect, 3000);
             };
-
+            
             ws.onerror = function(error) {
-                appendMessage('系统消息：发生错误', true);
+                appendMessage('连接错误', 'system-message');
                 console.error('WebSocket错误:', error);
             };
         }
-
+        
         function sendMessage() {
             const message = messageInput.value.trim();
-            const targetId = targetSessionInput.value.trim();
+            const targetId = targetSessionId.value.trim();
             
-            if (message && ws && ws.readyState === WebSocket.OPEN) {
+            if (!message) {
+                return;
+            }
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
                 if (targetId) {
+                    // 私聊消息
                     ws.send(`@${targetId}:${message}`);
                 } else {
+                    // 广播消息
                     ws.send(message);
                 }
                 messageInput.value = '';
+            } else {
+                appendMessage('未连接到服务器', 'system-message');
             }
         }
-
-        function appendMessage(message, isSystem, isPrivate) {
+        
+        function appendMessage(message, className) {
             const div = document.createElement('div');
-            div.className = isSystem ? 'system-message' : 
-                           isPrivate ? 'private-message' : 'user-message';
-            if (!message.startsWith('我') && !isSystem && !message.includes('说：')) {
-                const time = new Date().toLocaleTimeString();
-                div.textContent = `[${time}] ${message}`;
-            } else {
-                div.textContent = message;
-            }
+            div.className = className;
+            div.textContent = message;
             messageArea.appendChild(div);
             messageArea.scrollTop = messageArea.scrollHeight;
         }
 
-        function copySessionId() {
-            if (mySessionId) {
-                navigator.clipboard.writeText(mySessionId)
-                    .then(() => alert('ID已复制到剪贴板'))
-                    .catch(err => alert('复制失败: ' + err));
+        function startHeartbeat() {
+            // 每5秒发送一次ping
+            heartbeatTimer = setInterval(() => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send('ping');
+                }
+            }, 5000);
+        }
+
+        function stopHeartbeat() {
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+                heartbeatTimer = null;
             }
         }
 

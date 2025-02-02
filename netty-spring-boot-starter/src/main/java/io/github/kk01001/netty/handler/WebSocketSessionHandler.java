@@ -6,15 +6,14 @@ import io.github.kk01001.netty.session.WebSocketSessionManager;
 import io.github.kk01001.netty.trace.MessageTracer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
 @Slf4j
-public class WebSocketSessionHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
+public class WebSocketSessionHandler extends ChannelInboundHandlerAdapter {
 
     public static final AttributeKey<String> SESSION_ID_ATTR = AttributeKey.valueOf("sessionId-");
 
@@ -67,10 +66,5 @@ public class WebSocketSessionHandler extends SimpleChannelInboundHandler<WebSock
         );
         session.setUserId(channel.attr(WebSocketAuthHandshakeHandler.USER_ID_ATTR).get());
         return session;
-    }
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) throws Exception {
-
     }
 }

@@ -3,9 +3,8 @@ package io.github.kk01001.netty.handler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,7 @@ public class WebSocketHeartbeatHandler extends ChannelInboundHandlerAdapter {
                 ctx.close();
             } else if (event.state() == IdleState.WRITER_IDLE) {
                 log.debug("发送心跳包: {}", ctx.channel().remoteAddress());
-                ctx.writeAndFlush(new PingWebSocketFrame());
+                ctx.writeAndFlush(new TextWebSocketFrame("pong"));
             }
         } else {
             super.userEventTriggered(ctx, evt);

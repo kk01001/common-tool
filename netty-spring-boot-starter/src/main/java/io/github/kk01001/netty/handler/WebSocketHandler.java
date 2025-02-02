@@ -56,6 +56,10 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
         // 处理文本消息
         if (frame instanceof TextWebSocketFrame textFrame) {
             String message = textFrame.text();
+            if ("ping".equals(message)) {
+                session.sendPongText();
+                return;
+            }
             
             // 记录接收消息
             messageTracer.traceReceive(session, message);
@@ -79,15 +83,6 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
         
         // 处理二进制消息
         if (frame instanceof BinaryWebSocketFrame) {
-            // 检查是否是ping帧(0x9)
-            if (frame.content().readableBytes() >= 1) {
-                byte firstByte = frame.content().getByte(0);
-                if ((firstByte & 0xFF) == 0x9) {
-                    log.debug("收到二进制Ping消息: sessionId={}", session.getId());
-                    session.sendPong();
-                    return;
-                }
-            }
             log.debug("收到二进制消息: sessionId={}", session.getId());
             return;
         }

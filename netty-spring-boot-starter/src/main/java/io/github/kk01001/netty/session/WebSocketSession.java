@@ -179,4 +179,13 @@ public class WebSocketSession {
             channel.writeAndFlush(new PongWebSocketFrame());
         }
     }
+
+    /**
+     * 发送pong响应 text
+     */
+    public void sendPongText() {
+        if (isActive()) {
+            channel.writeAndFlush(new TextWebSocketFrame("pong"));
+        }
+    }
 }
