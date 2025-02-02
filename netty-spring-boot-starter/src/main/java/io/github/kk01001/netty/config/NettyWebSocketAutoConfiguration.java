@@ -7,6 +7,8 @@ import io.github.kk01001.netty.cluster.ClusterMessageHandler;
 import io.github.kk01001.netty.cluster.DefaultClusterMessageHandler;
 import io.github.kk01001.netty.cluster.RedisWebSocketClusterManager;
 import io.github.kk01001.netty.cluster.WebSocketClusterManager;
+import io.github.kk01001.netty.event.WebSocketMessageEventListener;
+import io.github.kk01001.netty.event.WebSocketSessionEventListener;
 import io.github.kk01001.netty.filter.MessageFilter;
 import io.github.kk01001.netty.message.MessageDispatcher;
 import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
@@ -160,5 +162,17 @@ public class NettyWebSocketAutoConfiguration {
     @ConditionalOnMissingBean
     public MessageTracer messageTracer(MeterRegistry registry, NettyWebSocketProperties properties) {
         return new MetricsMessageTracer(registry, properties);
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "netty.websocket.cluster.enabled", havingValue = "true")
+    public WebSocketSessionEventListener webSocketSessionEventListener(WebSocketClusterManager clusterManager) {
+        return new WebSocketSessionEventListener(clusterManager);
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "netty.websocket.cluster.enabled", havingValue = "true")
+    public WebSocketMessageEventListener webSocketMessageEventListener(WebSocketClusterManager clusterManager) {
+        return new WebSocketMessageEventListener(clusterManager);
     }
 }

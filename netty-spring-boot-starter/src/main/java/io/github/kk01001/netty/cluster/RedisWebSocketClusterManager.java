@@ -1,6 +1,8 @@
 package io.github.kk01001.netty.cluster;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.kk01001.netty.cluster.model.BroadcastMessage;
+import io.github.kk01001.netty.cluster.model.SessionInfo;
 import io.github.kk01001.netty.config.NettyWebSocketProperties;
 import io.github.kk01001.netty.event.WebSocketMessageEvent;
 import io.github.kk01001.netty.session.WebSocketSession;
@@ -20,7 +22,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class RedisWebSocketClusterManager implements WebSocketClusterManager, ApplicationListener<WebSocketMessageEvent> {
+public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
@@ -262,43 +264,5 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager, Ap
     
     private String getBroadcastChannel(String path) {
         return broadcastChannelPrefix + path;
-    }
-
-    @Override
-    public void onApplicationEvent(WebSocketMessageEvent event) {
-        // 处理消息事件
-        if (event.getTargetSessionId() != null) {
-            broadcast(event.getPath(), event.getMessage(), event.getTargetSessionId());
-        } else {
-            broadcast(event.getPath(), event.getMessage(), null);
-        }
-    }
-    
-    @Data
-    static class SessionInfo {
-        private String sessionId;
-        private String path;
-        private String nodeId;
-        private long createTime = System.currentTimeMillis();
-        
-        public SessionInfo(String sessionId, String path, String nodeId) {
-            this.sessionId = sessionId;
-            this.path = path;
-            this.nodeId = nodeId;
-        }
-    }
-    
-    @Data
-    static class BroadcastMessage {
-        private String path;
-        private String message;
-        private String sourceNodeId;
-        private long timestamp = System.currentTimeMillis();
-        
-        public BroadcastMessage(String path, String message, String sourceNodeId) {
-            this.path = path;
-            this.message = message;
-            this.sourceNodeId = sourceNodeId;
-        }
     }
 } 

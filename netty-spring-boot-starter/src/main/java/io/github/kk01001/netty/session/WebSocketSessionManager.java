@@ -3,6 +3,7 @@ package io.github.kk01001.netty.session;
 import io.github.kk01001.netty.cluster.WebSocketClusterManager;
 import io.github.kk01001.netty.config.NettyWebSocketProperties;
 import io.github.kk01001.netty.event.WebSocketMessageEvent;
+import io.github.kk01001.netty.event.WebSocketSessionEvent;
 import io.github.kk01001.netty.message.MessageDispatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -47,6 +48,9 @@ public class WebSocketSessionManager implements MessageDispatcher {
         sessions.computeIfAbsent(path, k -> new ConcurrentHashMap<>())
                 .put(session.getId(), session);
         log.debug("添加会话: path={}, sessionId={}", path, session.getId());
+
+        // 发布会话添加事件
+        eventPublisher.publishEvent(new WebSocketSessionEvent(this, path, session, WebSocketSessionEvent.EventType.ADD));
     }
     
     /**
@@ -59,6 +63,8 @@ public class WebSocketSessionManager implements MessageDispatcher {
             if (removed != null) {
                 removed.close();
                 log.debug("移除会话: path={}, sessionId={}", path, sessionId);
+                // 发布会话移除事件
+                eventPublisher.publishEvent(new WebSocketSessionEvent(this, path, removed, WebSocketSessionEvent.EventType.REMOVE));
             }
             // 如果该路径下没有会话了，移除该路径
             if (pathSessions.isEmpty()) {
