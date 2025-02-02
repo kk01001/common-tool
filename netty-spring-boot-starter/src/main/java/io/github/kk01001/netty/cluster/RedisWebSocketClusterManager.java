@@ -75,7 +75,7 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
         try {
             String json = objectMapper.writeValueAsString(sessionInfo);
             redisTemplate.opsForHash().put(sessionKey, session.getId(), json);
-            log.debug("添加会话到Redis: {}", sessionKey);
+            log.debug("添加会话到Redis: {}, sessionId: {}", sessionKey, session.getId());
         } catch (Exception e) {
             log.error("保存会话信息到Redis失败: {}", sessionKey, e);
             throw new RuntimeException("保存会话信息失败", e);
@@ -180,7 +180,7 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
             try {
                 String nodeKey = getNodeKey();
                 redisTemplate.opsForHash().put(nodeKey, nodeId, String.valueOf(System.currentTimeMillis()));
-                log.debug("更新节点心跳: {}", nodeKey);
+                log.debug("更新节点心跳: {}, nodeId: {}", nodeKey, nodeId);
             } catch (Exception e) {
                 log.error("更新节点心跳失败", e);
             }

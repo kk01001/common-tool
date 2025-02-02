@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class SessionInfo {
-    
+
     /**
      * 会话ID
      */

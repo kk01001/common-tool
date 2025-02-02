@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Comparator;
 import java.util.List;
 
+import static io.github.kk01001.netty.handler.WebSocketSessionHandler.SESSION_ATTRIBUTE_KEY_ATTR;
+
 /**
  * WebSocket消息处理器
  */
@@ -20,18 +22,16 @@ import java.util.List;
 public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
     
     private final WebSocketEndpointRegistry registry;
-    private final WebSocketSession session;
+    private WebSocketSession session;
     private final List<MessageFilter> messageFilters;
     private final MessageTracer messageTracer;
 
     public WebSocketHandler(
             WebSocketEndpointRegistry registry,
-            WebSocketSession session,
             List<MessageFilter> messageFilters,
             MessageTracer messageTracer) {
         super();
         this.registry = registry;
-        this.session = session;
         this.messageFilters = messageFilters;
         this.messageTracer = messageTracer;
     }
@@ -116,10 +116,19 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
         log.warn("收到未知类型消息: sessionId={}, frameType={}", 
                 session.getId(), frame.getClass().getSimpleName());
     }
-    
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        // 创建会话
+        this.session = ctx.channel().attr(SESSION_ATTRIBUTE_KEY_ATTR).get();
+        // 继续传递事件
+        super.channelActive(ctx);
+    }
+
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) {
         try {
+            this.session = ctx.channel().attr(SESSION_ATTRIBUTE_KEY_ATTR).get();
             messageTracer.traceConnect(session);
             log.debug("WebSocket连接建立: sessionId={}, remoteAddress={}", 
                     session.getId(), ctx.channel().remoteAddress());
@@ -130,7 +139,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
         }
     }
     
-    @Override
+    /*@Override
     public void handlerRemoved(ChannelHandlerContext ctx) {
         try {
             messageTracer.traceDisconnect(session);
@@ -139,7 +148,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
         } catch (Exception e) {
             log.error("处理连接关闭失败: sessionId={}", session.getId(), e);
         }
-    }
+    }*/
     
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
@@ -150,7 +159,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
             ctx.close();
         }
     }
-    
+
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         try {
@@ -172,12 +181,4 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
         }
     }
 
-    /**
-     * 发送ping消息
-     */
-    public void sendPing() {
-        if (session.isActive()) {
-            session.getChannel().writeAndFlush(new PingWebSocketFrame());
-        }
-    }
-} 
+}

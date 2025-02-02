@@ -1,11 +1,11 @@
 package io.github.kk01001.netty.trace;
 
+import io.github.kk01001.netty.config.NettyWebSocketProperties;
 import io.github.kk01001.netty.session.WebSocketSession;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
-import io.github.kk01001.netty.config.NettyWebSocketProperties;
 
 @Slf4j
 public class MetricsMessageTracer implements MessageTracer {
@@ -55,7 +55,7 @@ public class MetricsMessageTracer implements MessageTracer {
     @Override
     public void traceConnect(WebSocketSession session) {
         createCounter("websocket.connections", "WebSocket连接计数").increment();
-        log.info("连接建立: sessionId={}, remoteAddress={}", 
+        log.debug("连接建立: sessionId={}, remoteAddress={}",
                 session.getId(), session.getChannel().remoteAddress());
     }
 

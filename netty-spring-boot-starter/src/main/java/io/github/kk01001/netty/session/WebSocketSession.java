@@ -5,15 +5,18 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Data
+@Getter
+@Setter
 @Slf4j
 public class WebSocketSession {
+
     /**
      * 会话ID
      */
@@ -57,7 +60,7 @@ public class WebSocketSession {
     /**
      * 用户ID
      */
-    private final String userId;
+    private String userId;
 
     private final MessageTracer messageTracer;
 
@@ -66,14 +69,13 @@ public class WebSocketSession {
                             String path,
                             String uri,
                             WebSocketSessionManager sessionManager,
-                            String userId,
                             MessageTracer messageTracer) {
         this.id = id;
         this.channel = channel;
         this.path = path;
         this.uri = uri;
         this.sessionManager = sessionManager;
-        this.userId = userId;
+        this.userId = null;
         this.messageTracer = messageTracer;
     }
     

@@ -39,7 +39,7 @@ public class WebSocketAuthHandshakeHandler extends ChannelInboundHandlerAdapter 
         this.allowExtensions = allowExtensions;
         this.maxFramePayloadLength = maxFramePayloadLength;
     }
-    
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest request) {

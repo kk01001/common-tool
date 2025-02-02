@@ -4,9 +4,9 @@ import io.github.kk01001.netty.auth.WebSocketAuthenticator;
 import io.github.kk01001.netty.config.ChannelOptionCustomizer;
 import io.github.kk01001.netty.config.WebSocketPipelineConfigurer;
 import io.github.kk01001.netty.filter.MessageFilter;
-import io.github.kk01001.netty.filter.SensitiveWordFilter;
-import io.github.kk01001.netty.filter.MessageSizeFilter;
 import io.github.kk01001.netty.filter.MessageRateLimiter;
+import io.github.kk01001.netty.filter.MessageSizeFilter;
+import io.github.kk01001.netty.filter.SensitiveWordFilter;
 import io.github.kk01001.netty.session.WebSocketSession;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -47,14 +47,14 @@ public class WebSocketConfig {
     }
 
     private boolean isValidToken(String token) {
-        return true;
+        return "1".equals(token) || "2".equals(token) || "3".equals(token);
     }
 
     @Bean
     public WebSocketPipelineConfigurer customPipelineConfigurer() {
         return new WebSocketPipelineConfigurer() {
             @Override
-            public void configurePipeline(ChannelPipeline pipeline, WebSocketSession session) {
+            public void configurePipeline(ChannelPipeline pipeline) {
                 // 添加自定义处理器
                 pipeline.addLast("customHandler", new CustomHandler());
             }

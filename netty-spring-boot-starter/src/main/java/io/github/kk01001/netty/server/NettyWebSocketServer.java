@@ -9,6 +9,7 @@ import io.github.kk01001.netty.filter.MessageFilter;
 import io.github.kk01001.netty.handler.WebSocketAuthHandshakeHandler;
 import io.github.kk01001.netty.handler.WebSocketHandler;
 import io.github.kk01001.netty.handler.WebSocketHeartbeatHandler;
+import io.github.kk01001.netty.handler.WebSocketSessionHandler;
 import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
 import io.github.kk01001.netty.session.WebSocketSession;
 import io.github.kk01001.netty.session.WebSocketSessionManager;
@@ -43,7 +44,6 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
     private final WebSocketSessionManager sessionManager;
     private final NettyWebSocketProperties properties;
     private final WebSocketAuthenticator authenticator;
-    private final WebSocketAuthHandshakeHandler handshakeHandler;
     private final WebSocketHeartbeatHandler heartbeatHandler;
     private final List<WebSocketPipelineConfigurer> pipelineConfigurers;
     private final List<ChannelOptionCustomizer> optionCustomizers;
@@ -72,13 +72,6 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
         this.messageFilters = messageFilters;
         this.messageTracer = messageTracer;
         this.webSocketClusterManager = webSocketClusterManager;
-        this.handshakeHandler = new WebSocketAuthHandshakeHandler(
-                properties.getPath(),
-                String.join(",", properties.getSubprotocols()),
-                true,
-                properties.getMaxFrameSize(),
-                authenticator
-        );
         this.heartbeatHandler = new WebSocketHeartbeatHandler();
     }
     
@@ -142,8 +135,17 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
                             pipeline.addLast(new HttpObjectAggregator(properties.getMaxFrameSize()));
 
                             // WebSocket握手和鉴权处理
-                            pipeline.addLast(handshakeHandler);
-                            
+                            pipeline.addLast(new WebSocketAuthHandshakeHandler(
+                                    properties.getPath(),
+                                    String.join(",", properties.getSubprotocols()),
+                                    true,
+                                    properties.getMaxFrameSize(),
+                                    authenticator
+                            ));
+
+                            // 会话处理器
+                            pipeline.addLast(new WebSocketSessionHandler(properties, sessionManager, messageTracer));
+
                             // 心跳处理
                             if (properties.getHeartbeat().isEnabled()) {
                                 pipeline.addLast(new IdleStateHandler(
@@ -154,35 +156,18 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
                                 ));
                                 pipeline.addLast(heartbeatHandler);
                             }
-                            
-                            // 创建会话
-                            String sessionId = UUID.randomUUID().toString();
-                            String userId = null;
-                            if (properties.isAuthEnabled()) {
-                                userId = ch.attr(WebSocketAuthHandshakeHandler.USER_ID_ATTR).get();
-                            }
-                            WebSocketSession session = new WebSocketSession(
-                                    sessionId, 
-                                    ch, 
-                                    properties.getPath(),
-                                    ch.remoteAddress().toString(),
-                                    sessionManager,
-                                    userId,
-                                    messageTracer
-                            );
-                            sessionManager.addSession(properties.getPath(), session);
 
                             // 调用自定义Pipeline配置
                             if (pipelineConfigurers != null) {
                                 // 按优先级排序
                                 pipelineConfigurers.sort(Comparator.comparingInt(WebSocketPipelineConfigurer::getOrder));
                                 for (WebSocketPipelineConfigurer configurer : pipelineConfigurers) {
-                                    configurer.configurePipeline(pipeline, session);
+                                    configurer.configurePipeline(pipeline);
                                 }
                             }
                             
                             // 业务处理
-                            pipeline.addLast("webSocketHandler", new WebSocketHandler(registry, session, messageFilters, messageTracer));
+                            pipeline.addLast("webSocketHandler", new WebSocketHandler(registry, messageFilters, messageTracer));
                         }
                     });
             
@@ -215,7 +200,21 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
             throw e;
         }
     }
-    
+
+    private WebSocketSession getWebSocketSession(SocketChannel ch) {
+        String sessionId = UUID.randomUUID().toString();
+        WebSocketSession session = new WebSocketSession(
+                sessionId,
+                ch,
+                properties.getPath(),
+                ch.remoteAddress().toString(),
+                sessionManager,
+                messageTracer
+        );
+        sessionManager.addSession(properties.getPath(), session);
+        return session;
+    }
+
     private void applyDefaultOptions(ServerBootstrap bootstrap) {
         // 应用服务端选项
         bootstrap.option(ChannelOption.SO_BACKLOG, properties.getServerOptions().getSoBacklog());
