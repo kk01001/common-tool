@@ -121,7 +121,8 @@ public class NettyWebSocketAutoConfiguration {
             List<WebSocketPipelineConfigurer> pipelineConfigurers,
             List<ChannelOptionCustomizer> optionCustomizers,
             List<MessageFilter> messageFilters,
-            MessageTracer messageTracer) {
+            MessageTracer messageTracer,
+            WebSocketClusterManager webSocketClusterManager) {
         return new NettyWebSocketServer(
                 registry, 
                 sessionManager, 
@@ -130,7 +131,8 @@ public class NettyWebSocketAutoConfiguration {
                 pipelineConfigurers,
                 optionCustomizers,
                 messageFilters,
-                messageTracer);
+                messageTracer,
+                webSocketClusterManager);
     }
     
     @Bean

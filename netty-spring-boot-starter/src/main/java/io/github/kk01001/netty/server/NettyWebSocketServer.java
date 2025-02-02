@@ -1,6 +1,7 @@
 package io.github.kk01001.netty.server;
 
 import io.github.kk01001.netty.auth.WebSocketAuthenticator;
+import io.github.kk01001.netty.cluster.WebSocketClusterManager;
 import io.github.kk01001.netty.config.ChannelOptionCustomizer;
 import io.github.kk01001.netty.config.NettyWebSocketProperties;
 import io.github.kk01001.netty.config.WebSocketPipelineConfigurer;
@@ -48,6 +49,7 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
     private final List<ChannelOptionCustomizer> optionCustomizers;
     private final List<MessageFilter> messageFilters;
     private final MessageTracer messageTracer;
+    private final WebSocketClusterManager webSocketClusterManager;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel serverChannel;
@@ -60,7 +62,7 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
             WebSocketAuthenticator authenticator,
             List<WebSocketPipelineConfigurer> pipelineConfigurers,
             List<ChannelOptionCustomizer> optionCustomizers,
-            List<MessageFilter> messageFilters, MessageTracer messageTracer) {
+            List<MessageFilter> messageFilters, MessageTracer messageTracer, WebSocketClusterManager webSocketClusterManager) {
         this.registry = registry;
         this.sessionManager = sessionManager;
         this.properties = properties;
@@ -69,6 +71,7 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
         this.optionCustomizers = optionCustomizers;
         this.messageFilters = messageFilters;
         this.messageTracer = messageTracer;
+        this.webSocketClusterManager = webSocketClusterManager;
         this.handshakeHandler = new WebSocketAuthHandshakeHandler(
                 properties.getPath(),
                 String.join(",", properties.getSubprotocols()),
@@ -86,11 +89,15 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
             initSslContext();
         }
         start();
+        // 集群 初始化节点信息
+        webSocketClusterManager.init();
     }
     
     @Override
     public void destroy() throws Exception {
         stop();
+        // 集群 销毁节点信息
+        webSocketClusterManager.destroy();
     }
     
     private void initSslContext() throws Exception {
