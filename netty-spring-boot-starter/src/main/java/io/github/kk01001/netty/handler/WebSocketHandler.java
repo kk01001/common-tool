@@ -119,9 +119,17 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        // 创建会话
-        this.session = ctx.channel().attr(SESSION_ATTRIBUTE_KEY_ATTR).get();
-        // 继续传递事件
+        /*try {
+            this.session = ctx.channel().attr(SESSION_ATTRIBUTE_KEY_ATTR).get();
+            messageTracer.traceConnect(session);
+            log.debug("WebSocket连接建立: sessionId={}, remoteAddress={}",
+                    session.getId(), ctx.channel().remoteAddress());
+            registry.handleOpen(session);
+            super.channelActive(ctx);
+        } catch (Exception e) {
+            log.error("处理连接建立失败: sessionId={}", session.getId(), e);
+            ctx.close();
+        }*/
         super.channelActive(ctx);
     }
 
@@ -132,7 +140,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
             messageTracer.traceConnect(session);
             log.debug("WebSocket连接建立: sessionId={}, remoteAddress={}", 
                     session.getId(), ctx.channel().remoteAddress());
-            registry.handleOpen(session);
+            // registry.handleOpen(session);
         } catch (Exception e) {
             log.error("处理连接建立失败: sessionId={}", session.getId(), e);
             ctx.close();

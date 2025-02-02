@@ -1,6 +1,10 @@
 package io.github.kk01001.netty.handler;
 
 import io.github.kk01001.netty.auth.WebSocketAuthenticator;
+import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
+import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.kk01001.netty.session.WebSocketSessionManager;
+import io.github.kk01001.netty.trace.MessageTracer;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,11 +17,14 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 
+import static io.github.kk01001.netty.handler.WebSocketSessionHandler.SESSION_ATTRIBUTE_KEY_ATTR;
+
 @Slf4j
 @ChannelHandler.Sharable
 public class WebSocketAuthHandshakeHandler extends ChannelInboundHandlerAdapter {
     
     public static final AttributeKey<String> USER_ID_ATTR = AttributeKey.valueOf("userId");
+
     private static final AttributeKey<WebSocketServerHandshaker> HANDSHAKER_ATTR = 
             AttributeKey.valueOf("HANDSHAKER");
     
@@ -26,18 +33,25 @@ public class WebSocketAuthHandshakeHandler extends ChannelInboundHandlerAdapter 
     private final String subprotocols;
     private final boolean allowExtensions;
     private final int maxFramePayloadLength;
-    
+    private final WebSocketSessionManager sessionManager;
+    private final WebSocketEndpointRegistry registry;
+    private final MessageTracer messageTracer;
+
     public WebSocketAuthHandshakeHandler(
             String websocketPath,
             String subprotocols,
             boolean allowExtensions,
             int maxFramePayloadLength,
-            WebSocketAuthenticator authenticator) {
+            WebSocketAuthenticator authenticator,
+            WebSocketSessionManager sessionManager, WebSocketEndpointRegistry registry, MessageTracer messageTracer) {
         this.authenticator = authenticator;
         this.websocketPath = websocketPath;
         this.subprotocols = subprotocols;
         this.allowExtensions = allowExtensions;
         this.maxFramePayloadLength = maxFramePayloadLength;
+        this.sessionManager = sessionManager;
+        this.registry = registry;
+        this.messageTracer = messageTracer;
     }
 
     @Override
@@ -77,6 +91,13 @@ public class WebSocketAuthHandshakeHandler extends ChannelInboundHandlerAdapter 
             }
             // 保存用户ID到channel属性中
             ctx.channel().attr(USER_ID_ATTR).set(authResult.getUserId());
+
+            WebSocketSession session = ctx.channel().attr(SESSION_ATTRIBUTE_KEY_ATTR).get();
+            session.setUserId(authResult.getUserId());
+            session.setAttribute("authSuccess", true);
+            sessionManager.addSession(session.getPath(), session);
+
+            registry.handleOpen(session);
             log.debug("WebSocket鉴权成功: uri={}, userId={}", 
                     request.uri(), authResult.getUserId());
         }

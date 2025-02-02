@@ -67,6 +67,9 @@ public class ChatEndpoint {
 
     @OnClose
     public void onClose(WebSocketSession session) {
+        if (!Boolean.TRUE.equals(session.getAttribute("authSuccess"))) {
+            return;
+        }
         log.info("用户离开: sessionId={}", session.getId());
         // 发送离开消息
         ChatMessage leaveMessage = new ChatMessage();

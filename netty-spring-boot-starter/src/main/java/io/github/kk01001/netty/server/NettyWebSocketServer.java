@@ -140,7 +140,10 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
                                     String.join(",", properties.getSubprotocols()),
                                     true,
                                     properties.getMaxFrameSize(),
-                                    authenticator
+                                    authenticator,
+                                    sessionManager,
+                                    registry,
+                                    messageTracer
                             ));
 
                             // 会话处理器

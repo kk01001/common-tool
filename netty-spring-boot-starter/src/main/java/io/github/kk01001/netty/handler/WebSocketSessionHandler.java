@@ -34,11 +34,6 @@ public class WebSocketSessionHandler extends SimpleChannelInboundHandler<WebSock
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-
-    }
-
-    @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         // 创建会话
         String sessionId = UUID.randomUUID().toString();
