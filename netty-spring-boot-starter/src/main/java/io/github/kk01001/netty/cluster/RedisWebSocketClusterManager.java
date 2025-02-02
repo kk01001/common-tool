@@ -4,11 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.kk01001.netty.cluster.model.BroadcastMessage;
 import io.github.kk01001.netty.cluster.model.SessionInfo;
 import io.github.kk01001.netty.config.NettyWebSocketProperties;
-import io.github.kk01001.netty.event.WebSocketMessageEvent;
 import io.github.kk01001.netty.session.WebSocketSession;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -74,7 +71,7 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     @Override
     public void addSession(String path, WebSocketSession session) {
         String sessionKey = getSessionKey(path, session.getId());
-        SessionInfo sessionInfo = new SessionInfo(session.getId(), path, nodeId);
+        SessionInfo sessionInfo = new SessionInfo(session, nodeId);
         try {
             String json = objectMapper.writeValueAsString(sessionInfo);
             redisTemplate.opsForHash().put(sessionKey, session.getId(), json);
@@ -255,7 +252,7 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     
     private String getSessionKey(String path, String sessionId) {
         int shard = Math.abs(sessionId.hashCode()) % properties.getCluster().getSessionShardCount();
-        return sessionKeyPrefix + nodeId + ":" + path + ":" + shard;
+        return sessionKeyPrefix + nodeId + ":" + shard;
     }
 
     private String getNodeKey() {

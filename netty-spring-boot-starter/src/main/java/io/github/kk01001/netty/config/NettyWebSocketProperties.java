@@ -100,7 +100,7 @@ public class NettyWebSocketProperties {
         /**
          * 会话分片数量
          */
-        private int sessionShardCount = 500;
+        private int sessionShardCount = 5;
 
         /**
          * Redis 节点键前缀

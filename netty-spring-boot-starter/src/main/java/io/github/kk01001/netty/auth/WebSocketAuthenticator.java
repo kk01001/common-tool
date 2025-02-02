@@ -36,7 +36,7 @@ public interface WebSocketAuthenticator {
         private String userId;
         
         public static AuthResult success(String userId) {
-            return new AuthResult(true, null, userId);
+            return new AuthResult(true, "success", userId);
         }
         
         public static AuthResult fail(String message) {

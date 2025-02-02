@@ -50,7 +50,7 @@ netty:
       node-key-prefix: "netty-ws:node"
       broadcast-channel-prefix: "netty-ws:broadcast:"
       cleanup-interval: 5m  # 清理任务的间隔时间
-      session-shard-count: 500  # 会话分片数量
+      session-shard-count: 5  # 会话分片数量
     heartbeat:
       enabled: true
       reader-idle-time: 60  # 60秒没收到数据就断开连接
