@@ -12,8 +12,8 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.util.StringUtils;
 
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -21,10 +21,6 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class RedisWebSocketClusterManager implements WebSocketClusterManager, ApplicationListener<WebSocketMessageEvent> {
-    
-    private static final String SESSION_KEY_PREFIX = "ws:session:";
-    private static final String NODE_KEY_PREFIX = "ws:node:";
-    private static final String BROADCAST_CHANNEL_PREFIX = "ws:broadcast:";
     
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
@@ -34,7 +30,11 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager, Ap
     private final String nodeId;
     private final ScheduledExecutorService scheduler;
     private ScheduledFuture<?> heartbeatFuture;
-    
+
+    private final String sessionKeyPrefix;
+    private final String nodeKeyPrefix;
+    private final String broadcastChannelPrefix;
+
     public RedisWebSocketClusterManager(
             RedisTemplate<String, String> redisTemplate,
             ObjectMapper objectMapper,
@@ -49,6 +49,11 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager, Ap
         this.messageHandler = messageHandler;
         this.scheduler = scheduler;
         this.nodeId = generateNodeId();
+
+        // 从配置中获取前缀
+        this.sessionKeyPrefix = properties.getCluster().getSessionKeyPrefix();
+        this.nodeKeyPrefix = properties.getCluster().getNodeKeyPrefix();
+        this.broadcastChannelPrefix = properties.getCluster().getBroadcastChannelPrefix();
     }
     
     @Override
@@ -59,6 +64,8 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager, Ap
         registerNode();
         // 启动心跳
         startHeartbeat();
+        // 启动清理任务
+        startCleanupTask();
         log.info("Redis集群管理器初始化完成, nodeId: {}", nodeId);
     }
     
@@ -68,8 +75,7 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager, Ap
         SessionInfo sessionInfo = new SessionInfo(session.getId(), path, nodeId);
         try {
             String json = objectMapper.writeValueAsString(sessionInfo);
-            redisTemplate.opsForValue().set(sessionKey, json,
-                    properties.getCluster().getSessionTimeout());
+            redisTemplate.opsForHash().put(sessionKey, session.getId(), json);
             log.debug("添加会话到Redis: {}", sessionKey);
         } catch (Exception e) {
             log.error("保存会话信息到Redis失败: {}", sessionKey, e);
@@ -81,7 +87,7 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager, Ap
     public void removeSession(String path, String sessionId) {
         String sessionKey = getSessionKey(path, sessionId);
         try {
-            redisTemplate.delete(sessionKey);
+            redisTemplate.opsForHash().delete(sessionKey, sessionId);
             log.debug("从Redis移除会话: {}", sessionKey);
         } catch (Exception e) {
             log.error("从Redis删除会话失败: {}", sessionKey, e);
@@ -118,11 +124,11 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager, Ap
             if (heartbeatFuture != null) {
                 heartbeatFuture.cancel(true);
             }
-            // 注销节点
+            // 移除自身节点
             unregisterNode();
-            // 清理会话
+            // 清理本节点的会话数据
             cleanupSessions();
-            log.info("Redis集群管理器已销毁");
+            log.info("Redis集群管理器已销毁, nodeId: {}", nodeId);
         } catch (Exception e) {
             log.error("销毁Redis集群管理器失败", e);
         }
@@ -132,7 +138,7 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager, Ap
         // 订阅全局广播
         listenerContainer.addMessageListener(
                 (message, pattern) -> handleBroadcastMessage(message.toString()),
-                new PatternTopic(BROADCAST_CHANNEL_PREFIX + "*")
+                new PatternTopic(broadcastChannelPrefix + "*")
         );
     }
     
@@ -150,12 +156,9 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager, Ap
     }
     
     private void registerNode() {
-        String nodeKey = getNodeKey(nodeId);
-        NodeInfo nodeInfo = new NodeInfo(nodeId, System.currentTimeMillis());
+        String nodeKey = getNodeKey();
         try {
-            String json = objectMapper.writeValueAsString(nodeInfo);
-            redisTemplate.opsForValue().set(nodeKey, json,
-                    properties.getCluster().getSessionTimeout());
+            redisTemplate.opsForHash().put(nodeKey, nodeId, String.valueOf(System.currentTimeMillis()));
             log.info("注册节点到Redis: {}", nodeKey);
         } catch (Exception e) {
             log.error("注册节点到Redis失败: {}", nodeKey, e);
@@ -164,48 +167,83 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager, Ap
     }
     
     private void unregisterNode() {
-        String nodeKey = getNodeKey(nodeId);
-        redisTemplate.delete(nodeKey);
-        log.info("从Redis注销节点: {}", nodeKey);
+        String nodeKey = getNodeKey();
+        try {
+            redisTemplate.opsForHash().delete(nodeKey, nodeId);
+            log.info("从Redis注销节点: {}", nodeKey);
+        } catch (Exception e) {
+            log.error("从Redis注销节点失败: {}", nodeKey, e);
+        }
     }
     
     private void startHeartbeat() {
         heartbeatFuture = scheduler.scheduleAtFixedRate(() -> {
             try {
-                registerNode();
+                String nodeKey = getNodeKey();
+                redisTemplate.opsForHash().put(nodeKey, nodeId, String.valueOf(System.currentTimeMillis()));
+                log.debug("更新节点心跳: {}", nodeKey);
+            } catch (Exception e) {
+                log.error("更新节点心跳失败", e);
+            }
+        }, 0, properties.getCluster().getSessionTimeout().toSeconds() / 5, TimeUnit.SECONDS);
+    }
+
+    private void startCleanupTask() {
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
                 cleanupDeadNodes();
             } catch (Exception e) {
-                log.error("执行心跳任务失败", e);
+                log.error("清理死亡节点任务失败", e);
             }
-        }, 0, properties.getCluster().getSessionTimeout().toSeconds() / 3, TimeUnit.SECONDS);
+        }, 0, properties.getCluster().getCleanupInterval().toSeconds(), TimeUnit.SECONDS);
     }
-    
+
     private void cleanupDeadNodes() {
-        Set<String> nodeKeys = redisTemplate.keys(NODE_KEY_PREFIX + "*");
-        if (nodeKeys == null) return;
-        
-        long now = System.currentTimeMillis();
-        nodeKeys.forEach(nodeKey -> {
-            try {
-                String json = redisTemplate.opsForValue().get(nodeKey);
-                if (json != null) {
-                    NodeInfo nodeInfo = objectMapper.readValue(json, NodeInfo.class);
-                    if (now - nodeInfo.getLastHeartbeat() > properties.getCluster().getSessionTimeout().toMillis()) {
-                        redisTemplate.delete(nodeKey);
-                        log.info("清理死亡节点: {}", nodeKey);
-                    }
-                }
-            } catch (Exception e) {
-                log.error("清理死亡节点失败: {}", nodeKey, e);
+        String nodeKey = getNodeKey();
+        try {
+            Map<Object, Object> nodeData = redisTemplate.opsForHash().entries(nodeKey);
+            if (nodeData.isEmpty()) {
+                return;
             }
-        });
+
+            long now = System.currentTimeMillis();
+            nodeData.forEach((nodeId, lastHeartbeatStr) -> {
+                try {
+                    long lastHeartbeat = Long.parseLong((String) lastHeartbeatStr);
+                    if (now - lastHeartbeat > properties.getCluster().getSessionTimeout().toMillis()) {
+                        // 清理节点
+                        redisTemplate.opsForHash().delete(nodeKey, nodeId);
+                        log.info("清理死亡节点: {}", nodeId);
+
+                        // 清理该节点的会话数据
+                        cleanupSessionsForNode((String) nodeId);
+                    }
+                } catch (Exception e) {
+                    log.error("清理死亡节点失败: {}", nodeId, e);
+                }
+            });
+        } catch (Exception e) {
+            log.error("清理死亡节点任务失败", e);
+        }
     }
     
     private void cleanupSessions() {
-        Set<String> sessionKeys = redisTemplate.keys(SESSION_KEY_PREFIX + nodeId + ":*");
-        if (sessionKeys != null) {
-            redisTemplate.delete(sessionKeys);
-            log.info("清理节点会话数: {}", sessionKeys.size());
+        cleanupSessionsForNode(this.nodeId);
+    }
+
+    private void cleanupSessionsForNode(String nodeId) {
+        int shardCount = properties.getCluster().getSessionShardCount();
+        for (int shard = 0; shard < shardCount; shard++) {
+            String sessionKey = sessionKeyPrefix + nodeId + ":" + shard;
+            try {
+                Map<Object, Object> sessionData = redisTemplate.opsForHash().entries(sessionKey);
+                if (!sessionData.isEmpty()) {
+                    redisTemplate.unlink(sessionKey);
+                    log.info("清理节点 {} 的会话分片: {}", nodeId, sessionKey);
+                }
+            } catch (Exception e) {
+                log.error("清理节点 {} 的会话分片失败: {}", nodeId, sessionKey, e);
+            }
         }
     }
     
@@ -214,15 +252,16 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager, Ap
     }
     
     private String getSessionKey(String path, String sessionId) {
-        return SESSION_KEY_PREFIX + nodeId + ":" + path + ":" + sessionId;
+        int shard = Math.abs(sessionId.hashCode()) % properties.getCluster().getSessionShardCount();
+        return sessionKeyPrefix + nodeId + ":" + path + ":" + shard;
     }
-    
-    private String getNodeKey(String nodeId) {
-        return NODE_KEY_PREFIX + nodeId;
+
+    private String getNodeKey() {
+        return nodeKeyPrefix;
     }
     
     private String getBroadcastChannel(String path) {
-        return BROADCAST_CHANNEL_PREFIX + path;
+        return broadcastChannelPrefix + path;
     }
 
     @Override
@@ -232,17 +271,6 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager, Ap
             broadcast(event.getPath(), event.getMessage(), event.getTargetSessionId());
         } else {
             broadcast(event.getPath(), event.getMessage(), null);
-        }
-    }
-    
-    @Data
-    static class NodeInfo {
-        private String nodeId;
-        private long lastHeartbeat;
-        
-        public NodeInfo(String nodeId, long lastHeartbeat) {
-            this.nodeId = nodeId;
-            this.lastHeartbeat = lastHeartbeat;
         }
     }
     

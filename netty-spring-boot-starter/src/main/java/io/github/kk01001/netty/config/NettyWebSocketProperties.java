@@ -6,7 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import io.netty.channel.ChannelOption;
 
 @Data
 @ConfigurationProperties(prefix = "netty.websocket")
@@ -92,6 +91,31 @@ public class NettyWebSocketProperties {
          * 集群会话超时时间
          */
         private Duration sessionTimeout = Duration.ofHours(1);
+
+        /**
+         * Redis 会话键前缀
+         */
+        private String sessionKeyPrefix = "netty-ws:session:";
+
+        /**
+         * 会话分片数量
+         */
+        private int sessionShardCount = 500;
+
+        /**
+         * Redis 节点键前缀
+         */
+        private String nodeKeyPrefix = "netty-ws:node";
+
+        /**
+         * Redis 广播频道前缀
+         */
+        private String broadcastChannelPrefix = "netty-:broadcast:";
+
+        /**
+         * 清理死亡节点的间隔时间
+         */
+        private Duration cleanupInterval = Duration.ofMinutes(30);
     }
     
     @Data
