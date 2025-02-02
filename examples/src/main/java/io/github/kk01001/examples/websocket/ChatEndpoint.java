@@ -26,6 +26,11 @@ public class ChatEndpoint {
         broadcastMessage(session, joinMessage);
     }
 
+    @OnBinaryMessage
+    public void onBinaryMessage(WebSocketSession session, byte[] message) {
+        log.info("收到二进制消息: sessionId={}, message={}", session.getId(), new String(message));
+    }
+
     @OnMessage
     public void onMessage(WebSocketSession session, String message) {
         log.info("收到消息: sessionId={}, message={}", session.getId(), message);

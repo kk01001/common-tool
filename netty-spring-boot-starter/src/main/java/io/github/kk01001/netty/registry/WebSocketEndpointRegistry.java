@@ -56,6 +56,8 @@ public class WebSocketEndpointRegistry implements SmartInitializingSingleton {
                 handler.setOnOpenMethod(method);
             } else if (method.isAnnotationPresent(OnMessage.class)) {
                 handler.setOnMessageMethod(method);
+            } else if (method.isAnnotationPresent(OnBinaryMessage.class)) {
+                handler.setOnBinaryMessageMethod(method);
             } else if (method.isAnnotationPresent(OnClose.class)) {
                 handler.setOnCloseMethod(method);
             } else if (method.isAnnotationPresent(OnError.class)) {
@@ -83,7 +85,7 @@ public class WebSocketEndpointRegistry implements SmartInitializingSingleton {
     }
     
     /**
-     * 处理消息
+     * 处理文本消息
      */
     public void handleMessage(WebSocketSession session, String message) {
         EndpointMethodHandler handler = pathHandlers.get(session.getPath());
@@ -92,6 +94,21 @@ public class WebSocketEndpointRegistry implements SmartInitializingSingleton {
                 handler.getOnMessageMethod().invoke(handler.getBean(), session, message);
             } catch (Exception e) {
                 log.error("处理消息失败: path={}, sessionId={}", 
+                        session.getPath(), session.getId(), e);
+            }
+        }
+    }
+
+    /**
+     * 处理二进制消息
+     */
+    public void handleBinaryMessage(WebSocketSession session, byte[] bytes) {
+        EndpointMethodHandler handler = pathHandlers.get(session.getPath());
+        if (handler != null && handler.getOnMessageMethod() != null) {
+            try {
+                handler.getOnBinaryMessageMethod().invoke(handler.getBean(), session, bytes);
+            } catch (Exception e) {
+                log.error("处理消息失败: path={}, sessionId={}",
                         session.getPath(), session.getId(), e);
             }
         }

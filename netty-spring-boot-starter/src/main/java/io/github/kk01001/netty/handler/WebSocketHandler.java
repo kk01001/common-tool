@@ -5,6 +5,7 @@ import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
 import io.github.kk01001.netty.session.WebSocketSession;
 import io.github.kk01001.netty.trace.MessageTracer;
 import io.micrometer.core.instrument.Timer;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.*;
@@ -82,8 +83,12 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
         }
         
         // 处理二进制消息
-        if (frame instanceof BinaryWebSocketFrame) {
+        if (frame instanceof BinaryWebSocketFrame socketFrame) {
             log.debug("收到二进制消息: sessionId={}", session.getId());
+            ByteBuf content = socketFrame.content();
+            byte[] byteArray = new byte[content.readableBytes()];
+            content.readBytes(byteArray);
+            registry.handleBinaryMessage(session, byteArray);
             return;
         }
         
