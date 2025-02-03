@@ -87,12 +87,9 @@ public class WebSocketSessionManager implements MessageDispatcher {
     public void broadcast(String path, String message) {
         broadcast(path, message, session -> true);
     }
-    
-    /**
-     * 广播消息给符合条件的会话
-     */
+
     @Override
-    public void broadcast(String path, String message, Predicate<WebSocketSession> filter) {
+    public void broadcastLocal(String path, String message, Predicate<WebSocketSession> filter) {
         if (!StringUtils.hasText(message)) {
             return;
         }
@@ -106,10 +103,22 @@ public class WebSocketSessionManager implements MessageDispatcher {
                             session.sendMessage(message);
                         } catch (Exception e) {
                             log.error("广播消息失败: sessionId={}", session.getId(), e);
-                            removeSession(path, session.getId());
                         }
                     });
         }
+    }
+
+    /**
+     * 广播消息给符合条件的会话, 所有节点
+     */
+    @Override
+    public void broadcast(String path, String message, Predicate<WebSocketSession> filter) {
+        // 本机节点
+        broadcastLocal(path, message, filter);
+
+        log.debug("广播消息: path={}, message={}", path, message);
+        // 其他节点
+        eventPublisher.publishEvent(new WebSocketMessageEvent(this, path, message, null));
     }
     
     /**
@@ -162,24 +171,33 @@ public class WebSocketSessionManager implements MessageDispatcher {
      */
     @Override
     public void sendToSession(String path, String sessionId, String message) {
-        if (!StringUtils.hasText(message)) {
+        boolean local = sendToSessionLocal(path, sessionId, message);
+        if (local) {
             return;
         }
-        
+        // 本地找不到，发布事件
+        eventPublisher.publishEvent(new WebSocketMessageEvent(this,
+                path,
+                message,
+                sessionId));
+    }
+
+    @Override
+    public boolean sendToSessionLocal(String path, String sessionId, String message) {
+        if (!StringUtils.hasText(message)) {
+            return true;
+        }
+
         // 先查找本地会话
         WebSocketSession session = getSession(path, sessionId);
         if (session != null && session.isActive()) {
             try {
                 session.sendMessage(message);
-                return;
+                return true;
             } catch (Exception e) {
                 log.error("发送消息失败: sessionId={}", sessionId, e);
-                removeSession(path, sessionId);
-                return;
             }
         }
-        
-        // 本地找不到，发布事件
-        eventPublisher.publishEvent(new WebSocketMessageEvent(this, path, message, sessionId));
+        return false;
     }
 }

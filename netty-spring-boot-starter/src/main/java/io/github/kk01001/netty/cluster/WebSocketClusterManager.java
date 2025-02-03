@@ -19,8 +19,11 @@ public interface WebSocketClusterManager {
     
     /**
      * 广播消息
+     * @param path 路径
+     * @param message 消息
+     * @param targetSessionId 目标会话ID
      */
-    void broadcast(String path, String message, String sourceNodeId);
+    void broadcast(String path, String message, String targetSessionId);
     
     /**
      * 获取节点ID

@@ -96,21 +96,28 @@ public class WebSocketSession {
      * 广播消息给同路径的其他会话（不包括自己）
      */
     public void broadcast(String message) {
-        sessionManager.broadcast(path, message, session -> !session.getId().equals(this.id));
+        messageTracer.traceSend(this, message);
+        sessionManager.broadcast(path, message,
+                session -> !session.getId().equals(this.id));
+        updateLastActiveTime();
     }
 
     /**
      * 广播消息给所有会话（包括自己）
      */
     public void broadcastAll(String message) {
+        messageTracer.traceSend(this, message);
         sessionManager.broadcast(path, message);
+        updateLastActiveTime();
     }
 
     /**
      * 给指定会话发送消息
      */
     public void sendToSession(String sessionId, String message) {
+        messageTracer.traceSend(this, message);
         sessionManager.sendToSession(path, sessionId, message);
+        updateLastActiveTime();
     }
 
     /**
@@ -168,6 +175,7 @@ public class WebSocketSession {
     public void sendPing() {
         if (isActive()) {
             channel.writeAndFlush(new PingWebSocketFrame());
+            updateLastActiveTime();
         }
     }
     
@@ -177,6 +185,7 @@ public class WebSocketSession {
     public void sendPong() {
         if (isActive()) {
             channel.writeAndFlush(new PongWebSocketFrame());
+            updateLastActiveTime();
         }
     }
 
@@ -186,6 +195,7 @@ public class WebSocketSession {
     public void sendPongText() {
         if (isActive()) {
             channel.writeAndFlush(new TextWebSocketFrame("pong"));
+            updateLastActiveTime();
         }
     }
 }

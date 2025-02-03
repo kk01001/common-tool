@@ -5,13 +5,21 @@ package io.github.kk01001.netty.cluster;
  * 用于处理从其他节点接收到的消息
  */
 public interface ClusterMessageHandler {
-    
+
     /**
      * 处理广播消息
      * @param path WebSocket路径
      * @param message 消息内容
      */
     void handleBroadcastMessage(String path, String message);
+
+    /**
+     * 处理广播消息 只处理本机的消息
+     *
+     * @param path    WebSocket路径
+     * @param message 消息内容
+     */
+    void handleBroadcastLocalMessage(String path, String message);
     
     /**
      * 处理私聊消息
@@ -19,9 +27,7 @@ public interface ClusterMessageHandler {
      * @param targetSessionId 目标会话ID
      * @param message 消息内容
      */
-    default void handlePrivateMessage(String path, String targetSessionId, String message) {
-        // 默认实现为空，子类可以选择性实现
-    }
+    void handlePrivateMessage(String path, String targetSessionId, String message, boolean local);
     
     /**
      * 处理节点事件
@@ -31,7 +37,7 @@ public interface ClusterMessageHandler {
     default void handleNodeEvent(String nodeId, NodeEvent event) {
         // 默认实现为空，子类可以选择性实现
     }
-    
+
     /**
      * 节点事件类型
      */

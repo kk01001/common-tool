@@ -5,6 +5,7 @@ import io.github.kk01001.netty.cluster.model.BroadcastMessage;
 import io.github.kk01001.netty.cluster.model.SessionInfo;
 import io.github.kk01001.netty.config.NettyWebSocketProperties;
 import io.github.kk01001.netty.session.WebSocketSession;
+import io.netty.util.NetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
@@ -94,13 +95,13 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     }
     
     @Override
-    public void broadcast(String path, String message, String sourceNodeId) {
+    public void broadcast(String path, String message, String targetSessionId) {
         if (!StringUtils.hasText(message)) {
             return;
         }
         
         try {
-            BroadcastMessage broadcastMessage = new BroadcastMessage(path, message, sourceNodeId);
+            BroadcastMessage broadcastMessage = new BroadcastMessage(path, message, nodeId, targetSessionId);
             String json = objectMapper.writeValueAsString(broadcastMessage);
             String channel = getBroadcastChannel(path);
             redisTemplate.convertAndSend(channel, json);
@@ -136,19 +137,29 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     private void subscribeToChannels() {
         // 订阅全局广播
         listenerContainer.addMessageListener(
-                (message, pattern) -> handleBroadcastMessage(message.toString()),
+                (message, pattern) -> handleBroadcastLocalMessage(message.toString()),
                 new PatternTopic(broadcastChannelPrefix + "*")
         );
     }
-    
-    private void handleBroadcastMessage(String messageJson) {
+
+    private void handleBroadcastLocalMessage(String messageJson) {
         try {
             BroadcastMessage message = objectMapper.readValue(messageJson, BroadcastMessage.class);
-            // 忽略来自自己的消息
-            if (!Objects.equals(nodeId, message.getSourceNodeId())) {
-                messageHandler.handleBroadcastMessage(message.getPath(), message.getMessage());
-                log.debug("处理广播消息: {}", messageJson);
+            String targetSessionId = message.getTargetSessionId();
+            if (Objects.equals(nodeId, message.getNodeId())) {
+                log.debug("nodeId: {}, 忽略本节点的消息: {}", nodeId, messageJson);
+                return;
             }
+
+            // 私聊消息
+            if (StringUtils.hasText(targetSessionId)) {
+                messageHandler.handlePrivateMessage(message.getPath(), targetSessionId, message.getMessage(), true);
+                log.debug("私聊消息: {}", messageJson);
+                return;
+            }
+            // 广播消息 给本机每个会话发送
+            messageHandler.handleBroadcastLocalMessage(message.getPath(), message.getMessage());
+            log.debug("处理本机广播消息: {}", messageJson);
         } catch (Exception e) {
             log.error("处理广播消息失败: {}", messageJson, e);
         }
@@ -250,7 +261,7 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     }
     
     private String generateNodeId() {
-        return UUID.randomUUID().toString().replace("-", "");
+        return NetUtil.LOCALHOST4.getHostAddress() + "-" + UUID.randomUUID().toString().replace("-", "");
     }
     
     private String getSessionKey(String path, String sessionId) {
