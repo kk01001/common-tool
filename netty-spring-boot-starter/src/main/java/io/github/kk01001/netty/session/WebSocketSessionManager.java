@@ -1,6 +1,5 @@
 package io.github.kk01001.netty.session;
 
-import io.github.kk01001.netty.cluster.WebSocketClusterManager;
 import io.github.kk01001.netty.config.NettyWebSocketProperties;
 import io.github.kk01001.netty.event.WebSocketMessageEvent;
 import io.github.kk01001.netty.event.WebSocketSessionEvent;
@@ -92,6 +91,7 @@ public class WebSocketSessionManager implements MessageDispatcher {
     /**
      * 广播消息给符合条件的会话
      */
+    @Override
     public void broadcast(String path, String message, Predicate<WebSocketSession> filter) {
         if (!StringUtils.hasText(message)) {
             return;
@@ -115,6 +115,7 @@ public class WebSocketSessionManager implements MessageDispatcher {
     /**
      * 获取会话数量
      */
+    @Override
     public int getSessionCount(String path) {
         Map<String, WebSocketSession> pathSessions = sessions.get(path);
         return pathSessions != null ? pathSessions.size() : 0;

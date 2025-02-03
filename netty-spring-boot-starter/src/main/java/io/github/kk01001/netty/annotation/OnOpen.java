@@ -9,6 +9,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface OnOpen {
+    
     /**
      * 执行顺序，数字越小优先级越高
      */

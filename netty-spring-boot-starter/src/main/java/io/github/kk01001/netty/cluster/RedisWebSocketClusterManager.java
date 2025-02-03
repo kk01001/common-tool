@@ -158,6 +158,7 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
         String nodeKey = getNodeKey();
         try {
             redisTemplate.opsForHash().put(nodeKey, nodeId, String.valueOf(System.currentTimeMillis()));
+            messageHandler.handleNodeEvent(nodeId, ClusterMessageHandler.NodeEvent.NODE_UP);
             log.info("注册节点到Redis: {}", nodeKey);
         } catch (Exception e) {
             log.error("注册节点到Redis失败: {}", nodeKey, e);
@@ -169,6 +170,7 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
         String nodeKey = getNodeKey();
         try {
             redisTemplate.opsForHash().delete(nodeKey, nodeId);
+            messageHandler.handleNodeEvent(nodeId, ClusterMessageHandler.NodeEvent.NODE_DOWN);
             log.info("从Redis注销节点: {}", nodeKey);
         } catch (Exception e) {
             log.error("从Redis注销节点失败: {}", nodeKey, e);
@@ -212,6 +214,7 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
                     if (now - lastHeartbeat > properties.getCluster().getSessionTimeout().toMillis()) {
                         // 清理节点
                         redisTemplate.opsForHash().delete(nodeKey, nodeId);
+                        messageHandler.handleNodeEvent((String) nodeId, ClusterMessageHandler.NodeEvent.NODE_TIMEOUT);
                         log.info("清理死亡节点: {}", nodeId);
 
                         // 清理该节点的会话数据

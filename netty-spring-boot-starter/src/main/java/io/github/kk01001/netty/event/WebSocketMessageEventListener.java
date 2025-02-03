@@ -18,10 +18,6 @@ public class WebSocketMessageEventListener implements ApplicationListener<WebSoc
     @Override
     public void onApplicationEvent(WebSocketMessageEvent event) {
         // 处理消息事件
-        if (event.getTargetSessionId() != null) {
-            clusterManager.broadcast(event.getPath(), event.getMessage(), event.getTargetSessionId());
-        } else {
-            clusterManager.broadcast(event.getPath(), event.getMessage(), null);
-        }
+        clusterManager.broadcast(event.getPath(), event.getMessage(), event.getTargetSessionId());
     }
 } 
