@@ -149,7 +149,7 @@
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
             <version>2022.0.0.0</version>
         </dependency>
-        
+
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
@@ -173,7 +173,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-        
+
         <!-- Prometheus -->
         <dependency>
             <groupId>io.micrometer</groupId>

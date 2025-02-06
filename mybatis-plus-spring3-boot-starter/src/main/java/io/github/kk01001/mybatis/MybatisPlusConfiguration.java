@@ -1,8 +1,13 @@
 package io.github.kk01001.mybatis;
 
+import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
+import com.baomidou.dynamic.datasource.creator.DefaultDataSourceCreator;
+import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import io.github.kk01001.mybatis.core.DynamicTableProperties;
 import io.github.kk01001.mybatis.core.EasySqlInjector;
 import io.github.kk01001.mybatis.core.RequestDataHelper;
@@ -36,6 +41,8 @@ public class MybatisPlusConfiguration {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         // 防全表更新与删除插件
         // interceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
+
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL)); // 如果配置多个插件, 切记分页最后添加
 
         // 乐观锁插件
         interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
