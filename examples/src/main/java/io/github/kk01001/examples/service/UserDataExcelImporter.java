@@ -1,27 +1,27 @@
-package io.github.kk01001.examples.excel;
+package io.github.kk01001.examples.service;
 
 import io.github.kk01001.examples.dto.UserExcelDTO;
 import io.github.kk01001.examples.entity.User;
 import io.github.kk01001.examples.mapper.UserMapper;
-import io.github.kk01001.excel.core.ExcelDataHandler;
-import io.github.kk01001.excel.core.ExportContext;
-import io.github.kk01001.excel.core.ImportContext;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import io.github.kk01001.excel.core.importer.ImportContext;
+import io.github.kk01001.excel.core.importer.LargeDataExcelImporter;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
-@Component
-@RequiredArgsConstructor
-@Slf4j
-public class UserExcelHandler implements ExcelDataHandler<UserExcelDTO> {
-    
+@Service
+public class UserDataExcelImporter extends LargeDataExcelImporter<UserExcelDTO> {
+
     private final UserMapper userMapper;
 
+    public UserDataExcelImporter(@Qualifier("excelThreadPool") ExecutorService executorService, UserMapper userMapper) {
+        super(UserExcelDTO.class, executorService);
+        this.userMapper = userMapper;
+    }
+
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void handleImportData(List<UserExcelDTO> dataList, ImportContext context) {
         if (dataList == null || dataList.isEmpty()) {
             return;
@@ -43,13 +43,4 @@ public class UserExcelHandler implements ExcelDataHandler<UserExcelDTO> {
         userMapper.insertBatch(users);
         // log.info("批量插入用户数据完成");
     }
-
-    @Override
-    public List<UserExcelDTO> getExportData(ExportContext context) {
-        // 分页查询数据
-        return userMapper.queryUserExcelList(
-                (context.getCurrentPage() - 1) * context.getPageSize(),
-                context.getPageSize()
-        );
-    }
-} 
+}

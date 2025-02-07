@@ -1,8 +1,8 @@
 package io.github.kk01001.examples.controller;
 
 import cn.hutool.core.util.IdUtil;
-import io.github.kk01001.examples.service.UserExcelImporter;
-import io.github.kk01001.excel.core.BigImportContext;
+import io.github.kk01001.examples.service.UserDataExcelImporter;
+import io.github.kk01001.excel.core.importer.LargeDataImportContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserImportController {
 
-    private final UserExcelImporter userExcelImporter;
+    private final UserDataExcelImporter userExcelImporter;
 
     /**
      * 大数据量导入用户
@@ -25,7 +25,7 @@ public class UserImportController {
      */
     @PostMapping("/users")
     public void importUsers(@RequestParam("file") MultipartFile file) throws Exception {
-        BigImportContext context = new BigImportContext();
+        LargeDataImportContext context = new LargeDataImportContext();
         context.setUniqueId(IdUtil.fastSimpleUUID());
         context.setFile(file);
         context.setBatchSize(10000);
@@ -47,7 +47,7 @@ public class UserImportController {
      */
     @PostMapping("/users/continue-on-error")
     public void importUsersWithContinue(@RequestParam("file") MultipartFile file) throws Exception {
-        BigImportContext context = new BigImportContext();
+        LargeDataImportContext context = new LargeDataImportContext();
         context.setUniqueId(IdUtil.fastSimpleUUID());
         context.setFile(file);
         context.setBatchSize(10000);

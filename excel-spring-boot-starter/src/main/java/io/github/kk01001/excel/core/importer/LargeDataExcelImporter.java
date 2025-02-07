@@ -1,9 +1,8 @@
-package io.github.kk01001.excel.core;
+package io.github.kk01001.excel.core.importer;
 
-import cn.idev.excel.EasyExcel;
+import cn.idev.excel.FastExcel;
 import cn.idev.excel.context.AnalysisContext;
 import cn.idev.excel.read.listener.ReadListener;
-import io.github.kk01001.excel.config.ExcelProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.StopWatch;
@@ -15,22 +14,30 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
-public class LargeExcelImporter<T> extends AbstractExcelProcessor<T> {
+public abstract class LargeDataExcelImporter<T> {
 
-    private final ExcelProperties properties;
+    protected final Class<T> entityClass;
+    protected final ExecutorService executorService;
 
-    public LargeExcelImporter(ExcelDataHandler<T> dataHandler,
-                              Class<T> entityClass,
-                              @Qualifier("excelThreadPool") ExecutorService executorService,
-                              ExcelProperties properties) {
-        super(dataHandler, entityClass, executorService);
-        this.properties = properties;
+    public LargeDataExcelImporter(Class<T> entityClass,
+                                  @Qualifier("excelThreadPool") ExecutorService executorService) {
+        this.entityClass = entityClass;
+        this.executorService = executorService;
     }
+
+    /**
+     * 处理导入的数据
+     *
+     * @param dataList 解析的数据列表
+     * @param context  上下文信息
+     */
+    public abstract void handleImportData(List<T> dataList, ImportContext context);
+
 
     /**
      * 大数据量Excel导入
      */
-    public void importLargeExcel(BigImportContext context) throws Exception {
+    public void importLargeExcel(LargeDataImportContext context) throws Exception {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
@@ -55,7 +62,7 @@ public class LargeExcelImporter<T> extends AbstractExcelProcessor<T> {
                             continue;
                         }
                         try {
-                            dataHandler.handleImportData(batch, context);
+                            handleImportData(batch, context);
                             long currentTotal = totalCount.addAndGet(batch.size());
                             successCount.addAndGet(batch.size());
 
@@ -89,8 +96,8 @@ public class LargeExcelImporter<T> extends AbstractExcelProcessor<T> {
         }
 
         try {
-            EasyExcel.read(context.getFile().getInputStream(), entityClass, new ReadListener<T>() {
-                private List<T> cachedData = new ArrayList<>(context.getBatchSize());
+            FastExcel.read(context.getFile().getInputStream(), entityClass, new ReadListener<T>() {
+                final List<T> cachedData = new ArrayList<>(context.getBatchSize());
 
                 @Override
                 public void invoke(T data, AnalysisContext analysisContext) {
@@ -120,7 +127,7 @@ public class LargeExcelImporter<T> extends AbstractExcelProcessor<T> {
                     }
                     readComplete.set(true);
                 }
-            }).sheet().doRead();
+            }).sheet(context.getSheetNo()).doRead();
 
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         } finally {

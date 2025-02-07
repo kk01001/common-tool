@@ -1,4 +1,4 @@
-package io.github.kk01001.excel.core;
+package io.github.kk01001.excel.core.importer;
 
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,11 +11,7 @@ public class ImportContext {
 
     private MultipartFile file;
 
-    private String fileName;
-
     private Integer sheetNo;
-
-    private String sheetName;
 
     private Integer batchCount = 1000;
 }

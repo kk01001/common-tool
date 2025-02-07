@@ -1,11 +1,10 @@
-package io.github.kk01001.excel.core;
+package io.github.kk01001.excel.core.exporter;
 
 import cn.idev.excel.EasyExcel;
 import cn.idev.excel.ExcelWriter;
 import cn.idev.excel.FastExcel;
 import cn.idev.excel.write.metadata.WriteSheet;
 import cn.idev.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
-import io.github.kk01001.excel.config.ExcelProperties;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,39 +27,46 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Slf4j
-public class LargeExcelProcessor<T> extends AbstractExcelProcessor<T> {
+public abstract class LargeExcelZipExporter<T> {
 
+    protected final Class<T> entityClass;
     private final ExecutorService executorService;
-    private final ExcelProperties properties;
-    private final String tempDir;
 
-    public LargeExcelProcessor(ExcelDataHandler<T> dataHandler,
-                               Class<T> entityClass,
-                               @Qualifier("excelThreadPool") ExecutorService executorService,
-                               ExcelProperties properties) {
-        super(dataHandler, entityClass, executorService);
+    public LargeExcelZipExporter(Class<T> entityClass,
+                                 @Qualifier("excelThreadPool") ExecutorService executorService) {
+        this.entityClass = entityClass;
         this.executorService = executorService;
-        this.properties = properties;
-        this.tempDir = StringUtils.hasText(properties.getExport().getTempDir()) ?
-                properties.getExport().getTempDir() :
-                System.getProperty("java.io.tmpdir") + File.separator + "excel_temp";
-        new File(tempDir).mkdirs();
     }
+
+
+    /**
+     * 获取要导出的数据
+     *
+     * @param context 上下文信息
+     * @return 数据列表
+     */
+    public abstract List<T> getExportData(LargeExcelZipExportContext context);
+
+    /**
+     * 获取总数据量
+     */
+    public abstract Long getTotalCount(LargeExcelZipExportContext context);
+
 
     /**
      * 大数据量导出到ZIP
      */
-    public void exportLargeExcelToZip(ExportContext context, HttpServletResponse response) throws Exception {
+    public void exportLargeExcelToZip(LargeExcelZipExportContext context, HttpServletResponse response) throws Exception {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         long total = getTotalCount(context);
         if (total == 0) {
             return;
         }
-        int maxRowsPerFile = properties.getExport().getMaxRowsPerSheet();
-        int fetchSize = properties.getExport().getFetchSize();
+        int maxRowsPerFile = context.getMaxRowsPerSheet();
+        int fetchSize = context.getFetchSize();
 
-        String tempExcelDir = tempDir + File.separator + context.getUniqueId();
+        String tempExcelDir = context.getTempDir() + File.separator + context.getUniqueId();
         File tempExcelDirFile = new File(tempExcelDir);
         tempExcelDirFile.mkdirs();
 
@@ -117,14 +123,6 @@ public class LargeExcelProcessor<T> extends AbstractExcelProcessor<T> {
         }
     }
 
-    /**
-     * 获取总数据量
-     */
-    protected long getTotalCount(ExportContext context) {
-        // 可以由子类实现,用于优化分片
-        return 0L;
-    }
-
     private String getSheetName(String baseName, int index) {
         return StringUtils.hasText(baseName) ?
                 baseName + "_" + (index + 1) : "Sheet" + (index + 1);
@@ -174,7 +172,7 @@ public class LargeExcelProcessor<T> extends AbstractExcelProcessor<T> {
      * 写入Excel文件
      */
     private File writeExcelFile(File excelFile,
-                                ExportContext context,
+                                LargeExcelZipExportContext context,
                                 List<Integer> pages,
                                 int excelIndex,
                                 int fetchSize) throws IOException {
@@ -188,10 +186,10 @@ public class LargeExcelProcessor<T> extends AbstractExcelProcessor<T> {
 
             // 遍历每一页数据
             for (Integer page : pages) {
-                ExportContext pageContext = context.clone();
+                LargeExcelZipExportContext pageContext = context.clone();
                 pageContext.setCurrentPage(page);
                 pageContext.setPageSize(fetchSize);
-                List<T> pageData = dataHandler.getExportData(pageContext);
+                List<T> pageData = getExportData(pageContext);
                 log.info("处理Excel文件: {}, 读取数据, 第{}页, 数据量: {}", excelFile.getName(), page, pageData.size());
                 if (pageData.isEmpty()) {
                     continue;

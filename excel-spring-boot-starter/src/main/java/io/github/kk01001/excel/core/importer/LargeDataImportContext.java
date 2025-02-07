@@ -1,4 +1,4 @@
-package io.github.kk01001.excel.core;
+package io.github.kk01001.excel.core.importer;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class BigImportContext extends ImportContext {
+public class LargeDataImportContext extends ImportContext {
 
     /**
      * 唯一id
