@@ -47,7 +47,25 @@ public class UserController {
     public User getById(@PathVariable Long id) {
         return userService.getById(id);
     }
-    
+
+    /**
+     * 根据username查询2
+     */
+    @GetMapping("/username/{username}")
+    public User getByUsername(@PathVariable String username) {
+        return userService.getOne(Wrappers.lambdaQuery(User.class).eq(User::getUsername, username));
+    }
+
+    @GetMapping("/findByUsernameOne/{username}")
+    public User findByUsernameOne(@PathVariable String username) {
+        return userService.findByUsernameOne(username);
+    }
+
+    @GetMapping("/findByUsername/{username}")
+    public List<User> findByUsername(@PathVariable String username) {
+        return userService.findByUsername(username);
+    }
+
     /**
      * 新增用户
      */

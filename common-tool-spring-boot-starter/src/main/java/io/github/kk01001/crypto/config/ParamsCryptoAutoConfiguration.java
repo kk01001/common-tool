@@ -3,6 +3,8 @@ package io.github.kk01001.crypto.config;
 import io.github.kk01001.crypto.ParamsCryptoProvider;
 import io.github.kk01001.crypto.enums.CryptoType;
 import io.github.kk01001.crypto.exception.CryptoException;
+import io.github.kk01001.crypto.mybatis.MybatisCryptoInterceptor;
+import io.github.kk01001.crypto.mybatis.QueryParamInterceptor;
 import io.github.kk01001.crypto.provider.AESParamsCryptoProvider;
 import io.github.kk01001.crypto.provider.RSAParamsCryptoProvider;
 import io.github.kk01001.crypto.provider.SM2ParamsCryptoProvider;
@@ -13,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.util.StringUtils;
 
 @Configuration
@@ -66,5 +69,18 @@ public class ParamsCryptoAutoConfiguration {
             ParamsCryptoProvider paramsCryptoProvider,
             ParamsCryptoProperties properties) {
         return new ParamsCryptoRefreshListener(paramsCryptoProvider, properties);
+    }
+
+    @Bean
+    @Order()
+    public MybatisCryptoInterceptor mybatisCryptoInterceptor(ParamsCryptoProvider paramsCryptoProvider) {
+        return new MybatisCryptoInterceptor(paramsCryptoProvider);
+    }
+
+    @Bean
+    @Order()
+    public QueryParamInterceptor queryParamInterceptor(ParamsCryptoProvider paramsCryptoProvider,
+                                                       ParamsCryptoProperties paramsCryptoProperties) {
+        return new QueryParamInterceptor(paramsCryptoProvider, paramsCryptoProperties);
     }
 } 

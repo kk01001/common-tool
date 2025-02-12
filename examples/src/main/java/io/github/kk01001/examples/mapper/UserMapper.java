@@ -5,6 +5,7 @@ import io.github.kk01001.examples.dto.UserExcelDTO;
 import io.github.kk01001.examples.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -29,4 +30,10 @@ public interface UserMapper extends BaseMapper<User> {
      * @param users 用户列表
      */
     void insertBatch(@Param("list") List<User> users);
+
+    @Select("SELECT * FROM t_user WHERE username = #{username}")
+    List<User> findByUsername(@Param("username") String username);
+
+    @Select("SELECT * FROM t_user WHERE username = #{username} limit 1")
+    User findByUsernameOne(@Param("username") String username);
 } 

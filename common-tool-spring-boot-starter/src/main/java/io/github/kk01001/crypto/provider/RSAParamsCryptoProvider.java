@@ -43,4 +43,16 @@ public class RSAParamsCryptoProvider implements ParamsCryptoProvider {
             return content;
         }
     }
+
+    @Override
+    public RSAKeyPair generateRSAKeyPair(int keySize) {
+        if (keySize < 512 || keySize % 64 != 0) {
+            throw new IllegalArgumentException("RSA密钥大小必须是64的倍数且不小于512");
+        }
+        RSA rsa = new RSA();
+        return new RSAKeyPair(
+                rsa.getPublicKeyBase64(),
+                rsa.getPrivateKeyBase64()
+        );
+    }
 } 

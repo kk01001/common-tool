@@ -44,4 +44,13 @@ public class SM2ParamsCryptoProvider implements ParamsCryptoProvider {
             return content;
         }
     }
+
+    @Override
+    public RSAKeyPair generateRSAKeyPair(int keySize) {
+        SM2 sm2 = SmUtil.sm2();
+        return new RSAKeyPair(
+            sm2.getPublicKeyBase64(),
+            sm2.getPrivateKeyBase64()
+        );
+    }
 } 

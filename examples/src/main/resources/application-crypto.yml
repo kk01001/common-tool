@@ -2,4 +2,6 @@ common:
   params:
     crypto:
       type: AES
-      key: yourKey123456
+      key: 98672fe94191c1cadcf5700b407f936e
+      mybatisCryptoColumn:
+        - username
