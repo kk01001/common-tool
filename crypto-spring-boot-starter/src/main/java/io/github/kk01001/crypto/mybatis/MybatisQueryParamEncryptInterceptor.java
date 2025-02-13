@@ -22,11 +22,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * mybatis 查询条件加密 指定字段
+ */
 @Intercepts({
         @Signature(type = ParameterHandler.class, method = "setParameters", args = {PreparedStatement.class})
 })
 @RequiredArgsConstructor
-public class QueryParamInterceptor implements Interceptor {
+public class MybatisQueryParamEncryptInterceptor implements Interceptor {
 
     private final ParamsCryptoProvider cryptoProvider;
 

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev,robot,crypto,docs,desensitize,dict
+    active: dev,robot,crypto,docs,desensitize,dict,db-dev
 
 server:
   servlet:
@@ -13,7 +13,7 @@ server:
       charset: UTF-8
       force: true
       enabled: true
-  port: 8080
+  port: 8220
   tomcat:
     max-http-form-post-size: -1
     max-swallow-size: -1

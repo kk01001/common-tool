@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.kk01001</groupId>
     <artifactId>common-tool</artifactId>
-    <version>2.3.0</version>
+    <version>2.4.0</version>
     <name>common-tool</name>
     <description>通用工具</description>
 
@@ -29,6 +29,7 @@
         <module>docs-spring-boot-starter</module>
         <module>excel-spring-boot-starter</module>
         <module>netty-spring-boot-starter</module>
+        <module>crypto-spring-boot-starter</module>
     </modules>
 
     <properties>

@@ -1,10 +1,12 @@
 package io.github.kk01001.crypto.config;
 
 import io.github.kk01001.crypto.ParamsCryptoProvider;
+import io.github.kk01001.crypto.annotation.CryptoField;
 import io.github.kk01001.crypto.enums.CryptoType;
 import io.github.kk01001.crypto.exception.CryptoException;
-import io.github.kk01001.crypto.mybatis.MybatisCryptoInterceptor;
-import io.github.kk01001.crypto.mybatis.QueryParamInterceptor;
+import io.github.kk01001.crypto.mybatis.MybatisParamsEncryptInterceptor;
+import io.github.kk01001.crypto.mybatis.MybatisQueryParamEncryptInterceptor;
+import io.github.kk01001.crypto.mybatis.MybatisQueryResultDecryptInterceptor;
 import io.github.kk01001.crypto.provider.AESParamsCryptoProvider;
 import io.github.kk01001.crypto.provider.RSAParamsCryptoProvider;
 import io.github.kk01001.crypto.provider.SM2ParamsCryptoProvider;
@@ -71,16 +73,37 @@ public class ParamsCryptoAutoConfiguration {
         return new ParamsCryptoRefreshListener(paramsCryptoProvider, properties);
     }
 
+    /**
+     * mybatis 入库数据加密
+     * 返回值需要是实体类 并使用注解
+     *
+     * @see CryptoField
+     */
     @Bean
     @Order()
-    public MybatisCryptoInterceptor mybatisCryptoInterceptor(ParamsCryptoProvider paramsCryptoProvider) {
-        return new MybatisCryptoInterceptor(paramsCryptoProvider);
+    public MybatisParamsEncryptInterceptor mybatisParamsEncryptInterceptor(ParamsCryptoProvider paramsCryptoProvider) {
+        return new MybatisParamsEncryptInterceptor(paramsCryptoProvider);
     }
 
+    /**
+     * mybatis 查询结果解密
+     * 返回值需要是实体类 并使用注解
+     *
+     * @see CryptoField
+     */
     @Bean
     @Order()
-    public QueryParamInterceptor queryParamInterceptor(ParamsCryptoProvider paramsCryptoProvider,
-                                                       ParamsCryptoProperties paramsCryptoProperties) {
-        return new QueryParamInterceptor(paramsCryptoProvider, paramsCryptoProperties);
+    public MybatisQueryResultDecryptInterceptor mybatisQueryResultDecryptInterceptor(ParamsCryptoProvider paramsCryptoProvider) {
+        return new MybatisQueryResultDecryptInterceptor(paramsCryptoProvider);
+    }
+
+    /**
+     * mybatis 查询条件解密 指定字段
+     */
+    @Bean
+    @Order()
+    public MybatisQueryParamEncryptInterceptor queryParamInterceptor(ParamsCryptoProvider paramsCryptoProvider,
+                                                                     ParamsCryptoProperties paramsCryptoProperties) {
+        return new MybatisQueryParamEncryptInterceptor(paramsCryptoProvider, paramsCryptoProperties);
     }
 } 
