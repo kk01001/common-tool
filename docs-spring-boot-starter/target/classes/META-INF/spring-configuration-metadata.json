@@ -11,8 +11,7 @@
       "name": "swagger.basic-auth",
       "type": "java.lang.Boolean",
       "description": "是否开启Basic认证",
-      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties",
-      "defaultValue": false
+      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties"
     },
     {
       "name": "swagger.contact-email",
@@ -36,43 +35,37 @@
       "name": "swagger.description",
       "type": "java.lang.String",
       "description": "文档描述",
-      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties",
-      "defaultValue": "API接口文档"
+      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties"
     },
     {
       "name": "swagger.enabled",
       "type": "java.lang.Boolean",
       "description": "是否启用swagger",
-      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties",
-      "defaultValue": true
+      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties"
     },
     {
       "name": "swagger.password",
       "type": "java.lang.String",
       "description": "Basic认证密码",
-      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties",
-      "defaultValue": "123456"
+      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties"
     },
     {
       "name": "swagger.title",
       "type": "java.lang.String",
       "description": "文档标题",
-      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties",
-      "defaultValue": "API文档"
+      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties"
     },
     {
       "name": "swagger.username",
       "type": "java.lang.String",
       "description": "Basic认证用户名",
-      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties",
-      "defaultValue": "admin"
+      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties"
     },
     {
       "name": "swagger.version",
       "type": "java.lang.String",
       "description": "版本",
-      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties",
-      "defaultValue": "1.0.0"
+      "sourceType": "io.github.kk01001.docs.properties.SwaggerProperties"
     }
   ],
   "hints": []

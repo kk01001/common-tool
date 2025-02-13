@@ -1,7 +1,7 @@
 package io.github.kk01001.examples.model;
 
-import io.github.kk01001.common.desensitize.annotation.Desensitize;
-import io.github.kk01001.common.desensitize.enums.DesensitizeType;
+import io.github.kk01001.desensitize.annotation.Desensitize;
+import io.github.kk01001.desensitize.enums.DesensitizeType;
 import lombok.Data;
 
 @Data
