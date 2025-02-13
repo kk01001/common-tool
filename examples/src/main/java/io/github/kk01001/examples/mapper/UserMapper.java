@@ -34,6 +34,6 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("SELECT * FROM t_user WHERE username = #{username}")
     List<User> findByUsername(@Param("username") String username);
 
-    @Select("SELECT * FROM t_user WHERE username = #{username} limit 1")
-    User findByUsernameOne(@Param("username") String username);
+    @Select("SELECT * FROM t_user WHERE username = #{name} limit 1")
+    User findByUsernameOne(@Param("name") String username);
 } 

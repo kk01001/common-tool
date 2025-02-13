@@ -8,6 +8,8 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
 import org.springframework.util.ReflectionUtils;
 
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.Properties;
 
 @Intercepts({
@@ -35,47 +37,39 @@ public class MybatisParamsEncryptInterceptor implements Interceptor {
         return invocation.proceed();
     }
 
-    private void processEncrypt(Object obj) {
-        if (obj == null) {
-            return;
+    @SuppressWarnings("all")
+    private void processEncrypt(Object parameterObject) {
+        Class<?> parameterObjectClass = parameterObject.getClass();
+        if (parameterObject instanceof Map) {
+
+            if (((Map) parameterObject).containsKey("param1")) {
+                Map map = (Map) parameterObject;
+                Object param1 = map.get("param1");
+                if (param1 instanceof ArrayList) {
+                    ArrayList list = (ArrayList) param1;
+                    for (Object elementObject : list) {
+                        encrypt(elementObject);
+                    }
+                    return;
+                }
+                encrypt(param1);
+                return;
+            }
+
+            encrypt(parameterObject);
         }
 
-        ReflectionUtils.doWithFields(obj.getClass(), field -> {
+    }
+
+    private void encrypt(Object parameterObject) {
+        ReflectionUtils.doWithFields(parameterObject.getClass(), field -> {
             CryptoField annotation = field.getAnnotation(CryptoField.class);
             if (annotation != null && annotation.encrypt()) {
                 field.setAccessible(true);
-                Object value = field.get(obj);
+                Object value = field.get(parameterObject);
                 if (value instanceof String) {
-                    try {
-                        String decrypted = cryptoProvider.decrypt((String) value);
-                        if (decrypted.equals(value)) {
-                            // 原文，需要加密
-                            String encrypted = cryptoProvider.encrypt((String) value);
-                            field.set(obj, encrypted);
-                        }
-                    } catch (Exception e) {
-                        // 解密失败，说明是原文，需要加密
-                        String encrypted = cryptoProvider.encrypt((String) value);
-                        field.set(obj, encrypted);
-                    }
-                }
-            }
-        });
-    }
-
-    private void processDecrypt(Object obj) {
-        if (obj == null) {
-            return;
-        }
-
-        ReflectionUtils.doWithFields(obj.getClass(), field -> {
-            CryptoField annotation = field.getAnnotation(CryptoField.class);
-            if (annotation != null && annotation.decrypt()) {
-                field.setAccessible(true);
-                Object value = field.get(obj);
-                if (value instanceof String) {
-                    String decrypted = cryptoProvider.decrypt((String) value);
-                    field.set(obj, decrypted);
+                    String encrypted = cryptoProvider.encrypt((String) value);
+                    field.set(parameterObject, encrypted);
                 }
             }
         });
