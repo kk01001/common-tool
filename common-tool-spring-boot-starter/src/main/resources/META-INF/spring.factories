@@ -1,8 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   io.github.kk01001.CommonToolConfiguration\
   io.github.kk01001.nacos.NacosConfiguration\
-  io.github.kk01001.common.desensitize.config.DesensitizeAutoConfiguration\
-  io.github.kk01001.common.desensitize.config.FastJsonDesensitizeAutoConfiguration\
-  io.github.kk01001.common.desensitize.config.JacksonDesensitizeAutoConfiguration\
   io.github.kk01001.common.i18n.config.I18nAutoConfiguration
 
