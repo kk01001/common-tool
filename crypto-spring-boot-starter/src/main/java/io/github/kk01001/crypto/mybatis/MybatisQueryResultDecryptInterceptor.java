@@ -9,6 +9,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -52,9 +53,11 @@ public class MybatisQueryResultDecryptInterceptor implements Interceptor {
             if (annotation != null && annotation.decrypt()) {
                 field.setAccessible(true);
                 Object value = field.get(obj);
-                if (value instanceof String) {
-                    String decrypted = cryptoProvider.decrypt((String) value);
-                    field.set(obj, decrypted);
+                if (Objects.nonNull(value)) {
+                    if (value instanceof String) {
+                        String decrypted = cryptoProvider.decrypt((String) value);
+                        field.set(obj, decrypted);
+                    }
                 }
             }
         });

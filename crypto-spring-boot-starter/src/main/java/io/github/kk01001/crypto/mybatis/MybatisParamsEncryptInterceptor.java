@@ -10,6 +10,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 @Intercepts({
@@ -67,9 +68,11 @@ public class MybatisParamsEncryptInterceptor implements Interceptor {
             if (annotation != null && annotation.encrypt()) {
                 field.setAccessible(true);
                 Object value = field.get(parameterObject);
-                if (value instanceof String) {
-                    String encrypted = cryptoProvider.encrypt((String) value);
-                    field.set(parameterObject, encrypted);
+                if (Objects.nonNull(value)) {
+                    if (value instanceof String) {
+                        String encrypted = cryptoProvider.encrypt((String) value);
+                        field.set(parameterObject, encrypted);
+                    }
                 }
             }
         });
