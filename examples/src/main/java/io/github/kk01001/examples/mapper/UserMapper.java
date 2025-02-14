@@ -2,6 +2,7 @@ package io.github.kk01001.examples.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.kk01001.examples.dto.UserExcelDTO;
+import io.github.kk01001.examples.dto.UserQueryDTO;
 import io.github.kk01001.examples.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -36,4 +37,6 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Select("SELECT * FROM t_user WHERE username = #{name} limit 1")
     User findByUsernameOne(@Param("name") String username);
+
+    User queryUser(@Param("query") UserQueryDTO queryDTO);
 } 

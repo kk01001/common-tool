@@ -43,4 +43,18 @@
         </foreach>
     </insert>
 
-</mapper> 
+    <select id="queryUser" resultType="io.github.kk01001.examples.entity.User">
+        select
+            username,
+            email,
+            status,
+            type
+        from t_user
+        <where>
+            <if test="query.username != null and query.username != ''">
+                username = #{query.username}
+            </if>
+        </where>
+        limit 1
+    </select>
+</mapper>

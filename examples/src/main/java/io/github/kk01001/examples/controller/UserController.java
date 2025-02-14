@@ -3,7 +3,9 @@ package io.github.kk01001.examples.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.kk01001.examples.dto.UserQueryDTO;
 import io.github.kk01001.examples.entity.User;
+import io.github.kk01001.examples.mapper.UserMapper;
 import io.github.kk01001.examples.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,8 @@ import java.util.concurrent.Executors;
 public class UserController {
 
     private final UserService userService;
+
+    private final UserMapper userMapper;
     
     private static final String[] STATUS_ARRAY = {"0", "1"};
     private static final String[] TYPE_ARRAY = {"normal", "vip"};
@@ -53,7 +57,9 @@ public class UserController {
      */
     @GetMapping("/username/{username}")
     public User getByUsername(@PathVariable String username) {
-        return userService.getOne(Wrappers.lambdaQuery(User.class).eq(User::getUsername, username));
+        return userService.getOne(Wrappers.lambdaQuery(User.class)
+                .eq(User::getUsername, username)
+                .eq(User::getType, 1));
     }
 
     @GetMapping("/findByUsernameOne/{username}")
@@ -64,6 +70,11 @@ public class UserController {
     @GetMapping("/findByUsername/{username}")
     public List<User> findByUsername(@PathVariable String username) {
         return userService.findByUsername(username);
+    }
+
+    @GetMapping("/findByUsernameDTO")
+    public User findByUsernameDTO(UserQueryDTO userQueryDTO) {
+        return userMapper.queryUser(userQueryDTO);
     }
 
     /**
