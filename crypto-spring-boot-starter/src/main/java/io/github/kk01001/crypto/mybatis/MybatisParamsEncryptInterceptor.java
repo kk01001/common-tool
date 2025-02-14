@@ -41,6 +41,7 @@ public class MybatisParamsEncryptInterceptor implements Interceptor {
     @SuppressWarnings("all")
     private void processEncrypt(Object parameterObject) {
         Class<?> parameterObjectClass = parameterObject.getClass();
+        // map
         if (parameterObject instanceof Map) {
 
             if (((Map) parameterObject).containsKey("param1")) {
@@ -58,7 +59,13 @@ public class MybatisParamsEncryptInterceptor implements Interceptor {
             }
 
             encrypt(parameterObject);
+            return;
         }
+
+        // TODO list
+
+        // 对象
+        encrypt(parameterObject);
 
     }
 
