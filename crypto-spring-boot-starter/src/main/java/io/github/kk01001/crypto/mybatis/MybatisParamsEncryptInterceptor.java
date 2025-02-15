@@ -40,6 +40,9 @@ public class MybatisParamsEncryptInterceptor implements Interceptor {
 
     @SuppressWarnings("all")
     private void processEncrypt(Object parameterObject) {
+        if (Objects.isNull(parameterObject)) {
+            return;
+        }
         Class<?> parameterObjectClass = parameterObject.getClass();
         // map
         if (parameterObject instanceof Map) {
@@ -70,6 +73,9 @@ public class MybatisParamsEncryptInterceptor implements Interceptor {
     }
 
     private void encrypt(Object parameterObject) {
+        if (Objects.isNull(parameterObject)) {
+            return;
+        }
         ReflectionUtils.doWithFields(parameterObject.getClass(), field -> {
             CryptoField annotation = field.getAnnotation(CryptoField.class);
             if (annotation != null && annotation.encrypt()) {
