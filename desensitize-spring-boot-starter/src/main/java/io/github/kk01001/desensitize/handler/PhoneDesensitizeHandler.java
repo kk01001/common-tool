@@ -1,5 +1,11 @@
+/*
+ * @Author: linshiqiang
+ * @Date: 2025-02-06 15:22:29
+ * @Description: Do not edit
+ */
 package io.github.kk01001.desensitize.handler;
 
+import io.github.kk01001.desensitize.annotation.Desensitize;
 import io.github.kk01001.desensitize.annotation.DesensitizeFor;
 import io.github.kk01001.desensitize.enums.DesensitizeType;
 import org.springframework.util.StringUtils;
@@ -10,7 +16,7 @@ import org.springframework.util.StringUtils;
  * @description
  */
 @DesensitizeFor(DesensitizeType.PHONE)
-public class PhoneDesensitizeHandler implements DesensitizeHandler {
+public class PhoneDesensitizeHandler extends AbstractDesensitizeHandler {
     
     @Override
     public String desensitize(String value) {
@@ -18,5 +24,10 @@ public class PhoneDesensitizeHandler implements DesensitizeHandler {
             return value;
         }
         return value.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+    }
+
+    @Override
+    public String desensitize(String value, Desensitize annotation) {
+        return super.desensitize(value, annotation);
     }
 } 

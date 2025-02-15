@@ -1,5 +1,6 @@
 package io.github.kk01001.desensitize.handler;
 
+import io.github.kk01001.desensitize.annotation.Desensitize;
 import io.github.kk01001.desensitize.annotation.DesensitizeFor;
 import io.github.kk01001.desensitize.enums.DesensitizeType;
 import org.springframework.util.StringUtils;
@@ -10,7 +11,7 @@ import org.springframework.util.StringUtils;
  * @description
  */
 @DesensitizeFor(DesensitizeType.ID_CARD)
-public class IdCardDesensitizeHandler implements DesensitizeHandler {
+public class IdCardDesensitizeHandler extends AbstractDesensitizeHandler {
     
     @Override
     public String desensitize(String value) {
@@ -18,5 +19,10 @@ public class IdCardDesensitizeHandler implements DesensitizeHandler {
             return value;
         }
         return value.replaceAll("(\\d{4})\\d{10}(\\w{4})", "$1**********$2");
+    }
+
+    @Override
+    public String desensitize(String value, Desensitize annotation) {
+        return super.desensitize(value, annotation);
     }
 } 

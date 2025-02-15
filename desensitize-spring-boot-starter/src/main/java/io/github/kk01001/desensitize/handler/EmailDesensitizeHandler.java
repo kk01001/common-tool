@@ -1,5 +1,6 @@
 package io.github.kk01001.desensitize.handler;
 
+import io.github.kk01001.desensitize.annotation.Desensitize;
 import io.github.kk01001.desensitize.annotation.DesensitizeFor;
 import io.github.kk01001.desensitize.enums.DesensitizeType;
 import org.springframework.util.StringUtils;
@@ -10,7 +11,7 @@ import org.springframework.util.StringUtils;
  * @description
  */
 @DesensitizeFor(DesensitizeType.EMAIL)
-public class EmailDesensitizeHandler implements DesensitizeHandler {
+public class EmailDesensitizeHandler extends AbstractDesensitizeHandler {
 
     @Override
     public String desensitize(String value) {
@@ -22,5 +23,10 @@ public class EmailDesensitizeHandler implements DesensitizeHandler {
             return value;
         }
         return value.charAt(0) + "****" + value.substring(index);
+    }
+
+    @Override
+    public String desensitize(String value, Desensitize annotation) {
+        return super.desensitize(value, annotation);
     }
 } 

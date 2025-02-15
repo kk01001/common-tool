@@ -33,7 +33,7 @@ public class DesensitizeValueFilter implements ValueFilter {
                         handler = handlerFactory.getHandler(annotation.type());
                     }
                     if (handler != null) {
-                        return handler.desensitize((String) value);
+                        return handler.desensitize((String) value, annotation);
                     }
                 }
             } catch (Exception ignored) {

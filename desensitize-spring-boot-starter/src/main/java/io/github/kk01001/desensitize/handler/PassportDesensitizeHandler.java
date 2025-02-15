@@ -1,5 +1,11 @@
+/*
+ * @Author: linshiqiang
+ * @Date: 2025-02-06 15:22:29
+ * @Description: Do not edit
+ */
 package io.github.kk01001.desensitize.handler;
 
+import io.github.kk01001.desensitize.annotation.Desensitize;
 import io.github.kk01001.desensitize.annotation.DesensitizeFor;
 import io.github.kk01001.desensitize.enums.DesensitizeType;
 import org.springframework.util.StringUtils;
@@ -10,7 +16,7 @@ import org.springframework.util.StringUtils;
  * @description
  */
 @DesensitizeFor(DesensitizeType.PASSPORT)
-public class PassportDesensitizeHandler implements DesensitizeHandler {
+public class PassportDesensitizeHandler extends AbstractDesensitizeHandler {
     
     @Override
     public String desensitize(String value) {
@@ -22,5 +28,10 @@ public class PassportDesensitizeHandler implements DesensitizeHandler {
             return value.substring(0, 2) + "****" + value.substring(value.length() - 2);
         }
         return value;
+    }
+
+    @Override
+    public String desensitize(String value, Desensitize annotation) {
+        return super.desensitize(value, annotation);
     }
 } 

@@ -9,8 +9,8 @@ public class UserInfo {
     
     @Desensitize(type = DesensitizeType.NAME)
     private String name;
-    
-    @Desensitize(type = DesensitizeType.PHONE)
+
+    @Desensitize(type = DesensitizeType.PHONE, startIndex = 2, endIndex = -2, maskChar = "#")
     private String phone;
     
     @Desensitize(type = DesensitizeType.EMAIL)

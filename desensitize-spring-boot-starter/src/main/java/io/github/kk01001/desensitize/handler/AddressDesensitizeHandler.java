@@ -1,5 +1,6 @@
 package io.github.kk01001.desensitize.handler;
 
+import io.github.kk01001.desensitize.annotation.Desensitize;
 import io.github.kk01001.desensitize.annotation.DesensitizeFor;
 import io.github.kk01001.desensitize.enums.DesensitizeType;
 import org.springframework.util.StringUtils;
@@ -10,7 +11,7 @@ import org.springframework.util.StringUtils;
  * @description
  */
 @DesensitizeFor(DesensitizeType.ADDRESS)
-public class AddressDesensitizeHandler implements DesensitizeHandler {
+public class AddressDesensitizeHandler extends AbstractDesensitizeHandler {
     
     @Override
     public String desensitize(String value) {
@@ -23,5 +24,10 @@ public class AddressDesensitizeHandler implements DesensitizeHandler {
         }
         // 保留前6位和后2位
         return value.substring(0, 6) + "****" + value.substring(length - 2);
+    }
+
+    @Override
+    public String desensitize(String value, Desensitize annotation) {
+        return super.desensitize(value, annotation);
     }
 } 

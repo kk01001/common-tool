@@ -21,6 +21,7 @@ public class DesensitizeSerializer extends JsonSerializer<String> implements Con
     
     private final DesensitizeHandlerFactory handlerFactory;
     private DesensitizeHandler handler;
+    private Desensitize desensitize;
     
     public DesensitizeSerializer(DesensitizeHandlerFactory handlerFactory) {
         this.handlerFactory = handlerFactory;
@@ -29,7 +30,7 @@ public class DesensitizeSerializer extends JsonSerializer<String> implements Con
     @Override
     public void serialize(String value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         if (handler != null && value != null) {
-            gen.writeString(handler.desensitize(value));
+            gen.writeString(handler.desensitize(value, desensitize));
         } else {
             gen.writeString(value);
         }
@@ -41,6 +42,7 @@ public class DesensitizeSerializer extends JsonSerializer<String> implements Con
             Desensitize annotation = property.getAnnotation(Desensitize.class);
             if (annotation != null) {
                 DesensitizeSerializer serializer = new DesensitizeSerializer(handlerFactory);
+                serializer.desensitize = annotation;
                 if (annotation.type() == DesensitizeType.CUSTOM) {
                     try {
                         serializer.handler = annotation.handler().getDeclaredConstructor().newInstance();

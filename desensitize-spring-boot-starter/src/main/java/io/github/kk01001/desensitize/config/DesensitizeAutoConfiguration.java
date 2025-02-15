@@ -2,6 +2,7 @@ package io.github.kk01001.desensitize.config;
 
 import io.github.kk01001.desensitize.handler.DesensitizeHandlerFactory;
 import io.github.kk01001.desensitize.properties.DesensitizeProperties;
+import io.github.kk01001.desensitize.util.DesensitizeUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -25,6 +26,11 @@ public class DesensitizeAutoConfiguration {
     @ConditionalOnMissingBean
     public DesensitizeHandlerFactory desensitizeHandlerFactory(ApplicationContext applicationContext) {
         return new DesensitizeHandlerFactory(applicationContext);
+    }
+
+    @Bean
+    public DesensitizeUtil desensitizeUtil() {
+        return new DesensitizeUtil();
     }
    
 }

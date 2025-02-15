@@ -1,4 +1,11 @@
+/*
+ * @Author: linshiqiang
+ * @Date: 2025-02-06 15:22:29
+ * @Description: Do not edit
+ */
 package io.github.kk01001.desensitize.handler;
+
+import io.github.kk01001.desensitize.annotation.Desensitize;
 
 /**
  * @author kk01001
@@ -8,7 +15,16 @@ package io.github.kk01001.desensitize.handler;
 public interface DesensitizeHandler {
     
     /**
-     * 脱敏处理
+     * 带注解参数的脱敏处理
+     *
+     * @param value 原始值
+     * @param annotation 脱敏注解
+     * @return 脱敏后的值
+     */
+    String desensitize(String value, Desensitize annotation);
+
+    /**
+     * 使用默认参数的脱敏处理
      *
      * @param value 原始值
      * @return 脱敏后的值

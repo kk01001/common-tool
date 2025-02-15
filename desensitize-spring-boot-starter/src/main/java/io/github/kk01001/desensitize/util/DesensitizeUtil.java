@@ -10,9 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * 脱敏工具类
@@ -21,7 +18,6 @@ import java.util.List;
  * @date 2025-02-13 14:31:00
  */
 @Slf4j
-@Component
 public class DesensitizeUtil implements ApplicationContextAware {
 
     private static ObjectMapper objectMapper;

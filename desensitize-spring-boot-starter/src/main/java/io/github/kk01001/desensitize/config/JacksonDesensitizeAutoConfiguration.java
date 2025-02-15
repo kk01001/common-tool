@@ -17,14 +17,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties(DesensitizeProperties.class)
-@ConditionalOnProperty(prefix = "desensitize", name = "enable-jackson", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "desensitize", name = "enable-jackson", havingValue = "true")
 public class JacksonDesensitizeAutoConfiguration {
 
     /**
      * 配置Jackson序列化脱敏
      */
     @Bean
-    @ConditionalOnProperty(prefix = "desensitize", name = "enable-jackson", havingValue = "true", matchIfMissing = true)
     public DesensitizeModule desensitizeModule(DesensitizeHandlerFactory handlerFactory) {
         SimpleModule module = new SimpleModule();
         module.addSerializer(String.class, new DesensitizeSerializer(handlerFactory));
