@@ -1,5 +1,7 @@
 package io.github.kk01001.crypto.mybatis;
 
+import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.kk01001.crypto.ParamsCryptoProvider;
 import io.github.kk01001.crypto.annotation.CryptoField;
 import io.github.kk01001.crypto.config.ParamsCryptoProperties;
@@ -17,6 +19,8 @@ import org.springframework.util.ReflectionUtils;
 
 import java.sql.PreparedStatement;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * mybatis 查询条件加密 指定字段
@@ -26,6 +30,8 @@ import java.util.*;
 })
 @RequiredArgsConstructor
 public class MybatisQueryParamEncryptInterceptor implements Interceptor {
+
+    private final static Pattern PATTERN = Pattern.compile("(\\w+)\\s*=\\s*#\\{ew\\.paramNameValuePairs\\.(\\w+)\\}");
 
     private final ParamsCryptoProvider cryptoProvider;
 
@@ -58,6 +64,13 @@ public class MybatisQueryParamEncryptInterceptor implements Interceptor {
         BoundSql boundSql = (BoundSql) metaObject.getValue("boundSql");
         Configuration configuration = mappedStatement.getConfiguration();
 
+        // 参数是对象
+        if (isEntity(parameterObject)) {
+            encrypt(parameterObject);
+            return;
+        }
+
+
         // 参数是对象map
         if (parameterObject instanceof Map) {
             Map<?, ?> parameterObjectMap = (Map) parameterObject;
@@ -84,6 +97,10 @@ public class MybatisQueryParamEncryptInterceptor implements Interceptor {
                         return;
                     }
 
+                    if (isLambdaQueryWrapper(value, mybatisCryptoColumn)) {
+                        return;
+                    }
+
                     if (isEntity(value)) {
                         encrypt(param1);
                         return;
@@ -95,17 +112,74 @@ public class MybatisQueryParamEncryptInterceptor implements Interceptor {
         // TODO 参数是list
     }
 
+    /**
+     * Mybatis Plus 查询
+     * .eq
+     */
+    private boolean isLambdaQueryWrapper(Object parameterObject, List<String> mybatisCryptoColumn) {
+        if (Objects.isNull(parameterObject)) {
+            return false;
+        }
+        if (parameterObject instanceof LambdaQueryWrapper<?> wrapper) {
+            Map<String, Object> paramNameValuePairs = wrapper.getParamNameValuePairs();
+            if (CollUtil.isEmpty(paramNameValuePairs)) {
+                Object wrapperEntity = wrapper.getEntity();
+                if (Objects.nonNull(wrapperEntity)) {
+                    encrypt(wrapperEntity);
+                }
+                return true;
+            }
+            String sqlSegment = wrapper.getExpression().getSqlSegment();
+            Map<String, String> params = getParams(sqlSegment);
+            if (CollUtil.isEmpty(params)) {
+                return true;
+            }
+
+            params.forEach((paramKey, columnName) -> {
+                if (mybatisCryptoColumn.contains(columnName)) {
+                    String value = paramNameValuePairs.get(paramKey).toString();
+                    paramNameValuePairs.put(paramKey, cryptoProvider.encrypt(value));
+                }
+            });
+            return true;
+        }
+        return false;
+    }
+
+    private Map<String, String> getParams(String sqlSegment) {
+        // (name = #{ew.paramNameValuePairs.MPGENVAL1} AND email = #{ew.paramNameValuePairs.MPGENVAL2})
+        // 2. 创建匹配器
+        Matcher matcher = PATTERN.matcher(sqlSegment);
+
+        // 3. 存放结果的 Map，key: MPGENVAL1, value: name
+        Map<String, String> resultMap = new LinkedHashMap<>();
+
+        // 4. 遍历所有匹配
+        while (matcher.find()) {
+            // group(1) = 列名，例如 name / email
+            // group(2) = 占位符，例如 MPGENVAL1 / MPGENVAL2
+            String columnName = matcher.group(1);
+            String paramKey = matcher.group(2);
+
+            // 存入 map: MPGENVAL1 -> name
+            resultMap.put(paramKey, columnName);
+        }
+        return resultMap;
+    }
+
+    @SuppressWarnings("all")
     private boolean isEntity(Object value) {
-        if (value instanceof String) {
+        if (Objects.isNull(value)) {
             return false;
         }
-        if (value instanceof Long) {
-            return false;
-        }
-        if (value instanceof Integer) {
-            return false;
-        }
-        return true;
+        return switch (value) {
+            case String s -> false;
+            case Long l -> false;
+            case Integer i -> false;
+            case Map map -> false;
+            case List list -> false;
+            default -> true;
+        };
     }
 
     private void encrypt(Object parameterObject) {

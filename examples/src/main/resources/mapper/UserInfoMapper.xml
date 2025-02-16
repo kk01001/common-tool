@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.kk01001.examples.mapper.UserInfoMapper">
+    
+    <insert id="insert" parameterType="io.github.kk01001.examples.model.UserInfo">
+        INSERT INTO user_info (
+            name, phone, email, id_card, bank_card, address, password
+        ) VALUES (
+            #{name}, #{phone}, #{email}, #{idCard}, #{bankCard}, #{address}, #{password}
+        )
+    </insert>
+    
+    <update id="update" parameterType="io.github.kk01001.examples.model.UserInfo">
+        UPDATE user_info
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="idCard != null">id_card = #{idCard},</if>
+            <if test="bankCard != null">bank_card = #{bankCard},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="password != null">password = #{password}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO user_info (
+            name, phone, email, id_card, bank_card, address, password
+        ) VALUES 
+        <foreach collection="list" item="item" separator=",">
+            (#{item.name}, #{item.phone}, #{item.email}, #{item.idCard}, 
+             #{item.bankCard}, #{item.address}, #{item.password})
+        </foreach>
+    </insert>
+    
+    <update id="batchUpdate" parameterType="java.util.List">
+        UPDATE user_info
+        <trim prefix="SET" suffixOverrides=",">
+            <trim prefix="name = CASE" suffix="END,">
+                <foreach collection="list" item="item">
+                    WHEN id = #{item.id} THEN #{item.name}
+                </foreach>
+            </trim>
+            <trim prefix="phone = CASE" suffix="END,">
+                <foreach collection="list" item="item">
+                    WHEN id = #{item.id} THEN #{item.phone}
+                </foreach>
+            </trim>
+            <trim prefix="email = CASE" suffix="END,">
+                <foreach collection="list" item="item">
+                    WHEN id = #{item.id} THEN #{item.email}
+                </foreach>
+            </trim>
+            <trim prefix="id_card = CASE" suffix="END,">
+                <foreach collection="list" item="item">
+                    WHEN id = #{item.id} THEN #{item.idCard}
+                </foreach>
+            </trim>
+            <trim prefix="bank_card = CASE" suffix="END,">
+                <foreach collection="list" item="item">
+                    WHEN id = #{item.id} THEN #{item.bankCard}
+                </foreach>
+            </trim>
+            <trim prefix="address = CASE" suffix="END,">
+                <foreach collection="list" item="item">
+                    WHEN id = #{item.id} THEN #{item.address}
+                </foreach>
+            </trim>
+            <trim prefix="password = CASE" suffix="END,">
+                <foreach collection="list" item="item">
+                    WHEN id = #{item.id} THEN #{item.password}
+                </foreach>
+            </trim>
+        </trim>
+        WHERE id IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+    </update>
+    
+    <select id="selectByCondition" resultType="io.github.kk01001.examples.model.UserInfo">
+        SELECT * FROM user_info
+        <where>
+            <if test="name != null">AND name = #{name}</if>
+            <if test="phone != null">AND phone = #{phone}</if>
+            <if test="email != null">AND email = #{email}</if>
+            <if test="idCard != null">AND id_card = #{idCard}</if>
+            <if test="bankCard != null">AND bank_card = #{bankCard}</if>
+            <if test="address != null">AND address = #{address}</if>
+        </where>
+    </select>
+
+    <select id="selectByConditionWithParam" resultType="io.github.kk01001.examples.model.UserInfo">
+        SELECT * FROM user_info
+        <where>
+            <if test="param.name != null">AND name = #{param.name}</if>
+            <if test="param.phone != null">AND phone = #{param.phone}</if>
+            <if test="param.email != null">AND email = #{param.email}</if>
+            <if test="param.idCard != null">AND id_card = #{param.idCard}</if>
+            <if test="param.bankCard != null">AND bank_card = #{param.bankCard}</if>
+            <if test="param.address != null">AND address = #{param.address}</if>
+        </where>
+    </select>
+    
+    <select id="selectByFields" resultType="io.github.kk01001.examples.model.UserInfo">
+        SELECT * FROM user_info
+        <where>
+            <if test="name != null">AND name = #{name}</if>
+            <if test="phone != null">AND phone = #{phone}</if>
+            <if test="email != null">AND email = #{email}</if>
+        </where>
+    </select>
+    
+    <select id="selectById" resultType="io.github.kk01001.examples.model.UserInfo">
+        SELECT * FROM user_info WHERE id = #{id}
+    </select>
+</mapper>

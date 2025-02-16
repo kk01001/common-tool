@@ -1,5 +1,5 @@
 # 启用脱敏功能
 desensitize:
-  enabled: true
-  enable-jackson: true  # 使用Jackson序列化（默认）
+  enabled: false
+  enable-jackson: false  # 使用Jackson序列化（默认）
   enable-fastjson: false  # 不使用FastJson序列化

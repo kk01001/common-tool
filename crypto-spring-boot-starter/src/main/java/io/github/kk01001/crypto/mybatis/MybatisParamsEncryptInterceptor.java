@@ -46,10 +46,9 @@ public class MybatisParamsEncryptInterceptor implements Interceptor {
         Class<?> parameterObjectClass = parameterObject.getClass();
         // map
         if (parameterObject instanceof Map) {
-
-            if (((Map) parameterObject).containsKey("param1")) {
-                Map map = (Map) parameterObject;
-                Object param1 = map.get("param1");
+            Map parameterObjectMap = (Map) parameterObject;
+            if (parameterObjectMap.containsKey("param1")) {
+                Object param1 = parameterObjectMap.get("param1");
                 if (param1 instanceof ArrayList) {
                     ArrayList list = (ArrayList) param1;
                     for (Object elementObject : list) {
@@ -58,6 +57,13 @@ public class MybatisParamsEncryptInterceptor implements Interceptor {
                     return;
                 }
                 encrypt(param1);
+                return;
+            }
+
+            // Mybatis Plus 批量修改修改
+            if (parameterObjectMap.containsKey("et")) {
+                Object et = parameterObjectMap.get("et");
+                encrypt(et);
                 return;
             }
 

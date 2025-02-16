@@ -5,3 +5,4 @@ common:
       key: 98672fe94191c1cadcf5700b407f936e
       mybatisCryptoColumn:
         - username
+        - email

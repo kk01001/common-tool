@@ -5,17 +5,17 @@ spring:
     compatibility-verifier:
       enabled: false
     nacos:
-      server-addr: 10.255.1.8:8848
+      server-addr: 127.0.0.1:8848
       username: test
       password: test
       discovery:
-        namespace: public
-        group: public
+        namespace: test
+        group: test
       config:
         file-extension: yaml
-        namespace: public
-        group: public
-#        extension-configs:
-#          - data-id: examples-db.yaml
-#            group: test
-#            refresh: true
+        namespace: test
+        group: test
+        extension-configs:
+          - data-id: examples-db.yaml
+            group: test
+            refresh: true
