@@ -76,10 +76,18 @@ public enum DesensitizeType {
      */
     CNAPS_CODE,
 
+    /**
+     * 全部脱敏
+     */
     MASK_ALL,
 
     /**
      * 自定义
      */
-    CUSTOM
+    CUSTOM,
+
+    /**
+     * 域名
+     */
+    DOMAIN
 } 

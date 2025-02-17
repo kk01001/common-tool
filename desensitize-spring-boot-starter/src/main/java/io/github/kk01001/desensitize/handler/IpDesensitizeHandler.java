@@ -1,9 +1,10 @@
 package io.github.kk01001.desensitize.handler;
 
+import org.springframework.util.StringUtils;
+
 import io.github.kk01001.desensitize.annotation.Desensitize;
 import io.github.kk01001.desensitize.annotation.DesensitizeFor;
 import io.github.kk01001.desensitize.enums.DesensitizeType;
-import org.springframework.util.StringUtils;
 
 /**
  * @author kk01001
@@ -18,11 +19,24 @@ public class IpDesensitizeHandler extends AbstractDesensitizeHandler {
         if (!StringUtils.hasText(value)) {
             return value;
         }
-        String[] parts = value.split("\\.");
-        if (parts.length == 4) {
-            return parts[0] + ".*.*." + parts[3];
+
+        // 处理带端口号的情况
+        String ip = value;
+        String port = "";
+        
+        int portIndex = value.lastIndexOf(":");
+        if (portIndex > 0) {
+            ip = value.substring(0, portIndex);
+            port = value.substring(portIndex);
         }
-        return value;
+
+        String[] parts = ip.split("\\.");
+        if (parts.length != 4) {
+            return value;
+        }
+
+        // 保留第一段和最后一段，中间两段用*替代
+        return parts[0] + ".*.*." + parts[3] + port;
     }
 
     @Override

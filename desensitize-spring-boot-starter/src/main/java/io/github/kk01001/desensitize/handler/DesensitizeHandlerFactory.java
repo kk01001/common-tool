@@ -44,6 +44,7 @@ public class DesensitizeHandlerFactory implements InitializingBean {
         handlers.put(DesensitizeType.IPV4, new IpDesensitizeHandler());
         handlers.put(DesensitizeType.PASSPORT, new PassportDesensitizeHandler());
         handlers.put(DesensitizeType.MASK_ALL, new MastAllDesensitizeHandler());
+        handlers.put(DesensitizeType.DOMAIN, new DomainDesensitizeHandler());
     }
     
     private void registerCustomHandlers() {
