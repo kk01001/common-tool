@@ -1,5 +1,6 @@
 package io.github.kk01001.desensitize.util;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,10 +27,14 @@ public class DesensitizeUtil implements ApplicationContextAware {
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         // 初始化ObjectMapper并配置脱敏序列化器
         objectMapper = new ObjectMapper();
-        DesensitizeHandlerFactory handlerFactory = applicationContext.getBean(DesensitizeHandlerFactory.class);
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(String.class, new DesensitizeSerializer(handlerFactory));
-        objectMapper.registerModule(module);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        String jacksonEnableDesensitize = applicationContext.getEnvironment().getProperty("desensitize.enabled");
+        if (Boolean.TRUE.toString().equals(jacksonEnableDesensitize)) {
+            DesensitizeHandlerFactory handlerFactory = applicationContext.getBean(DesensitizeHandlerFactory.class);
+            SimpleModule module = new SimpleModule();
+            module.addSerializer(String.class, new DesensitizeSerializer(handlerFactory));
+            objectMapper.registerModule(module);
+        }
     }
 
     /**
