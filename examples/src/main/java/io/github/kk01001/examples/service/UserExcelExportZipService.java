@@ -11,18 +11,19 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 @Service
-public class UserExcelExportZipService extends LargeExcelZipExporter<UserExcelDTO> {
+public class UserExcelExportZipService extends LargeExcelZipExporter<UserExcelDTO, UserExcelDTO> {
 
     private final UserMapper userMapper;
 
     public UserExcelExportZipService(@Qualifier("excelThreadPool") ExecutorService executorService,
                                      UserMapper userMapper) {
-        super(UserExcelDTO.class, executorService);
+        super(executorService);
         this.userMapper = userMapper;
     }
 
     @Override
-    public List<UserExcelDTO> getExportData(LargeExcelZipExportContext context) {
+    public List<UserExcelDTO> getExportData(LargeExcelZipExportContext<UserExcelDTO, UserExcelDTO> context) {
+        UserExcelDTO queryParams = context.getQueryParams();
         // 分页查询数据
         return userMapper.queryUserExcelList(
                 (context.getCurrentPage() - 1) * context.getPageSize(),
@@ -31,7 +32,7 @@ public class UserExcelExportZipService extends LargeExcelZipExporter<UserExcelDT
     }
 
     @Override
-    public Long getTotalCount(LargeExcelZipExportContext context) {
+    public Long getTotalCount(LargeExcelZipExportContext<UserExcelDTO, UserExcelDTO> context) {
         return userMapper.count();
     }
 }

@@ -27,17 +27,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Slf4j
-public abstract class LargeExcelZipExporter<T> {
+public abstract class LargeExcelZipExporter<R, P> {
 
-    protected final Class<T> entityClass;
-    private final ExecutorService executorService;
+    protected final ExecutorService executorService;
 
-    public LargeExcelZipExporter(Class<T> entityClass,
-                                 @Qualifier("excelThreadPool") ExecutorService executorService) {
-        this.entityClass = entityClass;
+    public LargeExcelZipExporter(@Qualifier("excelThreadPool") ExecutorService executorService) {
         this.executorService = executorService;
     }
-
 
     /**
      * 获取要导出的数据
@@ -45,18 +41,18 @@ public abstract class LargeExcelZipExporter<T> {
      * @param context 上下文信息
      * @return 数据列表
      */
-    public abstract List<T> getExportData(LargeExcelZipExportContext context);
+    public abstract List<R> getExportData(LargeExcelZipExportContext<R, P> context);
 
     /**
      * 获取总数据量
      */
-    public abstract Long getTotalCount(LargeExcelZipExportContext context);
+    public abstract Long getTotalCount(LargeExcelZipExportContext<R, P> context);
 
 
     /**
      * 大数据量导出到ZIP
      */
-    public void exportLargeExcelToZip(LargeExcelZipExportContext context, HttpServletResponse response) throws Exception {
+    public void exportLargeExcelToZip(LargeExcelZipExportContext<R, P> context, HttpServletResponse response) throws Exception {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         long total = getTotalCount(context);
@@ -172,11 +168,11 @@ public abstract class LargeExcelZipExporter<T> {
      * 写入Excel文件
      */
     private File writeExcelFile(File excelFile,
-                                LargeExcelZipExportContext context,
-                                List<Integer> pages,
-                                int excelIndex,
-                                int fetchSize) throws IOException {
-        try (ExcelWriter excelWriter = FastExcel.write(excelFile, entityClass)
+                              LargeExcelZipExportContext<R, P> context,
+                              List<Integer> pages,
+                              int excelIndex,
+                              int fetchSize) throws IOException {
+        try (ExcelWriter excelWriter = FastExcel.write(excelFile, context.getEntityClass())
                 .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
                 .build()) {
             String sheetName = getSheetName(context.getSheetName(), excelIndex);
@@ -186,10 +182,10 @@ public abstract class LargeExcelZipExporter<T> {
 
             // 遍历每一页数据
             for (Integer page : pages) {
-                LargeExcelZipExportContext pageContext = context.clone();
+                LargeExcelZipExportContext<R, P> pageContext = context.clone();
                 pageContext.setCurrentPage(page);
                 pageContext.setPageSize(fetchSize);
-                List<T> pageData = getExportData(pageContext);
+                List<R> pageData = getExportData(pageContext);
                 log.info("处理Excel文件: {}, 读取数据, 第{}页, 数据量: {}", excelFile.getName(), page, pageData.size());
                 if (pageData.isEmpty()) {
                     continue;

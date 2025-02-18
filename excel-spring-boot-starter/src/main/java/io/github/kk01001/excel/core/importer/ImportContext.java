@@ -7,11 +7,13 @@ import org.springframework.web.multipart.MultipartFile;
  * 导入上下文
  */
 @Data
-public class ImportContext {
+public class ImportContext<R> {
 
     private MultipartFile file;
 
     private Integer sheetNo;
 
     private Integer batchCount = 1000;
+
+    private Class<R> entityClass;
 }

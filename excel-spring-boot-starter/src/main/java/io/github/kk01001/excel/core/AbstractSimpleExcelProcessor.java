@@ -1,3 +1,8 @@
+/*
+ * @Author: linshiqiang
+ * @Date: 2025-02-06 15:22:29
+ * @Description: Do not edit
+ */
 package io.github.kk01001.excel.core;
 
 import cn.idev.excel.FastExcel;
@@ -16,14 +21,11 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 @Slf4j
-public abstract class AbstractSimpleExcelProcessor<T> {
+public abstract class AbstractSimpleExcelProcessor<R, P> {
 
-    protected final Class<T> entityClass;
     protected final ExecutorService executorService;
 
-    protected AbstractSimpleExcelProcessor(Class<T> entityClass,
-                                           @Qualifier("excelThreadPool") ExecutorService executorService) {
-        this.entityClass = entityClass;
+    protected AbstractSimpleExcelProcessor(@Qualifier("excelThreadPool") ExecutorService executorService) {
         this.executorService = executorService;
     }
 
@@ -33,7 +35,7 @@ public abstract class AbstractSimpleExcelProcessor<T> {
      * @param dataList 解析的数据列表
      * @param context  上下文信息
      */
-    public abstract void handleImportData(List<T> dataList, ImportContext context);
+    public abstract void handleImportData(List<R> dataList, ImportContext context);
 
     /**
      * 获取要导出的数据
@@ -41,16 +43,16 @@ public abstract class AbstractSimpleExcelProcessor<T> {
      * @param context 上下文信息
      * @return 数据列表
      */
-    public abstract List<T> getExportData(ExportContext context);
+    public abstract List<R> getExportData(ExportContext<R, P> context);
 
     /**
      * 导入Excel
      */
-    public void importExcel(ImportContext context) throws IOException {
+    public void importExcel(ImportContext<R> context) throws IOException {
         MultipartFile file = context.getFile();
 
         // 使用PageReadListener分批处理数据
-        FastExcel.read(file.getInputStream(), entityClass, new PageReadListener<T>(dataList -> {
+        FastExcel.read(file.getInputStream(), context.getEntityClass(), new PageReadListener<R>(dataList -> {
             try {
                 handleImportData(dataList, context);
             } catch (Exception e) {
@@ -63,14 +65,14 @@ public abstract class AbstractSimpleExcelProcessor<T> {
     /**
      * 导出Excel
      */
-    public void exportExcel(ExportContext context, HttpServletResponse response) throws IOException {
+    public void exportExcel(ExportContext<R, P> context, HttpServletResponse response) throws IOException {
         String fileName = URLEncoder.encode(context.getFileName(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
         response.setContentType("application/vnd.ms-excel");
         response.setCharacterEncoding("utf-8");
         response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
 
-        List<T> data = getExportData(context);
-        FastExcel.write(fileName, entityClass)
+        List<R> data = getExportData(context);
+        FastExcel.write(fileName, context.getEntityClass())
                 .sheet(fileName)
                 .doWrite(data);
     }

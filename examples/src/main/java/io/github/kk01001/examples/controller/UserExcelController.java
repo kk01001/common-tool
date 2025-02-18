@@ -1,6 +1,7 @@
 package io.github.kk01001.examples.controller;
 
 import cn.hutool.core.util.IdUtil;
+import io.github.kk01001.examples.dto.UserExcelDTO;
 import io.github.kk01001.examples.service.UserExcelExportZipService;
 import io.github.kk01001.excel.core.exporter.LargeExcelZipExportContext;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,7 +23,7 @@ public class UserExcelController {
      */
     @GetMapping("/export-zip/users")
     public void exportUsers(HttpServletResponse response) throws Exception {
-        LargeExcelZipExportContext context = new LargeExcelZipExportContext();
+        LargeExcelZipExportContext<UserExcelDTO, UserExcelDTO> context = new LargeExcelZipExportContext<>();
         context.setUniqueId(IdUtil.fastSimpleUUID());
         context.setFileName("用户数据" + System.currentTimeMillis());
         context.setSheetName("用户列表");
@@ -31,6 +32,7 @@ public class UserExcelController {
         context.setMaxRowsPerSheet(500000);
         context.setFetchSize(5000);
         context.setTempDir("/home/temp/excel");
+        context.setEntityClass(UserExcelDTO.class);
         userExcelExportZipService.exportLargeExcelToZip(context, response);
     }
 } 

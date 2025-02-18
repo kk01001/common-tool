@@ -14,14 +14,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
-public abstract class LargeDataExcelImporter<T> {
+public abstract class LargeDataExcelImporter<R> {
 
-    protected final Class<T> entityClass;
     protected final ExecutorService executorService;
 
-    public LargeDataExcelImporter(Class<T> entityClass,
-                                  @Qualifier("excelThreadPool") ExecutorService executorService) {
-        this.entityClass = entityClass;
+    public LargeDataExcelImporter(@Qualifier("excelThreadPool") ExecutorService executorService) {
         this.executorService = executorService;
     }
 
@@ -31,17 +28,17 @@ public abstract class LargeDataExcelImporter<T> {
      * @param dataList 解析的数据列表
      * @param context  上下文信息
      */
-    public abstract void handleImportData(List<T> dataList, ImportContext context);
+    public abstract void handleImportData(List<R> dataList, LargeDataImportContext<R> context);
 
 
     /**
      * 大数据量Excel导入
      */
-    public void importLargeExcel(LargeDataImportContext context) throws Exception {
+    public void importLargeExcel(LargeDataImportContext<R> context) throws Exception {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        BlockingQueue<List<T>> dataQueue = new ArrayBlockingQueue<>(context.getQueueSize());
+        BlockingQueue<List<R>> dataQueue = new ArrayBlockingQueue<>(context.getQueueSize());
         AtomicLong totalCount = new AtomicLong(0);
         AtomicLong successCount = new AtomicLong(0);
         AtomicLong failedCount = new AtomicLong(0);
@@ -54,7 +51,7 @@ public abstract class LargeDataExcelImporter<T> {
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 try {
                     while (!Thread.currentThread().isInterrupted()) {
-                        List<T> batch = dataQueue.poll(100, TimeUnit.MILLISECONDS);
+                        List<R> batch = dataQueue.poll(100, TimeUnit.MILLISECONDS);
                         if (batch == null) {
                             if (readComplete.get() && dataQueue.isEmpty()) {
                                 break;
@@ -96,11 +93,11 @@ public abstract class LargeDataExcelImporter<T> {
         }
 
         try {
-            FastExcel.read(context.getFile().getInputStream(), entityClass, new ReadListener<T>() {
-                final List<T> cachedData = new ArrayList<>(context.getBatchSize());
+            FastExcel.read(context.getFile().getInputStream(), context.getEntityClass(), new ReadListener<R>() {
+                final List<R> cachedData = new ArrayList<>(context.getBatchSize());
 
                 @Override
-                public void invoke(T data, AnalysisContext analysisContext) {
+                public void invoke(R data, AnalysisContext analysisContext) {
                     cachedData.add(data);
                     if (cachedData.size() >= context.getBatchSize()) {
                         try {

@@ -20,14 +20,11 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
-public abstract class MultiSheetExcelExporter<T> {
+public abstract class MultiSheetExcelExporter<R, P> {
 
-    protected final Class<T> entityClass;
     protected final ExecutorService executorService;
 
-    protected MultiSheetExcelExporter(Class<T> entityClass,
-                                      @Qualifier("excelThreadPool") ExecutorService executorService) {
-        this.entityClass = entityClass;
+    protected MultiSheetExcelExporter(@Qualifier("excelThreadPool") ExecutorService executorService) {
         this.executorService = executorService;
     }
 
@@ -37,12 +34,12 @@ public abstract class MultiSheetExcelExporter<T> {
      * @param context 上下文信息
      * @return 数据列表
      */
-    public abstract List<T> getExportData(ExportContext context);
+    public abstract List<R> getExportData(MultiSheetExportContext<R, P> context);
 
     /**
      * 获取总数据量
      */
-    public abstract Long getTotalCount(ExportContext context);
+    public abstract Long getTotalCount(MultiSheetExportContext<R, P> context);
 
     /**
      * 导出多个sheet的Excel
@@ -50,7 +47,7 @@ public abstract class MultiSheetExcelExporter<T> {
      * @param context  导出上下文
      * @param response HTTP响应
      */
-    public void exportMultiSheetExcel(MultiSheetExportContext context, HttpServletResponse response) throws Exception {
+    public void exportMultiSheetExcel(MultiSheetExportContext<R, P> context, HttpServletResponse response) throws Exception {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
@@ -78,7 +75,7 @@ public abstract class MultiSheetExcelExporter<T> {
                 fileName, total, sheetPageMap.size());
 
         // 创建数据队列
-        BlockingQueue<Map<Integer, List<T>>> dataQueue = new LinkedBlockingQueue<>(10);
+        BlockingQueue<Map<Integer, List<R>>> dataQueue = new LinkedBlockingQueue<>(10);
         AtomicBoolean readComplete = new AtomicBoolean(false);
 
         // 启动数据读取线程
@@ -149,11 +146,11 @@ public abstract class MultiSheetExcelExporter<T> {
     /**
      * 处理sheet数据
      */
-    private void processSheetData(MultiSheetExportContext context,
+    private void processSheetData(MultiSheetExportContext<R, P> context,
                                   Map<Integer, List<Integer>> sheetPageMap,
                                   int threadIndex,
                                   int threadCount,
-                                  BlockingQueue<Map<Integer, List<T>>> dataQueue) throws InterruptedException {
+                                  BlockingQueue<Map<Integer, List<R>>> dataQueue) throws InterruptedException {
 
         for (Map.Entry<Integer, List<Integer>> entry : sheetPageMap.entrySet()) {
             int sheetIndex = entry.getKey();
@@ -164,12 +161,12 @@ public abstract class MultiSheetExcelExporter<T> {
 
             List<Integer> pages = entry.getValue();
             for (Integer page : pages) {
-                MultiSheetExportContext pageContext = context.clone();
+                MultiSheetExportContext<R, P> pageContext = context.clone();
                 pageContext.setCurrentPage(page);
 
-                List<T> pageData = getExportData(pageContext);
+                List<R> pageData = getExportData(pageContext);
                 if (pageData != null && !pageData.isEmpty()) {
-                    Map<Integer, List<T>> sheetDataMap = new HashMap<>();
+                    Map<Integer, List<R>> sheetDataMap = new HashMap<>();
                     sheetDataMap.put(sheetIndex, pageData);
                     dataQueue.put(sheetDataMap);
                     log.info("Sheet {} 第{}页数据读取完成, 数据量: {}", sheetIndex, page, pageData.size());
@@ -182,11 +179,11 @@ public abstract class MultiSheetExcelExporter<T> {
      * 写入Excel的sheets
      */
     private void writeExcelSheets(HttpServletResponse response,
-                                  MultiSheetExportContext context,
-                                  BlockingQueue<Map<Integer, List<T>>> dataQueue,
+                                  MultiSheetExportContext<R, P> context,
+                                  BlockingQueue<Map<Integer, List<R>>> dataQueue,
                                   AtomicBoolean readComplete) throws Exception {
 
-        try (ExcelWriter excelWriter = FastExcel.write(response.getOutputStream(), entityClass)
+        try (ExcelWriter excelWriter = FastExcel.write(response.getOutputStream(), context.getEntityClass())
                 .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
                 .build()) {
 
@@ -196,14 +193,14 @@ public abstract class MultiSheetExcelExporter<T> {
             Map<Integer, WriteSheet> writeSheets = new HashMap<>();
 
             while (!readComplete.get() || !dataQueue.isEmpty()) {
-                Map<Integer, List<T>> pageDataMap = dataQueue.poll(100, TimeUnit.MILLISECONDS);
+                Map<Integer, List<R>> pageDataMap = dataQueue.poll(100, TimeUnit.MILLISECONDS);
                 if (CollUtil.isEmpty(pageDataMap)) {
                     continue;
                 }
 
-                for (Map.Entry<Integer, List<T>> entry : pageDataMap.entrySet()) {
+                for (Map.Entry<Integer, List<R>> entry : pageDataMap.entrySet()) {
                     int sheetIndex = entry.getKey();
-                    List<T> pageData = entry.getValue();
+                    List<R> pageData = entry.getValue();
 
                     if (CollUtil.isNotEmpty(pageData)) {
                         // 获取或创建WriteSheet对象

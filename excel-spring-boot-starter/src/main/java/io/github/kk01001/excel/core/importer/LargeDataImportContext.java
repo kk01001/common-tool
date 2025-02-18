@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class LargeDataImportContext extends ImportContext {
+public class LargeDataImportContext<R> extends ImportContext<R> {
 
     /**
      * 唯一id

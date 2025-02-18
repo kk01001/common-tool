@@ -5,10 +5,12 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 导出上下文
+ * @param <R> 返回结果类型
+ * @param <P> 查询参数类型
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class LargeExcelZipExportContext extends ExportContext implements Cloneable {
+public class LargeExcelZipExportContext<R, P> extends ExportContext<R, P> {
 
     /**
      * 每个sheet最大行数
@@ -26,7 +28,7 @@ public class LargeExcelZipExportContext extends ExportContext implements Cloneab
     private String tempDir;
 
     @Override
-    public LargeExcelZipExportContext clone() {
-        return (LargeExcelZipExportContext) super.clone();
+    public LargeExcelZipExportContext<R, P> clone() {
+        return (LargeExcelZipExportContext<R, P>) super.clone();
     }
 } 
