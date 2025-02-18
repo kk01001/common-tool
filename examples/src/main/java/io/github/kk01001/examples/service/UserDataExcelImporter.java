@@ -3,8 +3,8 @@ package io.github.kk01001.examples.service;
 import io.github.kk01001.examples.dto.UserExcelDTO;
 import io.github.kk01001.examples.entity.User;
 import io.github.kk01001.examples.mapper.UserMapper;
-import io.github.kk01001.excel.core.importer.ImportContext;
 import io.github.kk01001.excel.core.importer.LargeDataExcelImporter;
+import io.github.kk01001.excel.core.importer.LargeDataImportContext;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +17,12 @@ public class UserDataExcelImporter extends LargeDataExcelImporter<UserExcelDTO> 
     private final UserMapper userMapper;
 
     public UserDataExcelImporter(@Qualifier("excelThreadPool") ExecutorService executorService, UserMapper userMapper) {
-        super(UserExcelDTO.class, executorService);
+        super(executorService);
         this.userMapper = userMapper;
     }
 
     @Override
-    public void handleImportData(List<UserExcelDTO> dataList, ImportContext context) {
+    public void handleImportData(List<UserExcelDTO> dataList, LargeDataImportContext<UserExcelDTO> context) {
         if (dataList == null || dataList.isEmpty()) {
             return;
         }
