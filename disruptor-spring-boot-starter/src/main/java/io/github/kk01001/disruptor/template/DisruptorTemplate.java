@@ -9,6 +9,7 @@ import io.github.kk01001.disruptor.event.DisruptorEvent;
 import io.github.kk01001.disruptor.factory.DisruptorEventFactory;
 import io.github.kk01001.disruptor.handler.MessageHandler;
 import io.github.kk01001.disruptor.handler.MessageHandlerAdapter;
+import io.github.kk01001.disruptor.monitor.DisruptorMetrics;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
@@ -25,6 +26,12 @@ import java.util.concurrent.ThreadFactory;
 public class DisruptorTemplate {
 
     private final Map<String, Disruptor<DisruptorEvent<Object>>> disruptorMap = new ConcurrentHashMap<>();
+
+    private final DisruptorMetrics disruptorMetrics;
+
+    public DisruptorTemplate(DisruptorMetrics disruptorMetrics) {
+        this.disruptorMetrics = disruptorMetrics;
+    }
 
     /**
      * 发送消息到指定队列
@@ -89,6 +96,7 @@ public class DisruptorTemplate {
      * @param <T>           消息类型
      * @return 创建的Disruptor实例
      */
+    @SuppressWarnings("unchecked")
     public <T> Disruptor<DisruptorEvent<T>> createQueue(
             String queueName,
             int bufferSize,
@@ -118,10 +126,10 @@ public class DisruptorTemplate {
         disruptor.handleEventsWith(eventHandler);
         disruptor.start();
         registerDisruptor(queueName, (Disruptor) disruptor);
+        disruptorMetrics.registerManualDisruptor(queueName, (Disruptor) disruptor);
 
         log.info("Created new Disruptor queue: {}, bufferSize: {}, producerType: {}, waitStrategy: {}",
                 queueName, bufferSize, producerType, waitStrategy.getClass().getSimpleName());
-
         return disruptor;
     }
 }

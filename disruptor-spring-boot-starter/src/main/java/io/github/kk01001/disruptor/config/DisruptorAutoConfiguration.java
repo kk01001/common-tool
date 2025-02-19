@@ -23,18 +23,19 @@ public class DisruptorAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DisruptorTemplate disruptorTemplate() {
-        return new DisruptorTemplate();
+    public DisruptorTemplate disruptorTemplate(DisruptorMetrics disruptorMetrics) {
+        return new DisruptorTemplate(disruptorMetrics);
     }
 
     @Bean
     public DisruptorListenerProcessor disruptorListenerProcessor(
-            DisruptorTemplate disruptorTemplate) {
-        return new DisruptorListenerProcessor(disruptorTemplate);
+            DisruptorTemplate disruptorTemplate,
+            DisruptorMetrics disruptorMetrics) {
+        return new DisruptorListenerProcessor(disruptorTemplate, disruptorMetrics);
     }
 
     @Bean
-    public DisruptorMetrics disruptorMetrics(DisruptorTemplate disruptorTemplate, MeterRegistry meterRegistry) {
-        return new DisruptorMetrics(disruptorTemplate.getDisruptorMap(), meterRegistry);
+    public DisruptorMetrics disruptorMetrics(MeterRegistry meterRegistry) {
+        return new DisruptorMetrics(meterRegistry);
     }
 }

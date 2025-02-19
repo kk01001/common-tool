@@ -5,6 +5,7 @@ import io.github.kk01001.disruptor.annotation.DisruptorListener;
 import io.github.kk01001.disruptor.event.DisruptorEvent;
 import io.github.kk01001.disruptor.factory.DisruptorEventFactory;
 import io.github.kk01001.disruptor.handler.DisruptorHandler;
+import io.github.kk01001.disruptor.monitor.DisruptorMetrics;
 import io.github.kk01001.disruptor.template.DisruptorTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
@@ -26,8 +27,11 @@ public class DisruptorListenerProcessor implements BeanPostProcessor {
 
     private final DisruptorTemplate disruptorTemplate;
 
-    public DisruptorListenerProcessor(DisruptorTemplate disruptorTemplate) {
+    private final DisruptorMetrics disruptorMetrics;
+
+    public DisruptorListenerProcessor(DisruptorTemplate disruptorTemplate, DisruptorMetrics disruptorMetrics) {
         this.disruptorTemplate = disruptorTemplate;
+        this.disruptorMetrics = disruptorMetrics;
     }
 
     @Override
@@ -82,6 +86,7 @@ public class DisruptorListenerProcessor implements BeanPostProcessor {
 
         disruptor.start();
         disruptorTemplate.registerDisruptor(queueName, disruptor);
+        disruptorMetrics.registerManualDisruptor(queueName, disruptor);
         log.info("Registered DisruptorListener for queue: {}, threads: {}, virtualThread: {}",
                 queueName, listener.threads(), listener.virtualThread());
     }
