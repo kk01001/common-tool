@@ -1,8 +1,3 @@
-/*
- * @Author: linshiqiang
- * @Date: 2025-02-06 15:22:29
- * @Description: Do not edit
- */
 package io.github.kk01001.desensitize.handler;
 
 import io.github.kk01001.desensitize.annotation.Desensitize;

@@ -25,6 +25,7 @@ replay_pid*
 /.idea/
 /target/
 /.vscode/
-target
+target/
 .history
 /.fastRequest/
+classes/
