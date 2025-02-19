@@ -80,8 +80,16 @@ public class DisruptorTemplate {
         disruptorMap.clear();
     }
 
-    public Map<String, Disruptor<DisruptorEvent<Object>>> getDisruptorMap() {
-        return this.disruptorMap;
+    /**
+     * 注册 Disruptor 监控指标
+     *
+     * @param queueName 队列名称
+     * @param disruptor Disruptor 实例
+     */
+    public void registerMetrics(String queueName, Disruptor<DisruptorEvent<Object>> disruptor) {
+        if (disruptorMetrics != null) {
+            disruptorMetrics.registerManualDisruptor(queueName, disruptor);
+        }
     }
 
     /**
@@ -96,7 +104,7 @@ public class DisruptorTemplate {
      * @param <T>           消息类型
      * @return 创建的Disruptor实例
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes", "unused"})
     public <T> Disruptor<DisruptorEvent<T>> createQueue(
             String queueName,
             int bufferSize,
@@ -126,7 +134,7 @@ public class DisruptorTemplate {
         disruptor.handleEventsWith(eventHandler);
         disruptor.start();
         registerDisruptor(queueName, (Disruptor) disruptor);
-        disruptorMetrics.registerManualDisruptor(queueName, (Disruptor) disruptor);
+        registerMetrics(queueName, (Disruptor) disruptor);
 
         log.info("Created new Disruptor queue: {}, bufferSize: {}, producerType: {}, waitStrategy: {}",
                 queueName, bufferSize, producerType, waitStrategy.getClass().getSimpleName());

@@ -27,4 +27,9 @@ public class DisruptorProperties {
      * 默认等待策略
      */
     private WaitStrategyType waitStrategy = WaitStrategyType.BLOCKING;
+
+    /**
+     * 是否启用监控
+     */
+    private boolean enableMetrics = false;
 } 

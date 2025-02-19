@@ -5,8 +5,10 @@ import io.github.kk01001.disruptor.monitor.DisruptorMetrics;
 import io.github.kk01001.disruptor.processor.DisruptorListenerProcessor;
 import io.github.kk01001.disruptor.template.DisruptorTemplate;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,18 +25,17 @@ public class DisruptorAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DisruptorTemplate disruptorTemplate(DisruptorMetrics disruptorMetrics) {
+    public DisruptorTemplate disruptorTemplate(@Autowired(required = false) DisruptorMetrics disruptorMetrics) {
         return new DisruptorTemplate(disruptorMetrics);
     }
 
     @Bean
-    public DisruptorListenerProcessor disruptorListenerProcessor(
-            DisruptorTemplate disruptorTemplate,
-            DisruptorMetrics disruptorMetrics) {
-        return new DisruptorListenerProcessor(disruptorTemplate, disruptorMetrics);
+    public DisruptorListenerProcessor disruptorListenerProcessor(DisruptorTemplate disruptorTemplate) {
+        return new DisruptorListenerProcessor(disruptorTemplate);
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "disruptor", name = "enable-metrics", havingValue = "true")
     public DisruptorMetrics disruptorMetrics(MeterRegistry meterRegistry) {
         return new DisruptorMetrics(meterRegistry);
     }

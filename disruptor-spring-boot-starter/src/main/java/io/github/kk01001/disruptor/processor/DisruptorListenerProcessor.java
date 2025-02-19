@@ -5,13 +5,13 @@ import io.github.kk01001.disruptor.annotation.DisruptorListener;
 import io.github.kk01001.disruptor.event.DisruptorEvent;
 import io.github.kk01001.disruptor.factory.DisruptorEventFactory;
 import io.github.kk01001.disruptor.handler.DisruptorHandler;
-import io.github.kk01001.disruptor.monitor.DisruptorMetrics;
 import io.github.kk01001.disruptor.template.DisruptorTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.NonNull;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
@@ -27,15 +27,12 @@ public class DisruptorListenerProcessor implements BeanPostProcessor {
 
     private final DisruptorTemplate disruptorTemplate;
 
-    private final DisruptorMetrics disruptorMetrics;
-
-    public DisruptorListenerProcessor(DisruptorTemplate disruptorTemplate, DisruptorMetrics disruptorMetrics) {
+    public DisruptorListenerProcessor(DisruptorTemplate disruptorTemplate) {
         this.disruptorTemplate = disruptorTemplate;
-        this.disruptorMetrics = disruptorMetrics;
     }
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
         Class<?> targetClass = AopUtils.getTargetClass(bean);
         ReflectionUtils.doWithMethods(targetClass, method -> {
             DisruptorListener listener = AnnotationUtils.findAnnotation(method, DisruptorListener.class);
@@ -46,6 +43,7 @@ public class DisruptorListenerProcessor implements BeanPostProcessor {
         return bean;
     }
 
+    @SuppressWarnings("unchecked")
     private void processDisruptorListener(Object bean, Method method, DisruptorListener listener) {
         String queueName = listener.value();
         ThreadFactory threadFactory = listener.virtualThread()
@@ -86,7 +84,7 @@ public class DisruptorListenerProcessor implements BeanPostProcessor {
 
         disruptor.start();
         disruptorTemplate.registerDisruptor(queueName, disruptor);
-        disruptorMetrics.registerManualDisruptor(queueName, disruptor);
+        disruptorTemplate.registerMetrics(queueName, disruptor);
         log.info("Registered DisruptorListener for queue: {}, threads: {}, virtualThread: {}",
                 queueName, listener.threads(), listener.virtualThread());
     }
