@@ -31,6 +31,7 @@
         <module>netty-spring-boot-starter</module>
         <module>crypto-spring-boot-starter</module>
         <module>desensitize-spring-boot-starter</module>
+        <module>disruptor-spring-boot-starter</module>
     </modules>
 
     <properties>

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev,robot,crypto,docs,desensitize,dict
+    active: dev,robot,crypto,docs,desensitize,dict,db-dev
 
 server:
   servlet:
