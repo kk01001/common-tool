@@ -16,6 +16,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author kk01001
@@ -34,21 +35,22 @@ public class DisruptorListenerProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
         Class<?> targetClass = AopUtils.getTargetClass(bean);
+        AtomicInteger index = new AtomicInteger(0);
         ReflectionUtils.doWithMethods(targetClass, method -> {
             DisruptorListener listener = AnnotationUtils.findAnnotation(method, DisruptorListener.class);
             if (listener != null) {
-                processDisruptorListener(bean, method, listener);
+                processDisruptorListener(bean, method, listener, index);
+                index.incrementAndGet();
             }
         });
         return bean;
     }
 
-    @SuppressWarnings("unchecked")
-    private void processDisruptorListener(Object bean, Method method, DisruptorListener listener) {
+    private void processDisruptorListener(Object bean, Method method, DisruptorListener listener, AtomicInteger index) {
         String queueName = listener.value();
         ThreadFactory threadFactory = listener.virtualThread()
-                ? Thread.ofVirtual().name("Disruptor-Virtual-Thread").factory()
-                : Thread.ofPlatform().name("Disruptor-Platform-Thread").factory();
+                ? Thread.ofVirtual().name("Disruptor-Virtual-Thread" + index.get()).factory()
+                : Thread.ofPlatform().name("Disruptor-Platform-Thread" + index.get()).factory();
 
         DisruptorEventFactory<Object> factory = new DisruptorEventFactory<>();
         Disruptor<DisruptorEvent<Object>> disruptor = new Disruptor<>(

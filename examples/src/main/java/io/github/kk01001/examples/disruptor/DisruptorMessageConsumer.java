@@ -23,4 +23,13 @@ public class DisruptorMessageConsumer {
                 message);
         // 模拟消息处理
     }
+
+    @DisruptorListener(value = "messageQueue2", threads = 2, virtualThread = true)
+    public void onMessage22(Message message) {
+        log.info("messageQueue22 threadName: {}, group: {}, 收到消息: {}",
+                Thread.currentThread().getName(),
+                Thread.currentThread().getThreadGroup().getName(),
+                message);
+        // 模拟消息处理
+    }
 } 

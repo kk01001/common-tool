@@ -4,8 +4,21 @@
 - [x] 机器人消息 钉钉 企微
 - [x] ip2region
 
-starter
+# starter
 
+## disruptor-spring-boot-starter
+
+- [ ] 支持广播
+- [ ] 多消费者
+- [x] 单消费者
+- [ ] 支持动态修改RIngBuffer大小等
+- [x] 同步发送
+- [ ] 异步发送
+- [ ] 发送结果回调
+- [x] 单生产者/多生产者
+- [x] 手动创建队列和消费者(单消费者)
+
+## 其他
 - [x] 在线接口文档
 - [x] excel导入导出 导出模板方法
 - [x] excel导出压缩文件 下载压缩文件
