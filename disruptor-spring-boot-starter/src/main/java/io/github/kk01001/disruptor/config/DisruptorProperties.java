@@ -1,5 +1,7 @@
 package io.github.kk01001.disruptor.config;
 
+import com.lmax.disruptor.dsl.ProducerType;
+import io.github.kk01001.disruptor.annotation.WaitStrategyType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -12,12 +14,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "disruptor")
 public class DisruptorProperties {
     /**
-     * 环形缓冲区大小，必须是2的幂
+     * 默认缓冲区大小
      */
     private int bufferSize = 1024;
-    
+
     /**
-     * 消费者线程数
+     * 默认生产者类型
      */
-    private int consumerCount = 1;
+    private ProducerType producerType = ProducerType.MULTI;
+
+    /**
+     * 默认等待策略
+     */
+    private WaitStrategyType waitStrategy = WaitStrategyType.BLOCKING;
 } 

@@ -1,7 +1,11 @@
 package io.github.kk01001.disruptor.config;
 
+import com.lmax.disruptor.dsl.Disruptor;
+import io.github.kk01001.disruptor.monitor.DisruptorMetrics;
 import io.github.kk01001.disruptor.processor.DisruptorListenerProcessor;
 import io.github.kk01001.disruptor.template.DisruptorTemplate;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties(DisruptorProperties.class)
+@ConditionalOnClass(Disruptor.class)
 public class DisruptorAutoConfiguration {
 
     @Bean
@@ -24,8 +29,12 @@ public class DisruptorAutoConfiguration {
 
     @Bean
     public DisruptorListenerProcessor disruptorListenerProcessor(
-            DisruptorTemplate disruptorTemplate,
-            DisruptorProperties properties) {
-        return new DisruptorListenerProcessor(disruptorTemplate, properties.getBufferSize());
+            DisruptorTemplate disruptorTemplate) {
+        return new DisruptorListenerProcessor(disruptorTemplate);
+    }
+
+    @Bean
+    public DisruptorMetrics disruptorMetrics(DisruptorTemplate disruptorTemplate, MeterRegistry meterRegistry) {
+        return new DisruptorMetrics(disruptorTemplate.getDisruptorMap(), meterRegistry);
     }
 }

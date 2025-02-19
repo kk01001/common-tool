@@ -1,8 +1,6 @@
 package io.github.kk01001.disruptor.processor;
 
-import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
 import io.github.kk01001.disruptor.annotation.DisruptorListener;
 import io.github.kk01001.disruptor.event.DisruptorEvent;
 import io.github.kk01001.disruptor.factory.DisruptorEventFactory;
@@ -27,11 +25,9 @@ import java.util.concurrent.ThreadFactory;
 public class DisruptorListenerProcessor implements BeanPostProcessor {
 
     private final DisruptorTemplate disruptorTemplate;
-    private final int bufferSize;
 
-    public DisruptorListenerProcessor(DisruptorTemplate disruptorTemplate, int bufferSize) {
+    public DisruptorListenerProcessor(DisruptorTemplate disruptorTemplate) {
         this.disruptorTemplate = disruptorTemplate;
-        this.bufferSize = bufferSize;
     }
 
     @Override
@@ -55,10 +51,10 @@ public class DisruptorListenerProcessor implements BeanPostProcessor {
         DisruptorEventFactory<Object> factory = new DisruptorEventFactory<>();
         Disruptor<DisruptorEvent<Object>> disruptor = new Disruptor<>(
                 factory,
-                bufferSize,
+                listener.bufferSize(),
                 threadFactory,
-                ProducerType.MULTI,
-                new BlockingWaitStrategy()
+                listener.producerType(),
+                listener.waitStrategy().create()
         );
 
         // 创建自定义Handler来调用被注解的方法

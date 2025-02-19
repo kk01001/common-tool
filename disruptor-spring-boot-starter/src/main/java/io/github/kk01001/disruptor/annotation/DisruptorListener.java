@@ -1,5 +1,7 @@
 package io.github.kk01001.disruptor.annotation;
 
+import com.lmax.disruptor.dsl.ProducerType;
+
 import java.lang.annotation.*;
 
 /**
@@ -25,4 +27,19 @@ public @interface DisruptorListener {
      * 是否使用虚拟线程
      */
     boolean virtualThread() default true;
+
+    /**
+     * 生产者类型
+     */
+    ProducerType producerType() default ProducerType.MULTI;
+
+    /**
+     * 等待策略
+     */
+    WaitStrategyType waitStrategy() default WaitStrategyType.BLOCKING;
+
+    /**
+     * 缓冲区大小
+     */
+    int bufferSize() default 1024;
 } 

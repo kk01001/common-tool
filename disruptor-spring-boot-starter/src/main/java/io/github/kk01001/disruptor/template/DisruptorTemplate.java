@@ -1,13 +1,20 @@
 package io.github.kk01001.disruptor.template;
 
+import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
 import io.github.kk01001.disruptor.event.DisruptorEvent;
+import io.github.kk01001.disruptor.factory.DisruptorEventFactory;
+import io.github.kk01001.disruptor.handler.MessageHandler;
+import io.github.kk01001.disruptor.handler.MessageHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * @author kk01001
@@ -65,4 +72,56 @@ public class DisruptorTemplate {
         disruptorMap.forEach((name, disruptor) -> disruptor.shutdown());
         disruptorMap.clear();
     }
-} 
+
+    public Map<String, Disruptor<DisruptorEvent<Object>>> getDisruptorMap() {
+        return this.disruptorMap;
+    }
+
+    /**
+     * 创建并注册一个新的Disruptor队列
+     *
+     * @param queueName     队列名称
+     * @param bufferSize    缓冲区大小
+     * @param producerType  生产者类型
+     * @param waitStrategy  等待策略
+     * @param threadFactory 线程工厂
+     * @param handler       消息处理器
+     * @param <T>           消息类型
+     * @return 创建的Disruptor实例
+     */
+    public <T> Disruptor<DisruptorEvent<T>> createQueue(
+            String queueName,
+            int bufferSize,
+            ProducerType producerType,
+            WaitStrategy waitStrategy,
+            ThreadFactory threadFactory,
+            MessageHandler<T> handler) {
+        Assert.hasText(queueName, "Queue name must not be empty");
+        Assert.isTrue(bufferSize > 0, "Buffer size must be positive");
+        Assert.notNull(producerType, "Producer type must not be null");
+        Assert.notNull(waitStrategy, "Wait strategy must not be null");
+        Assert.notNull(threadFactory, "Thread factory must not be null");
+        Assert.notNull(handler, "Handler must not be null");
+
+        // 将MessageHandler适配为EventHandler
+        EventHandler<DisruptorEvent<T>> eventHandler = new MessageHandlerAdapter<>(handler);
+
+        DisruptorEventFactory<T> factory = new DisruptorEventFactory<>();
+        Disruptor<DisruptorEvent<T>> disruptor = new Disruptor<>(
+                factory,
+                bufferSize,
+                threadFactory,
+                producerType,
+                waitStrategy
+        );
+
+        disruptor.handleEventsWith(eventHandler);
+        disruptor.start();
+        registerDisruptor(queueName, (Disruptor) disruptor);
+
+        log.info("Created new Disruptor queue: {}, bufferSize: {}, producerType: {}, waitStrategy: {}",
+                queueName, bufferSize, producerType, waitStrategy.getClass().getSimpleName());
+
+        return disruptor;
+    }
+}

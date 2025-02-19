@@ -1,5 +1,6 @@
 package io.github.kk01001.examples.disruptor;
 
+import com.lmax.disruptor.dsl.ProducerType;
 import io.github.kk01001.disruptor.annotation.DisruptorListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DisruptorMessageConsumer {
 
-    @DisruptorListener(value = "messageQueue", threads = 1, virtualThread = true)
+    @DisruptorListener(value = "messageQueue", producerType = ProducerType.SINGLE)
     public void onMessage(Message message) {
         log.info("messageQueue 收到消息: {}", message);
         // 模拟消息处理
