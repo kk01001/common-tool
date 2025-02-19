@@ -15,9 +15,12 @@ public class DisruptorMessageConsumer {
         // 模拟消息处理
     }
 
-    @DisruptorListener(value = "messageQueue2", threads = 1, virtualThread = true)
+    @DisruptorListener(value = "messageQueue2", threads = 2, virtualThread = true)
     public void onMessage2(Message message) {
-        log.info("messageQueue2 收到消息: {}", message);
+        log.info("messageQueue2 threadName: {}, group: {}, 收到消息: {}",
+                Thread.currentThread().getName(),
+                Thread.currentThread().getThreadGroup().getName(),
+                message);
         // 模拟消息处理
     }
 } 

@@ -70,17 +70,7 @@ public class DisruptorListenerProcessor implements BeanPostProcessor {
                 }
             }
         };
-
-        // 配置多个消费者
-        if (listener.threads() > 1) {
-            DisruptorHandler<Object>[] handlers = new DisruptorHandler[listener.threads()];
-            for (int i = 0; i < listener.threads(); i++) {
-                handlers[i] = handler;
-            }
-            disruptor.handleEventsWith(handlers);
-        } else {
-            disruptor.handleEventsWith(handler);
-        }
+        disruptor.handleEventsWith(handler);
 
         disruptor.start();
         disruptorTemplate.registerDisruptor(queueName, disruptor);
