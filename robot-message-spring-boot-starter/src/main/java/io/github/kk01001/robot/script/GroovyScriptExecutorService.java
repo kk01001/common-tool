@@ -1,9 +1,9 @@
 package io.github.kk01001.robot.script;
 
 import cn.hutool.http.HttpUtil;
-import io.github.kk01001.robot.config.SmsScriptProperties;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import io.github.kk01001.robot.config.SmsScriptProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class GroovyScriptExecutor {
+public class GroovyScriptExecutorService {
     
     /**
      * 短信脚本配置

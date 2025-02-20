@@ -1,0 +1,13 @@
+script:
+  enabled: true
+  cache-size: 1000
+  groovy:
+    enabled: true
+  javascript:
+    enabled: true
+  lua:
+    enabled: true
+  python:
+    enabled: true
+  java:
+    enabled: true

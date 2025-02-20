@@ -3,7 +3,7 @@ package io.github.kk01001.robot.client;
 import cn.hutool.extra.spring.SpringUtil;
 import io.github.kk01001.robot.message.RobotMessage;
 import io.github.kk01001.robot.message.SmsMessage;
-import io.github.kk01001.robot.script.GroovyScriptExecutor;
+import io.github.kk01001.robot.script.GroovyScriptExecutorService;
 import io.github.kk01001.robot.script.ScriptExecuteResult;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +20,7 @@ public class SmsRobotClient implements RobotClient {
     /**
      * Groovy脚本执行器
      */
-    private final GroovyScriptExecutor scriptExecutor;
+    private final GroovyScriptExecutorService scriptExecutor;
     
     /**
      * 短信配置参数
@@ -29,7 +29,7 @@ public class SmsRobotClient implements RobotClient {
 
     public SmsRobotClient(String endpoint, String accessKey, String secretKey,
                           String signName, String templateId) {
-        this.scriptExecutor = SpringUtil.getBean(GroovyScriptExecutor.class);
+        this.scriptExecutor = SpringUtil.getBean(GroovyScriptExecutorService.class);
         
         // 初始化配置参数
         this.configParams = new HashMap<>();
