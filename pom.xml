@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.kk01001</groupId>
     <artifactId>common-tool</artifactId>
-    <version>2.4.5.2</version>
+    <version>2.4.5.3</version>
     <name>common-tool</name>
     <description>通用工具</description>
 
@@ -32,6 +32,7 @@
         <module>crypto-spring-boot-starter</module>
         <module>desensitize-spring-boot-starter</module>
         <module>disruptor-spring-boot-starter</module>
+        <module>script-spring-boot-starter</module>
     </modules>
 
     <properties>
@@ -61,6 +62,7 @@
         <guava.version>33.3.1-jre</guava.version>
         <fastjson.version>1.2.83</fastjson.version>
         <mybatis.version>3.5.19</mybatis.version>
+        <groovy.version>4.0.25</groovy.version>
     </properties>
 
     <dependencyManagement>
@@ -189,6 +191,12 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${groovy.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
