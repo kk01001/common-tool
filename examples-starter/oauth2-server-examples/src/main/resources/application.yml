@@ -1,0 +1,17 @@
+server:
+  port: 8381
+
+spring:
+  application:
+    name: oauth2-resource-server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8380
+          jwk-set-uri: http://localhost:8380/.well-known/jwks.json
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.oauth2: DEBUG 
