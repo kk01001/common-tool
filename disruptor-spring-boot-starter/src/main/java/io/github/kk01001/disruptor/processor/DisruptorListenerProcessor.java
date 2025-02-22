@@ -26,6 +26,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class DisruptorListenerProcessor implements BeanPostProcessor {
 
+    private final ThreadFactory threadFactory = Thread.ofVirtual().name("Disruptor-Virtual-Thread").factory();
+
     private final DisruptorTemplate disruptorTemplate;
 
     public DisruptorListenerProcessor(DisruptorTemplate disruptorTemplate) {
@@ -48,9 +50,6 @@ public class DisruptorListenerProcessor implements BeanPostProcessor {
 
     private void processDisruptorListener(Object bean, Method method, DisruptorListener listener, AtomicInteger index) {
         String queueName = listener.value();
-        ThreadFactory threadFactory = listener.virtualThread()
-                ? Thread.ofVirtual().name("Disruptor-Virtual-Thread" + index.get()).factory()
-                : Thread.ofPlatform().name("Disruptor-Platform-Thread" + index.get()).factory();
 
         DisruptorEventFactory<Object> factory = new DisruptorEventFactory<>();
         Disruptor<DisruptorEvent<Object>> disruptor = new Disruptor<>(
