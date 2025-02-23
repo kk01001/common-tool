@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>idempotent-spring-boot-starter</artifactId>
+    <description>接口幂等性校验</description>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

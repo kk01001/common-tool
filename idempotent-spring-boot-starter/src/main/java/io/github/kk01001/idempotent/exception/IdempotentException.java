@@ -4,38 +4,36 @@ import lombok.Getter;
 
 /**
  * @author kk01001
- * date 2022/2/22 17:10
- * 异常
+ * @date 2025-02-13 14:31:00
+ * @description 幂等异常
  */
 @Getter
 public class IdempotentException extends RuntimeException {
 
-    private String requestId;
-
-    private String message;
-
-    private Object[] args;
-
-    public IdempotentException() {
-    }
+    private final String requestId;
+    private final Object[] args;
 
     public IdempotentException(String message) {
-        this.message = message;
+        super(message);
+        this.requestId = null;
+        this.args = null;
     }
 
     public IdempotentException(String requestId, String message) {
+        super(message);
         this.requestId = requestId;
-        this.message = message;
+        this.args = null;
     }
 
     public IdempotentException(String message, Object... args) {
-        this.message = message;
+        super(message);
+        this.requestId = null;
         this.args = args;
     }
 
     public IdempotentException(String requestId, String message, Object... args) {
+        super(message);
         this.requestId = requestId;
-        this.message = message;
         this.args = args;
     }
 

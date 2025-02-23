@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 /**
@@ -17,8 +16,7 @@ import java.util.Map;
 public class IdempotentController {
 
     @Idempotent(keyPrefix = "IdempotentTest",
-            expire = 30,
-            timeUnit = ChronoUnit.MILLIS)
+            expire = 1)
     @PostMapping("Idempotent")
     public Boolean ok(@RequestBody Map<String, String> params) {
 
