@@ -2,6 +2,7 @@ package io.github.kk01001.oss.client;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
+import io.github.kk01001.oss.listener.ByteProgressListener;
 import io.github.kk01001.oss.model.ChunkDTO;
 import io.github.kk01001.oss.model.ChunkMergeDTO;
 
@@ -147,4 +148,49 @@ public interface OssClient {
      * @return AmazonS3
      */
     AmazonS3 getS3Client();
+
+    /**
+     * 下载对象
+     *
+     * @param bucketName bucket名称
+     * @param objectName 文件名称
+     * @return InputStream
+     */
+    InputStream downloadObject(String bucketName, String objectName);
+
+    /**
+     * 下载对象（带进度监听）
+     *
+     * @param bucketName       bucket名称
+     * @param objectName       文件名称
+     * @param progressListener 进度监听器
+     * @param destinationFile  下载保存的目标文件
+     */
+    void downloadObject(String bucketName, String objectName, ByteProgressListener progressListener, File destinationFile);
+
+    /**
+     * 批量删除对象
+     *
+     * @param bucketName  bucket名称
+     * @param objectNames 文件名称列表
+     */
+    void removeObjects(String bucketName, List<String> objectNames);
+
+    /**
+     * 获取对象元数据
+     *
+     * @param bucketName bucket名称
+     * @param objectName 文件名称
+     * @return ObjectMetadata
+     */
+    ObjectMetadata getObjectMetadata(String bucketName, String objectName);
+
+    /**
+     * 更新对象元数据
+     *
+     * @param bucketName bucket名称
+     * @param objectName 文件名称
+     * @param metadata   新的元数据
+     */
+    void updateObjectMetadata(String bucketName, String objectName, ObjectMetadata metadata);
 }

@@ -2,7 +2,12 @@ package io.github.kk01001.oss.client;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.transfer.Download;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.util.IOUtils;
+import io.github.kk01001.oss.listener.ByteProgressListener;
+import io.github.kk01001.oss.listener.ProgressListenerAdapter;
 import io.github.kk01001.oss.model.ChunkDTO;
 import io.github.kk01001.oss.model.ChunkMergeDTO;
 import lombok.RequiredArgsConstructor;
@@ -211,4 +216,68 @@ public class S3OssClient implements OssClient {
         String fileExtension = getFileExtension(objectName);
         return getContentType(fileExtension);
     }
+
+    /**
+     * 下载对象
+     * AmazonS3：<a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html">...</a>
+     */
+    @Override
+    @SneakyThrows
+    public InputStream downloadObject(String bucketName, String objectName) {
+        S3Object s3Object = amazonS3.getObject(bucketName, objectName);
+        return s3Object.getObjectContent();
+    }
+
+    /**
+     * 下载对象（带进度监听）
+     * AmazonS3：<a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html">...</a>
+     */
+    @Override
+    @SneakyThrows
+    public void downloadObject(String bucketName, String objectName, ByteProgressListener progressListener, File destinationFile) {
+        TransferManager transferManager = TransferManagerBuilder.standard()
+                .withS3Client(amazonS3)
+                .build();
+
+        Download download = transferManager.download(bucketName, objectName, destinationFile);
+        long totalBytes = download.getObjectMetadata().getContentLength();
+        download.addProgressListener(new ProgressListenerAdapter(progressListener, totalBytes));
+        // 等待下载完成
+        download.waitForCompletion();
+    }
+
+    /**
+     * 批量删除对象
+     * AmazonS3：<a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObjects.html">...</a>
+     */
+    @Override
+    @SneakyThrows
+    public void removeObjects(String bucketName, List<String> objectNames) {
+        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketName)
+                .withKeys(objectNames.toArray(new String[0]));
+        amazonS3.deleteObjects(deleteObjectsRequest);
+    }
+
+    /**
+     * 获取对象元数据
+     * AmazonS3：<a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObjectMetadata.html">...</a>
+     */
+    @Override
+    @SneakyThrows
+    public ObjectMetadata getObjectMetadata(String bucketName, String objectName) {
+        return amazonS3.getObjectMetadata(bucketName, objectName);
+    }
+
+    /**
+     * 更新对象元数据
+     * AmazonS3：<a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html">...</a>
+     */
+    @Override
+    @SneakyThrows
+    public void updateObjectMetadata(String bucketName, String objectName, ObjectMetadata metadata) {
+        CopyObjectRequest copyObjRequest = new CopyObjectRequest(bucketName, objectName, bucketName, objectName)
+                .withNewObjectMetadata(metadata);
+        amazonS3.copyObject(copyObjRequest);
+    }
+
 }

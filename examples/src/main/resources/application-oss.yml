@@ -1,0 +1,7 @@
+oss:
+  enable: true
+  accessKey: assistant
+  accessSecret: assistant@2020
+  endpoint: http://10.255.1.8:19000/
+  maxConnections: 100
+  bucketName: test
