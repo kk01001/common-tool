@@ -2,7 +2,7 @@ package io.github.kk01001.oss.client;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
-import io.github.kk01001.oss.listener.ByteProgressListener;
+import io.github.kk01001.oss.listener.CustomProgressListener;
 import io.github.kk01001.oss.model.ChunkDTO;
 import io.github.kk01001.oss.model.ChunkMergeDTO;
 
@@ -166,7 +166,7 @@ public interface OssClient {
      * @param progressListener 进度监听器
      * @param destinationFile  下载保存的目标文件
      */
-    void downloadObject(String bucketName, String objectName, ByteProgressListener progressListener, File destinationFile);
+    void downloadObject(String bucketName, String objectName, CustomProgressListener progressListener, File destinationFile);
 
     /**
      * 批量删除对象

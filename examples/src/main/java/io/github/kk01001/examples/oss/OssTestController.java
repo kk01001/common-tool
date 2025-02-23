@@ -2,7 +2,7 @@ package io.github.kk01001.examples.oss;
 
 import io.github.kk01001.oss.OssProperties;
 import io.github.kk01001.oss.client.OssClient;
-import io.github.kk01001.oss.listener.ByteProgressListener;
+import io.github.kk01001.oss.listener.CustomProgressListener;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,13 +45,12 @@ public class OssTestController {
      */
     @GetMapping("/download-with-progress")
     public String downloadFileWithProgress(@RequestParam String objectName) {
-
         File destinationFile = new File("/home/temp/" + objectName);
         try {
-            ossClient.downloadObject(ossProperties.getBucketName(), objectName, new ByteProgressListener() {
+            ossClient.downloadObject(ossProperties.getBucketName(), objectName, new CustomProgressListener() {
                 @Override
-                public void onProgress(long bytesRead, long totalBytes, double percentage) {
-                    log.info("下载进度: {}%", percentage);
+                public void onProgress(long bytesRead, long totalBytes, double percentage, double speed, String speedUnit) {
+                    log.info("下载进度: {}%, 速度: {}{}", percentage, speed, speedUnit);
                 }
             }, destinationFile);
             return "文件下载成功（带进度），保存到: " + destinationFile.toString();

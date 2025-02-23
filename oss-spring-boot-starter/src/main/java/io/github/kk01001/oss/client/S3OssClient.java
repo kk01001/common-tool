@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.util.IOUtils;
-import io.github.kk01001.oss.listener.ByteProgressListener;
+import io.github.kk01001.oss.listener.CustomProgressListener;
 import io.github.kk01001.oss.listener.ProgressListenerAdapter;
 import io.github.kk01001.oss.model.ChunkDTO;
 import io.github.kk01001.oss.model.ChunkMergeDTO;
@@ -234,7 +234,7 @@ public class S3OssClient implements OssClient {
      */
     @Override
     @SneakyThrows
-    public void downloadObject(String bucketName, String objectName, ByteProgressListener progressListener, File destinationFile) {
+    public void downloadObject(String bucketName, String objectName, CustomProgressListener progressListener, File destinationFile) {
         TransferManager transferManager = TransferManagerBuilder.standard()
                 .withS3Client(amazonS3)
                 .build();
