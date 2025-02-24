@@ -4,13 +4,13 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
-import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import com.amazonaws.services.s3.transfer.Upload;
+import com.amazonaws.services.s3.transfer.model.UploadResult;
 import com.amazonaws.util.IOUtils;
 import io.github.kk01001.oss.listener.CustomProgressListener;
 import io.github.kk01001.oss.listener.ProgressListenerAdapter;
 import io.github.kk01001.oss.model.ChunkDTO;
 import io.github.kk01001.oss.model.ChunkMergeDTO;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.ByteArrayInputStream;
@@ -27,10 +27,19 @@ import java.util.List;
  * @author kk01001
  * date 2022-09-19 22:33:00
  */
-@RequiredArgsConstructor
 public class S3OssClient implements OssClient {
 
     private final AmazonS3 amazonS3;
+
+    /**
+     * 全局 TransferManager 实例
+     */
+    private final TransferManager transferManager;
+
+    public S3OssClient(AmazonS3 amazonS3, TransferManager transferManager) {
+        this.amazonS3 = amazonS3;
+        this.transferManager = transferManager;
+    }
 
     /**
      * 创建Bucket
@@ -235,10 +244,6 @@ public class S3OssClient implements OssClient {
     @Override
     @SneakyThrows
     public void downloadObject(String bucketName, String objectName, CustomProgressListener progressListener, File destinationFile) {
-        TransferManager transferManager = TransferManagerBuilder.standard()
-                .withS3Client(amazonS3)
-                .build();
-
         Download download = transferManager.download(bucketName, objectName, destinationFile);
         long totalBytes = download.getObjectMetadata().getContentLength();
         download.addProgressListener(new ProgressListenerAdapter(progressListener, totalBytes));
@@ -278,6 +283,42 @@ public class S3OssClient implements OssClient {
         CopyObjectRequest copyObjRequest = new CopyObjectRequest(bucketName, objectName, bucketName, objectName)
                 .withNewObjectMetadata(metadata);
         amazonS3.copyObject(copyObjRequest);
+    }
+
+    @Override
+    @SneakyThrows
+    public UploadResult putObject(String bucketName, String objectName, File file, CustomProgressListener progressListener) {
+        // 开始上传
+        Upload upload = transferManager.upload(bucketName, objectName, file);
+
+        // 添加进度监听器
+        upload.addProgressListener(new ProgressListenerAdapter(progressListener, file.length()));
+
+        // 等待上传完成并获取结果
+        return upload.waitForUploadResult();
+    }
+
+    @Override
+    @SneakyThrows
+    public UploadResult putObject(String bucketName, String objectName, InputStream is, long size,
+                                  String contentType, CustomProgressListener progressListener) {
+        // 先将输入流读入字节数组，这样可以重复读取
+        byte[] bytes = IOUtils.toByteArray(is);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(bytes.length);
+        objectMetadata.setContentType(contentType);
+
+        // 使用 ByteArrayInputStream，它支持 reset 操作
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+
+        // 开始上传
+        Upload upload = transferManager.upload(bucketName, objectName, byteArrayInputStream, objectMetadata);
+
+        // 添加进度监听器
+        upload.addProgressListener(new ProgressListenerAdapter(progressListener, bytes.length));
+
+        // 等待上传完成并获取结果
+        return upload.waitForUploadResult();
     }
 
 }

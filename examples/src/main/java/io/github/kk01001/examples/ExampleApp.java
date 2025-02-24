@@ -30,8 +30,8 @@ public class ExampleApp {
     @Bean
     public MultipartConfigElement multipartConfigElement() {
         MultipartConfigFactory factory = new MultipartConfigFactory();
-        factory.setMaxFileSize(DataSize.ofMegabytes(1000)); // 单个文件最大 10MB
-        factory.setMaxRequestSize(DataSize.ofMegabytes(1000)); // 总请求最大 50MB
+        factory.setMaxFileSize(DataSize.ofMegabytes(10000)); // 单个文件最大 10MB
+        factory.setMaxRequestSize(DataSize.ofMegabytes(10000)); // 总请求最大 50MB
         return factory.createMultipartConfig();
     }
 }

@@ -2,6 +2,7 @@ package io.github.kk01001.oss.client;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.transfer.model.UploadResult;
 import io.github.kk01001.oss.listener.CustomProgressListener;
 import io.github.kk01001.oss.model.ChunkDTO;
 import io.github.kk01001.oss.model.ChunkMergeDTO;
@@ -193,4 +194,27 @@ public interface OssClient {
      * @param metadata   新的元数据
      */
     void updateObjectMetadata(String bucketName, String objectName, ObjectMetadata metadata);
+
+    /**
+     * 上传文件（带进度监听）
+     *
+     * @param bucketName       bucket名称
+     * @param objectName       文件名称
+     * @param file             文件
+     * @param progressListener 进度监听器
+     * @return UploadResult
+     */
+    UploadResult putObject(String bucketName, String objectName, File file, CustomProgressListener progressListener);
+
+    /**
+     * 上传文件（带进度监听）
+     *
+     * @param bucketName       bucket名称
+     * @param objectName       文件名称
+     * @param is               文件流
+     * @param progressListener 进度监听器
+     * @return UploadResult
+     */
+    UploadResult putObject(String bucketName, String objectName, InputStream is, long size,
+                           String contentType, CustomProgressListener progressListener);
 }
