@@ -1,12 +1,12 @@
 package io.github.kk01001.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author kk01001
@@ -19,55 +19,55 @@ public class GitInfoController {
     /**
      * Git分支名称
      */
-    @Value("${git.branch}")
+    @Value("${git.branch:}")
     private String branch;
 
     /**
      * Git构建时间
      */
-    @Value("${git.build.time}")
+    @Value("${git.build.time:}")
     private String buildTime;
 
     /**
      * Git构建版本
      */
-    @Value("${git.build.version}")
+    @Value("${git.build.version:}")
     private String buildVersion;
 
     /**
      * Git提交ID（简短版本）
      */
-    @Value("${git.commit.id.abbrev}")
+    @Value("${git.commit.id.abbrev:}")
     private String commitIdAbbrev;
 
     /**
      * Git提交ID（完整版本）
      */
-    @Value("${git.commit.id.full}")
+    @Value("${git.commit.id.full:}")
     private String commitIdFull;
 
     /**
      * Git提交信息摘要
      */
-    @Value("${git.commit.message.short}")
+    @Value("${git.commit.message.short:}")
     private String commitMessageShort;
 
     /**
      * Git提交时间
      */
-    @Value("${git.commit.time}")
+    @Value("${git.commit.time:}")
     private String commitTime;
 
     /**
      * Git提交用户邮箱
      */
-    @Value("${git.commit.user.email}")
+    @Value("${git.commit.user.email:}")
     private String commitUserEmail;
 
     /**
      * Git提交用户名称
      */
-    @Value("${git.commit.user.name}")
+    @Value("${git.commit.user.name:}")
     private String commitUserName;
 
     @GetMapping("/git-info")
