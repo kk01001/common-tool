@@ -43,6 +43,21 @@ public class StrategyFactory implements ApplicationContextAware {
             Class<? extends Enum<?>> strategyEnum = strategy.strategyEnum();
             String strategyType = strategy.strategyType();
             
+            // 检查是否已存在相同的策略实现
+            Map<String, IStrategy<?, ?>> strategyMap = STRATEGY_MAP.get(strategyEnum);
+            if (strategyMap != null && strategyMap.containsKey(strategyType)) {
+                throw new StrategyException(
+                    String.format("重复的策略实现: enum=%s, type=%s, existClass=%s, newClass=%s",
+                        strategyEnum.getName(),
+                        strategyType,
+                        strategyMap.get(strategyType).getClass().getName(),
+                        bean.getClass().getName()
+                    ),
+                    strategyType,
+                    "DUPLICATE_STRATEGY"
+                );
+            }
+            
             // 将策略实现类放入映射
             STRATEGY_MAP.computeIfAbsent(strategyEnum, k -> new HashMap<>())
                     .put(strategyType, (IStrategy<?, ?>) bean);
