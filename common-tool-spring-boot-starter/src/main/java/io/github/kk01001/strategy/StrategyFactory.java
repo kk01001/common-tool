@@ -1,6 +1,7 @@
 package io.github.kk01001.strategy;
 
 import io.github.kk01001.strategy.annotation.Strategy;
+import io.github.kk01001.strategy.exception.StrategyException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -59,12 +60,12 @@ public class StrategyFactory implements ApplicationContextAware {
     public <T, R> IStrategy<T, R> getStrategy(Class<? extends Enum<?>> strategyEnum, String strategyType) {
         Map<String, IStrategy<?, ?>> strategyMap = STRATEGY_MAP.get(strategyEnum);
         if (strategyMap == null) {
-            throw new IllegalArgumentException("Strategy enum not found: " + strategyEnum);
+            throw new StrategyException("策略枚举类型未找到", strategyType, "STRATEGY_ENUM_NOT_FOUND");
         }
         
         IStrategy<?, ?> strategy = strategyMap.get(strategyType);
         if (strategy == null) {
-            throw new IllegalArgumentException("Strategy not found for type: " + strategyType);
+            throw new StrategyException("未找到对应的策略实现", strategyType, "STRATEGY_NOT_FOUND");
         }
         
         return (IStrategy<T, R>) strategy;
@@ -79,7 +80,13 @@ public class StrategyFactory implements ApplicationContextAware {
      * @return 策略执行结果
      */
     public <T, R> R execute(Class<? extends Enum<?>> strategyEnum, String strategyType, T param) {
-        IStrategy<T, R> strategy = getStrategy(strategyEnum, strategyType);
-        return strategy.execute(param);
+        try {
+            IStrategy<T, R> strategy = getStrategy(strategyEnum, strategyType);
+            return strategy.execute(param);
+        } catch (StrategyException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new StrategyException("策略执行失败", strategyType, "STRATEGY_EXECUTE_ERROR", e);
+        }
     }
 }
