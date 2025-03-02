@@ -19,7 +19,7 @@
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>common-tool-spring-boot-starter</artifactId>
-            <version>2.4.6.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -45,31 +45,37 @@
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>multi-redis-spring-boot-starter</artifactId>
-            <version>2.4.6.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>robot-message-spring-boot-starter</artifactId>
-            <version>2.4.6.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>docs-spring-boot-starter</artifactId>
-            <version>2.4.6.0</version>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.kk01001</groupId>
+            <artifactId>dict-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>desensitize-spring-boot-starter</artifactId>
-            <version>2.4.6.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>oss-spring-boot-starter</artifactId>
-            <version>2.4.6.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -90,25 +96,25 @@
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>rate-limiter-spring-boot-starter</artifactId>
-            <version>2.4.6.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>idempotent-spring-boot-starter</artifactId>
-            <version>2.4.6.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>netty-spring-boot-starter</artifactId>
-            <version>2.4.6.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>lock-spring-boot-starter</artifactId>
-            <version>2.4.6.0</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

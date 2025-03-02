@@ -1,6 +1,6 @@
-package io.github.kk01001.common.dict;
+package io.github.kk01001.dict;
 
-import io.github.kk01001.common.dict.properties.DictProperties;
+import io.github.kk01001.dict.properties.DictProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;

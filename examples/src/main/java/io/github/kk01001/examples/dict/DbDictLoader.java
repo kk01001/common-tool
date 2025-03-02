@@ -1,6 +1,6 @@
 package io.github.kk01001.examples.dict;
 
-import io.github.kk01001.common.dict.DictLoader;
+import io.github.kk01001.dict.DictLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

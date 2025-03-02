@@ -1,4 +1,4 @@
-package io.github.kk01001.common.dict;
+package io.github.kk01001.dict;
 
 import java.util.Map;
 
