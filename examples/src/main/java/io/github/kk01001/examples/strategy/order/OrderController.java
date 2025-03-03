@@ -1,12 +1,8 @@
 package io.github.kk01001.examples.strategy.order;
 
-import io.github.kk01001.strategy.StrategyFactory;
+import io.github.kk01001.design.strategy.StrategyFactory;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController

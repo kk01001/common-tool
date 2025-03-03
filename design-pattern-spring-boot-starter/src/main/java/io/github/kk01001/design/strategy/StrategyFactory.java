@@ -1,18 +1,16 @@
-package io.github.kk01001.strategy;
+package io.github.kk01001.design.strategy;
 
-import io.github.kk01001.strategy.annotation.Strategy;
-import io.github.kk01001.strategy.exception.StrategyException;
+import io.github.kk01001.design.strategy.annotation.Strategy;
+import io.github.kk01001.design.strategy.exception.StrategyException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
 public class StrategyFactory implements ApplicationContextAware {
     
     /**
@@ -98,6 +96,24 @@ public class StrategyFactory implements ApplicationContextAware {
         try {
             IStrategy<T, R> strategy = getStrategy(strategyEnum, strategyType);
             return strategy.execute(param);
+        } catch (StrategyException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new StrategyException("策略执行失败", strategyType, "STRATEGY_EXECUTE_ERROR", e);
+        }
+    }
+
+    /**
+     * 执行策略
+     *
+     * @param strategyEnum 策略枚举类
+     * @param strategyType 策略类型
+     * @param param        策略参数
+     */
+    public <T, R> void executeVoid(Class<? extends Enum<?>> strategyEnum, String strategyType, T param) {
+        try {
+            IStrategy<T, R> strategy = getStrategy(strategyEnum, strategyType);
+            strategy.executeVoid(param);
         } catch (StrategyException e) {
             throw e;
         } catch (Exception e) {

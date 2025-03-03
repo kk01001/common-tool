@@ -1,4 +1,4 @@
-package io.github.kk01001.strategy;
+package io.github.kk01001.design.strategy;
 
 /**
  * 通用策略接口
@@ -9,5 +9,11 @@ public interface IStrategy<T, R> {
     /**
      * 策略执行方法
      */
-    R execute(T param);
+    default R execute(T param) {
+        return null;
+    }
+
+    default void executeVoid(T param) {
+
+    }
 }

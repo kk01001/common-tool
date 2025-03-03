@@ -1,4 +1,4 @@
-package io.github.kk01001.strategy.annotation;
+package io.github.kk01001.design.strategy.annotation;
 
 import java.lang.annotation.*;
 

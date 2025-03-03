@@ -132,6 +132,14 @@
   > 推送服务
   - [ ] 多平台推送支持
 
+## dict-spring-boot-starter
+  > 字典管理
+
+## design-pattern-spring-boot-starter
+  > 设计模式
+  - [x] 策略模式
+  - [ ] 责任链模式
+
 # 待开发功能
 
 - [ ] nacos数据库配置动态刷新

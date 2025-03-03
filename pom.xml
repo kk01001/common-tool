@@ -34,6 +34,7 @@
         <module>disruptor-spring-boot-starter</module>
         <module>script-spring-boot-starter</module>
         <module>dict-spring-boot-starter</module>
+        <module>design-pattern-spring-boot-starter</module>
     </modules>
 
     <properties>

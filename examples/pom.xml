@@ -141,19 +141,19 @@
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>mybatis-plus-spring3-boot-starter</artifactId>
-            <version>2.4.6.1</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>crypto-spring-boot-starter</artifactId>
-            <version>2.4.6.1</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>excel-spring-boot-starter</artifactId>
-            <version>2.4.6.1</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -207,12 +207,18 @@
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>disruptor-spring-boot-starter</artifactId>
-            <version>2.4.6.1</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.kk01001</groupId>
             <artifactId>script-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.kk01001</groupId>
+            <artifactId>design-pattern-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

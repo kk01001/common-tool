@@ -1,6 +1,6 @@
 package io.github.kk01001.examples.strategy.pay;
 
-import io.github.kk01001.strategy.StrategyFactory;
+import io.github.kk01001.design.strategy.StrategyFactory;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
