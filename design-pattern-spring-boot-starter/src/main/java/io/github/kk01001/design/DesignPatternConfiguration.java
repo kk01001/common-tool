@@ -1,14 +1,6 @@
-/*
- * @Author: linshiqiang linshiqiang@linkcircle.cn
- * @Date: 2025-03-03 09:58:10
- * @LastEditors: linshiqiang linshiqiang@linkcircle.cn
- * @LastEditTime: 2025-03-03 14:19:02
- * @FilePath: \common-tool\design-pattern-spring-boot-starter\src\main\java\io\github\kk01001\design\DesignPatternConfiguration.java
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
 package io.github.kk01001.design;
 
-import io.github.kk01001.design.pattern.chain.ChainFactory;
+import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainFactory;
 import io.github.kk01001.design.pattern.strategy.StrategyFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -27,8 +19,8 @@ import org.springframework.context.annotation.Role;
 public class DesignPatternConfiguration {
 
     @Bean
-    public ChainFactory chainFactory() {
-        return new ChainFactory();
+    public ResponsibilityChainFactory responsibilityChainFactory() {
+        return new ResponsibilityChainFactory();
     }
 
     @Bean
