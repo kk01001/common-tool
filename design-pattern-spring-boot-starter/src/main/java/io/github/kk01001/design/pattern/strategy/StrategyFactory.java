@@ -1,7 +1,7 @@
-package io.github.kk01001.design.strategy;
+package io.github.kk01001.design.pattern.strategy;
 
-import io.github.kk01001.design.strategy.annotation.Strategy;
-import io.github.kk01001.design.strategy.exception.StrategyException;
+import io.github.kk01001.design.pattern.strategy.annotation.Strategy;
+import io.github.kk01001.design.pattern.strategy.exception.StrategyException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -11,6 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @author linshiqiang
+ * @date 2025-03-03 09:58:00
+ * @description 用于管理和执行策略模式，通过Spring容器自动收集被@Strategy注解标记的策略实现类
+ */
 public class StrategyFactory implements ApplicationContextAware {
     
     /**

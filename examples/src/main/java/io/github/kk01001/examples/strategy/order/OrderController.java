@@ -1,6 +1,6 @@
 package io.github.kk01001.examples.strategy.order;
 
-import io.github.kk01001.design.strategy.StrategyFactory;
+import io.github.kk01001.design.pattern.strategy.StrategyFactory;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,6 +1,6 @@
 package io.github.kk01001.examples.strategy.pay;
 
-import io.github.kk01001.design.strategy.annotation.Strategy;
+import io.github.kk01001.design.pattern.strategy.annotation.Strategy;
 import org.springframework.stereotype.Component;
 
 @Component
