@@ -10,13 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 订单处理责任链控制器
  * 演示如何通过接口动态注册和执行责任链处理器
  */
-@RestController
+// @RestController
 @RequestMapping("/api/order-process")
 public class OrderProcessController {
 

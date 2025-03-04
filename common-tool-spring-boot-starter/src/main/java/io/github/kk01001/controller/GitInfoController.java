@@ -1,12 +1,17 @@
 package io.github.kk01001.controller;
 
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * @author kk01001
@@ -14,74 +19,27 @@ import java.util.Map;
  * @description Git信息查询控制器，用于获取由git-commit-id-plugin插件生成的Git仓库详细信息
  */
 @RestController
+@RequiredArgsConstructor
 public class GitInfoController {
 
-    /**
-     * Git分支名称
-     */
-    @Value("${git.branch:}")
-    private String branch;
+    @Value("classpath:git.properties")
+    private Resource gitResource;
 
-    /**
-     * Git构建时间
-     */
-    @Value("${git.build.time:}")
-    private String buildTime;
+    private Map<String, String> gitPropertiesMap;
 
-    /**
-     * Git构建版本
-     */
-    @Value("${git.build.version:}")
-    private String buildVersion;
-
-    /**
-     * Git提交ID（简短版本）
-     */
-    @Value("${git.commit.id.abbrev:}")
-    private String commitIdAbbrev;
-
-    /**
-     * Git提交ID（完整版本）
-     */
-    @Value("${git.commit.id.full:}")
-    private String commitIdFull;
-
-    /**
-     * Git提交信息摘要
-     */
-    @Value("${git.commit.message.short:}")
-    private String commitMessageShort;
-
-    /**
-     * Git提交时间
-     */
-    @Value("${git.commit.time:}")
-    private String commitTime;
-
-    /**
-     * Git提交用户邮箱
-     */
-    @Value("${git.commit.user.email:}")
-    private String commitUserEmail;
-
-    /**
-     * Git提交用户名称
-     */
-    @Value("${git.commit.user.name:}")
-    private String commitUserName;
+    @PostConstruct
+    public void init() throws IOException {
+        Properties properties = new Properties();
+        properties.load(gitResource.getInputStream());
+        gitPropertiesMap = properties.entrySet().stream()
+                .collect(Collectors.toMap(
+                        e -> String.valueOf(e.getKey()),
+                        e -> String.valueOf(e.getValue())
+                ));
+    }
 
     @GetMapping("/git-info")
     public ResponseEntity<Map<String, String>> getGitInfo() {
-        Map<String, String> gitInfo = new HashMap<>();
-        gitInfo.put("branch", branch);
-        gitInfo.put("buildTime", buildTime);
-        gitInfo.put("buildVersion", buildVersion);
-        gitInfo.put("commitIdAbbrev", commitIdAbbrev);
-        gitInfo.put("commitIdFull", commitIdFull);
-        gitInfo.put("commitMessageShort", commitMessageShort);
-        gitInfo.put("commitTime", commitTime);
-        gitInfo.put("commitUserEmail", commitUserEmail);
-        gitInfo.put("commitUserName", commitUserName);
-        return ResponseEntity.ok(gitInfo);
+        return ResponseEntity.ok(gitPropertiesMap);
     }
 }
