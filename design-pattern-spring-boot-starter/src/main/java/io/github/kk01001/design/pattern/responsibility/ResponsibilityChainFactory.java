@@ -40,7 +40,7 @@ public class ResponsibilityChainFactory implements ApplicationContextAware, Init
      */
     @Override
     public void afterPropertiesSet() {
-        // 获取所有带有ChainGroup注解的Bean
+        // 获取所有带有ResponsibilityChain注解的Bean
         Map<String, Object> beans = applicationContext.getBeansWithAnnotation(ResponsibilityChain.class);
 
         // 按分组预加载所有处理器

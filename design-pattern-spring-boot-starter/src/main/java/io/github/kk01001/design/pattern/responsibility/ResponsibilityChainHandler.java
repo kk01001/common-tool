@@ -16,7 +16,9 @@ public interface ResponsibilityChainHandler<T, R> {
      * @return 处理结果
      * @throws Exception 处理过程中可能抛出的异常
      */
-    R handle(ResponsibilityChainContext<T, R> context) throws Exception;
+    default R handle(ResponsibilityChainContext<T, R> context) throws Exception {
+        return null;
+    }
 
     /**
      * 处理请求
@@ -24,7 +26,9 @@ public interface ResponsibilityChainHandler<T, R> {
      * @param context 责任链上下文
      * @throws Exception 处理过程中可能抛出的异常
      */
-    void handleVoid(ResponsibilityChainContext<T, R> context) throws Exception;
+    default void handleVoid(ResponsibilityChainContext<T, R> context) throws Exception {
+        
+    }
 
     /**
      * 异常处理方法
