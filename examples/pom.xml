@@ -266,12 +266,33 @@
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
                     <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
                     <includeOnlyProperties>
-                        <includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>
-                        <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
+                        <!-- Git 分支 -->
+                        <includeOnlyProperty>^git.branch$</includeOnlyProperty>
+                        <!-- 构建相关信息 -->
+                        <includeOnlyProperty>^git.build.host$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.build.time$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.build.user.email$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.build.user.name$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.build.version$</includeOnlyProperty>
+                        <!-- 最近标签相关 -->
+                        <includeOnlyProperty>^git.closest.tag.name$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.closest.tag.commit.count$</includeOnlyProperty>
+                        <!-- 提交信息 -->
+                        <includeOnlyProperty>^git.commit.id$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.commit.id.abbrev$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.commit.id.describe$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.commit.id.describe-short$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.commit.message.full$</includeOnlyProperty>
                         <includeOnlyProperty>^git.commit.message.short$</includeOnlyProperty>
                         <includeOnlyProperty>^git.commit.time$</includeOnlyProperty>
-                        <includeOnlyProperty>^git.commit.user.(email|name)$</includeOnlyProperty>
-                        <includeOnlyProperty>^git.branch$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.commit.user.email$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.commit.user.name$</includeOnlyProperty>
+                        <!-- 其他信息 -->
+                        <includeOnlyProperty>^git.dirty$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.local.branch$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.remote.origin.fetch$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.remote.origin.url$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.total.commit.count$</includeOnlyProperty>
                     </includeOnlyProperties>
                     <commitIdGenerationMode>full</commitIdGenerationMode>
                     <dateFormat>yyyy-MM-dd HH:mm:ss</dateFormat>
