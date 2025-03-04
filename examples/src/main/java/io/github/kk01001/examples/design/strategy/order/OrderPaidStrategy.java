@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.strategy.order;
+package io.github.kk01001.examples.design.strategy.order;
 
 import io.github.kk01001.design.pattern.strategy.IStrategy;
 import io.github.kk01001.design.pattern.strategy.annotation.Strategy;

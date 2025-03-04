@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.strategy.pay;
+package io.github.kk01001.examples.design.strategy.pay;
 
 import io.github.kk01001.design.pattern.strategy.StrategyFactory;
 import jakarta.annotation.Resource;

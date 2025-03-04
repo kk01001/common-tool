@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.strategy.pay;
+package io.github.kk01001.examples.design.strategy.pay;
 
 public enum PayTypeEnum {
     ALIPAY,

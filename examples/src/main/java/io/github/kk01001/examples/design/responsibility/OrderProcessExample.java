@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.responsibility;
+package io.github.kk01001.examples.design.responsibility;
 
 import io.github.kk01001.design.pattern.responsibility.ResponsibilityChain;
 import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainContext;

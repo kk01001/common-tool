@@ -1,10 +1,16 @@
-package io.github.kk01001.examples.responsibility;
+package io.github.kk01001.examples.design.responsibility;
 
 import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainContext;
 import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainFactory;
 import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 订单处理责任链控制器
