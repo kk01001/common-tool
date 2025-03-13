@@ -45,6 +45,11 @@ public class JavaScriptExecutor implements ScriptExecutor {
     }
 
     @Override
+    public Object executeMethod(String script, String methodName, Map<String, Object> params) {
+        return null;
+    }
+
+    @Override
     public Object compile(String script) {
         try {
             return context.parse("js", script);
@@ -66,6 +71,11 @@ public class JavaScriptExecutor implements ScriptExecutor {
             log.error("JavaScript execution failed", e);
             throw new ScriptExecuteException("JavaScript execution failed", e);
         }
+    }
+
+    @Override
+    public Object executeCompiledMethod(Object compiledScript, String methodName, Map<String, Object> params) {
+        return null;
     }
 
     @Override

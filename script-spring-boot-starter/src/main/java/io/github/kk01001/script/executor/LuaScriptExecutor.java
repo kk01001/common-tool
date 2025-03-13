@@ -45,6 +45,11 @@ public class LuaScriptExecutor implements ScriptExecutor {
     }
 
     @Override
+    public Object executeMethod(String script, String methodName, Map<String, Object> params) {
+        return null;
+    }
+
+    @Override
     public Object executeCompiled(Object compiledScript, Map<String, Object> params) {
         try {
             // 设置全局变量
@@ -58,5 +63,10 @@ public class LuaScriptExecutor implements ScriptExecutor {
             log.error("Lua script execution failed", e);
             throw new ScriptExecuteException("Lua script execution failed", e);
         }
+    }
+
+    @Override
+    public Object executeCompiledMethod(Object compiledScript, String methodName, Map<String, Object> params) {
+        return null;
     }
 }

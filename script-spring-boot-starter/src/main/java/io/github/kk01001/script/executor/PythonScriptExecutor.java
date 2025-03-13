@@ -35,6 +35,11 @@ public class PythonScriptExecutor implements ScriptExecutor {
     }
 
     @Override
+    public Object executeMethod(String script, String methodName, Map<String, Object> params) {
+        return null;
+    }
+
+    @Override
     public PyObject compile(String script) {
         try {
             return interpreter.compile(script);
@@ -55,6 +60,11 @@ public class PythonScriptExecutor implements ScriptExecutor {
             log.error("Python script execution failed", e);
             throw new ScriptExecuteException("Python script execution failed", e);
         }
+    }
+
+    @Override
+    public Object executeCompiledMethod(Object compiledScript, String methodName, Map<String, Object> params) {
+        return null;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package io.github.kk01001.script.executor;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.ClassLoaderUtil;
 import cn.hutool.core.util.StrUtil;
 import io.github.kk01001.script.enums.ScriptType;
 import io.github.kk01001.script.exception.ScriptCompileException;
@@ -9,12 +8,16 @@ import io.github.kk01001.script.exception.ScriptExecuteException;
 import io.github.kk01001.script.exception.ScriptValidateException;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.tools.*;
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -43,6 +46,11 @@ public class JavaExecutor implements ScriptExecutor {
     public Object execute(String script, Map<String, Object> params) {
         Object compiledScript = compile(script);
         return executeCompiled(compiledScript, params);
+    }
+
+    @Override
+    public Object executeMethod(String script, String methodName, Map<String, Object> params) {
+        return null;
     }
 
     @Override
@@ -115,6 +123,11 @@ public class JavaExecutor implements ScriptExecutor {
         }
     }
 
+    @Override
+    public Object executeCompiledMethod(Object compiledScript, String methodName, Map<String, Object> params) {
+        return null;
+    }
+    
     private String extractClassName(String script) {
         // 简单的类名提取，可以根据需要改进
         String[] lines = script.split("\n");

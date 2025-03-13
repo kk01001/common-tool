@@ -1,14 +1,19 @@
 package io.github.kk01001.script.service;
 
+import cn.hutool.crypto.SecureUtil;
 import io.github.kk01001.script.cache.ScriptCache;
 import io.github.kk01001.script.enums.ScriptType;
-import io.github.kk01001.script.executor.ScriptExecutor;
 import io.github.kk01001.script.exception.ScriptValidateException;
+import io.github.kk01001.script.executor.ScriptExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author kk01001
@@ -17,10 +22,19 @@ import java.util.Optional;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class ScriptService {
-    private final Map<ScriptType, ScriptExecutor> executors;
-    private final ScriptCache scriptCache;
-    
+public class ScriptService implements CommandLineRunner {
+
+    private final static Map<ScriptType, ScriptExecutor> EXECUTOR_MAP = new HashMap<>();
+
+    private final List<ScriptExecutor> executors;
+
+    @Override
+    public void run(String... args) {
+        executors.forEach(executor -> {
+            EXECUTOR_MAP.put(executor.getType(), executor);
+        });
+    }
+
     /**
      * 执行脚本
      *
@@ -31,39 +45,33 @@ public class ScriptService {
      * @return 执行结果
      */
     public Object execute(String scriptId, ScriptType type, String script, Map<String, Object> params) {
-        ScriptExecutor executor = executors.get(type);
-        if (executor == null) {
-            throw new IllegalArgumentException("Unsupported script type: " + type);
-        }
+        ScriptExecutor executor = getExecutor(type);
 
-        Optional<ScriptCache.CachedScript> cachedScript = scriptCache.get(scriptId);
-        if (cachedScript.isPresent() && script.equals(cachedScript.get().getScriptContent())) {
+        Optional<ScriptCache.CachedScript> cachedScript = ScriptCache.get(scriptId);
+        if (cachedScript.isPresent() && SecureUtil.md5(script).equals(cachedScript.get().getMd5())) {
             return executor.executeCompiled(cachedScript.get().getCompiledScript(), params);
         }
 
         Object compiledScript = executor.compile(script);
-        scriptCache.put(scriptId, script, compiledScript, type);
+        ScriptCache.put(scriptId, script, compiledScript, type);
         return executor.executeCompiled(compiledScript, params);
     }
-    
+
     /**
      * 刷新脚本
      */
     public void refresh(String scriptId, ScriptType type, String script) {
-        ScriptExecutor executor = executors.get(type);
-        if (executor == null) {
-            throw new IllegalArgumentException("Unsupported script type: " + type);
-        }
-        
+        ScriptExecutor executor = getExecutor(type);
+
         Object compiledScript = executor.compile(script);
-        scriptCache.put(scriptId, script, compiledScript, type);
+        ScriptCache.put(scriptId, script, compiledScript, type);
     }
-    
+
     /**
      * 移除脚本
      */
     public void remove(String scriptId) {
-        scriptCache.remove(scriptId);
+        ScriptCache.remove(scriptId);
     }
 
     /**
@@ -74,10 +82,44 @@ public class ScriptService {
      * @throws ScriptValidateException 校验失败时抛出异常
      */
     public void validate(ScriptType type, String script) throws ScriptValidateException {
-        ScriptExecutor executor = executors.get(type);
+        ScriptExecutor executor = getExecutor(type);
+        executor.validate(script);
+    }
+
+    /**
+     * 添加脚本执行器
+     *
+     * @param executor 脚本执行器
+     */
+    public void addExecutor(ScriptExecutor executor) {
+        if (executor == null) {
+            throw new IllegalArgumentException("Executor cannot be null");
+        }
+        EXECUTOR_MAP.put(executor.getType(), executor);
+        log.info("Added script executor for type: {}", executor.getType());
+    }
+
+    /**
+     * 获取脚本执行器
+     *
+     * @param type 脚本类型
+     * @return 脚本执行器
+     */
+    public ScriptExecutor getExecutor(ScriptType type) {
+        ScriptExecutor executor = EXECUTOR_MAP.get(type);
         if (executor == null) {
             throw new IllegalArgumentException("Unsupported script type: " + type);
         }
-        executor.validate(script);
+        return executor;
     }
-} 
+
+    /**
+     * 获取所有支持的脚本类型
+     *
+     * @return 支持的脚本类型集合
+     */
+    public Set<ScriptType> getSupportedTypes() {
+        return EXECUTOR_MAP.keySet();
+    }
+
+}

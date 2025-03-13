@@ -5,7 +5,13 @@ import io.github.kk01001.script.enums.ScriptType;
 import io.github.kk01001.script.service.ScriptService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,8 +48,8 @@ public class ScriptTestController {
     @PostMapping("/groovy")
     public Object executeGroovy(@RequestParam String scriptId, @RequestBody String script) {
         Map<String, Object> params = new HashMap<>();
-        params.put("name", "World");
-        params.put("timestamp", System.currentTimeMillis());
+        params.put("phoneNumber", "13023828639");
+        params.put("content", "hello");
 
         return scriptService.execute(scriptId, ScriptType.GROOVY, script, params);
     }

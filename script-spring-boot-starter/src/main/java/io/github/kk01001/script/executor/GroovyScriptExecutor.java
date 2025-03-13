@@ -1,6 +1,5 @@
 package io.github.kk01001.script.executor;
 
-import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 import io.github.kk01001.script.enums.ScriptType;
@@ -33,8 +32,13 @@ public class GroovyScriptExecutor implements ScriptExecutor {
 
     @Override
     public Object execute(String script, Map<String, Object> params) {
+        return executeMethod(script, "execute", params);
+    }
+
+    @Override
+    public Object executeMethod(String script, String methodName, Map<String, Object> params) {
         Script compiledScript = compile(script);
-        return executeCompiled(compiledScript, params);
+        return executeCompiledMethod(compiledScript, methodName, params);
     }
 
     @Override
@@ -49,14 +53,17 @@ public class GroovyScriptExecutor implements ScriptExecutor {
 
     @Override
     public Object executeCompiled(Object compiledScript, Map<String, Object> params) {
+        return executeCompiledMethod(compiledScript, "execute", params);
+    }
+
+    @Override
+    public Object executeCompiledMethod(Object compiledScript, String methodName, Map<String, Object> params) {
         try {
             Script script = (Script) compiledScript;
-            Binding binding = new Binding(params);
-            script.setBinding(binding);
-            return script.run();
+            return script.invokeMethod(methodName, new Object[]{params});
         } catch (Exception e) {
             log.error("Groovy script execution failed", e);
             throw new ScriptExecuteException("Groovy script execution failed", e);
         }
     }
-} 
+}
