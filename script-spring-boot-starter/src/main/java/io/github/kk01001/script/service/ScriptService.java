@@ -1,5 +1,6 @@
 package io.github.kk01001.script.service;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import io.github.kk01001.script.cache.ScriptCache;
 import io.github.kk01001.script.enums.ScriptType;
@@ -45,15 +46,35 @@ public class ScriptService implements CommandLineRunner {
      * @return 执行结果
      */
     public Object execute(String scriptId, ScriptType type, String script, Map<String, Object> params) {
+        return executeMethod(scriptId, type, script, null, params);
+    }
+
+    /**
+     * 执行脚本
+     *
+     * @param scriptId   脚本ID
+     * @param type       脚本类型
+     * @param script     脚本内容
+     * @param methodName 方法名
+     * @param params     参数
+     * @return 执行结果
+     */
+    public Object executeMethod(String scriptId, ScriptType type, String script, String methodName, Map<String, Object> params) {
         ScriptExecutor executor = getExecutor(type);
 
         Optional<ScriptCache.CachedScript> cachedScript = ScriptCache.get(scriptId);
         if (cachedScript.isPresent() && SecureUtil.md5(script).equals(cachedScript.get().getMd5())) {
+            if (StrUtil.isNotBlank(methodName)) {
+                return executor.executeCompiledMethod(cachedScript.get().getCompiledScript(), methodName, params);
+            }
             return executor.executeCompiled(cachedScript.get().getCompiledScript(), params);
         }
 
         Object compiledScript = executor.compile(script);
         ScriptCache.put(scriptId, script, compiledScript, type);
+        if (StrUtil.isNotBlank(methodName)) {
+            return executor.executeCompiledMethod(compiledScript, methodName, params);
+        }
         return executor.executeCompiled(compiledScript, params);
     }
 
