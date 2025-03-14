@@ -94,12 +94,14 @@ public class ScriptTestController {
      * 测试执行Lua脚本
      */
     @PostMapping("/lua")
-    public Object executeLua(@RequestParam String scriptId, @RequestBody String script) {
+    public Object executeLua(@RequestParam String scriptId,
+                             @RequestParam String methodName,
+                             @RequestBody String script) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", "World");
         params.put("timestamp", System.currentTimeMillis());
 
-        return scriptService.execute(scriptId, ScriptType.LUA, script, params);
+        return scriptService.executeMethod(scriptId, ScriptType.LUA, script, methodName, params);
     }
 
     /**

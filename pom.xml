@@ -65,6 +65,9 @@
         <fastjson.version>1.2.83</fastjson.version>
         <mybatis.version>3.5.19</mybatis.version>
         <groovy.version>4.0.25</groovy.version>
+        <nashorn.version>15.4</nashorn.version>
+        <luaj.version>3.0.1</luaj.version>
+        <graalvm.version>22.3.0</graalvm.version>
     </properties>
 
     <dependencyManagement>
@@ -199,6 +202,12 @@
                 <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
                 <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.luaj</groupId>
+                <artifactId>luaj-jse</artifactId>
+                <version>${luaj.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

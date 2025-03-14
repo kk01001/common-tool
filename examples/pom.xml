@@ -221,6 +221,11 @@
             <artifactId>design-pattern-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.luaj</groupId>
+            <artifactId>luaj-jse</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
