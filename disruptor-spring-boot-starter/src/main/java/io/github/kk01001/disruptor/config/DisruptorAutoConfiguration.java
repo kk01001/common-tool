@@ -12,6 +12,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Role;
+
+import static org.springframework.beans.factory.config.BeanDefinition.ROLE_INFRASTRUCTURE;
 
 /**
  * @author kk01001
@@ -21,7 +25,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties(DisruptorProperties.class)
 @ConditionalOnClass(Disruptor.class)
+@Role(ROLE_INFRASTRUCTURE)
 public class DisruptorAutoConfiguration {
+
+    @Bean
+    @ConditionalOnProperty(prefix = "disruptor", name = "enable-metrics", havingValue = "true")
+    public DisruptorMetrics disruptorMetrics(MeterRegistry meterRegistry) {
+        return new DisruptorMetrics(meterRegistry);
+    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -30,13 +41,8 @@ public class DisruptorAutoConfiguration {
     }
 
     @Bean
-    public DisruptorListenerProcessor disruptorListenerProcessor(DisruptorTemplate disruptorTemplate) {
+    public DisruptorListenerProcessor disruptorListenerProcessor(@Lazy DisruptorTemplate disruptorTemplate) {
         return new DisruptorListenerProcessor(disruptorTemplate);
     }
 
-    @Bean
-    @ConditionalOnProperty(prefix = "disruptor", name = "enable-metrics", havingValue = "true")
-    public DisruptorMetrics disruptorMetrics(MeterRegistry meterRegistry) {
-        return new DisruptorMetrics(meterRegistry);
-    }
 }

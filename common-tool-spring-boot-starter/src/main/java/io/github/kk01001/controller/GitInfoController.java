@@ -2,8 +2,8 @@ package io.github.kk01001.controller;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,15 +22,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GitInfoController {
 
-    @Value("classpath:git.properties")
-    private Resource gitResource;
+    private final ResourceLoader resourceLoader;
 
     private Map<String, String> gitPropertiesMap;
 
     @PostConstruct
     public void init() throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:git.properties");
+        if (!resource.exists()) {
+            return;
+        }
         Properties properties = new Properties();
-        properties.load(gitResource.getInputStream());
+        properties.load(resource.getInputStream());
         gitPropertiesMap = properties.entrySet().stream()
                 .collect(Collectors.toMap(
                         e -> String.valueOf(e.getKey()),
