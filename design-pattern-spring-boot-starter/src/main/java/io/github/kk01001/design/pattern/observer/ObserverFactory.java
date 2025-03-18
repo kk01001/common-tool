@@ -5,6 +5,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.NonNull;
 
@@ -15,8 +16,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author linshiqiang
- * @date 2025-03-03 09:58:00
+ * @author kk01001
+ * @date 2025-02-13 14:31:00
  * @description 观察者工厂，用于管理观察者和主题之间的关系
  */
 public class ObserverFactory implements ApplicationContextAware, InitializingBean {
@@ -25,7 +26,7 @@ public class ObserverFactory implements ApplicationContextAware, InitializingBea
      * 观察者缓存，key为主题名称，value为该主题下的所有观察者
      */
     private final Map<String, List<IObserver<?>>> observerCache = new ConcurrentHashMap<>();
-    
+
     private ApplicationContext applicationContext;
     
     @Override
@@ -46,10 +47,15 @@ public class ObserverFactory implements ApplicationContextAware, InitializingBea
                     if (annotation == null) {
                         return;
                     }
-                    
-                    String topic = annotation.topic();
+
                     IObserver<?> observer = (IObserver<?>) bean;
-                    
+
+                    // 获取观察者的泛型类型
+                    Class<?>[] genericTypes = GenericTypeResolver.resolveTypeArguments(bean.getClass(), IObserver.class);
+                    if (genericTypes == null || genericTypes.length == 0) {
+                        throw new IllegalArgumentException("Observer " + observer.getName() + " generic type not found");
+                    }
+                    String topic = getTopicName(annotation, genericTypes[0]);
                     // 将观察者添加到对应的主题组
                     observerCache.computeIfAbsent(topic, k -> new ArrayList<>())
                             .add(observer);
@@ -58,7 +64,14 @@ public class ObserverFactory implements ApplicationContextAware, InitializingBea
                     observerCache.get(topic).sort(Comparator.comparingInt(IObserver::getOrder));
                 });
     }
-    
+
+    private String getTopicName(Observer annotation, Class<?> beanClass) {
+        if (annotation != null && !annotation.topic().isEmpty()) {
+            return annotation.topic();
+        }
+        return beanClass.getSimpleName();
+    }
+
     /**
      * 获取指定主题下的所有观察者
      *
@@ -90,5 +103,15 @@ public class ObserverFactory implements ApplicationContextAware, InitializingBea
                 throw new RuntimeException("Observer " + observer.getName() + " update error", e);
             }
         });
+    }
+
+    /**
+     * 通知指定主题的所有观察者（使用ITopic接口）
+     *
+     * @param data 实现了ITopic接口的通知数据
+     * @param <T>  数据类型
+     */
+    public <T extends Subject> void notifyObservers(T data) {
+        notifyObservers(data.getTopic(), data);
     }
 }

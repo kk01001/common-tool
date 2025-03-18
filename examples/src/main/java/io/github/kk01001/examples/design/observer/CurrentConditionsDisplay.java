@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@Observer(topic = "weather")
-public class CurrentConditionsDisplay implements IObserver<WeatherData> {
+@Observer
+public class CurrentConditionsDisplay implements IObserver<WeatherSubject> {
     private float temperature;
     private float humidity;
     private float pressure;
 
     @Override
-    public void onUpdate(WeatherData data) {
+    public void onUpdate(WeatherSubject data) {
         this.temperature = data.getTemperature();
         this.humidity = data.getHumidity();
         this.pressure = data.getPressure();

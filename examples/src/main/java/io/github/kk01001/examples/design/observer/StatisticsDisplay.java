@@ -12,15 +12,15 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@Observer(topic = "weather")
-public class StatisticsDisplay implements IObserver<WeatherData> {
+@Observer
+public class StatisticsDisplay implements IObserver<WeatherSubject> {
     private float maxTemp = Float.MIN_VALUE;
     private float minTemp = Float.MAX_VALUE;
     private float tempSum = 0.0f;
     private int numReadings = 0;
 
     @Override
-    public void onUpdate(WeatherData data) {
+    public void onUpdate(WeatherSubject data) {
         float temperature = data.getTemperature();
         tempSum += temperature;
         numReadings++;

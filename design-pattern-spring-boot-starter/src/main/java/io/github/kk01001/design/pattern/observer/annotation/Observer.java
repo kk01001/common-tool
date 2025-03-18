@@ -21,7 +21,7 @@ public @interface Observer {
      * 主题分组名称，用于将观察者与特定主题关联
      * @return 主题分组名称
      */
-    String topic();
+    String topic() default "";
     
     /**
      * 观察者优先级，数值越小优先级越高

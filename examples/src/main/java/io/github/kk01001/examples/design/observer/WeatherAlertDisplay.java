@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@Observer(topic = "weather")
-public class WeatherAlertDisplay implements IObserver<WeatherData> {
+@Observer
+public class WeatherAlertDisplay implements IObserver<WeatherSubject> {
 
     /**
      * 温度阈值（高温预警）
@@ -36,7 +36,7 @@ public class WeatherAlertDisplay implements IObserver<WeatherData> {
     private static final float LOW_HUMIDITY_THRESHOLD = 30.0f;
 
     @Override
-    public void onUpdate(WeatherData data) {
+    public void onUpdate(WeatherSubject data) {
         checkTemperature(data.getTemperature());
         checkHumidity(data.getHumidity());
     }
