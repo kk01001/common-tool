@@ -1,5 +1,6 @@
 package io.github.kk01001.design;
 
+import io.github.kk01001.design.pattern.observer.ObserverFactory;
 import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainFactory;
 import io.github.kk01001.design.pattern.strategy.StrategyFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -26,5 +27,10 @@ public class DesignPatternConfiguration {
     @Bean
     public StrategyFactory strategyFactory() {
         return new StrategyFactory();
+    }
+
+    @Bean
+    public ObserverFactory observerFactory() {
+        return new ObserverFactory();
     }
 }
