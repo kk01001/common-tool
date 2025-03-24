@@ -223,6 +223,12 @@
         </dependency>
 
         <dependency>
+            <groupId>io.github.kk01001</groupId>
+            <artifactId>local-cache-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.luaj</groupId>
             <artifactId>luaj-jse</artifactId>
         </dependency>

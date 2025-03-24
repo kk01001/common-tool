@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    io.github.kk01001.cache.config.LocalCacheConfiguration

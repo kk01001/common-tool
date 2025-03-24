@@ -9,8 +9,8 @@
         <version>2.4.6.2</version>
     </parent>
 
-    <artifactId>cache-spring-boot-starter</artifactId>
-    <description>封装 一级缓存(jvm) 二级缓存(redis) ; 实现CURD</description>
+    <artifactId>local-cache-spring-boot-starter</artifactId>
+    <description>本地缓存实现</description>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -21,31 +21,13 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
             <optional>true</optional>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
             <optional>true</optional>
         </dependency>
 
@@ -56,16 +38,19 @@
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
             <optional>true</optional>
         </dependency>
 
         <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <optional>true</optional>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
     </dependencies>
-
 </project>

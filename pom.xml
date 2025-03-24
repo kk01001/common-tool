@@ -35,6 +35,7 @@
         <module>script-spring-boot-starter</module>
         <module>dict-spring-boot-starter</module>
         <module>design-pattern-spring-boot-starter</module>
+        <module>local-cache-spring-boot-starter</module>
     </modules>
 
     <properties>
