@@ -254,6 +254,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <mainClass>io.github.kk01001.examples.ExampleApp</mainClass>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
