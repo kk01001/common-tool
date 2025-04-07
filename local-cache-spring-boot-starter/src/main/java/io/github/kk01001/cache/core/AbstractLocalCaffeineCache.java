@@ -3,6 +3,7 @@ package io.github.kk01001.cache.core;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -103,5 +104,9 @@ public abstract class AbstractLocalCaffeineCache<K, V> {
      */
     public long size() {
         return cache.estimatedSize();
+    }
+
+    public CacheStats stats() {
+        return cache.stats();
     }
 } 

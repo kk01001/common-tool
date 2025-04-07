@@ -1,5 +1,6 @@
 package io.github.kk01001.cache.factory;
 
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import io.github.kk01001.cache.core.AbstractLocalCaffeineCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -7,8 +8,8 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @description 本地缓存工厂
  */
 @Slf4j
-@Component
 public class LocalCaffeineCacheFactory implements BeanFactoryPostProcessor, ApplicationContextAware {
 
     private static ApplicationContext applicationContext;
@@ -69,15 +69,36 @@ public class LocalCaffeineCacheFactory implements BeanFactoryPostProcessor, Appl
 
     /**
      * 获取缓存统计信息
+     *
+     * @return 返回包含各缓存实例统计信息的Map
      */
-    public static String getCacheStats() {
-        StringBuilder stats = new StringBuilder();
+    public static Map<String, Map<String, Object>> getCacheStats() {
+        Map<String, Map<String, Object>> statsMap = new HashMap<>();
+
         CACHE_INSTANCES.forEach((clazz, cache) -> {
-            stats.append(clazz.getSimpleName())
-                    .append(": size=")
-                    .append(cache.size())
-                    .append("\n");
+            Map<String, Object> cacheStats = new HashMap<>();
+            // 基本信息
+            cacheStats.put("size", cache.size());
+            // 获取命中率等信息
+            CacheStats stats = cache.stats();
+            if (stats != null) {
+                cacheStats.put("hitCount", stats.hitCount());
+                cacheStats.put("missCount", stats.missCount());
+                cacheStats.put("hitRate", String.format("%.2f%%", stats.hitRate() * 100));
+                cacheStats.put("missRate", String.format("%.2f%%", stats.missRate() * 100));
+                cacheStats.put("evictionCount", stats.evictionCount());
+                cacheStats.put("loadSuccessCount", stats.loadSuccessCount());
+                cacheStats.put("loadFailureCount", stats.loadFailureCount());
+                cacheStats.put("totalLoadTime", stats.totalLoadTime());
+                cacheStats.put("averageLoadPenalty", stats.averageLoadPenalty());
+                cacheStats.put("loadFailureRate", String.format("%.2f%%", stats.loadFailureRate() * 100));
+                cacheStats.put("requestCount", stats.requestCount());
+                cacheStats.put("evictionWeight", stats.evictionWeight());
+            }
+
+            statsMap.put(clazz.getSimpleName(), cacheStats);
         });
-        return stats.toString();
+
+        return statsMap;
     }
 } 
