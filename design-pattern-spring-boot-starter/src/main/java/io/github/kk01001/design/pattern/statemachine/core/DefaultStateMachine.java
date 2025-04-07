@@ -35,7 +35,12 @@ public class DefaultStateMachine<S, E, C> implements StateMachine<S, E, C> {
 
     @Override
     public void start(String machineId, C context) {
-        statePersister.write(context, initialState);
+        statePersister.write(this.machineName, machineId, context, initialState);
+    }
+
+    @Override
+    public void stop(String machineId, C context) {
+        statePersister.remove(this.machineName, machineId, context);
     }
 
     /**
@@ -48,29 +53,28 @@ public class DefaultStateMachine<S, E, C> implements StateMachine<S, E, C> {
     }
 
     @Override
-    public S sendEvent(E event, C context) {
+    public S sendEvent(String machineId, E event, C context) {
         Assert.notNull(event, "Event must not be null");
         Assert.notNull(context, "Context must not be null");
 
         // 获取当前状态
-        S currentState = getCurrentState(context);
+        S currentState = getCurrentState(this.machineName, context);
         if (currentState == null) {
             currentState = initialState;
-            statePersister.write(context, currentState);
+            statePersister.write(this.machineName, machineId, context, currentState);
         }
 
         // 查找匹配的处理器
         final S state = currentState;
         Optional<StateTransitionHandler<S, E, C>> handler = handlers.stream()
-                .filter(h -> h.getSourceState().equals(state)
-                        && h.getEvent().equals(event))
+                .filter(h -> h.getSourceState().equals(state) && h.getEvent().equals(event))
                 .findFirst();
 
         if (handler.isPresent()) {
             // 执行状态转换
             S newState = handler.get().handleTransition(state, event, context);
             // 持久化新状态
-            statePersister.write(context, newState);
+            statePersister.write(this.machineName, machineId, context, newState);
             return newState;
         }
 
@@ -78,9 +82,9 @@ public class DefaultStateMachine<S, E, C> implements StateMachine<S, E, C> {
     }
 
     @Override
-    public S getCurrentState(C context) {
+    public S getCurrentState(String machineId, C context) {
         Assert.notNull(context, "Context must not be null");
-        return statePersister.read(context);
+        return statePersister.read(this.machineName, machineId, context);
     }
 
     @Override

@@ -16,6 +16,14 @@ public interface StateMachine<S, E, C> {
     void start(String machineId, C context);
 
     /**
+     * 停止状态机
+     *
+     * @param machineId 状态机唯一标识
+     * @param context   上下文
+     */
+    void stop(String machineId, C context);
+
+    /**
      * 添加状态转换处理器
      *
      * @param handler 状态转换处理器
@@ -29,7 +37,7 @@ public interface StateMachine<S, E, C> {
      * @param context 上下文
      * @return 最终状态
      */
-    S sendEvent(E event, C context);
+    S sendEvent(String machineId, E event, C context);
 
     /**
      * 获取当前状态
@@ -37,7 +45,7 @@ public interface StateMachine<S, E, C> {
      * @param context 上下文
      * @return 当前状态
      */
-    S getCurrentState(C context);
+    S getCurrentState(String machineId, C context);
 
     /**
      * 获取状态机名称

@@ -42,7 +42,7 @@ public class StateMachineOrderController {
     public OrderState payOrder(@PathVariable String orderId) {
         OrderContext context = new OrderContext(orderId);
         StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
-        return stateMachine.sendEvent(OrderEvent.PAY, context);
+        return stateMachine.sendEvent(orderId, OrderEvent.PAY, context);
     }
 
     /**
@@ -52,7 +52,7 @@ public class StateMachineOrderController {
     public OrderState shipOrder(@PathVariable String orderId) {
         OrderContext context = new OrderContext(orderId);
         StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
-        return stateMachine.sendEvent(OrderEvent.SHIP, context);
+        return stateMachine.sendEvent(orderId, OrderEvent.SHIP, context);
     }
 
     /**
@@ -62,7 +62,7 @@ public class StateMachineOrderController {
     public OrderState confirmOrder(@PathVariable String orderId) {
         OrderContext context = new OrderContext(orderId);
         StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
-        return stateMachine.sendEvent(OrderEvent.CONFIRM, context);
+        return stateMachine.sendEvent(orderId, OrderEvent.CONFIRM, context);
     }
 
     /**
@@ -72,7 +72,7 @@ public class StateMachineOrderController {
     public OrderState cancelOrder(@PathVariable String orderId) {
         OrderContext context = new OrderContext(orderId);
         StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
-        return stateMachine.sendEvent(OrderEvent.CANCEL, context);
+        return stateMachine.sendEvent(orderId, OrderEvent.CANCEL, context);
     }
 
     /**
@@ -82,6 +82,16 @@ public class StateMachineOrderController {
     public OrderState getOrderState(@PathVariable String orderId) {
         OrderContext context = new OrderContext(orderId);
         StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
-        return stateMachine.getCurrentState(context);
+        return stateMachine.getCurrentState("orderStateMachine", context);
+    }
+
+    /**
+     * 结束订单
+     */
+    @GetMapping("/{orderId}/stop")
+    public void stop(@PathVariable String orderId) {
+        OrderContext context = new OrderContext(orderId);
+        StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
+        stateMachine.stop("orderStateMachine", context);
     }
 } 

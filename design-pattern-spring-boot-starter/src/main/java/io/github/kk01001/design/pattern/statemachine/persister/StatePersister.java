@@ -13,7 +13,7 @@ public interface StatePersister<S, C> {
      * @param context 上下文
      * @param state   状态
      */
-    void write(C context, S state);
+    void write(String machineName, String machineId, C context, S state);
 
     /**
      * 读取状态
@@ -21,5 +21,13 @@ public interface StatePersister<S, C> {
      * @param context 上下文
      * @return 状态
      */
-    S read(C context);
+    S read(String machineName, String machineId, C context);
+
+    /**
+     * 删除状态
+     *
+     * @param machineName 状态机名称
+     * @param context     上下文
+     */
+    void remove(String machineName, String machineId, C context);
 } 

@@ -15,14 +15,14 @@ public class InMemoryStatePersister<S, C> implements StatePersister<S, C> {
     private final ConcurrentHashMap<String, S> stateMap = new ConcurrentHashMap<>();
 
     @Override
-    public void write(C context, S state) {
+    public void write(String machineName, String machineId, C context, S state) {
         if (context != null && state != null) {
             stateMap.put(context.toString(), state);
         }
     }
 
     @Override
-    public S read(C context) {
+    public S read(String machineName, String machineId, C context) {
         return context != null ? stateMap.get(context.toString()) : null;
     }
 
@@ -31,7 +31,8 @@ public class InMemoryStatePersister<S, C> implements StatePersister<S, C> {
      *
      * @param context 上下文
      */
-    public void remove(C context) {
+    @Override
+    public void remove(String machineName, String machineId, C context) {
         if (context != null) {
             stateMap.remove(context.toString());
         }
