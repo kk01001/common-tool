@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -24,6 +26,8 @@ public class StateMachineOrderController {
 
     private final StateMachineFactory stateMachineFactory;
 
+    private final Map<String, OrderContext> map = new HashMap<>();
+
     /**
      * 创建订单
      */
@@ -32,6 +36,9 @@ public class StateMachineOrderController {
         OrderContext context = new OrderContext(UUID.randomUUID().toString());
         context.setAmount(amount != null ? amount : 100.0);
         // 初始状态将自动设置为 CREATED
+        StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
+        stateMachine.start(context.getOrderId(), context);
+        map.put(context.getOrderId(), context);
         return context;
     }
 
@@ -40,7 +47,7 @@ public class StateMachineOrderController {
      */
     @PostMapping("/{orderId}/pay")
     public OrderState payOrder(@PathVariable String orderId) {
-        OrderContext context = new OrderContext(orderId);
+        OrderContext context = map.get(orderId);
         StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
         return stateMachine.sendEvent(orderId, OrderEvent.PAY, context);
     }
@@ -50,7 +57,7 @@ public class StateMachineOrderController {
      */
     @PostMapping("/{orderId}/ship")
     public OrderState shipOrder(@PathVariable String orderId) {
-        OrderContext context = new OrderContext(orderId);
+        OrderContext context = map.get(orderId);
         StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
         return stateMachine.sendEvent(orderId, OrderEvent.SHIP, context);
     }
@@ -60,7 +67,7 @@ public class StateMachineOrderController {
      */
     @PostMapping("/{orderId}/confirm")
     public OrderState confirmOrder(@PathVariable String orderId) {
-        OrderContext context = new OrderContext(orderId);
+        OrderContext context = map.get(orderId);
         StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
         return stateMachine.sendEvent(orderId, OrderEvent.CONFIRM, context);
     }
@@ -70,7 +77,7 @@ public class StateMachineOrderController {
      */
     @PostMapping("/{orderId}/cancel")
     public OrderState cancelOrder(@PathVariable String orderId) {
-        OrderContext context = new OrderContext(orderId);
+        OrderContext context = map.get(orderId);
         StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
         return stateMachine.sendEvent(orderId, OrderEvent.CANCEL, context);
     }
@@ -80,7 +87,7 @@ public class StateMachineOrderController {
      */
     @GetMapping("/{orderId}/state")
     public OrderState getOrderState(@PathVariable String orderId) {
-        OrderContext context = new OrderContext(orderId);
+        OrderContext context = map.get(orderId);
         StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
         return stateMachine.getCurrentState("orderStateMachine", context);
     }
@@ -90,8 +97,9 @@ public class StateMachineOrderController {
      */
     @GetMapping("/{orderId}/stop")
     public void stop(@PathVariable String orderId) {
-        OrderContext context = new OrderContext(orderId);
+        OrderContext context = map.get(orderId);
         StateMachine<OrderState, OrderEvent, OrderContext> stateMachine = stateMachineFactory.getStateMachine(StateMachineOrderStateService.class);
         stateMachine.stop("orderStateMachine", context);
+        map.remove(orderId);
     }
 } 

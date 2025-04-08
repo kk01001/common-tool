@@ -2,6 +2,7 @@ package io.github.kk01001.examples.design.statemachine;
 
 import io.github.kk01001.design.pattern.statemachine.annotations.StateMachineDefinition;
 import io.github.kk01001.design.pattern.statemachine.annotations.StateTransition;
+import io.github.kk01001.design.pattern.statemachine.annotations.TransitionGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ public class StateMachineOrderStateService {
 
     private static final Logger logger = LoggerFactory.getLogger(StateMachineOrderStateService.class);
 
+    @TransitionGuard(OrderAmountTransitionGuard.class)
     @StateTransition(source = "CREATED", target = "PAID", event = "PAY")
     public OrderState handlePayment(OrderState from, OrderEvent event, OrderContext context) {
         logger.info("订单[{}]支付完成", context.getOrderId());
@@ -35,6 +37,7 @@ public class StateMachineOrderStateService {
         return OrderState.FINISHED;
     }
 
+    @TransitionGuard(OrderAmountTransitionGuard.class)
     @StateTransition(source = "CREATED", target = "CANCELLED", event = "CANCEL")
     public OrderState handleCancelFromCreated(OrderState from, OrderEvent event, OrderContext context) {
         logger.info("未支付订单[{}]已取消", context.getOrderId());

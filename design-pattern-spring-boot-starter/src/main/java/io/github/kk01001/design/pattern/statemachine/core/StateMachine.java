@@ -33,8 +33,9 @@ public interface StateMachine<S, E, C> {
     /**
      * 发送事件
      *
-     * @param event   事件
-     * @param context 上下文
+     * @param machineId 状态机唯一标识
+     * @param event     事件
+     * @param context   上下文
      * @return 最终状态
      */
     S sendEvent(String machineId, E event, C context);
@@ -42,7 +43,8 @@ public interface StateMachine<S, E, C> {
     /**
      * 获取当前状态
      *
-     * @param context 上下文
+     * @param machineId 状态机唯一标识
+     * @param context   上下文
      * @return 当前状态
      */
     S getCurrentState(String machineId, C context);
