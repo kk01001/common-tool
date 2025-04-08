@@ -55,5 +55,4 @@ public interface StateMachine<S, E, C> {
      * @return 状态机名称
      */
     String getMachineName();
-
 }

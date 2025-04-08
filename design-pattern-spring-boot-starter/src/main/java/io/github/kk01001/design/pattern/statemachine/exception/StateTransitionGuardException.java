@@ -1,4 +1,4 @@
-package io.github.kk01001.design.pattern.statemachine.guard;
+package io.github.kk01001.design.pattern.statemachine.exception;
 
 import lombok.Getter;
 

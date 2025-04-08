@@ -1,6 +1,9 @@
 package io.github.kk01001.design.pattern.statemachine.core;
 
-import io.github.kk01001.design.pattern.statemachine.guard.StateTransitionGuardException;
+import cn.hutool.extra.spring.SpringUtil;
+import io.github.kk01001.design.pattern.statemachine.exception.StateMachineException;
+import io.github.kk01001.design.pattern.statemachine.exception.StateTransitionGuardException;
+import io.github.kk01001.design.pattern.statemachine.history.StateTransitionEvent;
 import io.github.kk01001.design.pattern.statemachine.persister.StatePersister;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
@@ -50,6 +53,9 @@ public class DefaultStateMachine<S, E, C> implements StateMachine<S, E, C> {
         if (currentState == null) {
             statePersister.write(machineName, machineId, context, initialState);
             log.info("[{}][{}] 初始化状态: {}", machineName, machineId, initialState);
+
+            // 发布初始状态事件
+            publishInitialStateEvent(machineId, context, initialState);
         }
     }
 
@@ -89,8 +95,7 @@ public class DefaultStateMachine<S, E, C> implements StateMachine<S, E, C> {
             // 获取当前状态
             S currentState = getCurrentState(machineId, context);
             if (currentState == null) {
-                currentState = initialState;
-                statePersister.write(machineName, machineId, context, currentState);
+                throw new StateMachineException(machineName, machineId, "状态机未启动");
             }
 
             log.info("[{}][{}] 接收事件: {}, 当前状态: {}", machineName, machineId, event, currentState);
@@ -110,6 +115,9 @@ public class DefaultStateMachine<S, E, C> implements StateMachine<S, E, C> {
                     log.warn("[{}][{}] 状态转换被守卫拒绝: {} -> {} [{}], 原因: {}",
                             machineName, machineId, state, handler.getTargetState(), event, reason);
 
+                    // 发布状态转换失败事件
+                    publishTransitionFailureEvent(machineId, context, state, event, reason);
+
                     throw new StateTransitionGuardException(
                             reason, machineId, machineName, state, event);
                 }
@@ -120,6 +128,9 @@ public class DefaultStateMachine<S, E, C> implements StateMachine<S, E, C> {
                     // 持久化新状态
                     statePersister.write(machineName, machineId, context, newState);
 
+                    // 发布状态转换成功事件
+                    publishTransitionSuccessEvent(machineId, context, state, newState, event);
+
                     log.info("[{}][{}] 状态转换成功: {} -> {} [{}]",
                             machineName, machineId, state, newState, event);
 
@@ -127,13 +138,18 @@ public class DefaultStateMachine<S, E, C> implements StateMachine<S, E, C> {
                 } catch (Exception e) {
                     log.error("[{}][{}] 状态转换异常: {} -> {} [{}]",
                             machineName, machineId, state, handler.getTargetState(), event, e);
-                    throw e;
+
+                    // 发布状态转换失败事件
+                    publishTransitionFailureEvent(machineId, context, state, event, e.getMessage());
+                    throw new StateMachineException(machineName, machineId, "状态转换异常", e);
                 }
             }
             log.warn("[{}][{}] 未找到匹配的状态转换处理器: {} [{}]",
                     machineName, machineId, state, event);
 
-            return currentState;
+            // 发布状态转换失败事件
+            publishTransitionFailureEvent(machineId, context, state, event, "未找到匹配的状态转换处理器");
+            throw new StateMachineException(machineName, machineId, currentState, event, "未找到匹配的状态转换处理器");
         } finally {
             lock.unlock();
         }
@@ -149,5 +165,32 @@ public class DefaultStateMachine<S, E, C> implements StateMachine<S, E, C> {
     @Override
     public String getMachineName() {
         return machineName;
+    }
+
+    /**
+     * 发布初始状态事件
+     */
+    private void publishInitialStateEvent(String machineId, C context, S initialState) {
+        StateTransitionEvent<S, E, C> event = new StateTransitionEvent<>(
+                this, machineName, machineId, context, initialState, null, null);
+        SpringUtil.publishEvent(event);
+    }
+
+    /**
+     * 发布状态转换成功事件
+     */
+    private void publishTransitionSuccessEvent(String machineId, C context, S sourceState, S targetState, E event) {
+        StateTransitionEvent<S, E, C> transitionEvent = new StateTransitionEvent<>(
+                this, machineName, machineId, context, sourceState, targetState, event);
+        SpringUtil.publishEvent(transitionEvent);
+    }
+
+    /**
+     * 发布状态转换失败事件
+     */
+    private void publishTransitionFailureEvent(String machineId, C context, S sourceState, E event, String reason) {
+        StateTransitionEvent<S, E, C> transitionEvent = new StateTransitionEvent<>(
+                this, machineName, machineId, context, sourceState, event, reason);
+        SpringUtil.publishEvent(transitionEvent);
     }
 } 
