@@ -1,9 +1,10 @@
 package io.github.kk01001.design.pattern.statemachine.core;
 
 import cn.hutool.extra.spring.SpringUtil;
+import io.github.kk01001.design.pattern.statemachine.event.StateTransitionEvent;
+import io.github.kk01001.design.pattern.statemachine.event.StateTransitionEventType;
 import io.github.kk01001.design.pattern.statemachine.exception.StateMachineException;
 import io.github.kk01001.design.pattern.statemachine.exception.StateTransitionGuardException;
-import io.github.kk01001.design.pattern.statemachine.history.StateTransitionEvent;
 import io.github.kk01001.design.pattern.statemachine.persister.StatePersister;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
@@ -66,6 +67,9 @@ public class DefaultStateMachine<S, E, C> implements StateMachine<S, E, C> {
 
         log.info("[{}][{}] 状态机停止", machineName, machineId);
         statePersister.remove(machineName, machineId, context);
+
+        // 发布初始状态事件
+        publishStateMachineDestroyedEvent(machineId, context);
     }
 
     /**
@@ -171,26 +175,56 @@ public class DefaultStateMachine<S, E, C> implements StateMachine<S, E, C> {
      * 发布初始状态事件
      */
     private void publishInitialStateEvent(String machineId, C context, S initialState) {
-        StateTransitionEvent<S, E, C> event = new StateTransitionEvent<>(
-                this, machineName, machineId, context, initialState, null, null);
-        SpringUtil.publishEvent(event);
+        try {
+            StateTransitionEvent<S, E, C> event = new StateTransitionEvent<>(
+                    this, machineName, machineId, context, initialState, null, null,
+                    StateTransitionEventType.STATE_INITIALIZED);
+            SpringUtil.publishEvent(event);
+        } catch (Exception e) {
+            log.debug("发布初始状态事件失败", e);
+        }
+    }
+
+    /**
+     * 发布状态转换销毁事件
+     */
+    private void publishStateMachineDestroyedEvent(String machineId, C context) {
+        try {
+            StateTransitionEvent<S, E, C> event = new StateTransitionEvent<>(
+                    this, machineName, machineId, context, null, null, null,
+                    StateTransitionEventType.STATE_DESTROYED);
+            SpringUtil.publishEvent(event);
+        } catch (Exception e) {
+            log.debug("发布状态转换销毁事件失败", e);
+        }
     }
 
     /**
      * 发布状态转换成功事件
      */
     private void publishTransitionSuccessEvent(String machineId, C context, S sourceState, S targetState, E event) {
-        StateTransitionEvent<S, E, C> transitionEvent = new StateTransitionEvent<>(
-                this, machineName, machineId, context, sourceState, targetState, event);
-        SpringUtil.publishEvent(transitionEvent);
+        try {
+            StateTransitionEvent<S, E, C> transitionEvent = new StateTransitionEvent<>(
+                    this, machineName, machineId, context, sourceState, targetState, event,
+                    StateTransitionEventType.TRANSITION_COMPLETED);
+            SpringUtil.publishEvent(transitionEvent);
+        } catch (Exception e) {
+            log.debug("发布状态转换成功事件失败", e);
+        }
     }
 
     /**
      * 发布状态转换失败事件
      */
     private void publishTransitionFailureEvent(String machineId, C context, S sourceState, E event, String reason) {
-        StateTransitionEvent<S, E, C> transitionEvent = new StateTransitionEvent<>(
-                this, machineName, machineId, context, sourceState, event, reason);
-        SpringUtil.publishEvent(transitionEvent);
+        try {
+            StateTransitionEvent<S, E, C> transitionEvent = new StateTransitionEvent<>(
+                    this, machineName, machineId, context, sourceState, event, reason,
+                    StateTransitionEventType.TRANSITION_FAILED);
+            SpringUtil.publishEvent(transitionEvent);
+        } catch (Exception e) {
+            log.debug("发布状态转换失败事件失败", e);
+        }
     }
-} 
+
+}

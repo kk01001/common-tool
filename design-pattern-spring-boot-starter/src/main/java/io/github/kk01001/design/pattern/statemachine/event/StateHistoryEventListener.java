@@ -1,5 +1,7 @@
-package io.github.kk01001.design.pattern.statemachine.history;
+package io.github.kk01001.design.pattern.statemachine.event;
 
+import io.github.kk01001.design.pattern.statemachine.history.StateHistoryRepository;
+import io.github.kk01001.design.pattern.statemachine.history.StateTransitionHistory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.event.EventListener;

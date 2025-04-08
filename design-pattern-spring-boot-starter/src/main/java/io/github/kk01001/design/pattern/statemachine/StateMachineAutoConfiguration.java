@@ -2,7 +2,7 @@ package io.github.kk01001.design.pattern.statemachine;
 
 import io.github.kk01001.design.pattern.statemachine.config.StateMachineProperties;
 import io.github.kk01001.design.pattern.statemachine.core.StateMachineBuilder;
-import io.github.kk01001.design.pattern.statemachine.history.StateHistoryEventListener;
+import io.github.kk01001.design.pattern.statemachine.event.StateHistoryEventListener;
 import io.github.kk01001.design.pattern.statemachine.history.StateHistoryRepository;
 import io.github.kk01001.design.pattern.statemachine.persister.InMemoryStatePersister;
 import io.github.kk01001.design.pattern.statemachine.persister.StatePersister;

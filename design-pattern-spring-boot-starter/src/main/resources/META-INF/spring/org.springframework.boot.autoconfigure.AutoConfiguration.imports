@@ -1,2 +1,3 @@
 io.github.kk01001.design.DesignPatternConfiguration
 io.github.kk01001.design.pattern.statemachine.StateMachineAutoConfiguration
+io.github.kk01001.design.pattern.statemachine.StateMachineMetricsAutoConfiguration

@@ -112,7 +112,7 @@ public class StateMachineFactory implements ApplicationContextAware, Initializin
             public S handleTransition(S from, E event, C context) {
                 try {
                     Object object = ReflectionUtils.invokeMethod(method, bean, from, event, context);
-                    return (S) Enum.valueOf((Class<? extends Enum>) stateType, (String) object);
+                    return (S) object;
                 } catch (Exception e) {
                     throw new RuntimeException("Error executing state transition", e);
                 }

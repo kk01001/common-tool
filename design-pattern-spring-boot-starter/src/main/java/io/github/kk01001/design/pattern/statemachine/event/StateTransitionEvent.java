@@ -1,4 +1,4 @@
-package io.github.kk01001.design.pattern.statemachine.history;
+package io.github.kk01001.design.pattern.statemachine.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
@@ -10,6 +10,11 @@ import org.springframework.context.ApplicationEvent;
  */
 @Getter
 public class StateTransitionEvent<S, E, C> extends ApplicationEvent {
+
+    /**
+     * 事件类型
+     */
+    private final StateTransitionEventType eventType;
 
     /**
      * 状态机名称
@@ -68,7 +73,8 @@ public class StateTransitionEvent<S, E, C> extends ApplicationEvent {
      * @param event       触发事件
      */
     public StateTransitionEvent(Object source, String machineName, String machineId,
-                                C context, S sourceState, S targetState, E event) {
+                                C context, S sourceState, S targetState, E event,
+                                StateTransitionEventType eventType) {
         super(source);
         this.machineName = machineName;
         this.machineId = machineId;
@@ -79,6 +85,7 @@ public class StateTransitionEvent<S, E, C> extends ApplicationEvent {
         this.success = true;
         this.failureReason = null;
         this.transitionTime = System.currentTimeMillis();
+        this.eventType = eventType;
     }
 
     /**
@@ -93,7 +100,8 @@ public class StateTransitionEvent<S, E, C> extends ApplicationEvent {
      * @param failureReason 失败原因
      */
     public StateTransitionEvent(Object source, String machineName, String machineId,
-                                C context, S sourceState, E event, String failureReason) {
+                                C context, S sourceState, E event, String failureReason,
+                                StateTransitionEventType eventType) {
         super(source);
         this.machineName = machineName;
         this.machineId = machineId;
@@ -104,6 +112,7 @@ public class StateTransitionEvent<S, E, C> extends ApplicationEvent {
         this.success = false;
         this.failureReason = failureReason;
         this.transitionTime = System.currentTimeMillis();
+        this.eventType = eventType;
     }
 
     @Override
