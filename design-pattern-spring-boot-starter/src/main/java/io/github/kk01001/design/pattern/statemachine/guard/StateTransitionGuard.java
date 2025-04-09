@@ -25,4 +25,5 @@ public interface StateTransitionGuard<S, E, C> {
     default String getRejectionReason() {
         return "状态转换条件不满足";
     }
-} 
+
+}

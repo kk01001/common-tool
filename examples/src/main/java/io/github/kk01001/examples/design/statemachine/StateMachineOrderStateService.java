@@ -18,7 +18,11 @@ public class StateMachineOrderStateService {
 
     private static final Logger logger = LoggerFactory.getLogger(StateMachineOrderStateService.class);
 
-    @TransitionGuard(OrderAmountTransitionGuard.class)
+    @TransitionGuard(spEL = {
+            "event == '2222'",
+            "context?.amount > 10",
+            "context.amount > 101"
+    })
     @StateTransition(source = "CREATED", target = "PAID", event = "PAY")
     public OrderState handlePayment(OrderState from, OrderEvent event, OrderContext context) {
         logger.info("订单[{}]支付完成", context.getOrderId());

@@ -14,9 +14,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.core.MethodIntrospector;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
@@ -36,12 +38,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class StateMachineFactory implements ApplicationContextAware, InitializingBean {
 
-    private ApplicationContext applicationContext;
     private final Map<String, StateMachine<?, ?, ?>> stateMachines = new ConcurrentHashMap<>();
 
+    private ApplicationContext applicationContext;
+    private BeanFactoryResolver beanFactoryResolver;
+
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+        this.beanFactoryResolver = new BeanFactoryResolver(applicationContext);
     }
 
     @Override
@@ -56,7 +61,7 @@ public class StateMachineFactory implements ApplicationContextAware, Initializin
         });
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private <S, E, C> void createAndRegisterStateMachine(StateMachineDefinition definition, Object bean) {
         String name = definition.name();
         Class<? extends Enum> stateClass = definition.stateClass();
@@ -98,17 +103,68 @@ public class StateMachineFactory implements ApplicationContextAware, Initializin
                                                      StateTransition annotation,
                                                      Object bean,
                                                      StateMachine<S, E, C> stateMachine) {
+
+        StateTransitionHandler<S, E, C> handler = getStateTransitionHandler(method, annotation, bean);
+
+        // 处理守卫条件注解
+        TransitionGuard guardAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, TransitionGuard.class);
+        if (guardAnnotation != null) {
+            if (guardAnnotation.value() != null) {
+                Arrays.stream(guardAnnotation.value()).forEach(guardClass -> {
+                    try {
+                        // 从Spring容器中获取守卫条件Bean
+                        StateTransitionGuard<S, E, C> guard = (StateTransitionGuard<S, E, C>)
+                                applicationContext.getBean(guardClass);
+                        handler.addGuard(guard);
+                        log.info("为转换 {} -> {} [{}] 添加守卫条件: {}",
+                                handler.getSourceState(), handler.getTargetState(),
+                                handler.getEvent(), guardClass.getSimpleName());
+                    } catch (BeansException e) {
+                        // 如果容器中没有，则创建新实例
+                        try {
+                            StateTransitionGuard<S, E, C> guard = (StateTransitionGuard<S, E, C>)
+                                    guardClass.getDeclaredConstructor().newInstance();
+                            handler.addGuard(guard);
+                            log.info("为转换 {} -> {} [{}] 添加守卫条件: {}",
+                                    handler.getSourceState(), handler.getTargetState(),
+                                    handler.getEvent(), guardClass.getSimpleName());
+                        } catch (Exception ex) {
+                            log.error("创建守卫条件实例失败: {}", guardClass.getName(), ex);
+                        }
+                    }
+                });
+            }
+
+            // 处理SpEL表达式守卫
+            if (guardAnnotation.spEL() != null) {
+                for (String expressionString : guardAnnotation.spEL()) {
+                    handler.withSpElGuard(expressionString, beanFactoryResolver);
+                    log.info("为转换 {} -> {} [{}] 添加SpEL守卫条件: {}",
+                            handler.getSourceState(), handler.getTargetState(),
+                            handler.getEvent(), expressionString);
+                }
+            }
+        }
+
+        stateMachine.addTransitionHandler(handler);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private <S, E, C> StateTransitionHandler<S, E, C> getStateTransitionHandler(Method method,
+                                                                                StateTransition annotation,
+                                                                                Object bean) {
         // 获取方法参数类型
         Parameter[] parameters = method.getParameters();
         Class<?> stateType = parameters[0].getType();
         Class<?> eventType = parameters[1].getType();
 
-        StateTransitionHandler<S, E, C> handler = new StateTransitionHandler<>() {
+        // 存储守卫条件
+        // 使用枚举的valueOf方法将字符串转换为枚举
+        return new StateTransitionHandler<>() {
             // 存储守卫条件
             private final List<StateTransitionGuard<S, E, C>> guards = new ArrayList<>();
 
             @Override
-            @SuppressWarnings("unchecked")
             public S handleTransition(S from, E event, C context) {
                 try {
                     Object object = ReflectionUtils.invokeMethod(method, bean, from, event, context);
@@ -119,7 +175,6 @@ public class StateMachineFactory implements ApplicationContextAware, Initializin
             }
 
             @Override
-            @SuppressWarnings("unchecked")
             public S getSourceState() {
                 try {
                     // 使用枚举的valueOf方法将字符串转换为枚举
@@ -130,7 +185,6 @@ public class StateMachineFactory implements ApplicationContextAware, Initializin
             }
 
             @Override
-            @SuppressWarnings("unchecked")
             public S getTargetState() {
                 try {
                     return (S) Enum.valueOf((Class<? extends Enum>) stateType, annotation.target());
@@ -140,7 +194,6 @@ public class StateMachineFactory implements ApplicationContextAware, Initializin
             }
 
             @Override
-            @SuppressWarnings("unchecked")
             public E getEvent() {
                 try {
                     return (E) Enum.valueOf((Class<? extends Enum>) eventType, annotation.event());
@@ -154,36 +207,6 @@ public class StateMachineFactory implements ApplicationContextAware, Initializin
                 return guards;
             }
         };
-
-        // 处理守卫条件注解
-        TransitionGuard guardAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, TransitionGuard.class);
-        if (guardAnnotation != null) {
-            Arrays.stream(guardAnnotation.value()).forEach(guardClass -> {
-                try {
-                    // 从Spring容器中获取守卫条件Bean
-                    StateTransitionGuard<S, E, C> guard = (StateTransitionGuard<S, E, C>)
-                            applicationContext.getBean(guardClass);
-                    handler.addGuard(guard);
-                    log.info("为转换 {} -> {} [{}] 添加守卫条件: {}",
-                            handler.getSourceState(), handler.getTargetState(),
-                            handler.getEvent(), guardClass.getSimpleName());
-                } catch (BeansException e) {
-                    // 如果容器中没有，则创建新实例
-                    try {
-                        StateTransitionGuard<S, E, C> guard = (StateTransitionGuard<S, E, C>)
-                                guardClass.getDeclaredConstructor().newInstance();
-                        handler.addGuard(guard);
-                        log.info("为转换 {} -> {} [{}] 添加守卫条件: {}",
-                                handler.getSourceState(), handler.getTargetState(),
-                                handler.getEvent(), guardClass.getSimpleName());
-                    } catch (Exception ex) {
-                        log.error("创建守卫条件实例失败: {}", guardClass.getName(), ex);
-                    }
-                }
-            });
-        }
-
-        stateMachine.addTransitionHandler(handler);
     }
 
     /**

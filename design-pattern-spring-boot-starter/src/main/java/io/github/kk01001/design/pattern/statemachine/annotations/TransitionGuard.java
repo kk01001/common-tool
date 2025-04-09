@@ -22,6 +22,12 @@ public @interface TransitionGuard {
      * 守卫条件类
      * 必须实现StateTransitionGuard接口
      */
-    Class<? extends StateTransitionGuard<?, ?, ?>>[] value();
+    Class<? extends StateTransitionGuard<?, ?, ?>>[] value() default {};
+
+
+    /**
+     * SpEL表达式条件
+     */
+    String[] spEL() default {};
 
 } 

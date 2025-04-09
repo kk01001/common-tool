@@ -1,6 +1,8 @@
 package io.github.kk01001.design.pattern.statemachine.core;
 
+import io.github.kk01001.design.pattern.statemachine.guard.GuardConditionFactory;
 import io.github.kk01001.design.pattern.statemachine.guard.StateTransitionGuard;
+import org.springframework.context.expression.BeanFactoryResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,5 +116,28 @@ public interface StateTransitionHandler<S, E, C> {
      */
     default boolean matches(S state, E event) {
         return getSourceState().equals(state) && getEvent().equals(event);
+    }
+
+    /**
+     * 添加SpEL表达式守卫
+     *
+     * @param expression SpEL表达式
+     * @return 当前处理器
+     */
+    default StateTransitionHandler<S, E, C> withSpElGuard(String expression) {
+        this.addGuard(GuardConditionFactory.createSpElGuard(expression));
+        return this;
+    }
+
+    /**
+     * 添加SpEL表达式守卫
+     *
+     * @param expression  SpEL表达式
+     * @param beanFactory BeanFactoryResolver
+     * @return 当前处理器
+     */
+    default StateTransitionHandler<S, E, C> withSpElGuard(String expression, BeanFactoryResolver beanFactory) {
+        this.addGuard(GuardConditionFactory.createSpElGuard(expression, beanFactory));
+        return this;
     }
 } 

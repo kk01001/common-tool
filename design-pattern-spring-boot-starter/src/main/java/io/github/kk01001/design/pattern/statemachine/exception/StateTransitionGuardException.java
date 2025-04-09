@@ -24,9 +24,17 @@ public class StateTransitionGuardException extends RuntimeException {
         this.event = event;
     }
 
+    public StateTransitionGuardException(String message, Object sourceState, Object event) {
+        super(message);
+        this.machineId = null;
+        this.machineName = null;
+        this.sourceState = sourceState;
+        this.event = event;
+    }
+
     @Override
     public String getMessage() {
-        return String.format("%s [状态机: %s, ID: %s, 当前状态: %s, 事件: %s]",
-                super.getMessage(), machineName, machineId, sourceState, event);
+        return String.format("[状态机: %s, ID: %s, 当前状态: %s, 事件: %s] error: %s ",
+                machineName, machineId, sourceState, event, super.getMessage());
     }
 } 
