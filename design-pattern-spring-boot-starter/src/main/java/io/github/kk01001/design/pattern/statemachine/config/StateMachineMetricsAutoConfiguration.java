@@ -1,6 +1,5 @@
-package io.github.kk01001.design.pattern.statemachine;
+package io.github.kk01001.design.pattern.statemachine.config;
 
-import io.github.kk01001.design.pattern.statemachine.config.StateMachineProperties;
 import io.github.kk01001.design.pattern.statemachine.event.StateMachineMetricsEventListener;
 import io.github.kk01001.design.pattern.statemachine.metrics.MicrometerStateMachineMetrics;
 import io.micrometer.core.instrument.MeterRegistry;

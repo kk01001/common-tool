@@ -1,11 +1,9 @@
-package io.github.kk01001.design.pattern.statemachine;
+package io.github.kk01001.design.pattern.statemachine.config;
 
-import io.github.kk01001.design.pattern.statemachine.config.StateMachineProperties;
+import io.github.kk01001.design.pattern.statemachine.StateMachineFactory;
 import io.github.kk01001.design.pattern.statemachine.core.StateMachineBuilder;
 import io.github.kk01001.design.pattern.statemachine.event.StateHistoryEventListener;
 import io.github.kk01001.design.pattern.statemachine.history.StateHistoryRepository;
-import io.github.kk01001.design.pattern.statemachine.persister.InMemoryStatePersister;
-import io.github.kk01001.design.pattern.statemachine.persister.StatePersister;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -31,12 +29,6 @@ public class StateMachineAutoConfiguration {
     @ConditionalOnMissingBean
     public StateMachineFactory stateMachineFactory() {
         return new StateMachineFactory();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public StatePersister<Object, Object> localStatePersister() {
-        return new InMemoryStatePersister<>();
     }
 
     @Bean

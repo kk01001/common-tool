@@ -1,3 +1,5 @@
 state-machine:
   metrics:
     enabled: true
+  persister:
+    type: redisson
