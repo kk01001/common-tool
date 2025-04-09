@@ -70,6 +70,7 @@ public class DefaultStateMachine<S, E, C> implements StateMachine<S, E, C> {
 
         // 发布初始状态事件
         publishStateMachineDestroyedEvent(machineId, context);
+        locks.remove(machineName + ":" + machineId);
     }
 
     /**

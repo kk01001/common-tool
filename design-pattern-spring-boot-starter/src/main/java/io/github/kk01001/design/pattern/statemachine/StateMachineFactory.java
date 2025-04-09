@@ -3,6 +3,7 @@ package io.github.kk01001.design.pattern.statemachine;
 import io.github.kk01001.design.pattern.statemachine.annotations.StateMachineDefinition;
 import io.github.kk01001.design.pattern.statemachine.annotations.StateTransition;
 import io.github.kk01001.design.pattern.statemachine.annotations.TransitionGuard;
+import io.github.kk01001.design.pattern.statemachine.core.DefaultTransitionHandler;
 import io.github.kk01001.design.pattern.statemachine.core.StateMachine;
 import io.github.kk01001.design.pattern.statemachine.core.StateMachineBuilder;
 import io.github.kk01001.design.pattern.statemachine.core.StateTransitionHandler;
@@ -20,13 +21,9 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -104,7 +101,7 @@ public class StateMachineFactory implements ApplicationContextAware, Initializin
                                                      Object bean,
                                                      StateMachine<S, E, C> stateMachine) {
 
-        StateTransitionHandler<S, E, C> handler = getStateTransitionHandler(method, annotation, bean);
+        StateTransitionHandler<S, E, C> handler = createHandler(method, annotation, bean);
 
         // 处理守卫条件注解
         TransitionGuard guardAnnotation = AnnotatedElementUtils.findMergedAnnotation(method, TransitionGuard.class);
@@ -149,64 +146,10 @@ public class StateMachineFactory implements ApplicationContextAware, Initializin
         stateMachine.addTransitionHandler(handler);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private <S, E, C> StateTransitionHandler<S, E, C> getStateTransitionHandler(Method method,
-                                                                                StateTransition annotation,
-                                                                                Object bean) {
-        // 获取方法参数类型
-        Parameter[] parameters = method.getParameters();
-        Class<?> stateType = parameters[0].getType();
-        Class<?> eventType = parameters[1].getType();
-
-        // 存储守卫条件
-        // 使用枚举的valueOf方法将字符串转换为枚举
-        return new StateTransitionHandler<>() {
-            // 存储守卫条件
-            private final List<StateTransitionGuard<S, E, C>> guards = new ArrayList<>();
-
-            @Override
-            public S handleTransition(S from, E event, C context) {
-                try {
-                    Object object = ReflectionUtils.invokeMethod(method, bean, from, event, context);
-                    return (S) object;
-                } catch (Exception e) {
-                    throw new RuntimeException("Error executing state transition", e);
-                }
-            }
-
-            @Override
-            public S getSourceState() {
-                try {
-                    // 使用枚举的valueOf方法将字符串转换为枚举
-                    return (S) Enum.valueOf((Class<? extends Enum>) stateType, annotation.source());
-                } catch (Exception e) {
-                    throw new RuntimeException("Error converting source state: " + annotation.source(), e);
-                }
-            }
-
-            @Override
-            public S getTargetState() {
-                try {
-                    return (S) Enum.valueOf((Class<? extends Enum>) stateType, annotation.target());
-                } catch (Exception e) {
-                    throw new RuntimeException("Error converting target state: " + annotation.target(), e);
-                }
-            }
-
-            @Override
-            public E getEvent() {
-                try {
-                    return (E) Enum.valueOf((Class<? extends Enum>) eventType, annotation.event());
-                } catch (Exception e) {
-                    throw new RuntimeException("Error converting event: " + annotation.event(), e);
-                }
-            }
-
-            @Override
-            public List<StateTransitionGuard<S, E, C>> getGuards() {
-                return guards;
-            }
-        };
+    private <S, E, C> StateTransitionHandler<S, E, C> createHandler(Method method,
+                                                                    StateTransition annotation,
+                                                                    Object bean) {
+        return new DefaultTransitionHandler<>(method, annotation, bean);
     }
 
     /**
