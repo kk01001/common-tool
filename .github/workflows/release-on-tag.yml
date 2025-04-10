@@ -59,7 +59,7 @@ jobs:
           echo "Publishing version: $VERSION"
           
           mvn -B versions:set -DnewVersion=$VERSION
-          mvn -B clean deploy -X \
+          mvn -B clean deploy \
             -Dmaven.test.skip=true \
             -Dgpg.executable=gpg2 \
             -Dgpg.homedir=$HOME/.gnupg \
