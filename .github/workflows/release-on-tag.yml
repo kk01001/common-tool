@@ -47,7 +47,7 @@ jobs:
           
           # 使用Maven发布
           mvn -B versions:set -DnewVersion=$VERSION
-          mvn -B clean deploy -P release \
+          mvn -B clean deploy \
             -Dmaven.test.skip=true \
             -Dgpg.passphrase=$GPG_PASSPHRASE
           
