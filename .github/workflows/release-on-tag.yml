@@ -59,11 +59,19 @@ jobs:
           echo "Publishing version: $VERSION"
           
           mvn -B versions:set -DnewVersion=$VERSION
+          
+          echo "mvn -B clean deploy \
+            -Dmaven.test.skip=true \
+            -Dgpg.executable=gpg2 \
+            -Dgpg.homedir=$HOME/.gnupg \
+            -Dgpg.passphrase=$GPG_PASSPHRASE \
+            -Dossrh.username=$OSSRH_USERNAME \
+            -Dossrh.password=$OSSRH_TOKEN"
+          
           mvn -B clean deploy \
             -Dmaven.test.skip=true \
             -Dgpg.executable=gpg2 \
             -Dgpg.homedir=$HOME/.gnupg \
             -Dgpg.passphrase=$GPG_PASSPHRASE \
-            -Darguments="-Dgpg.skip=false" \
             -Dossrh.username=$OSSRH_USERNAME \
             -Dossrh.password=$OSSRH_TOKEN
