@@ -23,7 +23,7 @@
         <module>rate-limiter-spring-boot-starter</module>
         <module>lock-spring-boot-starter</module>
         <module>idempotent-spring-boot-starter</module>
-        <!--<module>ip2region-spring-boot-starter</module>-->
+        <module>ip2region-spring-boot-starter</module>
         <!--<module>push-spring-boot-starter</module>-->
         <module>robot-message-spring-boot-starter</module>
         <module>docs-spring-boot-starter</module>
