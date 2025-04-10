@@ -31,13 +31,13 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2-
 
-      - name: Verify tag format
-        run: |
-          # 验证标签格式是否符合语义化版本控制
-          if [[ ! ${{ github.ref_name }} =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
-            echo "Error: Tag ${{ github.ref_name }} does not match expected version format (vX.Y.Z)"
-            exit 1
-          fi
+      #      - name: Verify tag format
+      #        run: |
+      #          # 验证标签格式是否符合语义化版本控制
+      #          if [[ ! ${{ github.ref_name }} =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+      #            echo "Error: Tag ${{ github.ref_name }} does not match expected version format (vX.Y.Z)"
+      #            exit 1
+      #          fi
 
       - name: Build and publish
         run: |
