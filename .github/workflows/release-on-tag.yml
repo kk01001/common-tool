@@ -21,8 +21,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           server-id: central # Maven中央仓库的server-id
-          server-username: MAVEN_USERNAME # 从secrets读取
-          server-password: MAVEN_PASSWORD # 从secrets读取
+          server-username: ${{ secrets.OSSRH_USERNAME }}
+          server-password: ${{ secrets.OSSRH_TOKEN }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Cache Maven packages
         uses: actions/cache@v3
@@ -38,8 +39,16 @@ jobs:
       #            echo "Error: Tag ${{ github.ref_name }} does not match expected version format (vX.Y.Z)"
       #            exit 1
       #          fi
+      - name: 检查环境
+        run: |
+          java -version
+          mvn --version
 
       - name: Build and publish
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           # 移除标签前缀 'v' 以获取版本号
           VERSION=${GITHUB_REF#refs/tags/v}
@@ -47,17 +56,9 @@ jobs:
           
           # 使用Maven发布
           mvn -B versions:set -DnewVersion=$VERSION
-          mvn -B clean deploy \
-            -Dmaven.test.skip=true \
-            -Dgpg.passphrase=$GPG_PASSPHRASE
+          mvn -B clean deploy -Dmaven.test.skip=true 
           
           echo "Publication completed for version $VERSION"
-        
-        env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
       - name: Setup GPG
         if: env.GPG_PRIVATE_KEY
