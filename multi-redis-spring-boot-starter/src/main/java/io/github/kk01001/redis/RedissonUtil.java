@@ -59,7 +59,7 @@ public class RedissonUtil {
     private RedissonClient redissonClient2;
 
     @Resource
-    private DoubleRedisProperties redisProperties;
+    private MultiRedisProperties redisProperties;
 
     @Resource(name = "otherRoomExecutor")
     private ExecutorService otherExecutor;

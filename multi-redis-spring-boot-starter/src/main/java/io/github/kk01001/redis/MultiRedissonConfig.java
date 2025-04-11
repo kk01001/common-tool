@@ -35,9 +35,9 @@ public class MultiRedissonConfig {
 
     private static final String LINUX = "Linux";
 
-    private final DoubleRedisProperties redisProperties;
+    private final MultiRedisProperties redisProperties;
 
-    public MultiRedissonConfig(DoubleRedisProperties redisProperties) {
+    public MultiRedissonConfig(MultiRedisProperties redisProperties) {
         this.redisProperties = redisProperties;
     }
 
@@ -45,7 +45,7 @@ public class MultiRedissonConfig {
     @Primary
     @ConditionalOnMissingBean(RedissonClient.class)
     public RedissonClient redissonClient() {
-        DoubleRedisProperties.Cluster cluster = redisProperties.getCluster();
+        MultiRedisProperties.Cluster cluster = redisProperties.getCluster();
         Config config = getConfig(cluster);
         config.setCodec(StringCodec.INSTANCE);
         String osName = System.getProperty("os.name");
@@ -64,7 +64,7 @@ public class MultiRedissonConfig {
     @Bean(name = "redissonClient2")
     @ConditionalOnProperty(prefix = "spring.data.redis.cluster2", name = "active", havingValue = "true")
     public RedissonClient redissonClient2() {
-        DoubleRedisProperties.Cluster cluster2 = redisProperties.getCluster2();
+        MultiRedisProperties.Cluster cluster2 = redisProperties.getCluster2();
         Config config = getConfig(cluster2);
         config.setCodec(StringCodec.INSTANCE);
         String osName = System.getProperty("os.name");
@@ -80,7 +80,7 @@ public class MultiRedissonConfig {
     @Bean(name = "redissonClient3")
     @ConditionalOnProperty(prefix = "spring.data.redis.cluster3", name = "active", havingValue = "true")
     public RedissonClient redissonClient3() {
-        DoubleRedisProperties.Cluster cluster3 = redisProperties.getCluster3();
+        MultiRedisProperties.Cluster cluster3 = redisProperties.getCluster3();
         Config config = getConfig(cluster3);
         config.setCodec(StringCodec.INSTANCE);
         String osName = System.getProperty("os.name");
@@ -94,7 +94,7 @@ public class MultiRedissonConfig {
     }
 
     @SuppressWarnings("all")
-    private Config getConfig(DoubleRedisProperties.Cluster cluster) {
+    private Config getConfig(MultiRedisProperties.Cluster cluster) {
         String clusterPassword = cluster.getPassword();
         String password = StringUtils.hasLength(clusterPassword) ? clusterPassword : redisProperties.getPassword();
         List<String> nodesList = cluster.getNodes();
