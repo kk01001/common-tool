@@ -4,10 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
+import org.redisson.api.GeoEntry;
+import org.redisson.api.GeoOrder;
+import org.redisson.api.GeoPosition;
+import org.redisson.api.GeoUnit;
 import org.redisson.api.RAtomicLong;
 import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RBucket;
 import org.redisson.api.RDeque;
+import org.redisson.api.RGeo;
 import org.redisson.api.RList;
 import org.redisson.api.RLock;
 import org.redisson.api.RMap;
@@ -15,6 +20,7 @@ import org.redisson.api.RReadWriteLock;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
+import org.redisson.api.geo.GeoSearchArgs;
 import org.redisson.client.codec.Codec;
 import org.redisson.client.protocol.ScoredEntry;
 import org.slf4j.Logger;
@@ -132,8 +138,7 @@ public class RedissonUtil {
     }
 
     /**
-     * 设置锁
-     * 过期时间单位 分钟
+     * 设置锁 过期时间单位 分钟
      */
     public <V> boolean setNx(String key, V value, Duration duration) {
         RBucket<V> bucket = redissonClient.getBucket(key);
@@ -169,7 +174,6 @@ public class RedissonUtil {
     }
 
     // ====================== Hash 操作 ======================
-
     /**
      * 设置hash字段
      */
@@ -217,9 +221,9 @@ public class RedissonUtil {
     /**
      * 获取整个hash
      *
-     * @param key   键
+     * @param key 键
      * @param clazz 对象class类型
-     * @param <V>   对象泛型
+     * @param <V> 对象泛型
      * @return 对象
      */
     public <V> V hget(String key, Class<V> clazz) {
@@ -261,7 +265,6 @@ public class RedissonUtil {
     }
 
     // ====================== Set 操作 ======================
-
     /**
      * 添加Set元素（支持可变参数）
      */
@@ -391,7 +394,6 @@ public class RedissonUtil {
     }
 
     // ====================== List 操作 ======================
-
     /**
      * 添加List元素
      */
@@ -466,7 +468,7 @@ public class RedissonUtil {
     /**
      * 检查列表中是否包含指定元素
      *
-     * @param key   键
+     * @param key 键
      * @param value 要检查的元素
      * @return 如果列表包含指定元素，则返回true
      */
@@ -476,7 +478,6 @@ public class RedissonUtil {
     }
 
     // ====================== ZSet 操作 ======================
-
     /**
      * 添加有序集合元素
      */
@@ -509,7 +510,7 @@ public class RedissonUtil {
     /**
      * 批量添加有序集合元素
      *
-     * @param key    键
+     * @param key 键
      * @param values 元素和分数的映射
      * @return 成功添加的元素个数
      */
@@ -526,7 +527,7 @@ public class RedissonUtil {
     /**
      * 获取有序集合中指定元素的排名（从大到小）
      *
-     * @param key   键
+     * @param key 键
      * @param value 元素
      * @return 排名，从0开始；如果元素不存在，返回null
      */
@@ -538,9 +539,9 @@ public class RedissonUtil {
     /**
      * 按分数从大到小返回元素
      *
-     * @param key   键
+     * @param key 键
      * @param start 开始位置（包含）
-     * @param end   结束位置（包含）
+     * @param end 结束位置（包含）
      * @return 元素集合
      */
     public <V> Collection<V> zrevrange(String key, int start, int end) {
@@ -562,7 +563,7 @@ public class RedissonUtil {
     /**
      * 移除有序集合中的一个或多个元素
      *
-     * @param key    键
+     * @param key 键
      * @param values 要移除的元素
      * @return 成功移除的元素个数
      */
@@ -603,7 +604,7 @@ public class RedissonUtil {
     /**
      * 增加有序集合中元素的分数
      *
-     * @param key   键
+     * @param key 键
      * @param value 元素
      * @param delta 增加的分数
      * @return 增加后的分数
@@ -619,7 +620,6 @@ public class RedissonUtil {
     }
 
     // ====================== Deque 操作 ======================
-
     /**
      * 添加双端队列元素到队尾
      */
@@ -700,7 +700,6 @@ public class RedissonUtil {
     }
 
     // ====================== Lock 操作 ======================
-
     /**
      * 获取可重入锁
      */
@@ -736,13 +735,9 @@ public class RedissonUtil {
     }
 
     // ====================== 阻塞队列 BlockingQueue ======================
-
     /**
-     * 如果可能，将指定的元素插入到此队列中
-     * 所以立即在不违反容量限制的情况下，返回
-     * 成功时为 {@code true}，如果当前没有空格，则为 {@code false}
-     * 可用。检索并删除此队列的头部，必要时等待
-     * ，直到某个元素变为可用。
+     * 如果可能，将指定的元素插入到此队列中 所以立即在不违反容量限制的情况下，返回 成功时为 {@code true}，如果当前没有空格，则为
+     * {@code false} 可用。检索并删除此队列的头部，必要时等待 ，直到某个元素变为可用。
      */
     public <E> boolean offerBlockingQueue(String key, E value) {
         return writeWithResult(() -> {
@@ -755,8 +750,7 @@ public class RedissonUtil {
     }
 
     /**
-     * 检索并删除此队列的头部，必要时等待
-     * ，直到某个元素变为可用。
+     * 检索并删除此队列的头部，必要时等待 ，直到某个元素变为可用。
      */
     public <E> E takeBlockingQueue(String key) {
         return writeWithResult(() -> {
@@ -773,8 +767,7 @@ public class RedissonUtil {
     }
 
     /**
-     * 检索并删除此队列的头部，等待
-     * 指定等待时间（如有必要）以使元素变为可用。
+     * 检索并删除此队列的头部，等待 指定等待时间（如有必要）以使元素变为可用。
      */
     public <E> E pollBlockingQueue(String key, long timeout, TimeUnit unit) {
         return writeWithResult(() -> {
@@ -790,8 +783,106 @@ public class RedissonUtil {
         }, "pollBlockingQueue");
     }
 
-    // ====================== 原子操作 ======================
+    // ====================== 地理位置 GEO ======================
 
+    /**
+     * 添加地理位置
+     */
+    public <V> long addGeoLocation(String key, double longitude, double latitude, V member) {
+        return write(() -> {
+            RGeo<V> geo = redissonClient.getGeo(key);
+            return geo.add(longitude, latitude, member);
+        }, () -> {
+            RGeo<V> geo = redissonClient2.getGeo(key);
+            geo.add(longitude, latitude, member);
+        }, "addGeoLocation");
+    }
+
+    /**
+     * 添加地理位置 GeoEntry
+     */
+    public <V> long addGeoLocation(String key, GeoEntry... geoEntry) {
+        return write(() -> {
+            RGeo<V> geo = redissonClient.getGeo(key);
+            return geo.add(geoEntry);
+        }, () -> {
+            RGeo<V> geo = redissonClient2.getGeo(key);
+            geo.add(geoEntry);
+        }, "addGeoLocation");
+    }
+
+    /**
+     * 删除地理位置
+     */
+    public <V> boolean removeGeoLocation(String key, V value) {
+        return write(() -> {
+            RGeo<V> geo = redissonClient.getGeo(key);
+            return geo.remove(value);
+        }, () -> {
+            RGeo<V> geo = redissonClient2.getGeo(key);
+            geo.remove(value);
+        }, "removeGeoLocation");
+    }
+
+    /**
+     * 批量删除地理位置
+     */
+    public <V> boolean removeGeoLocations(String key, List<V> values) {
+        return write(() -> {
+            RGeo<V> geo = redissonClient.getGeo(key);
+            return geo.removeAll(values);
+        }, () -> {
+            RGeo<V> geo = redissonClient2.getGeo(key);
+            geo.removeAll(values);
+        }, "removeGeoLocations");
+    }
+
+    /**
+     * 获取地理位置
+     */
+    @SafeVarargs
+    public final <V> Map<V, GeoPosition> getGeoPosition(String key, V... members) {
+        RGeo<V> geo = redissonClient.getGeo(key);
+        return geo.pos(members);
+    }
+
+    /**
+     * 计算两成员之间的距离
+     */
+    public <V> Double getDistance(String key, V firstMember, V secondMember, GeoUnit geoUnit) {
+        return redissonClient.getGeo(key).dist(firstMember, secondMember, geoUnit);
+    }
+
+    /**
+     * 获取指定位置, 返回排序集的成员，这些成员位于指定搜索条件的边框。
+     */
+    public <V> List<V> searchGeo(String key, double longitude, double latitude, double radius, GeoUnit unit) {
+        RGeo<V> geo = redissonClient.getGeo(key);
+        return geo.search(GeoSearchArgs.from(longitude, latitude)
+                .radius(radius, unit));
+    }
+
+    /**
+     * 获取指定位置, 返回按排序集的成员映射的距离，位于指定搜索条件的边界内。
+     */
+    public <V> Map<V, Double> searchGeoWithDistance(String key, double longitude, double latitude, double radius, GeoUnit unit) {
+        RGeo<V> geo = redissonClient.getGeo(key);
+        return geo.searchWithDistance(GeoSearchArgs.from(longitude, latitude)
+                .radius(radius, unit)
+                .order(GeoOrder.ASC));
+    }
+
+    /**
+     * 获取指定位置, 返回按排序集的成员映射的位置，位于指定搜索条件的边界内。
+     */
+    public <V> Map<V, GeoPosition> searchGeoWithPosition(String key, double longitude, double latitude, double radius, GeoUnit unit) {
+        RGeo<V> geo = redissonClient.getGeo(key);
+        return geo.searchWithPosition(GeoSearchArgs.from(longitude, latitude)
+                .radius(radius, unit)
+                .order(GeoOrder.ASC));
+    }
+
+    // ====================== 原子操作 ======================
     /**
      * 递增
      */
@@ -822,7 +913,6 @@ public class RedissonUtil {
     }
 
     // ====================== 通用操作 ======================
-
     /**
      * 删除key
      */
@@ -878,7 +968,6 @@ public class RedissonUtil {
     }
 
     // ====================== 私有方法 ======================
-
     /**
      * 写操作包装方法，支持双机房同步
      */
