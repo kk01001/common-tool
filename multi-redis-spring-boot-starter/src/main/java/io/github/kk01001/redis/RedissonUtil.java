@@ -9,10 +9,13 @@ import org.redisson.api.GeoOrder;
 import org.redisson.api.GeoPosition;
 import org.redisson.api.GeoUnit;
 import org.redisson.api.RAtomicLong;
+import org.redisson.api.RBitSet;
 import org.redisson.api.RBlockingQueue;
+import org.redisson.api.RBloomFilter;
 import org.redisson.api.RBucket;
 import org.redisson.api.RDeque;
 import org.redisson.api.RGeo;
+import org.redisson.api.RHyperLogLog;
 import org.redisson.api.RList;
 import org.redisson.api.RLock;
 import org.redisson.api.RMap;
@@ -784,7 +787,6 @@ public class RedissonUtil {
     }
 
     // ====================== 地理位置 GEO ======================
-
     /**
      * 添加地理位置
      */
@@ -882,6 +884,318 @@ public class RedissonUtil {
                 .order(GeoOrder.ASC));
     }
 
+    // ====================== 布隆过滤器 BloomFilter ======================
+
+    /**
+     * 创建布隆过滤器
+     *
+     * @param key                布隆过滤器的key
+     * @param expectedInsertions 预期插入的元素数量
+     * @param falseProbability   期望的误判率，如0.01表示1%
+     * @return 是否创建成功
+     */
+    public boolean createBloomFilter(String key, long expectedInsertions, double falseProbability) {
+        return write(() -> {
+            RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(key);
+            bloomFilter.tryInit(expectedInsertions, falseProbability);
+            return true;
+        }, () -> {
+            RBloomFilter<Object> bloomFilter = redissonClient2.getBloomFilter(key);
+            bloomFilter.tryInit(expectedInsertions, falseProbability);
+        }, "createBloomFilter");
+    }
+
+    /**
+     * 添加元素到布隆过滤器
+     *
+     * @param key   布隆过滤器的key
+     * @param value 要添加的元素
+     * @return 是否添加成功
+     */
+    public <T> boolean addToBloomFilter(String key, T value) {
+        return write(() -> {
+            RBloomFilter<T> bloomFilter = redissonClient.getBloomFilter(key);
+            return bloomFilter.add(value);
+        }, () -> {
+            RBloomFilter<T> bloomFilter = redissonClient2.getBloomFilter(key);
+            bloomFilter.add(value);
+        }, "addToBloomFilter");
+    }
+
+    /**
+     * 检查元素是否可能存在于布隆过滤器中
+     *
+     * @param key   布隆过滤器的key
+     * @param value 要检查的元素
+     * @return 如果元素可能存在返回true，如果元素一定不存在返回false
+     */
+    public <T> boolean mightContainInBloomFilter(String key, T value) {
+        RBloomFilter<T> bloomFilter = redissonClient.getBloomFilter(key);
+        return bloomFilter.contains(value);
+    }
+
+    /**
+     * 获取布隆过滤器中已添加的元素数量
+     *
+     * @param key 布隆过滤器的key
+     * @return 已添加的元素数量
+     */
+    public long getBloomFilterCount(String key) {
+        RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(key);
+        return bloomFilter.count();
+    }
+
+    /**
+     * 获取布隆过滤器的容量
+     *
+     * @param key 布隆过滤器的key
+     * @return 布隆过滤器的容量
+     */
+    public long getBloomFilterSize(String key) {
+        RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(key);
+        return bloomFilter.getSize();
+    }
+
+    /**
+     * 获取布隆过滤器的误判率
+     *
+     * @param key 布隆过滤器的key
+     * @return 误判率
+     */
+    public double getBloomFilterFalseProbability(String key) {
+        RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(key);
+        return bloomFilter.getFalseProbability();
+    }
+
+    /**
+     * 删除布隆过滤器
+     *
+     * @param key 布隆过滤器的key
+     * @return 是否删除成功
+     */
+    public boolean deleteBloomFilter(String key) {
+        return write(() -> {
+            RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(key);
+            return bloomFilter.unlink();
+        }, () -> {
+            RBloomFilter<Object> bloomFilter = redissonClient2.getBloomFilter(key);
+            bloomFilter.unlink();
+        }, "deleteBloomFilter");
+    }
+
+    // ====================== 位图 bitmap ======================
+
+    /**
+     * 设置位图指定位置的值
+     *
+     * @param key    键
+     * @param offset 偏移量
+     * @param value  true 为 1，false 为 0
+     * @return 该位置原来的值
+     */
+    public Boolean setBit(String key, long offset, boolean value) {
+        return write(() -> {
+            RBitSet bitSet = redissonClient.getBitSet(key);
+            return bitSet.set(offset, value);
+        }, () -> {
+            RBitSet bitSet = redissonClient2.getBitSet(key);
+            bitSet.set(offset, value);
+        }, "setBit");
+    }
+
+    /**
+     * 获取位图指定位置的值
+     *
+     * @param key    键
+     * @param offset 偏移量
+     * @return true 为 1，false 为 0
+     */
+    public Boolean getBit(String key, long offset) {
+        RBitSet bitSet = redissonClient.getBitSet(key);
+        return bitSet.get(offset);
+    }
+
+    /**
+     * 统计位图中值为 1 的数量
+     *
+     * @param key 键
+     * @return 值为 1 的数量
+     */
+    public Long bitCount(String key) {
+        RBitSet bitSet = redissonClient.getBitSet(key);
+        return bitSet.cardinality();
+    }
+
+    /**
+     * 对两个位图进行 AND 操作，并将结果保存到目标位图
+     *
+     * @param destKey    目标位图的键
+     * @param sourceKey1 源位图1的键
+     * @param sourceKey2 源位图2的键
+     * @return 操作是否成功
+     */
+    public Boolean bitAnd(String destKey, String sourceKey1, String sourceKey2) {
+        return write(() -> {
+            RBitSet destBitSet = redissonClient.getBitSet(destKey);
+            destBitSet.and(sourceKey1, sourceKey2);
+            return true;
+        }, () -> {
+            RBitSet destBitSet = redissonClient2.getBitSet(destKey);
+            destBitSet.and(sourceKey1, sourceKey2);
+        }, "bitAnd");
+    }
+
+    /**
+     * 对两个位图进行 OR 操作，并将结果保存到目标位图
+     *
+     * @param destKey    目标位图的键
+     * @param sourceKey1 源位图1的键
+     * @param sourceKey2 源位图2的键
+     * @return 操作是否成功
+     */
+    public Boolean bitOr(String destKey, String sourceKey1, String sourceKey2) {
+        return write(() -> {
+            RBitSet destBitSet = redissonClient.getBitSet(destKey);
+            destBitSet.or(sourceKey1, sourceKey2);
+            return true;
+        }, () -> {
+            RBitSet destBitSet = redissonClient2.getBitSet(destKey);
+            destBitSet.or(sourceKey1, sourceKey2);
+        }, "bitOr");
+    }
+
+    /**
+     * 对两个位图进行 XOR 操作，并将结果保存到目标位图
+     *
+     * @param destKey    目标位图的键
+     * @param sourceKey1 源位图1的键
+     * @param sourceKey2 源位图2的键
+     * @return 操作是否成功
+     */
+    public Boolean bitXor(String destKey, String sourceKey1, String sourceKey2) {
+        return write(() -> {
+            RBitSet destBitSet = redissonClient.getBitSet(destKey);
+            destBitSet.xor(sourceKey1, sourceKey2);
+            return true;
+        }, () -> {
+            RBitSet destBitSet = redissonClient2.getBitSet(destKey);
+            destBitSet.xor(sourceKey1, sourceKey2);
+        }, "bitXor");
+    }
+
+    /**
+     * 清空位图
+     *
+     * @param key 键
+     * @return 操作是否成功
+     */
+    public Boolean clearBitSet(String key) {
+        return write(() -> {
+            RBitSet bitSet = redissonClient.getBitSet(key);
+            bitSet.clear();
+            return true;
+        }, () -> {
+            RBitSet bitSet = redissonClient2.getBitSet(key);
+            bitSet.clear();
+        }, "clearBitSet");
+    }
+
+    // ====================== HyperLogLog 操作 ======================
+
+    /**
+     * 添加元素到 HyperLogLog
+     *
+     * @param key   键
+     * @param value 要添加的元素
+     * @return 添加后集合中的基数估计值
+     */
+    public <T> Long pfadd(String key, T value) {
+        return write(() -> {
+            RHyperLogLog<T> hyperLogLog = redissonClient.getHyperLogLog(key);
+            hyperLogLog.add(value);
+            return hyperLogLog.count();
+        }, () -> {
+            RHyperLogLog<T> hyperLogLog = redissonClient2.getHyperLogLog(key);
+            hyperLogLog.add(value);
+        }, "hyperLogLogAdd");
+    }
+
+    /**
+     * 批量添加元素到 HyperLogLog
+     *
+     * @param key    键
+     * @param values 要添加的元素集合
+     * @return 添加后集合中的基数估计值
+     */
+    public <T> Long pfaddAll(String key, Collection<T> values) {
+        return write(() -> {
+            RHyperLogLog<T> hyperLogLog = redissonClient.getHyperLogLog(key);
+            hyperLogLog.addAll(values);
+            return hyperLogLog.count();
+        }, () -> {
+            RHyperLogLog<T> hyperLogLog = redissonClient2.getHyperLogLog(key);
+            hyperLogLog.addAll(values);
+        }, "hyperLogLogAddBatch");
+    }
+
+    /**
+     * 获取 HyperLogLog 的基数估计值
+     *
+     * @param key 键
+     * @return 基数估计值
+     */
+    public Long pfcount(String key) {
+        RHyperLogLog<?> hyperLogLog = redissonClient.getHyperLogLog(key);
+        return hyperLogLog.count();
+    }
+
+    /**
+     * 获取多个 HyperLogLog 的并集的基数估计值
+     *
+     * @param keys 键的集合
+     * @return 基数估计值
+     */
+    public Long pfcountUnion(Collection<String> keys) {
+        List<RHyperLogLog<Object>> hyperLogLogs = keys.stream()
+                .map(redissonClient::getHyperLogLog)
+                .toList();
+        return hyperLogLogs.getFirst().countWith(keys.toArray(new String[0]));
+    }
+
+    /**
+     * 将多个 HyperLogLog 合并为一个
+     *
+     * @param destKey    目标键
+     * @param sourceKeys 源键的集合
+     * @return 合并后的基数估计值
+     */
+    public Long pfmerge(String destKey, Collection<String> sourceKeys) {
+        return write(() -> {
+            RHyperLogLog<?> destHLL = redissonClient.getHyperLogLog(destKey);
+            destHLL.mergeWith(sourceKeys.toArray(new String[0]));
+            return destHLL.count();
+        }, () -> {
+            RHyperLogLog<?> destHLL = redissonClient2.getHyperLogLog(destKey);
+            destHLL.mergeWith(sourceKeys.toArray(new String[0]));
+        }, "hyperLogLogMerge");
+    }
+
+    /**
+     * 删除 HyperLogLog
+     *
+     * @param key 键
+     * @return 是否删除成功
+     */
+    public Boolean pfdelete(String key) {
+        return write(() -> {
+            RHyperLogLog<?> hyperLogLog = redissonClient.getHyperLogLog(key);
+            return hyperLogLog.delete();
+        }, () -> {
+            RHyperLogLog<?> hyperLogLog = redissonClient2.getHyperLogLog(key);
+            hyperLogLog.delete();
+        }, "hyperLogLogDelete");
+    }
+
     // ====================== 原子操作 ======================
     /**
      * 递增
@@ -977,7 +1291,7 @@ public class RedissonUtil {
             result = action.get();
             if (Boolean.TRUE.equals(redisProperties.getCluster2().getActive())) {
                 try {
-                    backAction.run();
+                    otherExecutor.execute(backAction::run);
                 } catch (Exception e) {
                     LOGGER.error("{}, 异地redis异常:", actionName, e);
                 }
@@ -1003,7 +1317,10 @@ public class RedissonUtil {
             result = action.get();
             if (Boolean.TRUE.equals(redisProperties.getCluster2().getActive())) {
                 try {
-                    backAction.accept(result);
+                    T finalResult = result;
+                    otherExecutor.execute(() -> {
+                        backAction.accept(finalResult);
+                    });
                 } catch (Exception e) {
                     LOGGER.error("{} - 异地redis异常: ", actionName, e);
                 }
