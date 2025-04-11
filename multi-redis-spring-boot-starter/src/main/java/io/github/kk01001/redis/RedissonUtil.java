@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import org.redisson.api.RAtomicLong;
+import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RBucket;
 import org.redisson.api.RDeque;
 import org.redisson.api.RList;
@@ -131,6 +132,15 @@ public class RedissonUtil {
     }
 
     /**
+     * 设置锁
+     * 过期时间单位 分钟
+     */
+    public <V> boolean setNx(String key, V value, Duration duration) {
+        RBucket<V> bucket = redissonClient.getBucket(key);
+        return bucket.setIfAbsent(value, duration);
+    }
+
+    /**
      * 获取字符串值
      */
     public <V> V get(String key) {
@@ -191,16 +201,37 @@ public class RedissonUtil {
     /**
      * 获取hash字段值
      */
+    public <V> int hgetCount(String key) {
+        RMap<String, V> map = redissonClient.getMap(key);
+        return map.size();
+    }
+
+    /**
+     * 获取hash字段值
+     */
     public <V> V hget(String key, String field) {
         RMap<String, V> map = redissonClient.getMap(key);
         return map.get(field);
     }
 
     /**
+     * 获取整个hash
+     *
+     * @param key   键
+     * @param clazz 对象class类型
+     * @param <V>   对象泛型
+     * @return 对象
+     */
+    public <V> V hget(String key, Class<V> clazz) {
+        Map<Object, Object> allMap = redissonClient.getMap(key).readAllMap();
+        return objectMapper.convertValue(allMap, clazz);
+    }
+
+    /**
      * 获取所有hash字段和值
      */
-    public <V> Map<String, V> hgetAll(String key) {
-        RMap<String, V> map = redissonClient.getMap(key);
+    public <K, V> Map<K, V> hgetAll(String key) {
+        RMap<K, V> map = redissonClient.getMap(key);
         return map.readAllMap();
     }
 
@@ -215,6 +246,18 @@ public class RedissonUtil {
             RMap<String, ?> map = redissonClient2.getMap(key);
             map.fastRemove(fields);
         }, "hashDel");
+    }
+
+    /**
+     * hash元素递增
+     */
+    public <V> V hincrby(String key, String field, Long value) {
+        return write(() -> {
+                    RMap<Object, V> rMap = redissonClient.getMap(key);
+                    return rMap.addAndGet(field, value);
+                },
+                () -> redissonClient2.getMap(key).addAndGet(field, value),
+                "hashDel");
     }
 
     // ====================== Set 操作 ======================
@@ -314,6 +357,14 @@ public class RedissonUtil {
     }
 
     /**
+     * 随机取出一个元素
+     */
+    public <V> V sRandom(String key, V value) {
+        RSet<V> set = redissonClient.getSet(key);
+        return set.random();
+    }
+
+    /**
      * 随机移除Set中的一个元素
      */
     public <V> V spop(String key) {
@@ -324,6 +375,19 @@ public class RedissonUtil {
             RSet<V> set = redissonClient2.getSet(key);
             set.remove(data);
         }, "setPopRandom");
+    }
+
+    /**
+     * 随机移除Set中的多个元素
+     */
+    public <V> Set<V> spop(String key, int count) {
+        return writeWithResult(() -> {
+            RSet<V> set = redissonClient.getSet(key);
+            return set.removeRandom(count);
+        }, data -> {
+            RSet<V> set = redissonClient2.getSet(key);
+            set.removeAll(data);
+        }, "setPopRandomCount");
     }
 
     // ====================== List 操作 ======================
@@ -339,6 +403,17 @@ public class RedissonUtil {
             RList<V> list = redissonClient2.getList(key);
             list.addAll(Arrays.asList(values));
         }, "listPush");
+    }
+
+    /**
+     * 查询全部List
+     *
+     * @param key 键
+     * @return 如果列表包含指定元素，则返回true
+     */
+    public <V> List<V> lrange(String key) {
+        RList<V> list = redissonClient.getList(key);
+        return list.readAll();
     }
 
     /**
@@ -398,18 +473,6 @@ public class RedissonUtil {
     public <V> Boolean lcontains(String key, V value) {
         RList<V> list = redissonClient.getList(key);
         return list.contains(value);
-    }
-
-    /**
-     * 检查列表中是否包含指定的所有元素
-     *
-     * @param key    键
-     * @param values 要检查的元素集合
-     * @return 如果列表包含指定的所有元素，则返回true
-     */
-    public <V> Boolean lcontainsAll(String key, Collection<V> values) {
-        RList<V> list = redissonClient.getList(key);
-        return list.containsAll(values);
     }
 
     // ====================== ZSet 操作 ======================
@@ -581,16 +644,59 @@ public class RedissonUtil {
      * 获取并移除队首元素
      */
     public <V> V pollFirst(String key) {
-        RDeque<V> deque = redissonClient.getDeque(key);
-        return deque.pollFirst();
+        return writeWithResult(() -> {
+                    RDeque<V> rDeque = redissonClient.getDeque(key);
+                    return rDeque.pollFirst();
+                },
+                data -> redissonClient2.getDeque(key).remove(data),
+                "dequePollFirst"
+        );
     }
 
     /**
      * 获取并移除队尾元素
      */
     public <V> V pollLast(String key) {
-        RDeque<V> deque = redissonClient.getDeque(key);
-        return deque.pollLast();
+        return writeWithResult(() -> {
+                    RDeque<V> rDeque = redissonClient.getDeque(key);
+                    return rDeque.pollLast();
+                },
+                data -> redissonClient2.getDeque(key).remove(data),
+                "dequePollLast"
+        );
+    }
+
+    /**
+     * deque 添加List
+     */
+    public <V> Boolean dequeAddAll(String key, List<V> values) {
+        return write(() -> {
+                    RDeque<V> rDeque = redissonClient.getDeque(key);
+                    return rDeque.addAll(values);
+                },
+                () -> redissonClient2.getDeque(key).addAll(values),
+                "dequeAddAll"
+        );
+    }
+
+    /**
+     * deque 移除List
+     */
+    public <V> Boolean dequeRemoveAll(String key, List<V> values) {
+        return write(() -> {
+                    RDeque<V> rDeque = redissonClient.getDeque(key);
+                    return rDeque.removeAll(values);
+                },
+                () -> redissonClient2.getDeque(key).removeAll(values),
+                "dequeRemoveAll"
+        );
+    }
+
+    /**
+     * 是否存在
+     */
+    public <V> boolean containDeque(String key, V value) {
+        return redissonClient.getDeque(key).contains(value);
     }
 
     // ====================== Lock 操作 ======================
@@ -627,6 +733,61 @@ public class RedissonUtil {
      */
     public RLock getFairLock(String key) {
         return redissonClient.getFairLock(key);
+    }
+
+    // ====================== 阻塞队列 BlockingQueue ======================
+
+    /**
+     * 如果可能，将指定的元素插入到此队列中
+     * 所以立即在不违反容量限制的情况下，返回
+     * 成功时为 {@code true}，如果当前没有空格，则为 {@code false}
+     * 可用。检索并删除此队列的头部，必要时等待
+     * ，直到某个元素变为可用。
+     */
+    public <E> boolean offerBlockingQueue(String key, E value) {
+        return writeWithResult(() -> {
+            RBlockingQueue<E> blockingQueue = redissonClient.getBlockingQueue(key);
+            return blockingQueue.offer(value);
+        }, data -> {
+            RBlockingQueue<E> blockingQueue = redissonClient2.getBlockingQueue(key);
+            blockingQueue.offer(value);
+        }, "offerBlockingQueue");
+    }
+
+    /**
+     * 检索并删除此队列的头部，必要时等待
+     * ，直到某个元素变为可用。
+     */
+    public <E> E takeBlockingQueue(String key) {
+        return writeWithResult(() -> {
+            RBlockingQueue<E> blockingQueue = redissonClient.getBlockingQueue(key);
+            try {
+                return blockingQueue.take();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }, data -> {
+            RBlockingQueue<E> blockingQueue = redissonClient2.getBlockingQueue(key);
+            blockingQueue.remove(data);
+        }, "takeBlockingQueue");
+    }
+
+    /**
+     * 检索并删除此队列的头部，等待
+     * 指定等待时间（如有必要）以使元素变为可用。
+     */
+    public <E> E pollBlockingQueue(String key, long timeout, TimeUnit unit) {
+        return writeWithResult(() -> {
+            RBlockingQueue<E> blockingQueue = redissonClient.getBlockingQueue(key);
+            try {
+                return blockingQueue.poll(timeout, unit);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }, data -> {
+            RBlockingQueue<E> blockingQueue = redissonClient2.getBlockingQueue(key);
+            blockingQueue.remove(data);
+        }, "pollBlockingQueue");
     }
 
     // ====================== 原子操作 ======================
