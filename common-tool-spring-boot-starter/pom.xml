@@ -123,6 +123,13 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>com.hankcs</groupId>
+            <artifactId>hanlp</artifactId>
+            <version>portable-1.8.4</version>
+            <optional>true</optional>
+        </dependency>
+
     </dependencies>
 
 </project>
