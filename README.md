@@ -102,7 +102,7 @@ public class ToolController {
         return EncryptUtil.aesDecrypt(encryptedText, key);
     }
 }
-
+```
 [查看详细文档](./common-tool-spring-boot-starter/README.md)
 
 ### xxl-job-spring-boot-starter
