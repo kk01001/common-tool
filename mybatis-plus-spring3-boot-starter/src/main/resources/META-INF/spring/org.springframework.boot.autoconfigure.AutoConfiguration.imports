@@ -1,1 +1,2 @@
 io.github.kk01001.mybatis.MybatisPlusConfiguration
+io.github.kk01001.mybatis.permission.DataPermissionAutoConfiguration
