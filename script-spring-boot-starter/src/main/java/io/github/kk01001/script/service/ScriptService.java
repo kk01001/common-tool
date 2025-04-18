@@ -1,7 +1,6 @@
 package io.github.kk01001.script.service;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.SecureUtil;
 import io.github.kk01001.script.cache.ScriptCache;
 import io.github.kk01001.script.enums.ScriptType;
 import io.github.kk01001.script.exception.ScriptValidateException;
@@ -63,7 +62,7 @@ public class ScriptService implements CommandLineRunner {
         ScriptExecutor executor = getExecutor(type);
 
         Optional<ScriptCache.CachedScript> cachedScript = ScriptCache.get(scriptId);
-        if (cachedScript.isPresent() && SecureUtil.md5(script).equals(cachedScript.get().getMd5())) {
+        if (cachedScript.isPresent()) {
             if (StrUtil.isNotBlank(methodName)) {
                 return executor.executeCompiledMethod(cachedScript.get().getCompiledScript(), methodName, params);
             }

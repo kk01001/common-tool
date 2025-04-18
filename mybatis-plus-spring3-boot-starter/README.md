@@ -392,6 +392,176 @@ public class MultiTenantService {
 }
 ```
 
+## 数据权限控制
+
+本框架提供了灵活的数据权限控制功能，可以基于用户角色、部门等维度进行数据访问控制，确保用户只能访问被授权的数据。
+
+### 1. 配置数据权限
+
+在 `application.yml` 中开启数据权限功能：
+
+```yaml
+mybatis:
+  data:
+    permission:
+      enabled: true  # 默认为true，可省略
+      sql-log: false # 是否打印权限SQL日志
+```
+
+### 2. 使用注解标记需要权限控制的方法
+
+```java
+/**
+ * @author kk01001
+ * @date 2023-07-22 15:23:00
+ * @description 用户服务
+ */
+@Service
+public class UserService {
+
+    /**
+     * 自定义数据权限控制
+     * 查询时会自动添加权限过滤条件
+     */
+    @DataPermission(type = "SELF_AND_SUB", 
+                    value = {
+                        @DataColumn(name = "dept_id", alias = "u")
+                    })
+    public List<User> getUsersByDept() {
+        return userMapper.selectList(null);
+    }
+    
+    /**
+     * 仅查看本人数据
+     */
+    @DataPermission(type = "SELF", 
+                    value = {
+                        @DataColumn(name = "create_by", alias = "u")
+                    })
+    public List<User> getMyCreatedUsers() {
+        return userMapper.selectList(null);
+    }
+    
+    /**
+     * 忽略数据权限控制的方法
+     */
+    @DataPermission(ignore = true)
+    public List<User> getAllUsers() {
+        return userMapper.selectList(null);
+    }
+}
+```
+
+### 3. 实现权限服务接口
+
+需要实现 `UserPermissionService` 接口，提供当前用户的权限数据：
+
+```java
+/**
+ * @author kk01001
+ * @date 2023-07-22 15:23:00
+ * @description 自定义用户权限服务实现
+ */
+@Service
+@RequiredArgsConstructor
+public class CustomUserPermissionServiceImpl implements UserPermissionService<Long> {
+    
+    private final SecurityService securityService;
+    
+    @Override
+    public Long getCurrentSelfId(DataColumn dataColumn) {
+        // 获取当前用户ID
+        return securityService.getCurrentUserId();
+    }
+    
+    @Override
+    public List<Long> getSelfAndSubIds(DataColumn dataColumn) {
+        // 根据列类型返回不同数据
+        if ("dept_id".equals(dataColumn.name())) {
+            // 返回当前用户所在部门及子部门ID列表
+            return securityService.getCurrentUserDeptAndSubDepts();
+        }
+        
+        // 默认返回当前用户ID列表
+        return Collections.singletonList(securityService.getCurrentUserId());
+    }
+    
+    @Override
+    public boolean isAdmin() {
+        // 判断当前用户是否为管理员
+        return securityService.isAdmin();
+    }
+    
+    @Override
+    public List<Long> getCustomDataScope(DataColumn dataColumn) {
+        // 自定义数据范围实现
+        return securityService.getCustomDataScope();
+    }
+}
+```
+
+### 4. 数据权限类型
+
+框架内置了以下数据权限类型：
+
+| 类型 | 描述 |
+| ---- | ---- |
+| ALL | 全部数据权限，不添加过滤条件 |
+| SELF | 仅本人数据，添加 "column = 当前用户ID" 条件 |
+| SELF_AND_SUB | 本人及下属数据，添加 "column IN (本人及下属ID列表)" 条件 |
+| CUSTOM | 自定义数据权限，可以在注解中指定自定义SQL条件 |
+
+### 5. 自定义权限处理器
+
+如果内置的权限类型不能满足需求，可以自定义权限处理器：
+
+```java
+/**
+ * @author kk01001
+ * @date 2023-07-22 15:23:00
+ * @description 自定义数据权限处理器
+ */
+@Component
+@RequiredArgsConstructor
+public class CustomDataPermissionHandler extends AbstractDataPermissionHandler {
+
+    private final UserPermissionService userPermissionService;
+    
+    @Override
+    public String getType() {
+        return "CUSTOM_TYPE";
+    }
+    
+    @Override
+    public Expression buildCondition(DataColumn dataColumn) {
+        // 构建自定义SQL条件
+        String columnName = buildColumnName(dataColumn);
+        List<Long> ids = customService.getDataIds();
+        
+        // 返回 column IN (id1, id2, ...)
+        return buildInCondition(columnName, ids);
+    }
+}
+```
+
+### 6. 工作原理
+
+数据权限功能通过 MyBatis 拦截器实现，在查询执行前动态修改 SQL，添加权限过滤条件：
+
+1. 拦截 MyBatis 执行的 SQL 查询
+2. 检查方法或类上是否有 `@DataPermission` 注解
+3. 根据注解中配置的类型和列信息，构建权限过滤条件
+4. 将权限条件追加到原始 SQL 的 WHERE 子句中
+5. 执行修改后的 SQL，返回符合权限条件的数据
+
+### 7. 最佳实践
+
+- 对查询方法使用 `@DataPermission` 注解，对增删改方法不需要添加
+- 管理员用户可以通过 `isAdmin()` 方法判断，跳过权限控制
+- 在复杂查询中，使用表别名指定权限控制的列：`@DataColumn(name = "dept_id", alias = "u")`
+- 如果某些特殊场景需要查询所有数据，使用 `@DataPermission(ignore = true)` 忽略权限控制
+- 在多租户系统中，结合动态表名和数据权限，可以实现更精细的权限控制
+
 ## 配置参数详解
 
 ### MyBatis-Plus 配置

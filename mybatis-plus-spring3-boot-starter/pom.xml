@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>mybatis-plus-spring3-boot-starter</artifactId>
-    <description>Mybatis Plus 自动配置, 动态表名, 多数据源</description>
+    <description>Mybatis Plus 自动配置, 动态表名, 多数据源, 数据权限</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -5,6 +5,8 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import org.slf4j.MDC;
 
+import java.util.Map;
+
 /**
  * @author kk01001
  * @since 2022-10-21 16:50
@@ -87,6 +89,13 @@ public class TraceIdUtil {
 
     public static void clear() {
         MDC.clear();
+    }
+
+    /**
+     * 获取当前上下文的副本
+     */
+    public static Map<String, String> getMdcContextMap() {
+        return MDC.getCopyOfContextMap();
     }
 
     public static String generateTraceId() {
