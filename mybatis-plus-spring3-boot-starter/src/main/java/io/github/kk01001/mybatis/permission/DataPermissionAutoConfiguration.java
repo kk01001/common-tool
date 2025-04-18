@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureAfter(MybatisPlusConfiguration.class)
 @Configuration
 @EnableConfigurationProperties(DataPermissionProperties.class)
-@ConditionalOnProperty(prefix = "mybatis.data.permission", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "mybatis.data.permission", name = "enabled", havingValue = "true")
 public class DataPermissionAutoConfiguration {
 
     /**
