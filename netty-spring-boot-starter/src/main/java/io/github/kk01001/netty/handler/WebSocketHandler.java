@@ -8,7 +8,13 @@ import io.micrometer.core.instrument.Timer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.websocketx.*;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Comparator;
@@ -66,7 +72,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<WebSocketFrame
             messageTracer.traceReceive(session, message);
             
             // 应用消息过滤器
-            if (messageFilters != null) {
+            if (messageFilters != null && !messageFilters.isEmpty()) {
                 // 按优先级排序
                 messageFilters.sort(Comparator.comparingInt(MessageFilter::getOrder));
                 for (MessageFilter filter : messageFilters) {
