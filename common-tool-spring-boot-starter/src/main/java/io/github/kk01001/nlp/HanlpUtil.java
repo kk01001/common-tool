@@ -6,7 +6,6 @@ import com.hankcs.hanlp.seg.common.Term;
 import com.hankcs.hanlp.suggest.Suggester;
 import com.hankcs.hanlp.tokenizer.IndexTokenizer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +16,6 @@ import java.util.stream.Collectors;
  * @description HanLP分词工具类，提供中文分词、关键词提取、文本摘要等功能
  */
 @Slf4j
-@Component
 public class HanlpUtil {
 
     public static void main(String[] args) {
