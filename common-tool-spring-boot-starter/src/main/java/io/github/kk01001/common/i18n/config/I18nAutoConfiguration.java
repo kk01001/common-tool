@@ -20,7 +20,7 @@ import org.springframework.web.servlet.LocaleResolver;
 @Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties(I18nProperties.class)
-@ConditionalOnProperty(prefix = "i18n", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "i18n", name = "enabled", havingValue = "true")
 public class I18nAutoConfiguration {
 
     private final I18nProperties properties;
