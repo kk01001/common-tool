@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.kk01001</groupId>
         <artifactId>common-tool</artifactId>
-        <version>2.4.6.4</version>
+        <version>dev-2.4.6.5</version>
     </parent>
 
     <artifactId>dynamic-mq-spring-boot-starter</artifactId>
