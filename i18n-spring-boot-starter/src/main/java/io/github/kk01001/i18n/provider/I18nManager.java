@@ -1,4 +1,4 @@
-package io.github.kk01001.common.i18n.provider;
+package io.github.kk01001.i18n.provider;
 
 import lombok.RequiredArgsConstructor;
 

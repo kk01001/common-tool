@@ -1,4 +1,4 @@
-package io.github.kk01001.common.i18n.properties;
+package io.github.kk01001.i18n.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

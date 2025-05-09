@@ -1,6 +1,6 @@
-package io.github.kk01001.common.i18n.source;
+package io.github.kk01001.i18n.source;
 
-import io.github.kk01001.common.i18n.provider.I18nMessageProvider;
+import io.github.kk01001.i18n.provider.I18nMessageProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceResolvable;

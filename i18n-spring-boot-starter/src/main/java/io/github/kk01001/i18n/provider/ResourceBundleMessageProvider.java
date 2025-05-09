@@ -1,15 +1,17 @@
-package io.github.kk01001.common.i18n.provider;
+package io.github.kk01001.i18n.provider;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 
 @RequiredArgsConstructor
 public class ResourceBundleMessageProvider implements I18nMessageProvider {

@@ -1,4 +1,4 @@
-package io.github.kk01001.common.i18n.resolver;
+package io.github.kk01001.i18n.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
