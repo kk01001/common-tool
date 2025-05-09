@@ -1,7 +1,12 @@
 package io.github.kk01001.examples.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.kk01001.netty.annotation.*;
+import io.github.kk01001.netty.annotation.OnBinaryMessage;
+import io.github.kk01001.netty.annotation.OnClose;
+import io.github.kk01001.netty.annotation.OnError;
+import io.github.kk01001.netty.annotation.OnMessage;
+import io.github.kk01001.netty.annotation.OnOpen;
+import io.github.kk01001.netty.annotation.WebSocketEndpoint;
 import io.github.kk01001.netty.session.WebSocketSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@WebSocketEndpoint(path = "/chat")
+@WebSocketEndpoint
 public class ChatEndpoint {
 
     private final ObjectMapper objectMapper;

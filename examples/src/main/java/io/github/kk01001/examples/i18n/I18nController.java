@@ -1,8 +1,12 @@
 package io.github.kk01001.examples.i18n;
 
-import io.github.kk01001.common.i18n.provider.I18nManager;
+import io.github.kk01001.i18n.provider.I18nManager;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 

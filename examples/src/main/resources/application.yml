@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev,robot,crypto,docs,desensitize,dict,netty,script,db-dev,oss,statemachine
+    active: dev,robot,crypto,docs,desensitize,dict,netty,script,db-dev,oss,statemachine,i18n
 
 server:
   servlet:

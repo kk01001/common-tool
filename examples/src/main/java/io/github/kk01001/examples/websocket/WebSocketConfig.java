@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.config;
+package io.github.kk01001.examples.websocket;
 
 import io.github.kk01001.netty.auth.WebSocketAuthenticator;
 import io.github.kk01001.netty.config.ChannelOptionCustomizer;
@@ -9,7 +9,11 @@ import io.github.kk01001.netty.filter.MessageSizeFilter;
 import io.github.kk01001.netty.filter.SensitiveWordFilter;
 import io.github.kk01001.netty.session.WebSocketSession;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.WriteBufferWaterMark;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
