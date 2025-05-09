@@ -1,6 +1,12 @@
 package io.github.kk01001.netty.registry;
 
-import io.github.kk01001.netty.annotation.*;
+import io.github.kk01001.netty.annotation.OnBinaryMessage;
+import io.github.kk01001.netty.annotation.OnClose;
+import io.github.kk01001.netty.annotation.OnError;
+import io.github.kk01001.netty.annotation.OnMessage;
+import io.github.kk01001.netty.annotation.OnOpen;
+import io.github.kk01001.netty.annotation.WebSocketEndpoint;
+import io.github.kk01001.netty.config.NettyWebSocketProperties;
 import io.github.kk01001.netty.session.WebSocketSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.SmartInitializingSingleton;
@@ -15,10 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketEndpointRegistry implements SmartInitializingSingleton {
     
     private final ApplicationContext applicationContext;
+    private final NettyWebSocketProperties properties;
     private final Map<String, EndpointMethodHandler> pathHandlers = new ConcurrentHashMap<>();
-    
-    public WebSocketEndpointRegistry(ApplicationContext applicationContext) {
+
+    public WebSocketEndpointRegistry(ApplicationContext applicationContext, NettyWebSocketProperties properties) {
         this.applicationContext = applicationContext;
+        this.properties = properties;
     }
     
     @Override
@@ -47,7 +55,7 @@ public class WebSocketEndpointRegistry implements SmartInitializingSingleton {
      * 注册端点
      */
     private void registerEndpoint(WebSocketEndpoint endpoint, Object bean, Class<?> beanType) {
-        String path = endpoint.path();
+        String path = properties.getPath();
         EndpointMethodHandler handler = new EndpointMethodHandler(bean);
         
         // 扫描处理方法
@@ -73,13 +81,13 @@ public class WebSocketEndpointRegistry implements SmartInitializingSingleton {
      * 处理连接打开
      */
     public void handleOpen(WebSocketSession session) {
-        EndpointMethodHandler handler = pathHandlers.get(session.getPath());
+        EndpointMethodHandler handler = pathHandlers.get(properties.getPath());
         if (handler != null && handler.getOnOpenMethod() != null) {
             try {
                 handler.getOnOpenMethod().invoke(handler.getBean(), session);
             } catch (Exception e) {
-                log.error("处理连接打开失败: path={}, sessionId={}", 
-                        session.getPath(), session.getId(), e);
+                log.error("处理连接打开失败: path={}, sessionId={}",
+                        properties.getPath(), session.getId(), e);
             }
         }
     }
@@ -88,13 +96,13 @@ public class WebSocketEndpointRegistry implements SmartInitializingSingleton {
      * 处理文本消息
      */
     public void handleMessage(WebSocketSession session, String message) {
-        EndpointMethodHandler handler = pathHandlers.get(session.getPath());
+        EndpointMethodHandler handler = pathHandlers.get(properties.getPath());
         if (handler != null && handler.getOnMessageMethod() != null) {
             try {
                 handler.getOnMessageMethod().invoke(handler.getBean(), session, message);
             } catch (Exception e) {
-                log.error("处理消息失败: path={}, sessionId={}", 
-                        session.getPath(), session.getId(), e);
+                log.error("处理消息失败: path={}, sessionId={}",
+                        properties.getPath(), session.getId(), e);
             }
         }
     }
@@ -103,13 +111,13 @@ public class WebSocketEndpointRegistry implements SmartInitializingSingleton {
      * 处理二进制消息
      */
     public void handleBinaryMessage(WebSocketSession session, byte[] bytes) {
-        EndpointMethodHandler handler = pathHandlers.get(session.getPath());
+        EndpointMethodHandler handler = pathHandlers.get(properties.getPath());
         if (handler != null && handler.getOnMessageMethod() != null) {
             try {
                 handler.getOnBinaryMessageMethod().invoke(handler.getBean(), session, bytes);
             } catch (Exception e) {
                 log.error("处理消息失败: path={}, sessionId={}",
-                        session.getPath(), session.getId(), e);
+                        properties.getPath(), session.getId(), e);
             }
         }
     }
@@ -118,13 +126,13 @@ public class WebSocketEndpointRegistry implements SmartInitializingSingleton {
      * 处理连接关闭
      */
     public void handleClose(WebSocketSession session) {
-        EndpointMethodHandler handler = pathHandlers.get(session.getPath());
+        EndpointMethodHandler handler = pathHandlers.get(properties.getPath());
         if (handler != null && handler.getOnCloseMethod() != null) {
             try {
                 handler.getOnCloseMethod().invoke(handler.getBean(), session);
             } catch (Exception e) {
-                log.error("处理连接关闭失败: path={}, sessionId={}", 
-                        session.getPath(), session.getId(), e);
+                log.error("处理连接关闭失败: path={}, sessionId={}",
+                        properties.getPath(), session.getId(), e);
             }
         }
     }
@@ -133,13 +141,13 @@ public class WebSocketEndpointRegistry implements SmartInitializingSingleton {
      * 处理错误
      */
     public void handleError(WebSocketSession session, Throwable error) {
-        EndpointMethodHandler handler = pathHandlers.get(session.getPath());
+        EndpointMethodHandler handler = pathHandlers.get(properties.getPath());
         if (handler != null && handler.getOnErrorMethod() != null) {
             try {
                 handler.getOnErrorMethod().invoke(handler.getBean(), session, error);
             } catch (Exception e) {
-                log.error("处理错误失败: path={}, sessionId={}", 
-                        session.getPath(), session.getId(), e);
+                log.error("处理错误失败: path={}, sessionId={}",
+                        properties.getPath(), session.getId(), e);
             }
         }
     }

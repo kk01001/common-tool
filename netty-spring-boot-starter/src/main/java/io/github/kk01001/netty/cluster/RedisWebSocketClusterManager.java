@@ -70,8 +70,8 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     }
     
     @Override
-    public void addSession(String path, WebSocketSession session) {
-        String sessionKey = getSessionKey(path, session.getId());
+    public void addSession(WebSocketSession session) {
+        String sessionKey = getSessionKey(session.getId());
         SessionInfo sessionInfo = new SessionInfo(session, nodeId);
         try {
             String json = objectMapper.writeValueAsString(sessionInfo);
@@ -84,8 +84,8 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     }
     
     @Override
-    public void removeSession(String path, String sessionId) {
-        String sessionKey = getSessionKey(path, sessionId);
+    public void removeSession(String sessionId) {
+        String sessionKey = getSessionKey(sessionId);
         try {
             redisTemplate.opsForHash().delete(sessionKey, sessionId);
             log.debug("从Redis移除会话: {}", sessionKey);
@@ -95,19 +95,19 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     }
     
     @Override
-    public void broadcast(String path, String message, String targetSessionId) {
+    public void broadcast(String message, String targetSessionId) {
         if (!StringUtils.hasText(message)) {
             return;
         }
         
         try {
-            BroadcastMessage broadcastMessage = new BroadcastMessage(path, message, nodeId, targetSessionId);
+            BroadcastMessage broadcastMessage = new BroadcastMessage(message, nodeId, targetSessionId);
             String json = objectMapper.writeValueAsString(broadcastMessage);
-            String channel = getBroadcastChannel(path);
+            String channel = getBroadcastChannel();
             redisTemplate.convertAndSend(channel, json);
-            log.debug("发送广播消息到Redis: channel={}, message={}", channel, json);
+            log.debug("发送广播消息到Redis: channel={}, targetSessionId={}, message={}", channel, targetSessionId, json);
         } catch (Exception e) {
-            log.error("发送广播消息到Redis失败: path={}", path, e);
+            log.error("targetSessionId={}, message={}, 发送广播消息到Redis失败:", targetSessionId, message, e);
             throw new RuntimeException("发送广播消息失败", e);
         }
     }
@@ -153,12 +153,12 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
 
             // 私聊消息
             if (StringUtils.hasText(targetSessionId)) {
-                messageHandler.handlePrivateMessage(message.getPath(), targetSessionId, message.getMessage(), true);
+                messageHandler.handlePrivateMessage(targetSessionId, message.getMessage(), true);
                 log.debug("私聊消息: {}", messageJson);
                 return;
             }
             // 广播消息 给本机每个会话发送
-            messageHandler.handleBroadcastLocalMessage(message.getPath(), message.getMessage());
+            messageHandler.handleBroadcastLocalMessage(message.getMessage());
             log.debug("处理本机广播消息: {}", messageJson);
         } catch (Exception e) {
             log.error("处理广播消息失败: {}", messageJson, e);
@@ -263,8 +263,8 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     private String generateNodeId() {
         return NetUtil.LOCALHOST4.getHostAddress() + "-" + UUID.randomUUID().toString().replace("-", "");
     }
-    
-    private String getSessionKey(String path, String sessionId) {
+
+    private String getSessionKey(String sessionId) {
         int shard = Math.abs(sessionId.hashCode()) % properties.getCluster().getSessionShardCount();
         return sessionKeyPrefix + nodeId + ":" + shard;
     }
@@ -272,8 +272,8 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     private String getNodeKey() {
         return nodeKeyPrefix;
     }
-    
-    private String getBroadcastChannel(String path) {
-        return broadcastChannelPrefix + path;
+
+    private String getBroadcastChannel() {
+        return broadcastChannelPrefix;
     }
 } 

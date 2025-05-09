@@ -18,14 +18,13 @@ public class WebSocketSessionEventListener implements ApplicationListener<WebSoc
 
     @Override
     public void onApplicationEvent(WebSocketSessionEvent event) {
-        String path = event.getPath();
         WebSocketSession session = event.getSession();
         switch (event.getEventType()) {
             case ADD:
-                clusterManager.addSession(path, session);
+                clusterManager.addSession(session);
                 break;
             case REMOVE:
-                clusterManager.removeSession(path, session.getId());
+                clusterManager.removeSession(session.getId());
                 break;
             default:
                 log.warn("未知的会话事件类型: {}", event.getEventType());

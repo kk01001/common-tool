@@ -12,11 +12,6 @@ public class SessionInfo {
     private final String sessionId;
 
     /**
-     * 会话路径
-     */
-    private final String path;
-
-    /**
      * 节点ID
      */
     private final String nodeId;
@@ -39,7 +34,6 @@ public class SessionInfo {
     // WebSocketSession -> SessionInfo
     public SessionInfo(WebSocketSession session, String nodeId) {
         this.sessionId = session.getId();
-        this.path = session.getPath();
         this.nodeId = nodeId;
         this.userId = session.getUserId();
         this.remoteAddress = session.getChannel().remoteAddress().toString();

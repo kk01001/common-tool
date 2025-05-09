@@ -10,20 +10,19 @@ public interface WebSocketClusterManager {
     /**
      * 添加会话
      */
-    void addSession(String path, WebSocketSession session);
+    void addSession(WebSocketSession session);
     
     /**
      * 移除会话
      */
-    void removeSession(String path, String sessionId);
+    void removeSession(String sessionId);
     
     /**
      * 广播消息
-     * @param path 路径
      * @param message 消息
      * @param targetSessionId 目标会话ID
      */
-    void broadcast(String path, String message, String targetSessionId);
+    void broadcast(String message, String targetSessionId);
     
     /**
      * 获取节点ID

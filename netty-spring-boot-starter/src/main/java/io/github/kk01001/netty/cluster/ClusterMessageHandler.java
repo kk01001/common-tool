@@ -8,26 +8,23 @@ public interface ClusterMessageHandler {
 
     /**
      * 处理广播消息
-     * @param path WebSocket路径
      * @param message 消息内容
      */
-    void handleBroadcastMessage(String path, String message);
+    void handleBroadcastMessage(String message);
 
     /**
      * 处理广播消息 只处理本机的消息
      *
-     * @param path    WebSocket路径
      * @param message 消息内容
      */
-    void handleBroadcastLocalMessage(String path, String message);
+    void handleBroadcastLocalMessage(String message);
     
     /**
      * 处理私聊消息
-     * @param path WebSocket路径
      * @param targetSessionId 目标会话ID
      * @param message 消息内容
      */
-    void handlePrivateMessage(String path, String targetSessionId, String message, boolean local);
+    void handlePrivateMessage(String targetSessionId, String message, boolean local);
     
     /**
      * 处理节点事件

@@ -9,7 +9,12 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
@@ -95,7 +100,7 @@ public class WebSocketAuthHandshakeHandler extends ChannelInboundHandlerAdapter 
             WebSocketSession session = ctx.channel().attr(SESSION_ATTRIBUTE_KEY_ATTR).get();
             session.setUserId(authResult.getUserId());
             session.setAttribute("authSuccess", true);
-            sessionManager.addSession(session.getPath(), session);
+            sessionManager.addSession(session);
 
             registry.handleOpen(session);
             log.debug("WebSocket鉴权成功: uri={}, userId={}", 

@@ -1,6 +1,10 @@
 package io.github.kk01001.netty.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * WebSocket端点注解
@@ -11,13 +15,4 @@ import java.lang.annotation.*;
 @Documented
 public @interface WebSocketEndpoint {
 
-    /**
-     * WebSocket的路径
-     */
-    String path() default "/";
-    
-    /**
-     * 子协议
-     */
-    String[] subprotocols() default {};
 }

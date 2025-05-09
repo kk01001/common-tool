@@ -84,8 +84,9 @@ public class NettyWebSocketAutoConfiguration {
     }
     
     @Bean
-    public WebSocketEndpointRegistry webSocketEndpointRegistry(ApplicationContext applicationContext) {
-        return new WebSocketEndpointRegistry(applicationContext);
+    public WebSocketEndpointRegistry webSocketEndpointRegistry(ApplicationContext applicationContext,
+                                                               NettyWebSocketProperties properties) {
+        return new WebSocketEndpointRegistry(applicationContext, properties);
     }
     
     @Bean

@@ -1,43 +1,43 @@
 package io.github.kk01001.netty.cluster.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BroadcastMessage {
-
-    /**
-     * 路径
-     */
-    private final String path;
 
     /**
      * 消息
      */
-    private final String message;
+    private String message;
 
     /**
      * 节点ID
      */
-    private final String nodeId;
+    private String nodeId;
 
     /**
      * 目标会话ID
      */
-    private final String targetSessionId;
+    private String targetSessionId;
 
     /**
      * 消息发送时间
      */
-    private final long timestamp = System.currentTimeMillis();
+    private long timestamp;
 
-    public BroadcastMessage(String path,
-                            String message,
+
+    public BroadcastMessage(String message,
                             String nodeId,
-                            String targetSessionId
-    ) {
-        this.path = path;
+                            String targetSessionId) {
         this.message = message;
         this.nodeId = nodeId;
         this.targetSessionId = targetSessionId;
+        this.timestamp = System.currentTimeMillis();
     }
 } 

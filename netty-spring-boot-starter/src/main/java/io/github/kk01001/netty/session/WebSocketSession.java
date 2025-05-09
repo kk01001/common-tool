@@ -26,12 +26,7 @@ public class WebSocketSession {
      * Netty通道
      */
     private final Channel channel;
-    
-    /**
-     * WebSocket路径
-     */
-    private final String path;
-    
+
     /**
      * 请求URI
      */
@@ -66,13 +61,11 @@ public class WebSocketSession {
 
     public WebSocketSession(String id,
                             Channel channel,
-                            String path,
                             String uri,
                             WebSocketSessionManager sessionManager,
                             MessageTracer messageTracer) {
         this.id = id;
         this.channel = channel;
-        this.path = path;
         this.uri = uri;
         this.sessionManager = sessionManager;
         this.userId = null;
@@ -97,8 +90,7 @@ public class WebSocketSession {
      */
     public void broadcast(String message) {
         messageTracer.traceSend(this, message);
-        sessionManager.broadcast(path, message,
-                session -> !session.getId().equals(this.id));
+        sessionManager.broadcast(message, session -> !session.getId().equals(this.id));
         updateLastActiveTime();
     }
 
@@ -107,7 +99,7 @@ public class WebSocketSession {
      */
     public void broadcastAll(String message) {
         messageTracer.traceSend(this, message);
-        sessionManager.broadcast(path, message);
+        sessionManager.broadcast(message);
         updateLastActiveTime();
     }
 
@@ -116,7 +108,7 @@ public class WebSocketSession {
      */
     public void sendToSession(String sessionId, String message) {
         messageTracer.traceSend(this, message);
-        sessionManager.sendToSession(path, sessionId, message);
+        sessionManager.sendToSession(sessionId, message);
         updateLastActiveTime();
     }
 

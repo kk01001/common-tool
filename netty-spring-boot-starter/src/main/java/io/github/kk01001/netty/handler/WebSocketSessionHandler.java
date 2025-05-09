@@ -37,7 +37,7 @@ public class WebSocketSessionHandler extends ChannelInboundHandlerAdapter {
         // 创建会话
         String sessionId = UUID.randomUUID().toString();
         WebSocketSession session = getWebSocketSession(ctx.channel());
-        sessionManager.addSession(properties.getPath(), session);
+        sessionManager.addSession(session);
         ctx.channel().attr(SESSION_ATTRIBUTE_KEY_ATTR).set(session);
         ctx.channel().attr(SESSION_ID_ATTR).set(session.getId());
         log.debug("创建WebSocket会话: sessionId={}, userId={}", sessionId, session.getUserId());
@@ -47,7 +47,7 @@ public class WebSocketSessionHandler extends ChannelInboundHandlerAdapter {
     public void handlerRemoved(ChannelHandlerContext ctx) {
         String sessionId = ctx.channel().attr(SESSION_ID_ATTR).get();
         try {
-            sessionManager.removeSession(properties.getPath(), sessionId);
+            sessionManager.removeSession(sessionId);
             log.debug("WebSocket连接关闭: sessionId={}", sessionId);
         } catch (Exception e) {
             log.error("处理连接关闭失败: sessionId={}", sessionId, e);
@@ -59,7 +59,6 @@ public class WebSocketSessionHandler extends ChannelInboundHandlerAdapter {
         WebSocketSession session = new WebSocketSession(
                 sessionId,
                 channel,
-                properties.getPath(),
                 channel.remoteAddress().toString(),
                 sessionManager,
                 messageTracer

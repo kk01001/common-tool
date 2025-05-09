@@ -101,7 +101,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@WebSocketEndpoint(path = "/ws")
+@WebSocketEndpoint
 public class MyWebSocketHandler {
 
     @OnOpen

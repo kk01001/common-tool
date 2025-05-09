@@ -19,6 +19,6 @@ public class WebSocketMessageEventListener implements ApplicationListener<WebSoc
     public void onApplicationEvent(WebSocketMessageEvent event) {
         // 收到消息 广播给每个节点
         String targetSessionId = event.getTargetSessionId();
-        clusterManager.broadcast(event.getPath(), event.getMessage(), targetSessionId);
+        clusterManager.broadcast(event.getMessage(), targetSessionId);
     }
 } 

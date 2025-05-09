@@ -11,11 +11,16 @@ import io.github.kk01001.netty.handler.WebSocketHandler;
 import io.github.kk01001.netty.handler.WebSocketHeartbeatHandler;
 import io.github.kk01001.netty.handler.WebSocketSessionHandler;
 import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
-import io.github.kk01001.netty.session.WebSocketSession;
 import io.github.kk01001.netty.session.WebSocketSessionManager;
 import io.github.kk01001.netty.trace.MessageTracer;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -34,7 +39,6 @@ import javax.net.ssl.SSLEngine;
 import java.io.File;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -202,20 +206,6 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
             stop();
             throw e;
         }
-    }
-
-    private WebSocketSession getWebSocketSession(SocketChannel ch) {
-        String sessionId = UUID.randomUUID().toString();
-        WebSocketSession session = new WebSocketSession(
-                sessionId,
-                ch,
-                properties.getPath(),
-                ch.remoteAddress().toString(),
-                sessionManager,
-                messageTracer
-        );
-        sessionManager.addSession(properties.getPath(), session);
-        return session;
     }
 
     private void applyDefaultOptions(ServerBootstrap bootstrap) {
