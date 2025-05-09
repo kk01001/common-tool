@@ -38,8 +38,8 @@ public class DataPermissionAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public SelfAndSubDataPermissionHandler deptAndSubDataScopeHandler(UserPermissionService userPermissionService) {
-        return new SelfAndSubDataPermissionHandler(userPermissionService);
+    public <T> SelfAndSubDataPermissionHandler<T> deptAndSubDataScopeHandler(UserPermissionService<T> userPermissionService) {
+        return new SelfAndSubDataPermissionHandler<>(userPermissionService);
     }
 
     /**
