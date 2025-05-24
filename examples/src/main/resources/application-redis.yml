@@ -1,0 +1,43 @@
+multi:
+  redis:
+    enabled: true
+    default-instance: master  # 默认使用 master 实例
+    instances:
+      # 备用实例 - 作为 backupRedissonClient Bean
+      backup:
+        enabled: true
+        mode: CLUSTER
+        password: Cqt@redis2021
+        connection-timeout: 5000
+        response-timeout: 3000
+        idle-connection-timeout: 10000
+        retry-attempts: 3
+        retry-interval: 1000
+        netty-threads: 32
+        check-lock-synced-slaves: false
+        #        codec-class: org.redisson.codec.JsonJacksonCodec
+        cluster:
+          node-addresses:
+            - 10.255.1.11:9100
+          master-connection-pool-size: 64
+          slave-connection-pool-size: 64
+          read-mode: master
+          scan-interval: 5000
+          check-slots-coverage: true
+          max-redirects: 3
+
+      # 主实例 - 作为 redissonClient Bean
+      master:
+        enabled: true
+        mode: CLUSTER
+        password: 123456
+        #        codec-class: org.redisson.codec.JsonJacksonCodec
+        cluster:
+          node-addresses:
+            - 127.0.0.1:9100
+          master-connection-pool-size: 32
+          slave-connection-pool-size: 32
+          read-mode: SLAVE
+          scan-interval: 5000
+          check-slots-coverage: true
+          max-redirects: 3

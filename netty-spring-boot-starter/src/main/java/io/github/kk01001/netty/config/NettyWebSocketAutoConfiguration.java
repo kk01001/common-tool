@@ -73,7 +73,7 @@ public class NettyWebSocketAutoConfiguration {
     @ConditionalOnProperty(name = "netty.websocket.cluster.enabled", havingValue = "true")
     @ConditionalOnMissingBean(WebSocketClusterManager.class)
     public WebSocketClusterManager redisWebSocketClusterManager(
-            RedisTemplate<String, String> redisTemplate,
+            RedisTemplate<String, Object> redisTemplate,
             ObjectMapper objectMapper,
             NettyWebSocketProperties properties,
             RedisMessageListenerContainer listenerContainer,

@@ -5,6 +5,7 @@ import io.github.kk01001.design.pattern.statemachine.persister.RedissonStatePers
 import io.github.kk01001.design.pattern.statemachine.persister.StatePersister;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -28,7 +29,7 @@ public class StateMachinePersisterAutoConfiguration {
     @Bean
     @ConditionalOnBean(RedissonClient.class)
     @ConditionalOnProperty(prefix = "state-machine.persister", name = "type", havingValue = "redisson")
-    public StatePersister<?, ?> redissonStatePersister(RedissonClient redissonClient, StateMachineProperties properties) {
+    public StatePersister<?, ?> redissonStatePersister(@Qualifier("redissonClient") RedissonClient redissonClient, StateMachineProperties properties) {
         log.info("Configuring Redisson state persister for state machine");
         return new RedissonStatePersister<>(redissonClient, properties);
     }

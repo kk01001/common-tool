@@ -2,30 +2,30 @@ spring:
   application:
     name: examples
 
-  data:
-    redis:
-      password: Cqt@redis2021
-      masterConnectionPoolSize: 200
-      cluster:
-        nodes:
-          - 10.255.1.11:9100
-        max-redirects: 5
-        location: A
-      cluster2:
-        # 激活异地机房
-        active: false
-        nodes:
-          - 10.255.1.11:9100
-        max-redirects: 5
-        location: B
-      timeout: 10000
-      database: 0
-      lettuce:
-        pool:
-          maxIdle: 8
-          minIdle: 0
-          maxActive: 8
-          timeBetweenEvictionRuns: 600s
+#  data:
+#    redis:
+#      password: Cqt@redis2021
+#      masterConnectionPoolSize: 200
+#      cluster:
+#        nodes:
+#          - 10.255.1.11:9100
+#        max-redirects: 5
+#        location: A
+#      cluster2:
+#        # 激活异地机房
+#        active: false
+#        nodes:
+#          - 10.255.1.11:9100
+#        max-redirects: 5
+#        location: B
+#      timeout: 10000
+#      database: 0
+#      lettuce:
+#        pool:
+#          maxIdle: 8
+#          minIdle: 0
+#          maxActive: 8
+#          timeBetweenEvictionRuns: 600s
 
 xxl-job:
   accessToken:

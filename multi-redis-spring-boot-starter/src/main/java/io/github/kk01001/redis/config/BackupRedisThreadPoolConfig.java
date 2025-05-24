@@ -1,4 +1,4 @@
-package io.github.kk01001.redis;
+package io.github.kk01001.redis.config;
 
 import com.alibaba.ttl.threadpool.TtlExecutors;
 import lombok.extern.slf4j.Slf4j;
@@ -17,25 +17,25 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Configuration
-public class OtherThreadPoolConfig {
+public class BackupRedisThreadPoolConfig {
 
     public static final int CPU_NUM = Runtime.getRuntime().availableProcessors();
 
     public static final int QUEUE_CAPACITY = 20000;
 
-    public static final String BACK_REDIS_POOL = "back-redis-pool-";
+    public static final String BACK_REDIS_POOL = "backup-redis-pool-";
 
     /**
      * 异地机房redis操作
      */
-    @Bean("otherRoomExecutor")
+    @Bean("backupRedisExecutor")
     public ExecutorService otherExecutor() {
         log.info("初始化 {} 线程池, 当前核数: {}", BACK_REDIS_POOL, CPU_NUM);
         ExecutorService executorService = new ThreadPoolExecutor(CPU_NUM,
-                CPU_NUM,
+                CPU_NUM * 2,
                 60L,
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(200),
+                new LinkedBlockingQueue<>(QUEUE_CAPACITY),
                 Thread.ofVirtual().name(BACK_REDIS_POOL, 0).factory(),
                 new ThreadPoolExecutor.CallerRunsPolicy());
         return TtlExecutors.getTtlExecutorService(executorService);

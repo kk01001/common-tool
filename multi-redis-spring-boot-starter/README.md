@@ -1,4 +1,4 @@
-# 多Redis实例 Spring Boot Starter
+# Multi Redis Spring Boot Starter
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/multi-redis-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.kk01001/multi-redis-spring-boot-starter)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
@@ -22,11 +22,13 @@
 
 ## 核心功能与亮点 ✨
 
-- **多集群支持**：同时支持最多三个Redis集群的连接和管理
-- **自动配置**：与Spring Boot无缝整合，自动配置多个Redisson客户端
+- **多模式支持**：支持单机、主从、集群、哨兵四种Redis模式
+- **多实例管理**：同时支持多个Redis实例的连接和管理
+- **自动配置**：与Spring Boot无缝整合，自动配置多个Redisson客户端和RedisTemplate
+- **分离式配置**：Redisson客户端和RedisTemplate使用独立的配置类，职责清晰
 - **统一操作工具**：提供`RedissonUtil`工具类，统一操作多个Redis实例
 - **异步写入**：自动将写操作异步同步到备用Redis集群
-- **机房位置标识**：通过配置标识不同Redis集群的机房位置，便于业务逻辑选择
+- **Bean兼容性**：提供Master和Back两个主要Bean，保持向后兼容
 - **线程池优化**：使用Java 21虚拟线程处理异步操作，提高性能和资源利用率
 - **内存优化**：针对不同的机房集群参数进行了细致的内存和连接池优化
 
@@ -40,480 +42,796 @@
 
 ## 快速开始 🚀
 
-### 添加依赖
+### 1. 添加依赖
 
 ```xml
 <dependency>
     <groupId>io.github.kk01001</groupId>
     <artifactId>multi-redis-spring-boot-starter</artifactId>
-    <version>${latest.version}</version>
+    <version>dev-2.4.6.5</version>
 </dependency>
 ```
 
-### 配置多Redis集群
+### 2. 配置文件
 
-在 `application.yml` 或 `application.properties` 中配置多个Redis集群：
+#### 基础配置
 
 ```yaml
-spring:
-  data:
-    redis:
-      # 通用配置
-      password: common-password  # 可选，如果所有集群密码相同
-      connection-timeout: 5000   # 连接超时时间
-      response-timeout: 3000     # 响应超时时间
-      master-connection-pool-size: 100  # 主节点连接池大小
-      slave-connection-pool-size: 100   # 从节点连接池大小
-      
-      # 主集群配置
-      cluster:
-        active: true             # 是否启用
-        location: A              # 机房位置标识
-        password: clusterA-pass  # 集群密码，覆盖通用密码
-        nodes:                   # 节点列表
-          - 192.168.1.1:6379
-          - 192.168.1.2:6379
-          - 192.168.1.3:6379
-        netty-threads: 32        # Netty线程数
-        max-redirects: 3         # 最大重定向次数
-      
-      # 备用集群配置
-      cluster2:
-        active: true             # 是否启用
-        location: B              # 机房位置标识
-        password: clusterB-pass  # 集群密码
-        nodes:                   # 节点列表
-          - 192.168.2.1:6379
-          - 192.168.2.2:6379
-          - 192.168.2.3:6379
-        netty-threads: 16        # Netty线程数
+multi:
+  redis:
+    enabled: true
+    default-instance: default
+    instances:
+      default:
+        enabled: true
+        mode: SINGLE
+        password: your_password
+        single:
+          address: localhost:6379
 ```
 
-### 使用RedissonUtil操作Redis
+#### 单机模式配置
+
+```yaml
+multi:
+  redis:
+    enabled: true
+    default-instance: cache
+    instances:
+      cache:
+        enabled: true
+        mode: SINGLE
+        password: your_password
+        database: 0
+        connection-timeout: 5000
+        response-timeout: 3000
+        single:
+          address: localhost:6379
+          connection-pool-size: 64
+          connection-minimum-idle-size: 24
+```
+
+#### 主从模式配置
+
+```yaml
+multi:
+  redis:
+    enabled: true
+    default-instance: session
+    instances:
+      session:
+        enabled: true
+        mode: MASTER_SLAVE
+        password: your_password
+        database: 0
+        master-slave:
+          master-address: localhost:6379
+          slave-addresses:
+            - localhost:6380
+            - localhost:6381
+          master-connection-pool-size: 64
+          slave-connection-pool-size: 64
+          read-mode: SLAVE
+```
+
+#### 集群模式配置
+
+```yaml
+multi:
+  redis:
+    enabled: true
+    default-instance: cluster
+    instances:
+      cluster:
+        enabled: true
+        mode: CLUSTER
+        password: your_password
+        cluster:
+          node-addresses:
+            - localhost:7000
+            - localhost:7001
+            - localhost:7002
+            - localhost:7003
+            - localhost:7004
+            - localhost:7005
+          master-connection-pool-size: 64
+          slave-connection-pool-size: 64
+          read-mode: SLAVE
+          scan-interval: 5000
+          check-slots-coverage: true
+          max-redirects: 3
+```
+
+#### 哨兵模式配置
+
+```yaml
+multi:
+  redis:
+    enabled: true
+    default-instance: sentinel
+    instances:
+      sentinel:
+        enabled: true
+        mode: SENTINEL
+        password: your_password
+        database: 0
+        sentinel:
+          master-name: mymaster
+          sentinel-addresses:
+            - localhost:26379
+            - localhost:26380
+            - localhost:26381
+          master-connection-pool-size: 64
+          slave-connection-pool-size: 64
+          read-mode: SLAVE
+          scan-interval: 1000
+```
+
+## 多套 Redis 配置示例 🔧
+
+### 1. Master + Back + 其他实例配置
+
+```yaml
+multi:
+  redis:
+    enabled: true
+    default-instance: master  # 默认使用 master 实例
+    instances:
+      # 主实例 - 作为 redissonClient Bean
+      master:
+        enabled: true
+        mode: CLUSTER
+        password: master_password
+        cluster:
+          node-addresses:
+            - redis-master-1:7000
+            - redis-master-2:7001
+            - redis-master-3:7002
+            - redis-master-4:7003
+            - redis-master-5:7004
+            - redis-master-6:7005
+          master-connection-pool-size: 64
+          slave-connection-pool-size: 64
+          read-mode: SLAVE
+      
+      # 备用实例 - 作为 redissonClient2 Bean
+      back:
+        enabled: true
+        mode: CLUSTER
+        password: back_password
+        cluster:
+          node-addresses:
+            - redis-back-1:7000
+            - redis-back-2:7001
+            - redis-back-3:7002
+            - redis-back-4:7003
+            - redis-back-5:7004
+            - redis-back-6:7005
+          master-connection-pool-size: 32
+          slave-connection-pool-size: 32
+          read-mode: SLAVE
+      
+      # 缓存实例 - 单机模式
+      cache:
+        enabled: true
+        mode: SINGLE
+        password: cache_password
+        database: 0
+        single:
+          address: redis-cache:6379
+          connection-pool-size: 32
+          connection-minimum-idle-size: 10
+      
+      # 会话实例 - 主从模式
+      session:
+        enabled: true
+        mode: MASTER_SLAVE
+        password: session_password
+        database: 1
+        master-slave:
+          master-address: redis-session-master:6379
+          slave-addresses:
+            - redis-session-slave1:6379
+            - redis-session-slave2:6379
+          master-connection-pool-size: 32
+          slave-connection-pool-size: 32
+          read-mode: SLAVE
+      
+      # 分布式锁实例 - 哨兵模式
+      lock:
+        enabled: true
+        mode: SENTINEL
+        password: lock_password
+        database: 0
+        sentinel:
+          master-name: mymaster
+          sentinel-addresses:
+            - redis-sentinel-1:26379
+            - redis-sentinel-2:26379
+            - redis-sentinel-3:26379
+          master-connection-pool-size: 16
+          slave-connection-pool-size: 16
+          read-mode: MASTER
+```
+
+### 2. 多机房配置示例
+
+```yaml
+multi:
+  redis:
+    enabled: true
+    default-instance: beijing
+    instances:
+      # 北京机房 - 主实例
+      beijing:
+        enabled: true
+        mode: CLUSTER
+        password: beijing_redis_password
+        connection-timeout: 3000
+        response-timeout: 2000
+        cluster:
+          node-addresses:
+            - beijing-redis-1:7000
+            - beijing-redis-2:7001
+            - beijing-redis-3:7002
+            - beijing-redis-4:7003
+            - beijing-redis-5:7004
+            - beijing-redis-6:7005
+          master-connection-pool-size: 64
+          slave-connection-pool-size: 64
+          read-mode: SLAVE
+      
+      # 上海机房 - 备用实例
+      back:  # 这个会被注册为 redissonClient2
+        enabled: true
+        mode: CLUSTER
+        password: shanghai_redis_password
+        connection-timeout: 5000  # 跨机房延迟较高
+        response-timeout: 3000
+        cluster:
+          node-addresses:
+            - shanghai-redis-1:7000
+            - shanghai-redis-2:7001
+            - shanghai-redis-3:7002
+            - shanghai-redis-4:7003
+            - shanghai-redis-5:7004
+            - shanghai-redis-6:7005
+          master-connection-pool-size: 32
+          slave-connection-pool-size: 32
+          read-mode: SLAVE
+      
+      # 广州机房 - 其他实例
+      guangzhou:
+        enabled: true
+        mode: CLUSTER
+        password: guangzhou_redis_password
+        connection-timeout: 5000
+        response-timeout: 3000
+        cluster:
+          node-addresses:
+            - guangzhou-redis-1:7000
+            - guangzhou-redis-2:7001
+            - guangzhou-redis-3:7002
+```
+
+### 3. 不同业务场景配置
+
+```yaml
+multi:
+    redis:
+    enabled: true
+    default-instance: business
+    instances:
+      # 业务数据 - 主实例
+      business:
+        enabled: true
+        mode: CLUSTER
+        password: business_password
+        cluster:
+          node-addresses:
+            - business-redis-1:7000
+            - business-redis-2:7001
+            - business-redis-3:7002
+          master-connection-pool-size: 64
+          slave-connection-pool-size: 64
+          read-mode: SLAVE
+      
+      # 业务数据备份 - 备用实例
+      back:
+        enabled: true
+        mode: CLUSTER
+        password: business_backup_password
+      cluster:
+          node-addresses:
+            - backup-redis-1:7000
+            - backup-redis-2:7001
+            - backup-redis-3:7002
+          master-connection-pool-size: 32
+          slave-connection-pool-size: 32
+          read-mode: SLAVE
+      
+      # 用户会话
+      user-session:
+        enabled: true
+        mode: SINGLE
+        password: session_password
+        database: 0
+        single:
+          address: session-redis:6379
+          connection-pool-size: 32
+      
+      # 分布式锁
+      distributed-lock:
+        enabled: true
+        mode: SENTINEL
+        password: lock_password
+        sentinel:
+          master-name: lock-master
+          sentinel-addresses:
+            - lock-sentinel-1:26379
+            - lock-sentinel-2:26379
+            - lock-sentinel-3:26379
+          master-connection-pool-size: 16
+          slave-connection-pool-size: 16
+      
+      # 消息队列
+      message-queue:
+        enabled: true
+        mode: MASTER_SLAVE
+        password: mq_password
+        master-slave:
+          master-address: mq-redis-master:6379
+          slave-addresses:
+            - mq-redis-slave1:6379
+            - mq-redis-slave2:6379
+          master-connection-pool-size: 32
+          slave-connection-pool-size: 32
+          read-mode: MASTER  # 消息队列需要强一致性
+      
+      # 缓存数据
+      cache-data:
+        enabled: true
+        mode: SINGLE
+        password: cache_password
+        database: 1
+        single:
+          address: cache-redis:6379
+          connection-pool-size: 64
+          connection-minimum-idle-size: 20
+```
+
+### 4. 环境配置示例
+
+#### application-dev.yml (开发环境)
+```yaml
+multi:
+  redis:
+    enabled: true
+    default-instance: dev
+    instances:
+      dev:
+        enabled: true
+        mode: SINGLE
+        password: dev_password
+        database: 0
+        single:
+          address: localhost:6379
+          connection-pool-size: 16
+      
+      back:
+        enabled: false  # 开发环境不需要备用实例
+```
+
+#### application-prod.yml (生产环境)
+```yaml
+multi:
+  redis:
+    enabled: true
+    default-instance: prod-primary
+    instances:
+      prod-primary:
+        enabled: true
+        mode: CLUSTER
+        password: ${REDIS_PRIMARY_PASSWORD}
+        connection-timeout: 3000
+        response-timeout: 2000
+        retry-attempts: 3
+        retry-interval: 1000
+        netty-threads: 32
+        cluster:
+          node-addresses:
+            - ${REDIS_PRIMARY_NODE1}:7000
+            - ${REDIS_PRIMARY_NODE2}:7001
+            - ${REDIS_PRIMARY_NODE3}:7002
+            - ${REDIS_PRIMARY_NODE4}:7003
+            - ${REDIS_PRIMARY_NODE5}:7004
+            - ${REDIS_PRIMARY_NODE6}:7005
+          master-connection-pool-size: 64
+          slave-connection-pool-size: 64
+          read-mode: SLAVE
+          scan-interval: 5000
+          check-slots-coverage: true
+      
+      back:
+        enabled: true
+        mode: CLUSTER
+        password: ${REDIS_BACKUP_PASSWORD}
+        connection-timeout: 5000
+        response-timeout: 3000
+        cluster:
+          node-addresses:
+            - ${REDIS_BACKUP_NODE1}:7000
+            - ${REDIS_BACKUP_NODE2}:7001
+            - ${REDIS_BACKUP_NODE3}:7002
+            - ${REDIS_BACKUP_NODE4}:7003
+            - ${REDIS_BACKUP_NODE5}:7004
+            - ${REDIS_BACKUP_NODE6}:7005
+          master-connection-pool-size: 32
+          slave-connection-pool-size: 32
+          read-mode: SLAVE
+```
+
+### 3. 使用方式
+
+#### 注入客户端管理器
 
 ```java
-/**
- * @author kk01001
- * @date 2025-02-13 14:31:00
- * @description 用户服务
- */
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
-    private final RedissonUtil redissonUtil;
+    @Autowired
+    private MultiRedisClientManager redisClientManager;
     
-    /**
-     * 保存用户数据到缓存
-     * 自动写入所有配置的Redis集群
-     */
-    public void cacheUserInfo(String userId, UserDTO userInfo) {
-        String key = "user:info:" + userId;
-        // 写入数据，自动同步到所有激活的Redis集群
-        redissonUtil.setSerialize(key, userInfo);
-        // 设置过期时间
-        redissonUtil.setExpire(key, Duration.ofHours(2));
-    }
+    @Autowired
+    private RedissonUtil redissonUtil;
     
-    /**
-     * 从缓存获取用户数据
-     */
-    public UserDTO getUserInfo(String userId) {
-        String key = "user:info:" + userId;
-        String json = redissonUtil.get(key);
-        if (json != null) {
-            return objectMapper.readValue(json, UserDTO.class);
-        }
-        return null;
-    }
-    
-    /**
-     * 从指定机房获取数据
-     */
-    public UserDTO getUserInfoFromLocation(String userId, String location) {
-        String key = "user:info:" + userId;
-        RedissonClient client = redissonUtil.getRedissonClient(location);
-        String json = client.getBucket(key).get();
-        if (json != null) {
-            return objectMapper.readValue(json, UserDTO.class);
-        }
-        return null;
+    public void cacheUser(User user) {
+        // 使用默认实例（master）
+        redissonUtil.set("user:" + user.getId(), user);
+        
+        // 使用指定实例
+        redissonUtil.set("cache", "user:" + user.getId(), user);
+        
+        // 直接获取客户端
+        RedissonClient cacheClient = redisClientManager.getClient("cache");
+        cacheClient.getBucket("user:" + user.getId()).set(user);
     }
 }
 ```
 
-## 高级用法
-
-### 1. 操作Hash数据结构
+#### 使用工具类 - 兼容原有功能
 
 ```java
-/**
- * @author kk01001
- * @date 2025-02-13 14:31:00
- * @description 产品服务
- */
 @Service
-@RequiredArgsConstructor
-public class ProductService {
+public class CacheService {
 
-    private final RedissonUtil redissonUtil;
+    @Autowired
+    private RedissonUtil redissonUtil;
     
-    /**
-     * 批量更新产品库存
-     */
-    public void updateStocks(Map<String, Integer> productStocks) {
-        String key = "product:stocks";
-        // 批量设置HashMap
-        redissonUtil.setHash(key, productStocks);
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+    
+    // 字符串操作 - 原有方法保持不变
+    public void stringOperations() {
+        // 使用默认实例（会自动同步到 back 实例）
+        redissonUtil.set("key", "value");
+        String value = redissonUtil.get("key");
+        
+        // 使用指定实例
+        redissonUtil.set("cache", "key", "value", Duration.ofMinutes(10));
+        String value2 = redissonUtil.get("cache", "key");
     }
     
-    /**
-     * 更新单个产品库存
-     */
-    public void updateStock(String productId, int stock) {
-        String key = "product:stocks";
-        // 设置单个Hash字段
-        redissonUtil.setHash(key, productId, stock);
+    // RedisTemplate 操作 - 基于默认实例
+    public void redisTemplateOperations() {
+        // 字符串操作
+        redisTemplate.opsForValue().set("template:key", "template:value");
+        redisTemplate.opsForValue().set("template:key2", "template:value2", Duration.ofMinutes(10));
+        String value = (String) redisTemplate.opsForValue().get("template:key");
+        
+        // 哈希操作
+        redisTemplate.opsForHash().put("template:hash", "field1", "value1");
+        redisTemplate.opsForHash().put("template:hash", "field2", "value2");
+        Object hashValue = redisTemplate.opsForHash().get("template:hash", "field1");
+        Map<Object, Object> allHash = redisTemplate.opsForHash().entries("template:hash");
+        
+        // 列表操作
+        redisTemplate.opsForList().leftPush("template:list", "item1");
+        redisTemplate.opsForList().leftPush("template:list", "item2");
+        List<Object> listItems = redisTemplate.opsForList().range("template:list", 0, -1);
+    
+        // 集合操作
+        redisTemplate.opsForSet().add("template:set", "member1", "member2", "member3");
+        Set<Object> setMembers = redisTemplate.opsForSet().members("template:set");
+        
+        // 有序集合操作
+        redisTemplate.opsForZSet().add("template:zset", "member1", 1.0);
+        redisTemplate.opsForZSet().add("template:zset", "member2", 2.0);
+        Set<Object> zsetMembers = redisTemplate.opsForZSet().range("template:zset", 0, -1);
+        
+        // 过期时间操作
+        redisTemplate.expire("template:key", Duration.ofMinutes(30));
+        Boolean hasKey = redisTemplate.hasKey("template:key");
+        Long ttl = redisTemplate.getExpire("template:key");
+        
+        // 删除操作
+        redisTemplate.delete("template:key");
+        redisTemplate.delete(Arrays.asList("template:key1", "template:key2"));
     }
     
-    /**
-     * 获取产品库存
-     */
-    public Integer getStock(String productId) {
-        String key = "product:stocks";
-        // 获取Hash字段值
-        return redissonUtil.getHashByItem(key, productId);
+    // 哈希操作 - 支持多实例
+    public void hashOperations() {
+        // 使用默认实例
+        redissonUtil.hset("hash_key", "field", "value");
+        
+        // 使用指定实例
+        redissonUtil.hset("session", "hash_key", "field", "value");
     }
     
-    /**
-     * 递增产品销量
-     */
-    public Long incrementSales(String productId, long increment) {
-        String key = "product:sales";
-        // 递增Hash字段值并设置过期时间
-        return redissonUtil.hashIncrement(key, productId, increment, Duration.ofDays(30));
-    }
-}
-```
-
-### 2. 使用有序集合(ZSet)实现排行榜
-
-```java
-/**
- * @author kk01001
- * @date 2025-02-13 14:31:00
- * @description 排行榜服务
- */
-@Service
-@RequiredArgsConstructor
-public class LeaderboardService {
-
-    private final RedissonUtil redissonUtil;
-    
-    /**
-     * 更新得分
-     */
-    public void updateScore(String userId, double score) {
-        String key = "leaderboard:scores";
-        // 添加或更新分数
-        redissonUtil.addZset(key, userId, score);
-    }
-    
-    /**
-     * 增加得分
-     */
-    public Double incrementScore(String userId, double increment) {
-        String key = "leaderboard:scores";
-        // 增加分数
-        return redissonUtil.addScoreZset(key, userId, increment);
-    }
-    
-    /**
-     * 获取排行榜（降序）
-     */
-    public List<String> getTopUsers(int count) {
-        String key = "leaderboard:scores";
-        // 获取排序后的数据
-        return redissonUtil.readAllDescZset(key).stream()
-                .limit(count)
-                .collect(Collectors.toList());
-    }
-    
-    /**
-     * 获取排行榜（升序）
-     */
-    public List<String> getBottomUsers(int count) {
-        String key = "leaderboard:scores";
-        // 获取排序后的数据
-        return redissonUtil.readAllAscZset(key).stream()
-                .limit(count)
-                .collect(Collectors.toList());
-    }
-}
-```
-
-### 3. 使用List实现队列
-
-```java
-/**
- * @author kk01001
- * @date 2025-02-13 14:31:00
- * @description 消息队列服务
- */
-@Service
-@RequiredArgsConstructor
-public class MessageQueueService {
-
-    private final RedissonUtil redissonUtil;
-    
-    /**
-     * 发送消息到队列
-     */
-    public void sendMessage(String queueName, String message) {
-        // 添加到列表末尾
-        redissonUtil.addList(queueName, message, Duration.ofDays(1));
-    }
-    
-    /**
-     * 批量发送消息
-     */
-    public void sendMessages(String queueName, List<String> messages) {
-        // 批量添加到列表
-        redissonUtil.addAllList(queueName, messages);
-    }
-    
-    /**
-     * 消费消息
-     */
-    public String consumeMessage(String queueName) {
-        // 从阻塞队列取出消息，超时时间5秒
+    // 锁操作 - 支持指定实例
+    public void lockOperations() {
+        // 使用默认实例的锁
+        RLock lock = redissonUtil.getLock("lock_key");
+        
+        // 使用分布式锁实例
+        RLock distributedLock = redissonUtil.getLock("distributed-lock", "business_lock");
+        
         try {
-            return redissonUtil.pollBlockList(queueName, 5, TimeUnit.SECONDS);
+            if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
+                // 业务逻辑
+            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return null;
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
-    }
-    
-    /**
-     * 批量消费消息
-     */
-    public List<String> consumeMessages(String queueName, int batchSize) {
-        // 批量取出消息
-        return redissonUtil.pollBlockList(queueName, batchSize);
     }
 }
 ```
 
-### 4. 使用直接访问特定Redis实例
+#### 获取特定实例的客户端
 
 ```java
-/**
- * @author kk01001
- * @date 2025-02-13 14:31:00
- * @description Redis直接访问服务
- */
 @Service
-@RequiredArgsConstructor
-public class DirectRedisAccessService {
+public class DistributedLockService {
 
-    private final RedissonUtil redissonUtil;
-    
-    /**
-     * 仅在特定机房的Redis实例中操作数据
-     */
-    public void operateInSpecificLocation(String location, String key, String value) {
-        RedissonClient client = redissonUtil.getRedissonClient(location);
-        if (client != null) {
-            client.getBucket(key).set(value);
-        } else {
-            throw new IllegalArgumentException("未找到指定机房的Redis实例: " + location);
-        }
-    }
-    
-    /**
-     * 获取主Redis实例
-     */
-    public RedissonClient getPrimaryClient() {
-        return redissonUtil.getRedissonClient();
-    }
-    
-    /**
-     * 获取备用Redis实例
-     */
-    public RedissonClient getBackupClient() {
-        return redissonUtil.getBackRedissonClient();
-    }
-    
-    /**
-     * 在所有Redis实例上执行相同操作
-     */
-    public void executeOnAllInstances(String key, String value) {
-        // 获取所有可用的Redis实例
-        List<RedissonClient> clients = new ArrayList<>();
-        clients.add(redissonUtil.getRedissonClient());
-        
-        RedissonClient backupClient = redissonUtil.getBackRedissonClient();
-        if (backupClient != null) {
-            clients.add(backupClient);
-        }
-        
-        // 在所有实例上执行操作
-        for (RedissonClient client : clients) {
-            client.getBucket(key).set(value);
-        }
-    }
-}
-```
-
-## 配置参数详解
-
-### 公共配置
-
-| 参数名 | 类型 | 默认值 | 说明 |
-| ------ | ---- | ------ | ---- |
-| spring.data.redis.password | String | null | 公共Redis密码 |
-| spring.data.redis.connection-timeout | Integer | 5000 | 连接超时时间(毫秒) |
-| spring.data.redis.response-timeout | Integer | 3000 | 响应超时时间(毫秒) |
-| spring.data.redis.idle-connection-timeout | Integer | 10000 | 空闲连接超时时间(毫秒) |
-| spring.data.redis.master-connection-pool-size | Integer | 100 | 主节点连接池大小 |
-| spring.data.redis.slave-connection-pool-size | Integer | 128 | 从节点连接池大小 |
-| spring.data.redis.retry-attempts | Integer | 3 | 重试次数 |
-| spring.data.redis.retry-interval | Integer | 1000 | 重试间隔(毫秒) |
-| spring.data.redis.check-lock-synced-slaves | Boolean | false | 是否检查锁是否同步到从节点 |
-| spring.data.redis.slaves-sync-timeout | Long | 1000 | 从节点同步超时时间(毫秒) |
-
-### 集群配置
-
-| 参数名 | 类型 | 默认值 | 说明 |
-| ------ | ---- | ------ | ---- |
-| spring.data.redis.cluster.active | Boolean | false | 是否启用集群 |
-| spring.data.redis.cluster.location | String | null | 机房位置标识 |
-| spring.data.redis.cluster.password | String | null | 集群密码(覆盖公共密码) |
-| spring.data.redis.cluster.nodes | List | null | 集群节点列表 |
-| spring.data.redis.cluster.netty-threads | Integer | 32 | Netty线程数 |
-| spring.data.redis.cluster.max-redirects | Integer | 3 | 最大重定向次数 |
-
-### 备用集群配置
-
-备用集群配置与主集群配置相同，只需将 `cluster` 替换为 `cluster2` 或 `cluster3`。
-
-## 最佳实践
-
-### 1. 合理设置机房位置标识
-
-机房位置标识是区分不同Redis集群的重要依据，建议使用有意义的标识：
-
-```yaml
-spring:
-  data:
-    redis:
-      cluster:
-        location: SHANGHAI  # 上海机房
-      cluster2:
-        location: BEIJING   # 北京机房
-```
-
-### 2. 异步写入优化
-
-本组件默认会将写操作异步同步到备用Redis集群，但在某些情况下可能需要优化：
-
-- **高频写入**：对于高频写入的场景，可以考虑批量操作减少网络请求
-- **延迟敏感**：如果对写入延迟不敏感，可以放心使用异步写入
-- **数据一致性**：如果要求强一致性，建议手动管理多Redis实例的写入
-
-### 3. 机房Redis选择策略
-
-在读取数据时，可以根据不同的策略选择从哪个机房读取：
-
-- **就近原则**：根据用户所在地选择最近的机房Redis
-- **负载均衡**：在多个Redis实例间进行负载均衡
-- **主备模式**：始终从主Redis读取，备用Redis只作为灾备
-
-```java
-/**
- * @author kk01001
- * @date 2025-02-13 14:31:00
- * @description Redis选择策略
- */
-@Component
-public class RedisLocationStrategy {
-
-    private final RedissonUtil redissonUtil;
-    
     @Autowired
-    public RedisLocationStrategy(RedissonUtil redissonUtil) {
-        this.redissonUtil = redissonUtil;
-    }
+    private MultiRedisClientManager redisClientManager;
     
-    /**
-     * 根据用户IP选择最近的Redis
-     */
-    public RedissonClient selectByUserIp(String userIp) {
-        // 判断用户IP所在区域
-        String location = determineLocationByIp(userIp);
-        return redissonUtil.getRedissonClient(location);
-    }
-    
-    // 省略IP定位实现
-}
-```
-
-### 4. 处理Redis不可用情况
-
-配置合理的容错机制，确保一个Redis集群不可用时，系统仍然能够正常工作：
-
-```java
-/**
- * @author kk01001
- * @date 2025-02-13 14:31:00
- * @description Redis容错服务
- */
-@Service
-@Slf4j
-public class RedisFaultTolerantService {
-
-    private final RedissonUtil redissonUtil;
-    
-    @Autowired
-    public RedisFaultTolerantService(RedissonUtil redissonUtil) {
-        this.redissonUtil = redissonUtil;
-    }
-    
-    /**
-     * 容错获取数据
-     */
-    public <T> T getWithFallback(String key) {
+    public boolean tryLock(String lockKey) {
+        // 获取专门用于分布式锁的 Redis 实例
+        RedissonClient lockClient = redisClientManager.getClient("distributed-lock");
+        RLock lock = lockClient.getLock(lockKey);
+        
         try {
-            // 先尝试从主Redis获取
-            T value = redissonUtil.get(key);
-            if (value != null) {
-                return value;
-            }
-            
-            // 主Redis没有数据，尝试从备用Redis获取
-            RedissonClient backupClient = redissonUtil.getBackRedissonClient();
-            if (backupClient != null) {
-                return (T) backupClient.getBucket(key).get();
-            }
-            
-            return null;
-        } catch (Exception e) {
-            log.error("Redis读取异常，尝试从备用实例获取", e);
-            // 主Redis异常，尝试从备用Redis获取
-            try {
-                RedissonClient backupClient = redissonUtil.getBackRedissonClient();
-                if (backupClient != null) {
-                    return (T) backupClient.getBucket(key).get();
-                }
-            } catch (Exception ex) {
-                log.error("所有Redis实例都不可用", ex);
-            }
-            return null;
+            return lock.tryLock(10, 30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
         }
     }
 }
 ```
+
+#### 兼容原有代码
+
+```java
+@Service
+public class LegacyService {
+    
+    @Autowired
+    @Qualifier("redissonClient")
+    private RedissonClient redissonClient;  // 主实例
+    
+    @Autowired
+    @Qualifier("redissonClient2")
+    private RedissonClient redissonClient2; // 备用实例（可能为null）
+    
+    @Autowired
+    private RedissonUtil redissonUtil;
+    
+    public void legacyMethod() {
+        // 原有代码无需修改，继续使用
+        redissonClient.getBucket("key").set("value");
+        
+        // RedissonUtil 的原有方法也保持不变
+        redissonUtil.set("key", "value");  // 会自动同步到备用实例
+        redissonUtil.hset("hash", "field", "value");
+    }
+}
+```
+
+## Bean 说明 📦
+
+### 自动创建的 Bean
+
+1. **redissonClient** (Primary Bean)
+   - 对应 `default-instance` 配置的实例
+   - 作为主要的 Redis 客户端
+
+2. **redissonClient2** (可选 Bean)
+   - 对应名为 "back" 或 "backup" 的实例
+   - 作为备用 Redis 客户端
+   - 如果没有配置则为 null
+
+3. **redisTemplate** (Primary Bean)
+   - 基于 `default-instance` 配置的 RedisTemplate
+   - 使用 String 序列化 key，JSON 序列化 value
+   - 支持标准的 Spring Data Redis 操作
+
+4. **redisConnectionFactory** (Primary Bean)
+   - 基于 `default-instance` 配置的连接工厂
+   - 支持单机、主从、集群、哨兵四种模式
+
+5. **MultiRedisClientManager**
+   - 管理所有 Redis 实例
+   - 包含 master、back 和其他所有实例
+
+### Bean 注入示例
+
+```java
+@Component
+public class RedisService {
+    
+    // 主实例 - 自动注入
+    @Autowired
+    private RedissonClient redissonClient;
+    
+    // 备用实例 - 可能为 null
+    @Autowired(required = false)
+    private RedissonClient redissonClient2;
+    
+    // RedisTemplate - 基于默认实例
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+    
+    // 实例管理器
+    @Autowired
+    private MultiRedisClientManager redisClientManager;
+    
+    // 工具类
+    @Autowired
+    private RedissonUtil redissonUtil;
+    
+    public void useRedis() {
+        // 使用主实例
+        redissonClient.getBucket("key1").set("value1");
+        
+        // 使用备用实例（如果存在）
+        if (redissonClient2 != null) {
+            redissonClient2.getBucket("key2").set("value2");
+            }
+            
+        // 使用 RedisTemplate（推荐用于简单操作）
+        redisTemplate.opsForValue().set("template_key", "template_value");
+        String value = (String) redisTemplate.opsForValue().get("template_key");
+        
+        // 使用指定实例
+        RedissonClient cacheClient = redisClientManager.getClient("cache");
+        cacheClient.getBucket("cache_key").set("cache_value");
+        
+        // 使用工具类（推荐用于复杂操作）
+        redissonUtil.set("key3", "value3");  // 使用默认实例
+        redissonUtil.set("cache", "key4", "value4");  // 使用指定实例
+    }
+}
+```
+
+## 配置参数说明
+
+### 全局配置
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `multi.redis.enabled` | boolean | false | 是否启用多 Redis 配置 |
+| `multi.redis.default-instance` | String | default | 默认实例名称，对应 redissonClient Bean |
+
+### 实例配置
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `enabled` | boolean | true | 是否启用此实例 |
+| `mode` | enum | SINGLE | Redis 模式：SINGLE/MASTER_SLAVE/CLUSTER/SENTINEL |
+| `password` | String | - | Redis 密码 |
+| `database` | int | 0 | 数据库索引（仅单机和主从模式） |
+| `connection-timeout` | int | 5000 | 连接超时时间（毫秒） |
+| `response-timeout` | int | 3000 | 响应超时时间（毫秒） |
+| `idle-connection-timeout` | int | 10000 | 空闲连接超时时间（毫秒） |
+| `retry-attempts` | int | 3 | 重试次数 |
+| `retry-interval` | int | 1000 | 重试间隔（毫秒） |
+| `netty-threads` | int | 32 | Netty 线程数 |
+
+### 单机模式配置
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `single.address` | String | - | Redis 服务器地址 |
+| `single.connection-pool-size` | int | 64 | 连接池大小 |
+| `single.connection-minimum-idle-size` | int | 24 | 最小空闲连接数 |
+
+### 主从模式配置
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `master-slave.master-address` | String | - | 主节点地址 |
+| `master-slave.slave-addresses` | List<String> | - | 从节点地址列表 |
+| `master-slave.read-mode` | enum | SLAVE | 读取模式 |
+
+### 集群模式配置
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `cluster.node-addresses` | List<String> | - | 集群节点地址列表 |
+| `cluster.scan-interval` | int | 5000 | 集群扫描间隔（毫秒） |
+| `cluster.check-slots-coverage` | boolean | true | 是否检查槽位覆盖 |
+| `cluster.max-redirects` | int | 3 | 最大重定向次数 |
+
+### 哨兵模式配置
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `sentinel.master-name` | String | - | 主服务器名称 |
+| `sentinel.sentinel-addresses` | List<String> | - | 哨兵节点地址列表 |
+| `sentinel.scan-interval` | int | 1000 | 哨兵扫描间隔（毫秒） |
+
+## 特殊实例名称说明 🏷️
+
+### 预定义实例名称
+
+- **default-instance**: 配置的默认实例名称，会被注册为 `redissonClient` Bean
+- **back**: 会被注册为 `redissonClient2` Bean，用作备用实例
+- **backup**: 如果没有 "back"，会查找 "backup" 作为 `redissonClient2` Bean
+
+### 实例优先级
+
+1. `redissonClient` = `default-instance` 配置的实例
+2. `redissonClient2` = "back" > "backup" > null
+3. 所有实例都会注册到 `MultiRedisClientManager`
+
+## 注意事项
+
+1. **实例命名**: 
+   - `default-instance` 指定的实例作为主实例
+   - 名为 "back" 或 "backup" 的实例作为备用实例
+   - 其他实例通过 `MultiRedisClientManager` 访问
+
+2. **兼容性保证**:
+   - 保留原有的 `writeWithResult` 和 `write` 方法
+   - 支持主备自动同步功能
+   - 原有代码无需修改
+   - 提供标准的 `RedisTemplate` Bean，基于默认实例
+
+3. **配置要求**:
+   - 确保配置的 Redis 服务器地址可访问
+   - 集群模式需要至少 3 个主节点
+   - 哨兵模式需要至少 3 个哨兵节点
+   - 密码配置为可选
+
+4. **性能考虑**:
+   - 跨机房实例建议增加超时时间
+   - 根据业务需求调整连接池大小
+   - 备用实例可以使用较小的连接池
+
+## 版本兼容性
+
+- Spring Boot 3.x
+- Java 21+
+- Redisson 3.x
+
+## 更新日志
+
+### v2.4.6.5
+- 重构多 Redis 实例配置
+- 支持四种 Redis 模式（单机、主从、集群、哨兵）
+- 提供统一的客户端管理器
+- 更新工具类支持实例级别操作
+- 保持向后兼容性，支持原有 Bean 注入方式
+- 新增 Master/Back Bean 自动配置
+- 完善多套 Redis 配置支持
+- 新增 RedisTemplate Bean 自动配置，基于默认实例
+- **配置类分离**：将 RedisTemplate 配置独立为 `RedisTemplateAutoConfiguration`，与 Redisson 配置分离，职责更清晰
 
 ## 应用场景
 
@@ -521,20 +839,51 @@ public class RedisFaultTolerantService {
 - **数据容灾备份**：将数据同时写入多个Redis集群，实现灾备
 - **就近访问加速**：用户访问就近的Redis集群，降低延迟
 - **读写分离**：主Redis实例负责写操作，从Redis实例负责读操作
+- **业务隔离**：不同业务使用不同的Redis实例，避免相互影响
 - **灰度发布**：新功能先在一个Redis集群上测试，确认无误后再推广
 - **流量分担**：将不同类型的数据存储在不同的Redis集群，分担负载
 
 ## 常见问题
 
-### 1. 多Redis实例同步失败怎么办？
+### 1. 如何配置多套Redis？
 
-当异步同步到备用Redis失败时，系统会记录错误日志但不会影响主流程。如果需要更可靠的同步，建议：
+参考上面的"多套 Redis 配置示例"部分，根据您的需求选择合适的配置方式。
+
+### 2. 如何保持向后兼容？
+
+组件自动创建 `redissonClient`、`redissonClient2` 和 `redisTemplate` Bean，原有代码无需修改：
+
+```java
+// 原有代码继续有效
+@Autowired
+private RedissonClient redissonClient;
+
+@Autowired
+private RedissonUtil redissonUtil;
+
+// 新增的 RedisTemplate 支持
+@Autowired
+private RedisTemplate<String, Object> redisTemplate;
+```
+
+### 3. RedisTemplate 和 RedissonClient 有什么区别？
+
+- **RedisTemplate**: Spring Data Redis 的标准模板，适合简单的 CRUD 操作
+- **RedissonClient**: Redisson 客户端，提供更丰富的分布式功能（锁、队列、布隆过滤器等）
+
+推荐使用场景：
+- 简单缓存操作：使用 `RedisTemplate`
+- 分布式锁、队列等高级功能：使用 `RedissonClient` 或 `RedissonUtil`
+
+### 4. 多Redis实例同步失败怎么办？
+
+当异步同步到备用Redis失败时，系统会记录错误日志但不会影响主流程。建议：
 
 1. 实现自定义的重试机制
 2. 使用消息队列进行数据同步
 3. 定期进行数据校验和修复
 
-### 2. 如何监控多个Redis实例？
+### 5. 如何监控多个Redis实例？
 
 建议设置以下监控指标：
 
@@ -553,12 +902,11 @@ public class RedisFaultTolerantService {
 @Slf4j
 public class RedisMonitorService {
 
-    private final RedissonUtil redissonUtil;
+    @Autowired
+    private MultiRedisClientManager redisClientManager;
     
     @Autowired
-    public RedisMonitorService(RedissonUtil redissonUtil) {
-        this.redissonUtil = redissonUtil;
-    }
+    private RedisTemplate<String, Object> redisTemplate;
     
     /**
      * 检查所有Redis实例可用性
@@ -567,26 +915,25 @@ public class RedisMonitorService {
     public void checkRedisAvailability() {
         Map<String, Boolean> status = new HashMap<>();
         
-        // 检查主Redis
+        // 检查默认实例（RedisTemplate）
         try {
-            RedissonClient client = redissonUtil.getRedissonClient();
-            client.getBucket("health:check").set("ok");
-            status.put("primary", true);
+            redisTemplate.opsForValue().set("health:check:template", "ok");
+            status.put("default-template", true);
         } catch (Exception e) {
-            log.error("主Redis不可用", e);
-            status.put("primary", false);
+            log.error("RedisTemplate 不可用", e);
+            status.put("default-template", false);
         }
         
-        // 检查备用Redis
+        // 检查所有 Redisson 实例
+        for (String instanceName : redisClientManager.getInstanceNames()) {
         try {
-            RedissonClient backupClient = redissonUtil.getBackRedissonClient();
-            if (backupClient != null) {
-                backupClient.getBucket("health:check").set("ok");
-                status.put("backup", true);
-            }
+                RedissonClient client = redisClientManager.getClient(instanceName);
+                client.getBucket("health:check:" + instanceName).set("ok");
+                status.put(instanceName, true);
         } catch (Exception e) {
-            log.error("备用Redis不可用", e);
-            status.put("backup", false);
+                log.error("Redis实例不可用: {}", instanceName, e);
+                status.put(instanceName, false);
+            }
         }
         
         log.info("Redis实例状态: {}", status);
@@ -594,13 +941,33 @@ public class RedisMonitorService {
 }
 ```
 
-### 3. 如何处理Redis配置变更？
+### 6. 如何处理Redis配置变更？
 
 Redis配置变更通常需要重启应用，但可以实现动态刷新机制：
 
 1. 使用Spring Cloud Config或其他配置中心动态更新配置
 2. 实现自定义的Redis连接池管理器，支持动态刷新
 3. 使用监听器监听配置变更，重新初始化Redis连接
+
+### 7. 配置类的职责分工是什么？
+
+项目采用分离式配置设计，职责清晰：
+
+- **`MultiRedissonConfig`**: 负责 Redisson 客户端的配置和管理
+  - 创建 `MultiRedisClientManager`
+  - 创建 `redissonClient` 和 `redissonClient2` Bean
+  - 管理多个 Redisson 实例
+
+- **`RedisTemplateAutoConfiguration`**: 负责 RedisTemplate 的配置
+  - 创建 `RedisConnectionFactory`
+  - 创建 `RedisTemplate` Bean
+  - 基于默认实例配置连接工厂
+
+这种设计的优势：
+- 职责单一，便于维护
+- 可以独立扩展和修改
+- 降低配置类的复杂度
+- 便于单元测试
 
 ## 贡献 🙏
 

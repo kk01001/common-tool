@@ -1,2 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  io.github.kk01001.redis.MultiRedissonConfig
+  io.github.kk01001.redis.config.MultiRedissonConfiguration \
+  io.github.kk01001.redis.config.RedisTemplateAutoConfiguration \
+  io.github.kk01001.redis.config.BackupRedisThreadPoolConfig

@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class RedisWebSocketClusterManager implements WebSocketClusterManager {
-    
-    private final RedisTemplate<String, String> redisTemplate;
+
+    private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final NettyWebSocketProperties properties;
     private final RedisMessageListenerContainer listenerContainer;
@@ -36,7 +36,7 @@ public class RedisWebSocketClusterManager implements WebSocketClusterManager {
     private final String broadcastChannelPrefix;
 
     public RedisWebSocketClusterManager(
-            RedisTemplate<String, String> redisTemplate,
+            RedisTemplate<String, Object> redisTemplate,
             ObjectMapper objectMapper,
             NettyWebSocketProperties properties,
             RedisMessageListenerContainer listenerContainer,

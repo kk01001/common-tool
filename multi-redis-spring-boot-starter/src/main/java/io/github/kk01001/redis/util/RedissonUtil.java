@@ -1,8 +1,7 @@
-package io.github.kk01001.redis;
+package io.github.kk01001.redis.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
+import io.github.kk01001.redis.core.MultiRedisClientManager;
 import lombok.SneakyThrows;
 import org.redisson.api.GeoEntry;
 import org.redisson.api.GeoOrder;
@@ -28,9 +27,6 @@ import org.redisson.client.codec.Codec;
 import org.redisson.client.protocol.ScoredEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.time.Duration;
@@ -38,9 +34,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -52,59 +46,57 @@ import java.util.function.Supplier;
  * @description
  * Redisson工具类，支持多机房Redis操作，包含string、hash、set、list、deque、zset、lock等操作
  */
-@Component
 public class RedissonUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RedissonUtil.class);
 
-    private static final Map<String, RedissonClient> REDISSON_CLIENT_MAP = new ConcurrentHashMap<>(16);
+    private final RedissonClient redissonClient;
 
-    @Qualifier(value = "redissonClient")
-    @Autowired
-    private RedissonClient redissonClient;
+    private final RedissonClient backupRedissonClient;
 
-    @Qualifier(value = "redissonClient2")
-    @Autowired(required = false)
-    private RedissonClient redissonClient2;
+    private final ExecutorService backupRedisExecutor;
 
-    @Resource
-    private MultiRedisProperties redisProperties;
+    private final ObjectMapper objectMapper;
 
-    @Resource(name = "otherRoomExecutor")
-    private ExecutorService otherExecutor;
+    private final MultiRedisClientManager redisClientManager;
 
-    @Resource
-    private ObjectMapper objectMapper;
-
-    /**
-     * 初始化客户端
-     */
-    @PostConstruct
-    public void initClient() {
-        String location = redisProperties.getCluster().getLocation();
-        REDISSON_CLIENT_MAP.put(location, redissonClient);
-        if (Optional.ofNullable(redissonClient2).isPresent()) {
-            String location2 = redisProperties.getCluster2().getLocation();
-            REDISSON_CLIENT_MAP.put(location2, redissonClient2);
-        }
+    public RedissonUtil(RedissonClient redissonClient,
+                        RedissonClient backupRedissonClient,
+                        ExecutorService backupRedisExecutor,
+                        ObjectMapper objectMapper,
+                        MultiRedisClientManager redisClientManager) {
+        this.redissonClient = redissonClient;
+        this.backupRedissonClient = backupRedissonClient;
+        this.backupRedisExecutor = backupRedisExecutor;
+        this.objectMapper = objectMapper;
+        this.redisClientManager = redisClientManager;
     }
 
+    /**
+     * 获取master RedissonClient
+     *
+     * @return RedissonClient
+     */
     public RedissonClient getRedissonClient() {
         return redissonClient;
     }
 
+    /**
+     * 获取backup RedissonClient
+     * @return RedissonClient
+     */
     public RedissonClient getBackRedissonClient() {
-        return redissonClient2;
+        return redisClientManager.getBackupClient();
     }
 
     /**
      * 根据机房位置获取RedissonClient
      *
-     * @param location 机房位置
+     * @param instanceName 实例名称
      * @return RedissonClient
      */
-    public RedissonClient getRedissonClient(String location) {
-        return REDISSON_CLIENT_MAP.get(location);
+    public RedissonClient getRedissonClient(String instanceName) {
+        return redisClientManager.getClient(instanceName);
     }
 
     // ====================== String 操作 ======================
@@ -115,7 +107,7 @@ public class RedissonUtil {
         return write(() -> {
             redissonClient.getBucket(key).set(value);
             return true;
-        }, () -> redissonClient2.getBucket(key).set(value), "setBucket");
+        }, () -> backupRedissonClient.getBucket(key).set(value), "setBucket");
     }
 
     /**
@@ -125,7 +117,7 @@ public class RedissonUtil {
         return write(() -> {
             redissonClient.getBucket(key).set(value, duration);
             return true;
-        }, () -> redissonClient2.getBucket(key).set(value, duration), "setBucketExpire");
+        }, () -> backupRedissonClient.getBucket(key).set(value, duration), "setBucketExpire");
     }
 
     /**
@@ -137,7 +129,7 @@ public class RedissonUtil {
         return write(() -> {
             redissonClient.getBucket(key).set(json);
             return true;
-        }, () -> redissonClient2.getBucket(key).set(json), "setSerialize");
+        }, () -> backupRedissonClient.getBucket(key).set(json), "setSerialize");
     }
 
     /**
@@ -186,7 +178,7 @@ public class RedissonUtil {
             map.put(field, value);
             return null;
         }, () -> {
-            RMap<String, V> map = redissonClient2.getMap(key);
+            RMap<String, V> map = backupRedissonClient.getMap(key);
             map.put(field, value);
         }, "hashSet");
     }
@@ -200,7 +192,7 @@ public class RedissonUtil {
             rMap.putAll(map);
             return null;
         }, () -> {
-            RMap<String, V> rMap = redissonClient2.getMap(key);
+            RMap<String, V> rMap = backupRedissonClient.getMap(key);
             rMap.putAll(map);
         }, "hashMSet");
     }
@@ -250,7 +242,7 @@ public class RedissonUtil {
             RMap<String, ?> map = redissonClient.getMap(key);
             return map.fastRemove(fields);
         }, () -> {
-            RMap<String, ?> map = redissonClient2.getMap(key);
+            RMap<String, ?> map = backupRedissonClient.getMap(key);
             map.fastRemove(fields);
         }, "hashDel");
     }
@@ -263,7 +255,7 @@ public class RedissonUtil {
                     RMap<Object, V> rMap = redissonClient.getMap(key);
                     return rMap.addAndGet(field, value);
                 },
-                () -> redissonClient2.getMap(key).addAndGet(field, value),
+                () -> backupRedissonClient.getMap(key).addAndGet(field, value),
                 "hashDel");
     }
 
@@ -276,7 +268,7 @@ public class RedissonUtil {
             RSet<V> set = redissonClient.getSet(key);
             return set.addAll(Arrays.asList(values));
         }, () -> {
-            RSet<V> set = redissonClient2.getSet(key);
+            RSet<V> set = backupRedissonClient.getSet(key);
             set.addAll(Arrays.asList(values));
         }, "setAdd");
     }
@@ -289,7 +281,7 @@ public class RedissonUtil {
             RSet<V> set = redissonClient.getSet(key);
             return set.addAll(values);
         }, () -> {
-            RSet<V> set = redissonClient2.getSet(key);
+            RSet<V> set = backupRedissonClient.getSet(key);
             set.addAll(values);
         }, "setAddList");
     }
@@ -302,7 +294,7 @@ public class RedissonUtil {
             RSet<V> set = redissonClient.getSet(key);
             return set.addAll(values);
         }, () -> {
-            RSet<V> set = redissonClient2.getSet(key);
+            RSet<V> set = backupRedissonClient.getSet(key);
             set.addAll(values);
         }, "setAddSet");
     }
@@ -315,7 +307,7 @@ public class RedissonUtil {
             RSet<V> set = redissonClient.getSet(key);
             return set.removeAll(Arrays.asList(values));
         }, () -> {
-            RSet<V> set = redissonClient2.getSet(key);
+            RSet<V> set = backupRedissonClient.getSet(key);
             set.removeAll(Arrays.asList(values));
         }, "setRemove");
     }
@@ -328,7 +320,7 @@ public class RedissonUtil {
             RSet<V> set = redissonClient.getSet(key);
             return set.removeAll(values);
         }, () -> {
-            RSet<V> set = redissonClient2.getSet(key);
+            RSet<V> set = backupRedissonClient.getSet(key);
             set.removeAll(values);
         }, "setRemoveList");
     }
@@ -341,7 +333,7 @@ public class RedissonUtil {
             RSet<V> set = redissonClient.getSet(key);
             return set.removeAll(values);
         }, () -> {
-            RSet<V> set = redissonClient2.getSet(key);
+            RSet<V> set = backupRedissonClient.getSet(key);
             set.removeAll(values);
         }, "setRemoveSet");
     }
@@ -378,7 +370,7 @@ public class RedissonUtil {
             RSet<V> set = redissonClient.getSet(key);
             return set.removeRandom();
         }, data -> {
-            RSet<V> set = redissonClient2.getSet(key);
+            RSet<V> set = backupRedissonClient.getSet(key);
             set.remove(data);
         }, "setPopRandom");
     }
@@ -391,7 +383,7 @@ public class RedissonUtil {
             RSet<V> set = redissonClient.getSet(key);
             return set.removeRandom(count);
         }, data -> {
-            RSet<V> set = redissonClient2.getSet(key);
+            RSet<V> set = backupRedissonClient.getSet(key);
             set.removeAll(data);
         }, "setPopRandomCount");
     }
@@ -405,7 +397,7 @@ public class RedissonUtil {
             RList<V> list = redissonClient.getList(key);
             return list.addAll(Arrays.asList(values));
         }, () -> {
-            RList<V> list = redissonClient2.getList(key);
+            RList<V> list = backupRedissonClient.getList(key);
             list.addAll(Arrays.asList(values));
         }, "listPush");
     }
@@ -437,7 +429,7 @@ public class RedissonUtil {
             RList<V> list = redissonClient.getList(key);
             return list.remove(value);
         }, () -> {
-            RList<V> list = redissonClient2.getList(key);
+            RList<V> list = backupRedissonClient.getList(key);
             list.remove(value);
         }, "listRemove");
     }
@@ -450,7 +442,7 @@ public class RedissonUtil {
             RList<V> list = redissonClient.getList(key);
             return list.addAll(values);
         }, () -> {
-            RList<V> list = redissonClient2.getList(key);
+            RList<V> list = backupRedissonClient.getList(key);
             list.addAll(values);
         }, "listPushAll");
     }
@@ -463,7 +455,7 @@ public class RedissonUtil {
             RList<V> list = redissonClient.getList(key);
             return list.removeAll(values);
         }, () -> {
-            RList<V> list = redissonClient2.getList(key);
+            RList<V> list = backupRedissonClient.getList(key);
             list.removeAll(values);
         }, "listRemoveAll");
     }
@@ -489,7 +481,7 @@ public class RedissonUtil {
             RScoredSortedSet<V> zset = redissonClient.getScoredSortedSet(key);
             return zset.add(score, value);
         }, () -> {
-            RScoredSortedSet<V> zset = redissonClient2.getScoredSortedSet(key);
+            RScoredSortedSet<V> zset = backupRedissonClient.getScoredSortedSet(key);
             zset.add(score, value);
         }, "zsetAdd");
     }
@@ -522,7 +514,7 @@ public class RedissonUtil {
             RScoredSortedSet<V> zset = redissonClient.getScoredSortedSet(key);
             return zset.addAll(values);
         }, () -> {
-            RScoredSortedSet<V> zset = redissonClient2.getScoredSortedSet(key);
+            RScoredSortedSet<V> zset = backupRedissonClient.getScoredSortedSet(key);
             zset.addAll(values);
         }, "zsetAddBatch");
     }
@@ -575,7 +567,7 @@ public class RedissonUtil {
             RScoredSortedSet<V> zset = redissonClient.getScoredSortedSet(key);
             return zset.removeAll(Arrays.asList(values));
         }, () -> {
-            RScoredSortedSet<V> zset = redissonClient2.getScoredSortedSet(key);
+            RScoredSortedSet<V> zset = backupRedissonClient.getScoredSortedSet(key);
             zset.removeAll(Arrays.asList(values));
         }, "zsetRemove");
     }
@@ -617,7 +609,7 @@ public class RedissonUtil {
             RScoredSortedSet<V> zset = redissonClient.getScoredSortedSet(key);
             return zset.addScore(value, delta);
         }, () -> {
-            RScoredSortedSet<V> zset = redissonClient2.getScoredSortedSet(key);
+            RScoredSortedSet<V> zset = backupRedissonClient.getScoredSortedSet(key);
             zset.addScore(value, delta);
         }, "zsetIncrementScore");
     }
@@ -628,7 +620,7 @@ public class RedissonUtil {
      */
     public <V> Boolean offerLast(String key, V value) {
         return write(() -> redissonClient.getDeque(key).offerLast(value),
-                () -> redissonClient2.getDeque(key).offerLast(value),
+                () -> backupRedissonClient.getDeque(key).offerLast(value),
                 "dequePushLast"
         );
     }
@@ -638,7 +630,7 @@ public class RedissonUtil {
      */
     public <V> Boolean offerFirst(String key, V value) {
         return write(() -> redissonClient.getDeque(key).offerFirst(value),
-                () -> redissonClient2.getDeque(key).offerFirst(value),
+                () -> backupRedissonClient.getDeque(key).offerFirst(value),
                 "dequePushFirst"
         );
     }
@@ -651,7 +643,7 @@ public class RedissonUtil {
                     RDeque<V> rDeque = redissonClient.getDeque(key);
                     return rDeque.pollFirst();
                 },
-                data -> redissonClient2.getDeque(key).remove(data),
+                data -> backupRedissonClient.getDeque(key).remove(data),
                 "dequePollFirst"
         );
     }
@@ -664,7 +656,7 @@ public class RedissonUtil {
                     RDeque<V> rDeque = redissonClient.getDeque(key);
                     return rDeque.pollLast();
                 },
-                data -> redissonClient2.getDeque(key).remove(data),
+                data -> backupRedissonClient.getDeque(key).remove(data),
                 "dequePollLast"
         );
     }
@@ -677,7 +669,7 @@ public class RedissonUtil {
                     RDeque<V> rDeque = redissonClient.getDeque(key);
                     return rDeque.addAll(values);
                 },
-                () -> redissonClient2.getDeque(key).addAll(values),
+                () -> backupRedissonClient.getDeque(key).addAll(values),
                 "dequeAddAll"
         );
     }
@@ -690,7 +682,7 @@ public class RedissonUtil {
                     RDeque<V> rDeque = redissonClient.getDeque(key);
                     return rDeque.removeAll(values);
                 },
-                () -> redissonClient2.getDeque(key).removeAll(values),
+                () -> backupRedissonClient.getDeque(key).removeAll(values),
                 "dequeRemoveAll"
         );
     }
@@ -747,7 +739,7 @@ public class RedissonUtil {
             RBlockingQueue<E> blockingQueue = redissonClient.getBlockingQueue(key);
             return blockingQueue.offer(value);
         }, data -> {
-            RBlockingQueue<E> blockingQueue = redissonClient2.getBlockingQueue(key);
+            RBlockingQueue<E> blockingQueue = backupRedissonClient.getBlockingQueue(key);
             blockingQueue.offer(value);
         }, "offerBlockingQueue");
     }
@@ -764,7 +756,7 @@ public class RedissonUtil {
                 throw new RuntimeException(e);
             }
         }, data -> {
-            RBlockingQueue<E> blockingQueue = redissonClient2.getBlockingQueue(key);
+            RBlockingQueue<E> blockingQueue = backupRedissonClient.getBlockingQueue(key);
             blockingQueue.remove(data);
         }, "takeBlockingQueue");
     }
@@ -781,7 +773,7 @@ public class RedissonUtil {
                 throw new RuntimeException(e);
             }
         }, data -> {
-            RBlockingQueue<E> blockingQueue = redissonClient2.getBlockingQueue(key);
+            RBlockingQueue<E> blockingQueue = backupRedissonClient.getBlockingQueue(key);
             blockingQueue.remove(data);
         }, "pollBlockingQueue");
     }
@@ -795,7 +787,7 @@ public class RedissonUtil {
             RGeo<V> geo = redissonClient.getGeo(key);
             return geo.add(longitude, latitude, member);
         }, () -> {
-            RGeo<V> geo = redissonClient2.getGeo(key);
+            RGeo<V> geo = backupRedissonClient.getGeo(key);
             geo.add(longitude, latitude, member);
         }, "addGeoLocation");
     }
@@ -808,7 +800,7 @@ public class RedissonUtil {
             RGeo<V> geo = redissonClient.getGeo(key);
             return geo.add(geoEntry);
         }, () -> {
-            RGeo<V> geo = redissonClient2.getGeo(key);
+            RGeo<V> geo = backupRedissonClient.getGeo(key);
             geo.add(geoEntry);
         }, "addGeoLocation");
     }
@@ -821,7 +813,7 @@ public class RedissonUtil {
             RGeo<V> geo = redissonClient.getGeo(key);
             return geo.remove(value);
         }, () -> {
-            RGeo<V> geo = redissonClient2.getGeo(key);
+            RGeo<V> geo = backupRedissonClient.getGeo(key);
             geo.remove(value);
         }, "removeGeoLocation");
     }
@@ -834,7 +826,7 @@ public class RedissonUtil {
             RGeo<V> geo = redissonClient.getGeo(key);
             return geo.removeAll(values);
         }, () -> {
-            RGeo<V> geo = redissonClient2.getGeo(key);
+            RGeo<V> geo = backupRedissonClient.getGeo(key);
             geo.removeAll(values);
         }, "removeGeoLocations");
     }
@@ -900,7 +892,7 @@ public class RedissonUtil {
             bloomFilter.tryInit(expectedInsertions, falseProbability);
             return true;
         }, () -> {
-            RBloomFilter<Object> bloomFilter = redissonClient2.getBloomFilter(key);
+            RBloomFilter<Object> bloomFilter = backupRedissonClient.getBloomFilter(key);
             bloomFilter.tryInit(expectedInsertions, falseProbability);
         }, "createBloomFilter");
     }
@@ -917,7 +909,7 @@ public class RedissonUtil {
             RBloomFilter<T> bloomFilter = redissonClient.getBloomFilter(key);
             return bloomFilter.add(value);
         }, () -> {
-            RBloomFilter<T> bloomFilter = redissonClient2.getBloomFilter(key);
+            RBloomFilter<T> bloomFilter = backupRedissonClient.getBloomFilter(key);
             bloomFilter.add(value);
         }, "addToBloomFilter");
     }
@@ -978,7 +970,7 @@ public class RedissonUtil {
             RBloomFilter<Object> bloomFilter = redissonClient.getBloomFilter(key);
             return bloomFilter.unlink();
         }, () -> {
-            RBloomFilter<Object> bloomFilter = redissonClient2.getBloomFilter(key);
+            RBloomFilter<Object> bloomFilter = backupRedissonClient.getBloomFilter(key);
             bloomFilter.unlink();
         }, "deleteBloomFilter");
     }
@@ -998,7 +990,7 @@ public class RedissonUtil {
             RBitSet bitSet = redissonClient.getBitSet(key);
             return bitSet.set(offset, value);
         }, () -> {
-            RBitSet bitSet = redissonClient2.getBitSet(key);
+            RBitSet bitSet = backupRedissonClient.getBitSet(key);
             bitSet.set(offset, value);
         }, "setBit");
     }
@@ -1040,7 +1032,7 @@ public class RedissonUtil {
             destBitSet.and(sourceKey1, sourceKey2);
             return true;
         }, () -> {
-            RBitSet destBitSet = redissonClient2.getBitSet(destKey);
+            RBitSet destBitSet = backupRedissonClient.getBitSet(destKey);
             destBitSet.and(sourceKey1, sourceKey2);
         }, "bitAnd");
     }
@@ -1059,7 +1051,7 @@ public class RedissonUtil {
             destBitSet.or(sourceKey1, sourceKey2);
             return true;
         }, () -> {
-            RBitSet destBitSet = redissonClient2.getBitSet(destKey);
+            RBitSet destBitSet = backupRedissonClient.getBitSet(destKey);
             destBitSet.or(sourceKey1, sourceKey2);
         }, "bitOr");
     }
@@ -1078,7 +1070,7 @@ public class RedissonUtil {
             destBitSet.xor(sourceKey1, sourceKey2);
             return true;
         }, () -> {
-            RBitSet destBitSet = redissonClient2.getBitSet(destKey);
+            RBitSet destBitSet = backupRedissonClient.getBitSet(destKey);
             destBitSet.xor(sourceKey1, sourceKey2);
         }, "bitXor");
     }
@@ -1095,7 +1087,7 @@ public class RedissonUtil {
             bitSet.clear();
             return true;
         }, () -> {
-            RBitSet bitSet = redissonClient2.getBitSet(key);
+            RBitSet bitSet = backupRedissonClient.getBitSet(key);
             bitSet.clear();
         }, "clearBitSet");
     }
@@ -1115,7 +1107,7 @@ public class RedissonUtil {
             hyperLogLog.add(value);
             return hyperLogLog.count();
         }, () -> {
-            RHyperLogLog<T> hyperLogLog = redissonClient2.getHyperLogLog(key);
+            RHyperLogLog<T> hyperLogLog = backupRedissonClient.getHyperLogLog(key);
             hyperLogLog.add(value);
         }, "hyperLogLogAdd");
     }
@@ -1133,7 +1125,7 @@ public class RedissonUtil {
             hyperLogLog.addAll(values);
             return hyperLogLog.count();
         }, () -> {
-            RHyperLogLog<T> hyperLogLog = redissonClient2.getHyperLogLog(key);
+            RHyperLogLog<T> hyperLogLog = backupRedissonClient.getHyperLogLog(key);
             hyperLogLog.addAll(values);
         }, "hyperLogLogAddBatch");
     }
@@ -1175,7 +1167,7 @@ public class RedissonUtil {
             destHLL.mergeWith(sourceKeys.toArray(new String[0]));
             return destHLL.count();
         }, () -> {
-            RHyperLogLog<?> destHLL = redissonClient2.getHyperLogLog(destKey);
+            RHyperLogLog<?> destHLL = backupRedissonClient.getHyperLogLog(destKey);
             destHLL.mergeWith(sourceKeys.toArray(new String[0]));
         }, "hyperLogLogMerge");
     }
@@ -1191,7 +1183,7 @@ public class RedissonUtil {
             RHyperLogLog<?> hyperLogLog = redissonClient.getHyperLogLog(key);
             return hyperLogLog.delete();
         }, () -> {
-            RHyperLogLog<?> hyperLogLog = redissonClient2.getHyperLogLog(key);
+            RHyperLogLog<?> hyperLogLog = backupRedissonClient.getHyperLogLog(key);
             hyperLogLog.delete();
         }, "hyperLogLogDelete");
     }
@@ -1207,7 +1199,7 @@ public class RedissonUtil {
             atomicLong.expireIfNotSet(duration);
             return added;
         }, () -> {
-            RAtomicLong atomicLong = redissonClient2.getAtomicLong(key);
+            RAtomicLong atomicLong = backupRedissonClient.getAtomicLong(key);
             atomicLong.addAndGet(1);
             atomicLong.expireIfNotSet(duration);
         }, "increment");
@@ -1221,7 +1213,7 @@ public class RedissonUtil {
             RAtomicLong atomicLong = redissonClient.getAtomicLong(key);
             return atomicLong.decrementAndGet();
         }, () -> {
-            RAtomicLong atomicLong = redissonClient2.getAtomicLong(key);
+            RAtomicLong atomicLong = backupRedissonClient.getAtomicLong(key);
             atomicLong.decrementAndGet();
         }, "decrement");
     }
@@ -1235,7 +1227,7 @@ public class RedissonUtil {
             redissonClient.getBucket(key).delete();
             return true;
         }, () -> {
-            redissonClient2.getBucket(key).delete();
+            backupRedissonClient.getBucket(key).delete();
         }, "delete");
     }
 
@@ -1250,7 +1242,7 @@ public class RedissonUtil {
             return null;
         }, () -> {
             for (String key : keys) {
-                redissonClient2.getBucket(key).unlink();
+                backupRedissonClient.getBucket(key).unlink();
             }
         }, "batchDelete");
     }
@@ -1263,7 +1255,7 @@ public class RedissonUtil {
             redissonClient.getBucket(key).expire(duration);
             return true;
         }, () -> {
-            redissonClient2.getBucket(key).expire(duration);
+            backupRedissonClient.getBucket(key).expire(duration);
         }, "expire");
     }
 
@@ -1289,9 +1281,9 @@ public class RedissonUtil {
         T result = null;
         try {
             result = action.get();
-            if (Boolean.TRUE.equals(redisProperties.getCluster2().getActive())) {
+            if (redisClientManager.enableBackup()) {
                 try {
-                    otherExecutor.execute(backAction::run);
+                    backupRedisExecutor.execute(backAction);
                 } catch (Exception e) {
                     LOGGER.error("{}, 异地redis异常:", actionName, e);
                 }
@@ -1315,10 +1307,10 @@ public class RedissonUtil {
         T result = null;
         try {
             result = action.get();
-            if (Boolean.TRUE.equals(redisProperties.getCluster2().getActive())) {
+            if (redisClientManager.enableBackup()) {
                 try {
                     T finalResult = result;
-                    otherExecutor.execute(() -> {
+                    backupRedisExecutor.execute(() -> {
                         backAction.accept(finalResult);
                     });
                 } catch (Exception e) {
