@@ -37,6 +37,7 @@
         <module>design-pattern-spring-boot-starter</module>
         <module>local-cache-spring-boot-starter</module>
         <module>i18n-spring-boot-starter</module>
+        <module>sse-spring-boot-starter</module>
     </modules>
 
     <properties>

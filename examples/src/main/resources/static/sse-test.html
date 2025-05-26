@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, button {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            min-width: 100px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .message-container {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .message {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .message.user-message {
+            background-color: #e6f7ff;
+        }
+
+        .message.topic-message {
+            background-color: #f6ffed;
+        }
+
+        .message.broadcast {
+            background-color: #fff7e6;
+        }
+
+        .message.connect {
+            background-color: #f2f2f2;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .status.connected {
+            color: green;
+        }
+
+        .status.disconnected {
+            color: red;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>SSE测试页面</h1>
+
+<div class="container">
+    <div class="card">
+        <h2>连接管理</h2>
+        <div class="form-group">
+            <label for="clientId">客户端ID:</label>
+            <input type="text" id="clientId" placeholder="可选，留空自动生成">
+        </div>
+        <div class="form-group">
+            <label for="userId">用户ID:</label>
+            <input type="text" id="userId" placeholder="可选">
+        </div>
+        <div class="form-group">
+            <label for="topic">主题:</label>
+            <input type="text" id="topic" placeholder="可选">
+        </div>
+        <div class="form-group flex-row">
+            <button id="connectBtn">连接</button>
+            <button id="disconnectBtn" disabled>断开连接</button>
+            <span id="connectionStatus" class="status disconnected">未连接</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>发送消息</h2>
+        <div class="form-group">
+            <label for="messageType">消息类型:</label>
+            <select id="messageType">
+                <option value="user">发送给用户</option>
+                <option value="topic">发送给主题</option>
+                <option value="broadcast">广播消息</option>
+            </select>
+        </div>
+        <div class="form-group" id="userIdGroup">
+            <label for="targetUserId">目标用户ID:</label>
+            <input type="text" id="targetUserId">
+        </div>
+        <div class="form-group" id="topicGroup" style="display: none;">
+            <label for="targetTopic">目标主题:</label>
+            <input type="text" id="targetTopic">
+        </div>
+        <div class="form-group">
+            <label for="messageContent">消息内容:</label>
+            <input type="text" id="messageContent">
+        </div>
+        <div class="form-group">
+            <button id="sendBtn">发送消息</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>接收消息
+            <button id="clearBtn" style="float: right; min-width: auto; padding: 3px 8px;">清空</button>
+        </h2>
+        <div id="messageContainer" class="message-container"></div>
+    </div>
+</div>
+
+<script>
+    let eventSource = null;
+    let currentClientId = null;
+
+    document.getElementById('connectBtn').addEventListener('click', connect);
+    document.getElementById('disconnectBtn').addEventListener('click', disconnect);
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+    document.getElementById('clearBtn').addEventListener('click', clearMessages);
+    document.getElementById('messageType').addEventListener('change', toggleMessageTargetFields);
+
+    function toggleMessageTargetFields() {
+        const messageType = document.getElementById('messageType').value;
+        document.getElementById('userIdGroup').style.display = messageType === 'user' ? 'block' : 'none';
+        document.getElementById('topicGroup').style.display = messageType === 'topic' ? 'block' : 'none';
+    }
+
+    function connect() {
+        if (eventSource) {
+            disconnect();
+        }
+
+        const clientId = document.getElementById('clientId').value || '';
+        const userId = document.getElementById('userId').value || '';
+        const topic = document.getElementById('topic').value || '';
+
+        let url = 'http://192.168.206.10:8220/examples/api/sse/connect';
+        const params = [];
+
+        if (clientId) {
+            params.push(`clientId=${encodeURIComponent(clientId)}`);
+        }
+        if (userId) {
+            params.push(`userId=${encodeURIComponent(userId)}`);
+        }
+        if (topic) {
+            params.push(`topic=${encodeURIComponent(topic)}`);
+        }
+
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+
+        eventSource = new EventSource(url);
+
+        // 连接成功事件
+        eventSource.addEventListener('connect', function (event) {
+            const data = JSON.parse(event.data);
+            currentClientId = event.lastEventId;
+            document.getElementById('clientId').value = currentClientId;
+            updateConnectionStatus(true);
+            addMessage('连接成功', 'connect');
+        });
+
+        // 用户消息事件
+        eventSource.addEventListener('user-message', function (event) {
+            addMessage(`用户消息: ${event.data}`, 'user-message');
+        });
+
+        // 主题消息事件
+        eventSource.addEventListener('topic-message', function (event) {
+            addMessage(`主题消息: ${event.data}`, 'topic-message');
+        });
+
+        // 广播消息事件
+        eventSource.addEventListener('broadcast', function (event) {
+            addMessage(`广播消息: ${event.data}`, 'broadcast');
+        });
+
+        // 默认消息事件
+        eventSource.onmessage = function (event) {
+            addMessage(`默认消息: ${event.data}`);
+        };
+
+        // 错误处理
+        eventSource.onerror = function (error) {
+            console.error('SSE连接错误:', error);
+            addMessage('连接错误', 'error');
+            disconnect();
+        };
+    }
+
+    function disconnect() {
+        if (eventSource) {
+            eventSource.close();
+            eventSource = null;
+
+            if (currentClientId) {
+                fetch(`http://192.168.206.10:8220/examples/api/sse/disconnect?clientId=${currentClientId}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log('断开连接响应:', data);
+                        addMessage('已断开连接', 'disconnect');
+                    });
+            }
+
+            updateConnectionStatus(false);
+            currentClientId = null;
+        }
+    }
+
+    function updateConnectionStatus(connected) {
+        const statusElement = document.getElementById('connectionStatus');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+
+        if (connected) {
+            statusElement.textContent = '已连接';
+            statusElement.className = 'status connected';
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = false;
+        } else {
+            statusElement.textContent = '未连接';
+            statusElement.className = 'status disconnected';
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+        }
+    }
+
+    function sendMessage() {
+        const messageType = document.getElementById('messageType').value;
+        const messageContent = document.getElementById('messageContent').value;
+
+        if (!messageContent) {
+            alert('请输入消息内容');
+            return;
+        }
+
+        let url = '';
+        const params = new URLSearchParams();
+        params.append('message', messageContent);
+
+        switch (messageType) {
+            case 'user':
+                const userId = document.getElementById('targetUserId').value;
+                if (!userId) {
+                    alert('请输入目标用户ID');
+                    return;
+                }
+                url = `http://192.168.206.10:8220/examples/api/sse/send/user/${userId}`;
+                break;
+            case 'topic':
+                const topic = document.getElementById('targetTopic').value;
+                if (!topic) {
+                    alert('请输入目标主题');
+                    return;
+                }
+                url = `http://192.168.206.10:8220/examples/api/sse/send/topic/${topic}`;
+                break;
+            case 'broadcast':
+                url = 'http://192.168.206.10:8220/examples/api/sse/broadcast';
+                break;
+        }
+
+        fetch(url, {
+            method: 'POST',
+            body: params,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+            .then(response => response.text())
+            .then(data => {
+                console.log('发送消息响应:', data);
+                document.getElementById('messageContent').value = '';
+            })
+            .catch(error => {
+                console.error('发送消息错误:', error);
+                alert('发送消息失败');
+            });
+    }
+
+    function addMessage(message, type = '') {
+        const messageContainer = document.getElementById('messageContainer');
+        const messageElement = document.createElement('div');
+        messageElement.className = `message ${type}`;
+        messageElement.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        messageContainer.appendChild(messageElement);
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+
+    function clearMessages() {
+        document.getElementById('messageContainer').innerHTML = '';
+    }
+
+    // 初始化
+    toggleMessageTargetFields();
+</script>
+</body>
+</html> 

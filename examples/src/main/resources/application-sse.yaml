@@ -1,0 +1,18 @@
+sse:
+  enabled: true                   # 是否启用 SSE，默认为 true
+  cluster: true                   # 是否启用集群模式，默认为 false
+  message-forward-type: redis     # 消息转发方式：redis, rocketmq, none(默认)
+  heartbeat-interval: 10000       # 心跳间隔（毫秒），默认 10000
+  client-timeout: 0           # 客户端超时时间（毫秒），默认 0
+  controller:
+    enabled: false                 # 是否启用内置控制器，默认为 true
+
+  # Redis 配置（当 message-forward-type 为 redis 时有效）
+  redis:
+    topic: sse:message            # Redis 发布订阅主题，默认为 sse:message
+
+  # RocketMQ 配置（当 message-forward-type 为 rocketmq 时有效）
+  rocketMq:
+    topic: sse-message            # RocketMQ 主题，默认为 sse-message
+    consumer-group: sse-consumer-group  # 消费者组，默认为 sse-consumer-group
+    consumer-count: 1             # 消费者线程数，默认为 1
