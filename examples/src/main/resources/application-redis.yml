@@ -30,11 +30,13 @@ multi:
       master:
         enabled: true
         mode: CLUSTER
-        password: 123456
+        #        password: 123456
+        password: Cqt@redis2021
         #        codec-class: org.redisson.codec.JsonJacksonCodec
         cluster:
           node-addresses:
-            - 127.0.0.1:9100
+            #            - 127.0.0.1:9100
+            - 10.255.1.11:9100
           master-connection-pool-size: 32
           slave-connection-pool-size: 32
           read-mode: SLAVE
