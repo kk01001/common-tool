@@ -36,11 +36,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
-public abstract class BigDataCsvlExporter<R, P> {
+public abstract class BigDataCsvExporter<R, P> {
 
     protected final Executor excelThreadPool;
 
-    protected BigDataCsvlExporter(@Qualifier("excelThreadPool") Executor excelThreadPool) {
+    protected BigDataCsvExporter(@Qualifier("excelThreadPool") Executor excelThreadPool) {
         this.excelThreadPool = excelThreadPool;
     }
 
