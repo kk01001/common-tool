@@ -1,0 +1,117 @@
+# 动态MQ配置示例
+dynamic:
+  mq:
+    # 是否启用动态MQ
+    enabled: true
+    # 默认MQ类型：rocketmq, rabbitmq, kafka, redis
+    type: rocketmq
+    
+    # 生产者配置
+    producer:
+      # 发送超时时间（毫秒）
+      send-timeout: 3000
+      # 最大重试次数
+      max-retry-times: 3
+      # 是否启用事务
+      transaction-enabled: false
+    
+    # 消费者配置
+    consumer:
+      # 消费者组名
+      group-name: default-group
+      # 消费模式：CLUSTERING（集群）或 BROADCASTING（广播）
+      consume-mode: CLUSTERING
+      # 消费线程数
+      consume-thread-min: 1
+      consume-thread-max: 10
+      # 批量消费大小
+      consume-message-batch-max-size: 1
+    
+    # RocketMQ配置
+    rocketmq:
+      # NameServer地址
+      name-server: localhost:9876
+      # 生产者组
+      producer-group: default-producer-group
+      # 其他配置
+      properties:
+        # 消息最大大小
+        maxMessageSize: 4194304
+    
+    # RabbitMQ配置
+    rabbitmq:
+      host: localhost
+      port: 5672
+      username: guest
+      password: guest
+      virtual-host: /
+      properties:
+        # 连接超时
+        connection-timeout: 30000
+        # 心跳间隔
+        requested-heartbeat: 60
+    
+    # Kafka配置
+    kafka:
+      # Bootstrap服务器
+      bootstrap-servers: localhost:9092
+      properties:
+        # 生产者配置
+        acks: all
+        retries: 3
+        batch.size: 16384
+        linger.ms: 1
+        buffer.memory: 33554432
+        # 消费者配置
+        enable.auto.commit: false
+        auto.offset.reset: earliest
+        session.timeout.ms: 30000
+        max.poll.records: 500
+    
+    # Redis配置
+    redis:
+      host: localhost
+      port: 6379
+      password: 
+      database: 0
+      properties:
+        # 连接池配置
+        max-active: 20
+        max-idle: 10
+        min-idle: 5
+        max-wait: 5000
+
+---
+# 开发环境配置
+spring:
+  profiles: dev
+dynamic:
+  mq:
+    type: redis
+    redis:
+      host: 127.0.0.1
+      port: 6379
+
+---
+# 测试环境配置
+spring:
+  profiles: test
+dynamic:
+  mq:
+    type: rabbitmq
+    rabbitmq:
+      host: test-rabbitmq-server
+      port: 5672
+      username: test
+      password: test123
+
+---
+# 生产环境配置
+spring:
+  profiles: prod
+dynamic:
+  mq:
+    type: rocketmq
+    rocketmq:
+      name-server: prod-rocketmq-server:9876
+      producer-group: prod-producer-group

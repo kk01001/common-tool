@@ -1,0 +1,90 @@
+# 分离式配置示例 - Producer和Consumer可以使用不同的MQ
+dynamic:
+  mq:
+    # 全局开关
+    enabled: true
+    # 默认MQ类型（同时影响Producer和Consumer）
+    type: rocketmq
+    
+    # 生产者配置
+    producer:
+      # 发送超时时间（毫秒）
+      send-timeout: 3000
+      # 最大重试次数
+      max-retry-times: 3
+      # 是否启用事务
+      transaction-enabled: false
+    
+    # 消费者配置
+    consumer:
+      # 消费者组名
+      group-name: default-group
+      # 消费模式：CLUSTERING（集群）或 BROADCASTING（广播）
+      consume-mode: CLUSTERING
+      # 消费线程数
+      consume-thread-min: 1
+      consume-thread-max: 10
+      # 批量消费大小
+      consume-message-batch-max-size: 1
+    
+    # RocketMQ配置（Producer和Consumer共享）
+    rocketmq:
+      name-server: localhost:9876
+      producer-group: default-producer-group
+    
+    # RabbitMQ配置
+    rabbitmq:
+      host: localhost
+      port: 5672
+      username: guest
+      password: guest
+      virtual-host: /
+    
+    # Kafka配置
+    kafka:
+      bootstrap-servers: localhost:9092
+    
+    # Redis配置
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+
+---
+# 开发环境 - 只启用Producer，使用Redis
+spring:
+  profiles: dev-producer-only
+dynamic:
+  mq:
+    type: redis
+    # 可以通过自定义配置只初始化Producer
+    redis:
+      host: 127.0.0.1
+      port: 6379
+
+---
+# 测试环境 - 只启用Consumer，使用RabbitMQ
+spring:
+  profiles: test-consumer-only
+dynamic:
+  mq:
+    type: rabbitmq
+    # 可以通过自定义配置只初始化Consumer
+    rabbitmq:
+      host: test-rabbitmq-server
+      port: 5672
+
+---
+# 生产环境 - Producer和Consumer都启用，使用RocketMQ
+spring:
+  profiles: prod
+dynamic:
+  mq:
+    type: rocketmq
+    rocketmq:
+      name-server: prod-rocketmq-server:9876
+      producer-group: prod-producer-group
+    consumer:
+      group-name: prod-consumer-group
+      consume-thread-min: 5
+      consume-thread-max: 20
