@@ -1202,7 +1202,21 @@ public class RedissonUtil {
             RAtomicLong atomicLong = backupRedissonClient.getAtomicLong(key);
             atomicLong.addAndGet(1);
             atomicLong.expireIfNotSet(duration);
-        }, "increment");
+        }, "Increment-Expire");
+    }
+
+    /**
+     * 递增
+     */
+    public long increment(String key) {
+        return write(() -> {
+            RAtomicLong atomicLong = redissonClient.getAtomicLong(key);
+            long added = atomicLong.addAndGet(1);
+            return added;
+        }, () -> {
+            RAtomicLong atomicLong = backupRedissonClient.getAtomicLong(key);
+            atomicLong.addAndGet(1);
+        }, "Increment");
     }
 
     /**
