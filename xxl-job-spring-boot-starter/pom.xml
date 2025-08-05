@@ -9,6 +9,7 @@
         <version>2.4.6.4.1</version>
     </parent>
 
+    <name>xxl-job-spring-boot-starter</name>
     <artifactId>xxl-job-spring-boot-starter</artifactId>
     <description>XXL-JOB 自动注册任务</description>
 

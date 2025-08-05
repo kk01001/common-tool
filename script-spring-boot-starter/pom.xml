@@ -9,6 +9,7 @@
         <version>2.4.6.4.1</version>
     </parent>
 
+    <name>script-spring-boot-starter</name>
     <artifactId>script-spring-boot-starter</artifactId>
     <description>Groovy JavaScript等脚本</description>
 

@@ -9,6 +9,7 @@
         <version>2.4.6.4.1</version>
     </parent>
 
+    <name>i18n-spring-boot-starter</name>
     <artifactId>i18n-spring-boot-starter</artifactId>
 
     <properties>

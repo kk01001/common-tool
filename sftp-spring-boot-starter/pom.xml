@@ -9,6 +9,7 @@
         <version>2.4.6.4.1</version>
     </parent>
 
+    <name>sftp-spring-boot-starter</name>
     <artifactId>sftp-spring-boot-starter</artifactId>
     <description>简单SFTP连接池</description>
 

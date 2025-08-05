@@ -9,6 +9,7 @@
         <version>2.4.6.4.1</version>
     </parent>
 
+    <name>mybatis-plus-spring3-boot-starter</name>
     <artifactId>mybatis-plus-spring3-boot-starter</artifactId>
     <description>Mybatis Plus 自动配置, 动态表名, 多数据源, 数据权限</description>
 

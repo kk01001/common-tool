@@ -9,6 +9,7 @@
         <version>2.4.6.4.1</version>
     </parent>
 
+    <name>idempotent-spring-boot-starter</name>
     <artifactId>idempotent-spring-boot-starter</artifactId>
     <description>接口幂等性校验</description>
 

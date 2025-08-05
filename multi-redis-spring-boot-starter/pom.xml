@@ -9,6 +9,7 @@
         <version>2.4.6.4.1</version>
     </parent>
 
+    <name>multi-redis-spring-boot-starter</name>
     <artifactId>multi-redis-spring-boot-starter</artifactId>
     <description>Redisson多实例自动配置</description>
 

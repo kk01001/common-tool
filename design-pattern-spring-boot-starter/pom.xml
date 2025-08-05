@@ -9,6 +9,7 @@
         <version>2.4.6.4.1</version>
     </parent>
 
+    <name>design-pattern-spring-boot-starter</name>
     <artifactId>design-pattern-spring-boot-starter</artifactId>
     <description>一些设计模式的通用实现封装</description>
 

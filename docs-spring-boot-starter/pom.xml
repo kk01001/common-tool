@@ -9,6 +9,7 @@
         <version>2.4.6.4.1</version>
     </parent>
 
+    <name>docs-spring-boot-starter</name>
     <artifactId>docs-spring-boot-starter</artifactId>
     <description>在线接口文档</description>
 

@@ -9,6 +9,7 @@
         <version>2.4.6.4.1</version>
     </parent>
 
+    <name>disruptor-spring-boot-starter</name>
     <artifactId>disruptor-spring-boot-starter</artifactId>
 
     <properties>

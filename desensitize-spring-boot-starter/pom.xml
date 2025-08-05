@@ -9,6 +9,7 @@
         <version>2.4.6.4.1</version>
     </parent>
 
+    <name>desensitize-spring-boot-starter</name>
     <artifactId>desensitize-spring-boot-starter</artifactId>
 
     <properties>

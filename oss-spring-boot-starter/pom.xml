@@ -9,6 +9,7 @@
         <version>2.4.6.4.1</version>
     </parent>
 
+    <name>oss-spring-boot-starter</name>
     <artifactId>oss-spring-boot-starter</artifactId>
     <description>OSS S3协议封装</description>
 
