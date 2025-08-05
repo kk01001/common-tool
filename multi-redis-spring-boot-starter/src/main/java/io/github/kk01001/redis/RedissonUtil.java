@@ -8,6 +8,7 @@ import org.redisson.api.GeoEntry;
 import org.redisson.api.GeoOrder;
 import org.redisson.api.GeoPosition;
 import org.redisson.api.GeoUnit;
+import org.redisson.api.RAtomicDouble;
 import org.redisson.api.RAtomicLong;
 import org.redisson.api.RBitSet;
 import org.redisson.api.RBlockingQueue;
@@ -264,7 +265,31 @@ public class RedissonUtil {
                     return rMap.addAndGet(field, value);
                 },
                 () -> redissonClient2.getMap(key).addAndGet(field, value),
-                "hashDel");
+                "hincrby");
+    }
+
+    /**
+     * hash元素递增 Double
+     */
+    public <V> V hincrby(String key, String field, Double value) {
+        return write(() -> {
+                    RMap<Object, V> rMap = redissonClient.getMap(key);
+                    return rMap.addAndGet(field, value);
+                },
+                () -> redissonClient2.getMap(key).addAndGet(field, value),
+                "hincrbyDouble");
+    }
+
+    /**
+     * hash元素递增 Number
+     */
+    public <V> V hincrby(String key, String field, Number value) {
+        return write(() -> {
+                    RMap<Object, V> rMap = redissonClient.getMap(key);
+                    return rMap.addAndGet(field, value);
+                },
+                () -> redissonClient2.getMap(key).addAndGet(field, value),
+                "hincrbyNumber");
     }
 
     // ====================== Set 操作 ======================
@@ -1211,6 +1236,32 @@ public class RedissonUtil {
             atomicLong.addAndGet(1);
             atomicLong.expireIfNotSet(duration);
         }, "increment");
+    }
+
+    public long increment(String key, long delta, Duration duration) {
+        return write(() -> {
+            RAtomicLong atomicLong = redissonClient.getAtomicLong(key);
+            long added = atomicLong.addAndGet(delta);
+            atomicLong.expireIfNotSet(duration);
+            return added;
+        }, () -> {
+            RAtomicLong atomicLong = redissonClient2.getAtomicLong(key);
+            atomicLong.addAndGet(delta);
+            atomicLong.expireIfNotSet(duration);
+        }, "increment");
+    }
+
+    public double incrementDouble(String key, double delta, Duration duration) {
+        return write(() -> {
+            RAtomicDouble atomicDouble = redissonClient.getAtomicDouble(key);
+            double added = atomicDouble.addAndGet(delta);
+            atomicDouble.expireIfNotSet(duration);
+            return added;
+        }, () -> {
+            RAtomicDouble atomicDouble = redissonClient2.getAtomicDouble(key);
+            atomicDouble.addAndGet(delta);
+            atomicDouble.expireIfNotSet(duration);
+        }, "incrementDouble");
     }
 
     /**
