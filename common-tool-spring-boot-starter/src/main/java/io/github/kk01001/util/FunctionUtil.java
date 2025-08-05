@@ -25,7 +25,7 @@ public class FunctionUtil {
      * @param <T>         缓存对象类型
      * @return 返回缓存或数据库加载的结果
      */
-    private <T> Optional<T> getCachedOrLoadDb(String cacheKey,
+    public <T> Optional<T> getCachedOrLoadDb(String cacheKey,
                                               ThrowingSupplier<Optional<T>> loaderCache,
                                               Supplier<Optional<T>> loaderDb,
                                               Consumer<T> consumer) {
