@@ -1229,12 +1229,12 @@ public class RedissonUtil {
         return write(() -> {
             RAtomicLong atomicLong = redissonClient.getAtomicLong(key);
             long added = atomicLong.addAndGet(1);
-            atomicLong.expireIfNotSet(duration);
+            atomicLong.expire(duration);
             return added;
         }, () -> {
             RAtomicLong atomicLong = redissonClient2.getAtomicLong(key);
             atomicLong.addAndGet(1);
-            atomicLong.expireIfNotSet(duration);
+            atomicLong.expire(duration);
         }, "increment");
     }
 
@@ -1242,12 +1242,12 @@ public class RedissonUtil {
         return write(() -> {
             RAtomicLong atomicLong = redissonClient.getAtomicLong(key);
             long added = atomicLong.addAndGet(delta);
-            atomicLong.expireIfNotSet(duration);
+            atomicLong.expire(duration);
             return added;
         }, () -> {
             RAtomicLong atomicLong = redissonClient2.getAtomicLong(key);
             atomicLong.addAndGet(delta);
-            atomicLong.expireIfNotSet(duration);
+            atomicLong.expire(duration);
         }, "increment");
     }
 
@@ -1255,12 +1255,12 @@ public class RedissonUtil {
         return write(() -> {
             RAtomicDouble atomicDouble = redissonClient.getAtomicDouble(key);
             double added = atomicDouble.addAndGet(delta);
-            atomicDouble.expireIfNotSet(duration);
+            atomicDouble.expire(duration);
             return added;
         }, () -> {
             RAtomicDouble atomicDouble = redissonClient2.getAtomicDouble(key);
             atomicDouble.addAndGet(delta);
-            atomicDouble.expireIfNotSet(duration);
+            atomicDouble.expire(duration);
         }, "incrementDouble");
     }
 
