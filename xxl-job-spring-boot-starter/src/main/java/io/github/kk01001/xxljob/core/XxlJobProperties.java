@@ -12,7 +12,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "xxl-job")
 public class XxlJobProperties {
 
-    private Boolean enable;
+    private Boolean enable = true;
+
+    private Boolean enableAutoRegister = false;
 
     private String accessToken;
 

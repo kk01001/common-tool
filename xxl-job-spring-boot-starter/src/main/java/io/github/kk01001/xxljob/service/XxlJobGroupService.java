@@ -75,6 +75,8 @@ public class XxlJobGroupService {
         try (HttpResponse response = HttpRequest.post(url)
                 .form("appname", xxlJobProperties.getAppName())
                 .form("title", xxlJobProperties.getTitle())
+                .form("start", 0)
+                .form("length", 100)
                 .cookie(xxlJobLoginService.getCookie())
                 .timeout(3000)
                 .execute()) {

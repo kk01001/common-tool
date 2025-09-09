@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -32,7 +33,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "xxl-job", name = {"adminAddresses", "title", "userName", "password"})
+@ConditionalOnProperty(prefix = "xxl-job", name = "enableAutoRegister", havingValue = "true")
 public class XxlJobAutoRegister implements ApplicationListener<ApplicationReadyEvent>, ApplicationContextAware {
 
     private ApplicationContext applicationContext;
@@ -96,6 +97,9 @@ public class XxlJobAutoRegister implements ApplicationListener<ApplicationReadyE
                 if (executeMethod.isAnnotationPresent(XxlJobRegister.class)) {
                     XxlJobRegister xxlJobRegister = executeMethod.getAnnotation(XxlJobRegister.class);
                     List<XxlJobInfo> jobInfo = xxlJobInfoService.getJobInfo(xxlJobGroup.getId(), xxlJob.value());
+                    if (Objects.isNull(jobInfo)) {
+                        continue;
+                    }
                     if (!jobInfo.isEmpty()) {
                         // executor_handler 条件为模糊查询, 需再过滤
                         Optional<XxlJobInfo> first = jobInfo.stream()

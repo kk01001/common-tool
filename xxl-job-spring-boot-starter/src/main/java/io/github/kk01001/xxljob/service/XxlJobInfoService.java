@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -47,18 +48,25 @@ public class XxlJobInfoService {
                 .form("jobGroup", jobGroupId)
                 .form("executorHandler", executorHandler)
                 .form("triggerStatus", -1)
+                .form("start", 0)
+                .form("length", 100)
+                .form("jobDesc", "")
+                .form("author", "")
                 .cookie(xxlJobLoginService.getCookie())
                 .timeout(3000)
                 .execute()) {
             String body = response.body();
             JSONArray array = JSONUtil.parse(body).getByPath("data", JSONArray.class);
+            if (Objects.isNull(array)) {
+                return ListUtil.empty();
+            }
             return array.stream()
                     .map(o -> JSONUtil.toBean((JSONObject) o, XxlJobInfo.class))
                     .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("xxl-job job info page list: {} request error: ", url, e);
         }
-        return ListUtil.empty();
+        return null;
     }
 
     /**
