@@ -71,5 +71,10 @@ public class LocalMessageProperties {
          * 线程名称前缀
          */
         private String threadNamePrefix = "local-message-";
+
+        /**
+         * 拒绝策略
+         */
+        private String rejectedExecutionHandlerClass = "java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy";
     }
 }

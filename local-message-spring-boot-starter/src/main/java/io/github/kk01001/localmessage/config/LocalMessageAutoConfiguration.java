@@ -10,10 +10,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 本地消息自动配置类
@@ -29,52 +29,43 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class LocalMessageAutoConfiguration {
     
     /**
-     * 消息处理线程池
+     * 消息处理线程池（使用虚拟线程）
      */
     @Bean("messageProcessExecutor")
     @ConditionalOnMissingBean(name = "messageProcessExecutor")
     public ThreadPoolExecutor messageProcessExecutor(LocalMessageProperties properties) {
         LocalMessageProperties.ThreadPool threadPoolConfig = properties.getThreadPool();
-        
+
+        // 使用虚拟线程工厂
+        ThreadFactory virtualThreadFactory = Thread.ofVirtual()
+                .name(threadPoolConfig.getThreadNamePrefix(), 0)
+                .factory();
+
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
                 threadPoolConfig.getCorePoolSize(),
                 threadPoolConfig.getMaximumPoolSize(),
                 threadPoolConfig.getKeepAliveTime(),
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(threadPoolConfig.getQueueCapacity()),
-                new LocalMessageThreadFactory(threadPoolConfig.getThreadNamePrefix()),
-                new ThreadPoolExecutor.CallerRunsPolicy()
+                virtualThreadFactory,
+                loadRejectedHandler(threadPoolConfig.getRejectedExecutionHandlerClass())
         );
-        
-        log.info("初始化本地消息处理线程池: corePoolSize={}, maximumPoolSize={}, queueCapacity={}", 
-                threadPoolConfig.getCorePoolSize(), 
-                threadPoolConfig.getMaximumPoolSize(), 
+
+        log.info("初始化本地消息处理虚拟线程池: corePoolSize={}, maximumPoolSize={}, queueCapacity={}",
+                threadPoolConfig.getCorePoolSize(),
+                threadPoolConfig.getMaximumPoolSize(),
                 threadPoolConfig.getQueueCapacity());
-        
+
         return executor;
     }
-    
-    /**
-     * 自定义线程工厂
-     */
-    private static class LocalMessageThreadFactory implements ThreadFactory {
-        private final AtomicInteger threadNumber = new AtomicInteger(1);
-        private final String namePrefix;
-        
-        LocalMessageThreadFactory(String namePrefix) {
-            this.namePrefix = namePrefix;
-        }
-        
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, namePrefix + threadNumber.getAndIncrement());
-            if (t.isDaemon()) {
-                t.setDaemon(false);
-            }
-            if (t.getPriority() != Thread.NORM_PRIORITY) {
-                t.setPriority(Thread.NORM_PRIORITY);
-            }
-            return t;
+
+    public static RejectedExecutionHandler loadRejectedHandler(String className) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            return (RejectedExecutionHandler) clazz.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("无法实例化拒绝策略: " + className, e);
         }
     }
+
 }
