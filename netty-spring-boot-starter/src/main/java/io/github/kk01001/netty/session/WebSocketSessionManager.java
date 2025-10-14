@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +24,12 @@ public class WebSocketSessionManager implements MessageDispatcher {
      * path -> (sessionId -> session)
      */
     protected final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+
+    /**
+     * userId -> sessionId
+     */
+    protected final Map<String, String> userIdSessions = new ConcurrentHashMap<>();
+
     private final ScheduledExecutorService scheduler;
     private final Duration sessionTimeout;
     private final ApplicationEventPublisher eventPublisher;
@@ -45,6 +52,7 @@ public class WebSocketSessionManager implements MessageDispatcher {
             throw new IllegalArgumentException("session不能为空");
         }
         sessions.put(session.getId(), session);
+        userIdSessions.put(session.getUserId(), session.getId());
         log.debug("添加会话: userId={},sessionId={}", session.getUserId(), session.getId());
 
         // 发布会话添加事件
@@ -57,6 +65,7 @@ public class WebSocketSessionManager implements MessageDispatcher {
     public void removeSession(String sessionId) {
         WebSocketSession session = sessions.remove(sessionId);
         if (session != null) {
+            userIdSessions.remove(session.getUserId());
             session.close();
             log.debug("移除会话: userId={}, sessionId={}", session.getUserId(), sessionId);
             // 发布会话移除事件
@@ -112,15 +121,7 @@ public class WebSocketSessionManager implements MessageDispatcher {
         // 其他节点
         eventPublisher.publishEvent(new WebSocketMessageEvent(this, message, null));
     }
-    
-    /**
-     * 获取会话数量
-     */
-    @Override
-    public int getSessionCount() {
-        return sessions.size();
-    }
-    
+
     /**
      * 获取指定会话
      */
@@ -184,5 +185,29 @@ public class WebSocketSessionManager implements MessageDispatcher {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean sendToUser(String userId, String message) {
+        String sessionId = userIdSessions.get(userId);
+        if (!StringUtils.hasText(sessionId)) {
+            log.error("发送消息失败, 未找到匹配的session: userId={}, sessionId={}", userId, sessionId);
+            return false;
+        }
+        sendToSession(sessionId, message);
+        return true;
+    }
+
+    /**
+     * 获取会话数量
+     */
+    @Override
+    public int getSessionCount() {
+        return sessions.size();
+    }
+
+    @Override
+    public Set<String> getUserIds() {
+        return userIdSessions.keySet();
     }
 }

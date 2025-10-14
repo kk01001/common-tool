@@ -2,6 +2,7 @@ package io.github.kk01001.netty.message;
 
 import io.github.kk01001.netty.session.WebSocketSession;
 
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -37,8 +38,17 @@ public interface MessageDispatcher {
     boolean sendToSessionLocal(String sessionId, String message);
 
     /**
+     * 发送消息给指定用户ID
+     */
+    boolean sendToUser(String userId, String message);
+
+    /**
      * 获取会话数量
      */
     int getSessionCount();
 
+    /**
+     * 全部userId
+     */
+    Set<String> getUserIds();
 }
