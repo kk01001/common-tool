@@ -9,6 +9,7 @@
         <version>2.4.7</version>
     </parent>
 
+    <name>local-message-spring-boot-starter</name>
     <artifactId>local-message-spring-boot-starter</artifactId>
     <description>本地消息表 Starter 本地事务和第三方事务支持最终一致性</description>
 

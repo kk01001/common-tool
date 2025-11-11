@@ -52,7 +52,6 @@ public class WebSocketSessionManager implements MessageDispatcher {
             throw new IllegalArgumentException("session不能为空");
         }
         sessions.put(session.getId(), session);
-        userIdSessions.put(session.getUserId(), session.getId());
         log.debug("添加会话: userId={},sessionId={}", session.getUserId(), session.getId());
 
         // 发布会话添加事件

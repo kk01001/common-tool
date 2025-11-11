@@ -10,15 +10,23 @@ public class SqlConditionAdder {
         Statement statement = CCJSqlParserUtil.parse(originalSql);
 
         if (statement instanceof Select select) {
-            net.sf.jsqlparser.statement.select.PlainSelect plainSelect = (net.sf.jsqlparser.statement.select.PlainSelect) select.getSelectBody();
-            net.sf.jsqlparser.expression.Expression where = plainSelect.getWhere();
-            net.sf.jsqlparser.expression.Expression newExpr = CCJSqlParserUtil.parseCondExpression(newCondition);
-            if (where != null) {
-                plainSelect.setWhere(new net.sf.jsqlparser.expression.operators.conditional.AndExpression(where, newExpr));
-            } else {
-                plainSelect.setWhere(newExpr);
-            }
-            return statement.toString();
+            // PlainSelect plainSelect = select.getPlainSelect();
+            //
+            // // 获取现有WHERE条件
+            // Expression where = plainSelect.getWhere();
+            //
+            // // 解析新条件
+            // Expression newExpr = CCJSqlParserUtil.parseCondExpression(newCondition);
+            //
+            // // 组合条件
+            // if (where != null) {
+            //     // 已有WHERE，使用AND连接
+            //     plainSelect.setWhere(new AndExpression(where, newExpr));
+            // } else {
+            //     // 没有WHERE，直接设置
+            //     plainSelect.setWhere(newExpr);
+            // }
+            // return plainSelect.toString();
         }
 
         throw new IllegalArgumentException("Only SELECT statements are supported");
