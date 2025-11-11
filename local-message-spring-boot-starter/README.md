@@ -20,7 +20,7 @@
 <dependency>
     <groupId>io.github.kk01001</groupId>
     <artifactId>local-message-spring-boot-starter</artifactId>
-    <version>2.4.7</version>
+    <version>2.4.8</version>
 </dependency>
 ```
 
