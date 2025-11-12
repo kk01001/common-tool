@@ -1,0 +1,67 @@
+# MQTT 配置示例
+mqtt:
+  # 是否启用 MQTT（必须设置为 true）
+  enabled: true
+  
+  # MQTT Broker 地址
+  broker-url: tcp://10.255.1.21:1883
+  
+  # 客户端 ID（可选，不设置则自动生成）
+  client-id: mqtt-client-demo
+  
+  # 用户名
+  username: emqx_test
+  
+  # 密码
+  password: emqx_test_password
+  
+  # 是否清除会话
+  clean-session: true
+  
+  # 连接超时时间
+  connection-timeout: 30s
+  
+  # 保持连接时间间隔
+  keep-alive-interval: 60s
+  
+  # 是否自动重连
+  automatic-reconnect: true
+  
+  # 最大重连延迟时间
+  max-reconnect-delay: 128s
+  
+  # 遗嘱消息配置（可选）
+  will:
+    topic: testtopic/will
+    payload: Client disconnected unexpectedly
+    qos: 1
+    retained: false
+  
+  # 生产者配置
+  producer:
+    # 默认 QoS
+    default-qos: 1
+    # 默认是否保留消息
+    default-retained: false
+    # 发送超时时间
+    send-timeout: 5s
+    # 是否异步发送
+    async: false
+  
+  # 消费者配置
+  consumer:
+    # 默认订阅的主题（可选）
+    topics:
+      - testtopic/#
+    # 默认 QoS
+    default-qos: 1
+    # 消费线程池大小
+    thread-pool-size: 10
+    # 消费线程池队列大小
+    queue-capacity: 1000
+
+# Spring Boot 日志配置
+logging:
+  level:
+    io.github.kk01001.mqtt: DEBUG
+    org.eclipse.paho: INFO

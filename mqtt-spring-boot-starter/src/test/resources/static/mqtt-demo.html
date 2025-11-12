@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>MQTT Web Demo</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 26px;
+            color: #333;
+        }
+        fieldset {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            padding: 18px;
+        }
+        legend {
+            padding: 0 8px;
+            font-weight: bold;
+            color: #0a6ed1;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #0a6ed1;
+            border: none;
+            color: #fff;
+            padding: 10px 18px;
+            margin-right: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:disabled {
+            background-color: #b3d4fc;
+            cursor: not-allowed;
+        }
+        #log {
+            height: 280px;
+            width: 500px;
+            background-color: #111;
+            color: #0f0;
+            font-family: "Consolas", monospace;
+            overflow-y: auto;
+            border-radius: 8px;
+            padding: 12px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+        .status {
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+        .status.connected {
+            color: #1a7f37;
+        }
+        .status.disconnected {
+            color: #d93025;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>MQTT WebSocket Demo</h1>
+    <p>通过 WebSocket 连接 MQTT Broker，实时发送与接收消息。</p>
+
+    <fieldset>
+        <legend>连接配置</legend>
+        <label for="brokerUrl">Broker WebSocket 地址 (例如 ws://localhost:8083/mqtt)</label>
+        <input id="brokerUrl" type="text" value="ws://localhost:8083/mqtt" />
+
+        <label for="username">用户名 (可选)</label>
+        <input id="username" type="text" placeholder="如果 broker 需要鉴权，请填写" />
+
+        <label for="password">密码 (可选)</label>
+        <input id="password" type="text" placeholder="如果 broker 需要鉴权，请填写" />
+
+        <button id="connectBtn">连接</button>
+        <button id="disconnectBtn" disabled>断开</button>
+        <div id="status" class="status disconnected">状态：未连接</div>
+    </fieldset>
+
+    <fieldset>
+        <legend>订阅配置</legend>
+        <label for="subTopic">订阅主题</label>
+        <input id="subTopic" type="text" value="demo/topic" />
+
+        <button id="subscribeBtn" disabled>订阅</button>
+        <button id="unsubscribeBtn" disabled>取消订阅</button>
+    </fieldset>
+
+    <fieldset>
+        <legend>消息发送</legend>
+        <label for="pubTopic">发布主题</label>
+        <input id="pubTopic" type="text" value="demo/topic" />
+
+        <label for="messageInput">消息内容</label>
+        <textarea id="messageInput" rows="4">{"type":"ping","timestamp":0}</textarea>
+
+        <button id="sendBtn" disabled>发送消息</button>
+        <button id="sendReplyBtn" disabled>回复收到的最新消息</button>
+    </fieldset>
+
+    <fieldset>
+        <legend>消息日志</legend>
+        <div id="log"></div>
+    </fieldset>
+</div>
+
+<script>
+    const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
+    const subscribeBtn = document.getElementById('subscribeBtn');
+    const unsubscribeBtn = document.getElementById('unsubscribeBtn');
+    const sendBtn = document.getElementById('sendBtn');
+    const sendReplyBtn = document.getElementById('sendReplyBtn');
+    const statusLabel = document.getElementById('status');
+    const logContainer = document.getElementById('log');
+
+    let client = null;
+    let lastReceivedTopic = null;
+    let lastReceivedPayload = null;
+
+    const log = (message) => {
+        const time = new Date().toLocaleTimeString();
+        const line = document.createElement('div');
+        line.textContent = `[${time}] ${message}`;
+        logContainer.appendChild(line);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    };
+
+    const updateStatus = (connected) => {
+        if (connected) {
+            statusLabel.textContent = '状态：已连接';
+            statusLabel.classList.remove('disconnected');
+            statusLabel.classList.add('connected');
+        } else {
+            statusLabel.textContent = '状态：未连接';
+            statusLabel.classList.remove('connected');
+            statusLabel.classList.add('disconnected');
+        }
+    };
+
+    connectBtn.addEventListener('click', () => {
+        const brokerUrl = document.getElementById('brokerUrl').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!brokerUrl) {
+            alert('请填写 broker WebSocket 地址');
+            return;
+        }
+
+        const clientId = `web-client-${Math.random().toString(16).slice(2, 10)}`;
+        const options = {
+            clientId,
+            clean: true,
+            reconnectPeriod: 2000,
+            keepalive: 60
+        };
+
+        if (username) {
+            options.username = username;
+        }
+        if (password) {
+            options.password = password;
+        }
+
+        log(`开始连接 ${brokerUrl}，clientId=${clientId}`);
+        client = mqtt.connect(brokerUrl, options);
+
+        client.on('connect', () => {
+            log('连接成功');
+            updateStatus(true);
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = false;
+            subscribeBtn.disabled = false;
+            sendBtn.disabled = false;
+        });
+
+        client.on('reconnect', () => {
+            log('正在重连...');
+        });
+
+        client.on('error', (err) => {
+            log(`连接错误：${err.message}`);
+        });
+
+        client.on('close', () => {
+            log('连接已关闭');
+            updateStatus(false);
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+            subscribeBtn.disabled = true;
+            unsubscribeBtn.disabled = true;
+            sendBtn.disabled = true;
+            sendReplyBtn.disabled = true;
+        });
+
+        client.on('message', (topic, payload) => {
+            const text = payload.toString();
+            log(`收到消息 - topic: ${topic}, payload: ${text}`);
+            lastReceivedTopic = topic;
+            lastReceivedPayload = text;
+            sendReplyBtn.disabled = false;
+        });
+    });
+
+    disconnectBtn.addEventListener('click', () => {
+        if (client) {
+            client.end(true, () => {
+                log('主动断开连接');
+            });
+        }
+    });
+
+    subscribeBtn.addEventListener('click', () => {
+        if (!client || !client.connected) {
+            alert('请先连接 MQTT Broker');
+            return;
+        }
+        const topic = document.getElementById('subTopic').value.trim();
+        if (!topic) {
+            alert('请填写订阅主题');
+            return;
+        }
+        client.subscribe(topic, { qos: 1 }, (err, granted) => {
+            if (err) {
+                log(`订阅失败：${err.message}`);
+            } else {
+                log(`订阅成功：${granted.map(g => g.topic).join(', ')}`);
+                unsubscribeBtn.disabled = false;
+            }
+        });
+    });
+
+    unsubscribeBtn.addEventListener('click', () => {
+        if (!client || !client.connected) {
+            return;
+        }
+        const topic = document.getElementById('subTopic').value.trim();
+        if (!topic) {
+            return;
+        }
+        client.unsubscribe(topic, (err) => {
+            if (err) {
+                log(`取消订阅失败：${err.message}`);
+            } else {
+                log(`已取消订阅：${topic}`);
+                unsubscribeBtn.disabled = true;
+            }
+        });
+    });
+
+    sendBtn.addEventListener('click', () => {
+        if (!client || !client.connected) {
+            alert('请先连接 MQTT Broker');
+            return;
+        }
+        const topic = document.getElementById('pubTopic').value.trim();
+        const message = document.getElementById('messageInput').value;
+        if (!topic) {
+            alert('请填写发布主题');
+            return;
+        }
+        client.publish(topic, message, { qos: 0, retain: false }, (err) => {
+            if (err) {
+                log(`发送失败：${err.message}`);
+            } else {
+                log(`已发送消息 - topic: ${topic}, payload: ${message}`);
+            }
+        });
+    });
+
+    sendReplyBtn.addEventListener('click', () => {
+        if (!client || !client.connected) {
+            alert('请先连接 MQTT Broker');
+            return;
+        }
+        if (!lastReceivedTopic) {
+            alert('尚未收到任何消息，无法回复');
+            return;
+        }
+        const replyTopic = document.getElementById('pubTopic').value.trim() || lastReceivedTopic;
+        const payload = JSON.stringify({
+            type: 'reply',
+            originTopic: lastReceivedTopic,
+            originPayload: lastReceivedPayload,
+            replyAt: Date.now()
+        });
+        client.publish(replyTopic, payload, { qos: 0 }, (err) => {
+            if (err) {
+                log(`回复发送失败：${err.message}`);
+            } else {
+                log(`已回复消息 - topic: ${replyTopic}, payload: ${payload}`);
+            }
+        });
+    });
+</script>
+</body>
+</html>

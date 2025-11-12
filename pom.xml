@@ -38,6 +38,7 @@
         <module>local-cache-spring-boot-starter</module>
         <module>i18n-spring-boot-starter</module>
         <module>local-message-spring-boot-starter</module>
+        <module>mqtt-spring-boot-starter</module>
     </modules>
 
     <properties>
@@ -49,7 +50,7 @@
         <java.version>21</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <spring-boot-dependencies.version>3.3.1</spring-boot-dependencies.version>
+        <spring-boot-dependencies.version>3.5.7</spring-boot-dependencies.version>
         <spring-cloud-alibaba-dependencies.version>2023.0.1.2</spring-cloud-alibaba-dependencies.version>
         <lombok.version>1.18.34</lombok.version>
         <xxl.job.version>3.0.0</xxl.job.version>
