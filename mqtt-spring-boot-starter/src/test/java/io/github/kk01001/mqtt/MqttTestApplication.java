@@ -8,8 +8,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * MQTT 测试应用
  *
@@ -77,8 +75,12 @@ public class MqttTestApplication implements CommandLineRunner {
 
         // 6. 批量发送消息
         for (int i = 0; i < 5000; i++) {
-            mqttTemplate.send("demo/topic", "Batch message " + i);
-            TimeUnit.MILLISECONDS.sleep(100);
+            try {
+                mqttTemplate.send("demo/topic", "Batch message " + i, 2);
+                // TimeUnit.MILLISECONDS.sleep(100);
+            } catch (MqttException e) {
+                log.error("批量发送消息失败", e);
+            }
         }
         log.info("批量发送 5 条消息到 demo/topic");
 

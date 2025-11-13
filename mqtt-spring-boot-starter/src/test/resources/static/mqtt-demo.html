@@ -66,7 +66,7 @@
         }
         #log {
             height: 280px;
-            width: 500px;
+            /*width: 500px;*/
             background-color: #111;
             color: #0f0;
             font-family: "Consolas", monospace;
@@ -98,7 +98,7 @@
     <fieldset>
         <legend>连接配置</legend>
         <label for="brokerUrl">Broker WebSocket 地址 (例如 ws://localhost:8083/mqtt)</label>
-        <input id="brokerUrl" type="text" value="ws://localhost:8083/mqtt" />
+        <input id="brokerUrl" type="text" value="ws://10.255.1.21:8083/mqtt"/>
 
         <label for="username">用户名 (可选)</label>
         <input id="username" type="text" placeholder="如果 broker 需要鉴权，请填写" />
@@ -184,18 +184,34 @@
 
         const clientId = `web-client-${Math.random().toString(16).slice(2, 10)}`;
         const options = {
-            clientId,
-            clean: true,
-            reconnectPeriod: 2000,
-            keepalive: 60
+            clientId, // 客户端唯一标识
+            clean: true, // 是否开启清洁会话，true 表示不保留会话状态
+            reconnectPeriod: 2000, // 自动重连间隔（毫秒）
+            keepalive: 60, // 心跳间隔（秒）
+            connectTimeout: 30_000, // 连接超时时间（毫秒）
+            protocolId: 'MQTT', // 协议标识，默认 MQTT
+            protocolVersion: 5, // 协议版本，4=MQTT 3.1.1，5=MQTT 5.0
+            reschedulePings: true, // 收到任意数据包后是否重置心跳计时
+            resubscribe: true, // 重连后是否自动恢复订阅
+            queueQoSZero: true, // 断线时是否缓存 QoS 0 消息
+            manualConnect: false, // 是否手动调用 connect() 才发起连接
+            properties: {
+                sessionExpiryInterval: 0, // 会话过期间隔（秒），0 表示断开立即过期
+                receiveMaximum: 65_535, // 最大并发未确认 QoS>0 消息数
+                maximumPacketSize: undefined, // 允许的最大报文大小
+                topicAliasMaximum: 0, // 可用的主题别名数量
+                requestResponseInformation: false, // 是否请求响应信息
+                requestProblemInformation: true, // 是否请求错误调试信息
+                userProperties: {} // 用户自定义属性
+            },
+            will: undefined, // 遗嘱消息配置，可传 { topic, payload, qos, retain, properties }
+            transformWsUrl: undefined, // 返回自定义 WebSocket URL 的回调
+            wsOptions: {}, // WebSocket 额外配置，例如 headers
+            servers: undefined, // 备用服务器列表 [{ host, port, protocol }]
+            username: username || undefined, // 账号（可选）
+            password: password || undefined, // 密码（可选）
+            rejectUnauthorized: true // TLS 连接时是否校验证书
         };
-
-        if (username) {
-            options.username = username;
-        }
-        if (password) {
-            options.password = password;
-        }
 
         log(`开始连接 ${brokerUrl}，clientId=${clientId}`);
         client = mqtt.connect(brokerUrl, options);
