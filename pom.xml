@@ -39,6 +39,7 @@
         <module>i18n-spring-boot-starter</module>
         <module>local-message-spring-boot-starter</module>
         <module>mqtt-spring-boot-starter</module>
+        <module>examples-starter</module>
     </modules>
 
     <properties>
@@ -258,6 +259,7 @@
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                     <compilerArgument>-Xlint:unchecked</compilerArgument>
+                    <parameters>true</parameters>
                 </configuration>
             </plugin>
 

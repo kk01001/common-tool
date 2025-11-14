@@ -8,6 +8,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import io.github.kk01001.oss.client.OssClient;
@@ -75,13 +76,18 @@ public class OssConfiguration {
         AWSCredentials awsCredentials = new BasicAWSCredentials(ossProperties.getAccessKey(),
                 ossProperties.getAccessSecret());
         AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
-        AmazonS3 amazonS3 = AmazonS3Client.builder()
+        AmazonS3ClientBuilder builder = AmazonS3Client.builder()
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ossProperties.getEndpoint(), ossProperties.getRegion()))
                 .withCredentials(awsCredentialsProvider)
-                .disableChunkedEncoding()
                 .withClientConfiguration(clientConfiguration)
-                .withPathStyleAccessEnabled(ossProperties.isPathStyleAccess())
-                .build();
+                .withPathStyleAccessEnabled(ossProperties.isPathStyleAccess());
+
+        // 根据配置决定是否禁用 chunked 编码。默认开启以避免签名阶段对流 reset 的问题。
+        if (ossProperties.isChunkedEncodingDisabled()) {
+            builder.disableChunkedEncoding();
+        }
+
+        AmazonS3 amazonS3 = builder.build();
         log.info("amazonS3 初始化完成");
         return amazonS3;
     }

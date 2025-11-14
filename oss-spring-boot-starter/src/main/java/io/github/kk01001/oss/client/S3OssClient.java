@@ -110,15 +110,18 @@ public class S3OssClient implements OssClient {
     @SneakyThrows
     public UploadPartResult uploadPart(ChunkDTO chunk) {
         try (InputStream in = chunk.getFile().getInputStream()) {
-            // 上传
+            // 为避免签名阶段对流 reset 失败（如禁用 chunked 编码时），将分片内容读入内存并使用可重置的 ByteArrayInputStream
+            byte[] bytes = IOUtils.toByteArray(in);
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+
             UploadPartRequest uploadRequest = new UploadPartRequest()
                     .withBucketName(chunk.getBucketName())
                     .withKey(chunk.getObjectName())
                     .withUploadId(chunk.getUploadId())
-                    .withInputStream(in)
+                    .withInputStream(byteArrayInputStream)
                     .withLastPart(chunk.getIsLastPart())
                     .withPartNumber(chunk.getChunkNumber())
-                    .withPartSize(chunk.getCurrentChunkSize());
+                    .withPartSize(bytes.length);
             return amazonS3.uploadPart(uploadRequest);
         }
     }

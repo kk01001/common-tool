@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <title>OSS 分片上传示例</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 24px;
+        }
+
+        .row {
+            margin-bottom: 12px;
+        }
+
+        #progressContainer {
+            width: 480px;
+            height: 20px;
+            background: #eee;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        #progressBar {
+            height: 100%;
+            width: 0%;
+            background: #4caf50;
+            transition: width 0.1s ease;
+        }
+
+        #log {
+            white-space: pre-wrap;
+            background: #f7f7f7;
+            padding: 10px;
+            border: 1px solid #ddd;
+            height: 160px;
+            overflow: auto;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: 1px solid #333;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+<h2>OSS 分片上传（带进度条）</h2>
+
+<div class="row">
+    <input type="file" id="fileInput"/>
+</div>
+<div class="row">
+    <label>ObjectName: <input type="text" id="objectName" placeholder="例如：upload/demo.bin"
+                              style="width: 360px"/></label>
+</div>
+<div class="row">
+    <label>分片大小（MB）：<input type="number" id="chunkSizeMb" value="5" min="1" max="100"/></label>
+</div>
+<div class="row">
+    <button id="btnUpload" class="btn">开始上传</button>
+</div>
+
+<div class="row">
+    <div id="progressContainer">
+        <div id="progressBar"></div>
+    </div>
+    <div id="progressText">0%</div>
+</div>
+
+<h3>日志</h3>
+<div id="log"></div>
+
+<script>
+    const log = (msg) => {
+        const area = document.getElementById('log');
+        const time = new Date().toLocaleTimeString();
+        area.textContent += `[${time}] ${msg}\n`;
+        area.scrollTop = area.scrollHeight;
+    };
+
+    const setProgress = (percent) => {
+        const bar = document.getElementById('progressBar');
+        const txt = document.getElementById('progressText');
+        const val = Math.max(0, Math.min(100, percent));
+        bar.style.width = val + '%';
+        txt.textContent = val.toFixed(2) + '%';
+    };
+
+    async function initiateMultipart(objectName) {
+        const res = await fetch('/api/oss/initiate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({objectName})
+        });
+        const json = await res.json();
+        if (json.code !== 0) throw new Error(json.message || 'initiate error');
+        log('initiate uploadId: ' + json.data.uploadId);
+        return json.data.uploadId;
+    }
+
+    async function uploadPart(uploadId, bucketName, objectName, partNumber, isLastPart, blob) {
+        const form = new FormData();
+        form.append('uploadId', uploadId);
+        form.append('bucketName', bucketName || '');
+        form.append('objectName', objectName);
+        form.append('chunkNumber', partNumber);
+        form.append('isLastPart', isLastPart ? 'true' : 'false');
+        form.append('file', blob, `part-${partNumber}`);
+        const res = await fetch('/api/oss/uploadPart', {method: 'POST', body: form});
+        const json = await res.json();
+        if (json.code !== 0) throw new Error(json.message || 'uploadPart error');
+        log(`uploaded part ${partNumber}, eTag: ${json.data.eTag}`);
+        return json.data;
+    }
+
+    async function complete(uploadId, bucketName, objectName, parts) {
+        const res = await fetch('/api/oss/complete', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({uploadId, bucketName, objectName, parts})
+        });
+        const json = await res.json();
+        if (json.code !== 0) throw new Error(json.message || 'complete error');
+        log('complete location: ' + json.data.location);
+        return json.data;
+    }
+
+    async function startUpload() {
+        try {
+            const file = document.getElementById('fileInput').files[0];
+            const objectName = document.getElementById('objectName').value || (`upload/${Date.now()}.bin`);
+            const chunkSizeMb = parseInt(document.getElementById('chunkSizeMb').value, 10);
+            if (!file) return alert('请选择文件');
+
+            const uploadId = await initiateMultipart(objectName);
+            const bucketName = '';
+            const parts = [];
+
+            const chunkSize = chunkSizeMb * 1024 * 1024;
+            const totalChunks = Math.ceil(file.size / chunkSize);
+            let uploaded = 0;
+
+            for (let i = 0; i < totalChunks; i++) {
+                const start = i * chunkSize;
+                const end = Math.min(file.size, start + chunkSize);
+                const blob = file.slice(start, end);
+                const isLast = i === totalChunks - 1;
+
+                const data = await uploadPart(uploadId, bucketName, objectName, i + 1, isLast, blob);
+                parts.push({partNumber: data.partNumber, eTag: data.eTag});
+
+                uploaded += blob.size;
+                setProgress((uploaded / file.size) * 100);
+            }
+
+            await complete(uploadId, bucketName, objectName, parts);
+            alert('上传完成');
+        } catch (e) {
+            console.error(e);
+            log('错误: ' + e.message);
+            alert('上传失败: ' + (e.message || e));
+        }
+    }
+
+    document.getElementById('btnUpload').addEventListener('click', () => {
+        setProgress(0);
+        log('开始上传...');
+        startUpload();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+server:
+  port: 8032
+
+spring:
+  web:
+    resources:
+      add-mappings: true
+      static-locations: classpath:/static/
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+
+oss:
+  accessKey: EhId3ZrpVzuHKKJvT0Y7
+  accessSecret: aFaLbp43sJIawzSl8ziM2fwzmTFOTwnHK7mV328z
+  endpoint: ${OSS_ENDPOINT:http://10.255.1.8:19000}
+  region: ${OSS_REGION:us-east-1}
+  bucketName: ${OSS_BUCKET:test}
+  pathStyleAccess: true
+  enable: true

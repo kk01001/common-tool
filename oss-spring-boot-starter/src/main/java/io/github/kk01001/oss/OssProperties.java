@@ -50,4 +50,10 @@ public class OssProperties {
      * 存储空间名称
      */
     private String bucketName;
+
+    /**
+     * 是否禁用 S3 的 chunked 编码（默认不禁用）。
+     * 大多数 S3/MinIO 场景建议保持 chunked 编码开启，以避免签名阶段需要对流进行 reset。
+     */
+    private boolean chunkedEncodingDisabled = false;
 }
