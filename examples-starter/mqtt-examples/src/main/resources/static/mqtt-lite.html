@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>MQTT 轻量版连接页</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f6f7f9; margin: 0; padding: 24px; }
+        .wrap { max-width: 880px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+        h1 { margin: 0 0 16px; font-size: 22px; }
+        fieldset { border: 1px solid #e5e7eb; border-radius: 8px; margin: 16px 0; padding: 16px; }
+        legend { padding: 0 8px; font-weight: 600; color: #0a6ed1; }
+        label { display: block; margin: 10px 0 6px; font-weight: 600; }
+        input[type="text"], textarea, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        button { background: #0a6ed1; color: #fff; border: none; border-radius: 6px; padding: 8px 14px; margin-right: 8px; cursor: pointer; font-size: 14px; }
+        button:disabled { background: #9ec8f3; cursor: not-allowed; }
+        .status { font-weight: bold; margin-top: 8px; }
+        .status.connected { color: #1a7f37; }
+        .status.disconnected { color: #d93025; }
+        #log { height: 280px; background: #111; color: #0f0; font-family: Consolas, monospace; overflow-y: auto; border-radius: 8px; padding: 12px; line-height: 1.4; white-space: pre-wrap; word-break: break-word; }
+    </style>
+    <!--
+     轻量版页面：不依赖现有示例代码，提供基础连接/订阅/发布与日志
+     使用 ws:// 或 wss:// 的 WebSocket 地址（如 EMQX: ws://host:8083/mqtt，Mosquitto: ws://host:8083/）
+    -->
+</head>
+<body>
+<div class="wrap">
+    <h1>MQTT WebSocket 轻量连接页</h1>
+    <p style="color:#555;">用于快速验证 WebSocket 接入 MQTT Broker。默认协议版本为 3.1.1。</p>
+
+    <fieldset>
+        <legend>连接</legend>
+        <label for="brokerUrl">Broker WebSocket 地址</label>
+        <input id="brokerUrl" type="text" value="ws://10.255.1.21:8083/mqtt" placeholder="例如 ws://localhost:8083/mqtt 或 ws://localhost:8083/" />
+
+        <label for="mqttVersion">MQTT 协议版本</label>
+        <select id="mqttVersion">
+            <option value="4" selected>3.1.1</option>
+            <option value="5">5.0</option>
+        </select>
+
+        <label for="username">用户名（可选）</label>
+        <input id="username" type="text" placeholder="如 broker 需要鉴权" />
+
+        <label for="password">密码（可选）</label>
+        <input id="password" type="text" placeholder="如 broker 需要鉴权" />
+
+        <div style="margin-top:10px;">
+            <button id="connectBtn">连接</button>
+            <button id="disconnectBtn" disabled>断开</button>
+        </div>
+        <div id="status" class="status disconnected">状态：未连接</div>
+    </fieldset>
+
+    <fieldset>
+        <legend>订阅</legend>
+        <label for="subTopic">订阅主题</label>
+        <input id="subTopic" type="text" value="demo/topic" />
+        <div style="margin-top:10px;">
+            <button id="subscribeBtn" disabled>订阅</button>
+            <button id="unsubscribeBtn" disabled>取消订阅</button>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>发布</legend>
+        <label for="pubTopic">发布主题</label>
+        <input id="pubTopic" type="text" value="demo/topic" />
+        <label for="qosSel">QoS</label>
+        <select id="qosSel">
+            <option value="0" selected>0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+        </select>
+        <label for="retainChk" style="display:flex;align-items:center;gap:8px;">
+            <input id="retainChk" type="checkbox" /> 保留消息（retain）
+        </label>
+        <label for="messageInput">消息内容</label>
+        <textarea id="messageInput" rows="4">{"hello":"world","ts":0}</textarea>
+        <div style="margin-top:10px;">
+            <button id="sendBtn" disabled>发送</button>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>后端批量发送</legend>
+        <p style="color:#666;">调用后端接口 <code>/api/mqtt/bulk-send</code> 使用服务端模板同步发送。</p>
+        <label for="bulkCount">批量条数</label>
+        <input id="bulkCount" type="text" value="100" />
+        <label for="bulkQos">QoS</label>
+        <select id="bulkQos">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+        </select>
+        <label for="bulkPrefix">Payload 前缀</label>
+        <input id="bulkPrefix" type="text" value="Batch message" />
+        <div style="margin-top:10px;">
+            <button id="bulkSendBtn">调用后端批量发送</button>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>日志</legend>
+        <div id="log"></div>
+        <div style="margin-top:10px;">
+            <button id="clearLogBtn">清空日志</button>
+        </div>
+    </fieldset>
+</div>
+
+<script>
+    const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
+    const subscribeBtn = document.getElementById('subscribeBtn');
+    const unsubscribeBtn = document.getElementById('unsubscribeBtn');
+    const sendBtn = document.getElementById('sendBtn');
+    const bulkSendBtn = document.getElementById('bulkSendBtn');
+    const statusLabel = document.getElementById('status');
+    const logContainer = document.getElementById('log');
+    const mqttVersionSelect = document.getElementById('mqttVersion');
+    const clearLogBtn = document.getElementById('clearLogBtn');
+
+    let client = null;
+
+    function now() { return new Date().toLocaleTimeString(); }
+    function log(message) {
+        const line = document.createElement('div');
+        line.textContent = `[${now()}] ${message}`;
+        logContainer.appendChild(line);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+    function updateStatus(connected) {
+        if (connected) {
+            statusLabel.textContent = '状态：已连接';
+            statusLabel.classList.remove('disconnected');
+            statusLabel.classList.add('connected');
+        } else {
+            statusLabel.textContent = '状态：未连接';
+            statusLabel.classList.remove('connected');
+            statusLabel.classList.add('disconnected');
+        }
+    }
+
+    connectBtn.addEventListener('click', () => {
+        const brokerUrl = document.getElementById('brokerUrl').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const protocolVersion = Number(mqttVersionSelect.value);
+
+        if (!brokerUrl) {
+            alert('请填写 broker WebSocket 地址');
+            return;
+        }
+
+        const clientId = `lite-client-${Math.random().toString(16).slice(2, 10)}`;
+        const options = {
+            clientId,
+            clean: true,
+            reconnectPeriod: 2000,
+            keepalive: 60,
+            connectTimeout: 30_000,
+            protocolId: 'MQTT',
+            protocolVersion,
+            reschedulePings: true,
+            resubscribe: true,
+            queueQoSZero: true,
+            manualConnect: false,
+            properties: {
+                sessionExpiryInterval: 0,
+                receiveMaximum: 65_535,
+                topicAliasMaximum: 0,
+                requestResponseInformation: false,
+                requestProblemInformation: true,
+                userProperties: {}
+            },
+            username: username || undefined,
+            password: password || undefined,
+            rejectUnauthorized: true
+        };
+
+        log(`开始连接 ${brokerUrl}，clientId=${clientId}，协议版本=${protocolVersion}`);
+        try {
+            client = mqtt.connect(brokerUrl, options);
+        } catch (e) {
+            log(`创建连接失败：${e.message}`);
+            return;
+        }
+
+        client.on('connect', () => {
+            log('连接成功');
+            updateStatus(true);
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = false;
+            subscribeBtn.disabled = false;
+            sendBtn.disabled = false;
+        });
+        client.on('reconnect', () => log('正在重连...'));
+        client.on('error', (err) => {
+            const msg = err && err.message ? err.message : String(err);
+            const code = err && err.code ? ` (code=${err.code})` : '';
+            log(`连接错误：${msg}${code}`);
+        });
+        client.on('close', () => {
+            log('连接已关闭');
+            updateStatus(false);
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+            subscribeBtn.disabled = true;
+            unsubscribeBtn.disabled = true;
+            sendBtn.disabled = true;
+        });
+        client.on('message', (topic, payload) => {
+            const text = payload.toString();
+            log(`收到消息 - topic: ${topic}, payload: ${text}`);
+        });
+    });
+
+    disconnectBtn.addEventListener('click', () => {
+        if (!client) return;
+        try { client.end(true, () => log('主动断开连接')); } catch (e) { log(`断开异常：${e.message}`); }
+    });
+
+    subscribeBtn.addEventListener('click', () => {
+        if (!client || !client.connected) { alert('请先连接 MQTT Broker'); return; }
+        const topic = document.getElementById('subTopic').value.trim();
+        if (!topic) { alert('请填写订阅主题'); return; }
+        client.subscribe(topic, { qos: 1 }, (err, granted) => {
+            if (err) {
+                log(`订阅失败：${err.message}`);
+            } else {
+                log(`订阅成功：${granted.map(g => g.topic).join(', ')}`);
+                unsubscribeBtn.disabled = false;
+            }
+        });
+    });
+
+    unsubscribeBtn.addEventListener('click', () => {
+        if (!client || !client.connected) return;
+        const topic = document.getElementById('subTopic').value.trim();
+        if (!topic) return;
+        client.unsubscribe(topic, (err) => {
+            if (err) {
+                log(`取消订阅失败：${err.message}`);
+            } else {
+                log(`已取消订阅：${topic}`);
+                unsubscribeBtn.disabled = true;
+            }
+        });
+    });
+
+    sendBtn.addEventListener('click', () => {
+        if (!client || !client.connected) { alert('请先连接 MQTT Broker'); return; }
+        const topic = document.getElementById('pubTopic').value.trim();
+        const message = document.getElementById('messageInput').value;
+        const qos = Number(document.getElementById('qosSel').value);
+        const retain = document.getElementById('retainChk').checked;
+        if (!topic) { alert('请填写发布主题'); return; }
+        client.publish(topic, message, { qos, retain }, (err) => {
+            if (err) {
+                log(`发送失败：${err.message}`);
+            } else {
+                log(`已发送消息 - topic: ${topic}, qos=${qos}, retain=${retain}, payload: ${message}`);
+            }
+        });
+    });
+
+    // 清空日志
+    clearLogBtn.addEventListener('click', () => {
+        logContainer.textContent = '';
+        log('日志已清空');
+    });
+
+    // 后端批量发送调用
+    bulkSendBtn.addEventListener('click', async () => {
+        const topic = document.getElementById('pubTopic').value.trim();
+        const bulkCountStr = document.getElementById('bulkCount').value.trim();
+        const bulkQos = Number(document.getElementById('bulkQos').value);
+        const payloadPrefix = document.getElementById('bulkPrefix').value.trim() || 'Batch message';
+
+        if (!topic) { alert('请填写发布主题'); return; }
+        const bulkCount = parseInt(bulkCountStr, 10);
+        if (isNaN(bulkCount) || bulkCount < 1) { alert('批量条数必须为正整数'); return; }
+        if (![0,1,2].includes(bulkQos)) { alert('QoS 需为 0/1/2'); return; }
+
+        try {
+            bulkSendBtn.disabled = true;
+            log(`准备调用后端批量发送：topic=${topic}, count=${bulkCount}, qos=${bulkQos}`);
+            const resp = await fetch('/api/mqtt/bulk-send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic, count: bulkCount, qos: bulkQos, payloadPrefix })
+            });
+            const data = await resp.json();
+            if (data && data.code === 0) {
+                const r = data.data;
+                log(`后端批量发送完成：success=${r.successCount}, failure=${r.failureCount}, durationMs=${r.durationMs}`);
+            } else {
+                const msg = data && data.message ? data.message : '未知错误';
+                log(`后端批量发送失败：${msg}`);
+                alert(msg);
+            }
+        } catch (e) {
+            log(`调用接口异常：${e.message}`);
+            alert(`调用接口异常：${e.message}`);
+        } finally {
+            bulkSendBtn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>

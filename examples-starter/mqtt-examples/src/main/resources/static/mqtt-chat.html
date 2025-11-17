@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MQTT Simple Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #ededed; }
+        fieldset { margin-bottom: 16px; border-radius: 8px; }
+        label { display: inline-block; width: 120px; }
+        input[type="text"], input[type="password"] { width: 300px; }
+        .row { margin: 8px 0; }
+        .hidden { display: none; }
+
+        /* 聊天区域微信风格 */
+        #chatLog { border: 1px solid #ddd; border-radius: 8px; height: 420px; overflow-y: auto; padding: 12px; background: #f5f5f5; }
+        .sys-line { text-align: center; color: #888; font-size: 12px; margin: 8px 0; }
+
+        .msg-row { display: flex; align-items: flex-end; margin: 10px 0; }
+        .msg-row.peer { justify-content: flex-start; }
+        .msg-row.me { justify-content: flex-end; }
+
+        .avatar { width: 32px; height: 32px; border-radius: 50%; background: #ddd; color: #555; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 0 8px; user-select: none; }
+
+        .bubble-wrap { max-width: 65%; display: flex; flex-direction: column; }
+        .bubble { padding: 8px 12px; border-radius: 18px; word-break: break-word; line-height: 1.5; }
+        .msg-row.peer .bubble { background: #fff; border: 1px solid #e6e6e6; border-top-left-radius: 4px; }
+        .msg-row.me .bubble { background: #95ec69; border-top-right-radius: 4px; }
+        .meta { font-size: 12px; color: #999; margin-top: 4px; }
+        .msg-row.me .bubble-wrap { align-items: flex-end; }
+        .msg-row.peer .bubble-wrap { align-items: flex-start; }
+    </style>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+</head>
+<body>
+    <h2>MQTT Simple Chat（client/{userId}）</h2>
+
+    <fieldset id="loginPanel">
+        <legend>登录</legend>
+        <div class="row">
+            <label for="loginUser">账号/用户ID</label>
+            <input id="loginUser" type="text" placeholder="例如 u001" />
+        </div>
+        <div class="row">
+            <label for="loginPass">密码</label>
+            <input id="loginPass" type="password" placeholder="与账号一致" />
+        </div>
+        <div class="row">
+            <button id="loginBtn">登录</button>
+            <span class="sys">账号与密码需相同</span>
+        </div>
+    </fieldset>
+
+    <fieldset id="connConfig" class="hidden">
+        <legend>连接配置</legend>
+        <div class="row">
+            <label for="brokerUrl">Broker 地址</label>
+            <input id="brokerUrl" type="text" value="ws://10.255.1.21:8083/mqtt" placeholder="例如 ws://host:8083/mqtt" />
+        </div>
+        <div class="row">
+            <label for="userId">我的用户ID</label>
+            <input id="userId" type="text" placeholder="例如 u001" />
+        </div>
+        <!-- 旧的目标用户输入改为仅用于配置保留，不再使用 -->
+        <div class="row hidden">
+            <label for="peerUserIdConf">目标用户ID</label>
+            <input id="peerUserIdConf" type="text" placeholder="例如 u002" />
+        </div>
+        <div class="row">
+            <label for="username">用户名</label>
+            <input id="username" type="text" placeholder="(可选)" />
+        </div>
+        <div class="row">
+            <label for="password">密码</label>
+            <input id="password" type="password" placeholder="(可选)" />
+        </div>
+        <div class="row">
+            <button id="connectBtn">连接</button>
+            <button id="disconnectBtn" disabled>断开</button>
+            <span id="status" class="sys">未连接</span>
+        </div>
+        <div class="row">
+            <label>订阅主题</label>
+            <span id="subTopicPreview" class="sys">(chat/{userId})</span>
+        </div>
+        <div class="row">
+            <label>客户端ID</label>
+            <span id="clientIdPreview" class="sys">(client/{userId})</span>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>聊天</legend>
+        <div class="row">
+            <label for="peerSelect">目标列表</label>
+            <select id="peerSelect" style="width: 180px;"></select>
+            <input id="peerUserId" type="text" placeholder="手动输入目标用户ID" style="width: 180px; margin-left:8px;" />
+            <button id="addPeerBtn" style="margin-left:8px;">添加到列表</button>
+        </div>
+        <div id="chatLog"></div>
+        <div class="row">
+            <label for="chatInput">消息</label>
+            <input id="chatInput" type="text" placeholder="输入要发送的内容" />
+            <button id="sendBtn" disabled>发送</button>
+            <button id="clearBtn">清空</button>
+        </div>
+    </fieldset>
+
+    <script>
+        const brokerUrlEl = document.getElementById('brokerUrl');
+        const userIdEl = document.getElementById('userId');
+        const peerUserIdEl = document.getElementById('peerUserId');
+        const usernameEl = document.getElementById('username');
+        const passwordEl = document.getElementById('password');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const statusEl = document.getElementById('status');
+        const subTopicPreview = document.getElementById('subTopicPreview');
+        const clientIdPreview = document.getElementById('clientIdPreview');
+        const chatLog = document.getElementById('chatLog');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const loginUserEl = document.getElementById('loginUser');
+        const loginPassEl = document.getElementById('loginPass');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginPanel = document.getElementById('loginPanel');
+        const connConfig = document.getElementById('connConfig');
+        const peerSelect = document.getElementById('peerSelect');
+        const addPeerBtn = document.getElementById('addPeerBtn');
+
+        let client = null;
+        let lastUserId = '';
+        let peerTargets = [];
+
+        function sysLog(line) {
+            const div = document.createElement('div');
+            div.className = 'sys-line';
+            div.textContent = line;
+            chatLog.appendChild(div);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        function avatarChar(name) {
+            const s = (name || '?').trim();
+            return s ? s[0].toUpperCase() : '?';
+        }
+
+        function formatTime(ts) {
+            const d = new Date(ts);
+            return d.toLocaleTimeString();
+        }
+
+        function appendMessage(side, name, text, ts) {
+            const row = document.createElement('div');
+            row.className = `msg-row ${side}`;
+
+            const bubbleWrap = document.createElement('div');
+            bubbleWrap.className = 'bubble-wrap';
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = text;
+            const meta = document.createElement('div');
+            meta.className = 'meta';
+            meta.textContent = `${name} · ${formatTime(ts)}`;
+
+            bubbleWrap.appendChild(bubble);
+            bubbleWrap.appendChild(meta);
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = avatarChar(name);
+
+            if (side === 'peer') {
+                row.appendChild(avatar);
+                row.appendChild(bubbleWrap);
+            } else {
+                row.appendChild(bubbleWrap);
+                row.appendChild(avatar);
+            }
+
+            chatLog.appendChild(row);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+        
+        // 保留系统日志方法兼容旧调用
+        function log(line, cls = 'sys') {
+            sysLog(line);
+        }
+
+        // 目标列表渲染与交互
+        function renderPeerSelect() {
+            peerSelect.innerHTML = '';
+            const optManual = document.createElement('option');
+            optManual.value = '';
+            optManual.textContent = '手动输入...';
+            peerSelect.appendChild(optManual);
+            peerTargets.forEach(id => {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.textContent = id;
+                peerSelect.appendChild(opt);
+            });
+        }
+
+        function loadPeerTargets() {
+            try {
+                const raw = localStorage.getItem('mqttChatTargets');
+                peerTargets = raw ? JSON.parse(raw) : [];
+            } catch (_) { peerTargets = []; }
+            if (!Array.isArray(peerTargets) || peerTargets.length === 0) {
+                peerTargets = ['u001','u002','u003'];
+            }
+            renderPeerSelect();
+            peerSelect.value = '';
+            peerUserIdEl.disabled = false;
+        }
+        loadPeerTargets();
+
+        peerSelect.addEventListener('change', () => {
+            const val = peerSelect.value;
+            if (val) {
+                peerUserIdEl.value = val;
+                peerUserIdEl.disabled = true;
+            } else {
+                peerUserIdEl.disabled = false;
+                peerUserIdEl.value = '';
+            }
+        });
+
+        addPeerBtn.addEventListener('click', () => {
+            const val = (peerUserIdEl.value || '').trim();
+            if (!val) { alert('请输入目标用户ID'); return; }
+            if (!peerTargets.includes(val)) {
+                peerTargets.push(val);
+                localStorage.setItem('mqttChatTargets', JSON.stringify(peerTargets));
+                renderPeerSelect();
+                peerSelect.value = val;
+                peerSelect.dispatchEvent(new Event('change'));
+                sysLog(`已添加目标：${val}`);
+            }
+        });
+
+        function updatePreviews() {
+            const uid = (userIdEl.value || '').trim();
+            subTopicPreview.textContent = uid ? `chat/${uid}` : '(chat/{userId})';
+            clientIdPreview.textContent = uid ? `client/${uid}` : '(client/{userId})';
+        }
+
+        userIdEl.addEventListener('input', updatePreviews);
+        updatePreviews();
+
+        // 登录后隐藏登录与连接配置，并自动连接
+        loginBtn.addEventListener('click', () => {
+            const u = (loginUserEl.value || '').trim();
+            const p = (loginPassEl.value || '').trim();
+            if (!u || !p) { alert('请输入账号和密码'); return; }
+            if (u !== p) { alert('账号与密码必须相同'); return; }
+            userIdEl.value = u;
+            usernameEl.value = u;
+            passwordEl.value = p;
+            updatePreviews();
+            loginPanel.classList.add('hidden');
+            connConfig.classList.add('hidden');
+            sysLog(`登录成功：${u}`);
+            connectBtn.click();
+        });
+
+        connectBtn.addEventListener('click', () => {
+            const brokerUrl = (brokerUrlEl.value || '').trim();
+            const userId = (userIdEl.value || '').trim();
+            if (!brokerUrl) { alert('请填写 Broker 地址'); return; }
+            if (!userId) { alert('请填写我的用户ID'); return; }
+
+            const clientId = `client/${userId}`; // clientId 格式: client/{userId}
+            const options = {
+                clientId,
+                protocolVersion: 4, // MQTT 3.1.1
+                username: (usernameEl.value || '').trim() || undefined,
+                password: (passwordEl.value || '').trim() || undefined,
+                keepalive: 30,
+                // 持久会话以便离线消息在重连后继续投递（需 QoS>=1 且之前已订阅）
+                clean: false,
+                // 自动重连以恢复消费离线消息
+                reconnectPeriod: 3000,
+            };
+
+            try {
+                client = mqtt.connect(brokerUrl, options);
+            } catch (e) {
+                log(`连接创建失败：${e.message}`);
+                return;
+            }
+
+            statusEl.textContent = '连接中...';
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = false;
+            lastUserId = userId;
+
+            client.on('connect', (connack) => {
+                statusEl.textContent = '已连接';
+                const present = connack && connack.sessionPresent ? true : false;
+                sysLog(`已连接，clientId=${clientId}${present ? '（会话已存在，继续消费离线消息）' : ''}`);
+                // 订阅专属接收主题 chat/{userId}
+                const subTopic = `chat/${userId}`;
+                // 当会话已存在时说明之前已订阅，无需重复订阅；首次连接或会话不存在则订阅
+                if (!present) {
+                    client.subscribe(subTopic, { qos: 1 }, (err) => {
+                        if (err) {
+                            sysLog(`订阅失败：${err.message}`);
+                        } else {
+                            sysLog(`已订阅：${subTopic}`);
+                            sendBtn.disabled = false;
+                        }
+                    });
+                } else {
+                    sendBtn.disabled = false;
+                }
+            });
+
+            client.on('message', (topic, payload) => {
+                let msg = {};
+                try { msg = JSON.parse(payload.toString()); } catch (_) { msg = { text: payload.toString() }; }
+                const from = msg.from || 'unknown';
+                const text = msg.text || '';
+                const ts = msg.ts || Date.now();
+                const side = from === lastUserId ? 'me' : 'peer';
+                appendMessage(side, from, text, ts);
+            });
+
+            client.on('error', (err) => {
+                sysLog(`连接错误：${err.message}`);
+                statusEl.textContent = '错误';
+            });
+
+            client.on('close', () => {
+                sysLog('连接已关闭');
+                statusEl.textContent = '未连接';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                sendBtn.disabled = true;
+            });
+        });
+
+        disconnectBtn.addEventListener('click', () => {
+            if (client) {
+                try { client.end(true); } catch (_) {}
+                client = null;
+            }
+        });
+
+        sendBtn.addEventListener('click', () => {
+            if (!client || !client.connected) { alert('请先连接'); return; }
+            const myId = (userIdEl.value || '').trim();
+            const peerId = (peerUserIdEl.value || '').trim();
+            const text = (chatInput.value || '').trim();
+            if (!peerId) { alert('请填写目标用户ID'); return; }
+            if (!text) { alert('请输入消息内容'); return; }
+            const topic = `chat/${peerId}`;
+            const payload = JSON.stringify({ from: myId, to: peerId, text, ts: Date.now() });
+            client.publish(topic, payload, { qos: 1, retain: false }, (err) => {
+                if (err) {
+                    sysLog(`发送失败：${err.message}`);
+                } else {
+                    appendMessage('me', myId, text, Date.now());
+                    chatInput.value = '';
+                }
+            });
+        });
+
+        // 回车发送（Shift+Enter 换行）
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendBtn.click();
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            chatLog.textContent = '';
+            sysLog('聊天记录已清空');
+        });
+    </script>
+</body>
+</html>
