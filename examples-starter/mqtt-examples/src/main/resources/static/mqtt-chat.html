@@ -47,7 +47,6 @@
         </div>
         <div class="row">
             <button id="loginBtn">登录</button>
-            <span class="sys">账号与密码需相同</span>
         </div>
     </fieldset>
 
@@ -255,7 +254,6 @@
             const u = (loginUserEl.value || '').trim();
             const p = (loginPassEl.value || '').trim();
             if (!u || !p) { alert('请输入账号和密码'); return; }
-            if (u !== p) { alert('账号与密码必须相同'); return; }
             userIdEl.value = u;
             usernameEl.value = u;
             passwordEl.value = p;

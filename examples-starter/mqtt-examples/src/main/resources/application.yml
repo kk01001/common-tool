@@ -36,10 +36,10 @@ mqtt:
   client-id: mqtt-client-demo
   
   # 用户名（如果 Broker 需要认证）
-  username: emqx_test
+  username: "admin"
   
   # 密码（如果 Broker 需要认证）
-  password: emqx_test_password
+  password: "admin"
   
   # ============================================
   # 连接行为配置
@@ -149,4 +149,15 @@ mqtt:
     #   - 中等流量：1000-2000
     #   - 高流量：2000-5000
     queue-capacity: 1000
+
+# EMQX HTTP 鉴权示例配置（用于 /api/emqx/auth）
+emqx:
+  auth:
+    users:
+      - username: u001
+        password: u001pass
+        superuser: false
+      - username: u002
+        password: u002pass
+        superuser: true
 
