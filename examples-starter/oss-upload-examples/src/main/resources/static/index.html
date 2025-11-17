@@ -65,6 +65,13 @@
 </div>
 <div class="row">
     <button id="btnUpload" class="btn">开始上传</button>
+    <button id="btnPause" class="btn" style="margin-left:8px;">暂停上传</button>
+</div>
+
+<div class="row">
+    <button id="btnResume" class="btn">继续上传未完成</button>
+    <button id="btnClearState" class="btn" style="margin-left:8px;">清除本地记录</button>
+    <span style="margin-left:8px;color:#555;">使用上方 ObjectName 与 UploadId</span>
 </div>
 
 <div class="row">
@@ -73,6 +80,18 @@
     </div>
     <div id="progressText">0%</div>
 </div>
+
+<h3>查询已上传分片</h3>
+<div class="row">
+    <label>UploadId: <input type="text" id="queryUploadId" placeholder="来自 initiate 返回的 uploadId"
+                             style="width: 360px"/></label>
+</div>
+<div class="row">
+    <button id="btnListParts" class="btn">查询分片</button>
+    <button id="btnAbort" class="btn" style="margin-left: 8px;">终止分片上传</button>
+    <span id="listPartsInfo" style="margin-left: 8px;color:#555;"></span>
+</div>
+<div class="row" id="partsResult" style="max-width:640px"></div>
 
 <h3>日志</h3>
 <div id="log"></div>
@@ -91,6 +110,22 @@
         const val = Math.max(0, Math.min(100, percent));
         bar.style.width = val + '%';
         txt.textContent = val.toFixed(2) + '%';
+    };
+
+    // 暂停相关的全局状态
+    let isPaused = false;
+    let currentAbortController = null;
+
+    // 本地存储断点续传状态
+    const stateKey = (bucketName, objectName) => `ossUpload:${bucketName || ''}:${objectName}`;
+    const saveState = (bucketName, objectName, state) => {
+        try { localStorage.setItem(stateKey(bucketName, objectName), JSON.stringify(state)); } catch (e) { console.warn('保存本地状态失败', e); }
+    };
+    const loadState = (bucketName, objectName) => {
+        try { const raw = localStorage.getItem(stateKey(bucketName, objectName)); return raw ? JSON.parse(raw) : null; } catch (e) { console.warn('读取本地状态失败', e); return null; }
+    };
+    const clearState = (bucketName, objectName) => {
+        try { localStorage.removeItem(stateKey(bucketName, objectName)); } catch (e) { console.warn('清除本地状态失败', e); }
     };
 
     async function initiateMultipart(objectName) {
@@ -113,7 +148,9 @@
         form.append('chunkNumber', partNumber);
         form.append('isLastPart', isLastPart ? 'true' : 'false');
         form.append('file', blob, `part-${partNumber}`);
-        const res = await fetch('/api/oss/uploadPart', {method: 'POST', body: form});
+        const ac = new AbortController();
+        currentAbortController = ac;
+        const res = await fetch('/api/oss/uploadPart', {method: 'POST', body: form, signal: ac.signal});
         const json = await res.json();
         if (json.code !== 0) throw new Error(json.message || 'uploadPart error');
         log(`uploaded part ${partNumber}, eTag: ${json.data.eTag}`);
@@ -132,40 +169,137 @@
         return json.data;
     }
 
+    async function listParts(uploadId, bucketName, objectName) {
+        const res = await fetch('/api/oss/listParts', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({uploadId, bucketName, objectName})
+        });
+        const json = await res.json();
+        if (json.code !== 0) throw new Error(json.message || 'listParts error');
+        return json.data;
+    }
+
+    async function abort(uploadId, bucketName, objectName) {
+        const res = await fetch('/api/oss/abort', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({uploadId, bucketName, objectName})
+        });
+        const json = await res.json();
+        if (json.code !== 0) throw new Error(json.message || 'abort error');
+        return json.data;
+    }
+
     async function startUpload() {
         try {
             const file = document.getElementById('fileInput').files[0];
             const objectName = document.getElementById('objectName').value || (`upload/${Date.now()}.bin`);
             const chunkSizeMb = parseInt(document.getElementById('chunkSizeMb').value, 10);
             if (!file) return alert('请选择文件');
+            isPaused = false;
 
             const uploadId = await initiateMultipart(objectName);
+            // 自动填充查询框中的 UploadId，便于后续查询/终止
+            const queryEl = document.getElementById('queryUploadId');
+            if (queryEl) {
+                queryEl.value = uploadId;
+            }
             const bucketName = '';
             const parts = [];
+
+            // 初始化状态
+            saveState(bucketName, objectName, { uploadId, chunkSizeMb, totalSize: file.size, parts });
 
             const chunkSize = chunkSizeMb * 1024 * 1024;
             const totalChunks = Math.ceil(file.size / chunkSize);
             let uploaded = 0;
 
             for (let i = 0; i < totalChunks; i++) {
+                if (isPaused) {
+                    log('检测到暂停，停止继续上传');
+                    return; // 不调用 complete，保留已上传分片用于续传
+                }
                 const start = i * chunkSize;
                 const end = Math.min(file.size, start + chunkSize);
                 const blob = file.slice(start, end);
                 const isLast = i === totalChunks - 1;
 
                 const data = await uploadPart(uploadId, bucketName, objectName, i + 1, isLast, blob);
-                parts.push({partNumber: data.partNumber, eTag: data.eTag});
+                parts.push({partNumber: data.partNumber, eTag: data.eTag, size: blob.size});
 
                 uploaded += blob.size;
                 setProgress((uploaded / file.size) * 100);
+
+                // 持续保存状态
+                saveState(bucketName, objectName, { uploadId, chunkSizeMb, totalSize: file.size, parts });
             }
 
             await complete(uploadId, bucketName, objectName, parts);
             alert('上传完成');
+            clearState(bucketName, objectName);
+        } catch (e) {
+            console.error(e);
+            if (e && (e.name === 'AbortError' || ('' + e).includes('Abort'))) {
+                log('上传已暂停');
+                alert('已暂停当前上传');
+            } else {
+                log('错误: ' + e.message);
+                alert('上传失败: ' + (e.message || e));
+            }
+        }
+    }
+
+    // 继续上传：查询服务端已上传分片并跳过
+    async function resumeUpload() {
+        try {
+            const file = document.getElementById('fileInput').files[0];
+            const objectName = document.getElementById('objectName').value.trim();
+            const chunkSizeMb = parseInt(document.getElementById('chunkSizeMb').value, 10);
+            const uploadIdInput = document.getElementById('queryUploadId').value.trim();
+            if (!file) return alert('请选择文件');
+            if (!objectName) return alert('请填写 ObjectName');
+            if (!uploadIdInput) return alert('请填写 UploadId');
+            const bucketName = '';
+
+            const state = loadState(bucketName, objectName) || { uploadId: uploadIdInput, chunkSizeMb, totalSize: file.size, parts: [] };
+            if (state.totalSize !== file.size) return alert('文件大小与本地记录不一致，请重新开始上传');
+            if (state.chunkSizeMb !== chunkSizeMb) return alert('分片大小与本地记录不一致，请保持一致或重新开始');
+
+            const uploadId = state.uploadId || uploadIdInput;
+            const listData = await listParts(uploadId, bucketName, objectName);
+            const serverParts = (listData.parts || []).slice();
+            const chunkSize = chunkSizeMb * 1024 * 1024;
+            const totalChunks = Math.ceil(file.size / chunkSize);
+            const serverMap = new Map();
+            let uploadedBytes = 0;
+            for (const p of serverParts) { serverMap.set(p.partNumber, p); uploadedBytes += (p.size || 0); }
+            setProgress((uploadedBytes / file.size) * 100);
+
+            const parts = serverParts.map(p => ({ partNumber: p.partNumber, eTag: p.eTag, size: p.size }));
+
+            for (let i = 0; i < totalChunks; i++) {
+                const partNumber = i + 1;
+                const isLast = i === totalChunks - 1;
+                if (serverMap.has(partNumber)) continue;
+                const start = i * chunkSize;
+                const end = Math.min(file.size, start + chunkSize);
+                const blob = file.slice(start, end);
+                const data = await uploadPart(uploadId, bucketName, objectName, partNumber, isLast, blob);
+                parts.push({ partNumber: data.partNumber, eTag: data.eTag, size: blob.size });
+                uploadedBytes += blob.size;
+                setProgress((uploadedBytes / file.size) * 100);
+                saveState(bucketName, objectName, { uploadId, chunkSizeMb, totalSize: file.size, parts });
+            }
+
+            parts.sort((a, b) => a.partNumber - b.partNumber);
+            await complete(uploadId, bucketName, objectName, parts.map(({partNumber, eTag}) => ({partNumber, eTag})));
+            alert('续传完成');
+            clearState(bucketName, objectName);
         } catch (e) {
             console.error(e);
             log('错误: ' + e.message);
-            alert('上传失败: ' + (e.message || e));
+            alert('继续上传失败: ' + (e.message || e));
         }
     }
 
@@ -173,6 +307,70 @@
         setProgress(0);
         log('开始上传...');
         startUpload();
+    });
+
+    document.getElementById('btnPause').addEventListener('click', () => {
+        isPaused = true;
+        if (currentAbortController) {
+            try { currentAbortController.abort(); } catch (e) {}
+        }
+        log('已请求暂停，正在取消当前分片请求');
+    });
+
+    document.getElementById('btnResume').addEventListener('click', () => {
+        log('尝试继续上传未完成分片...');
+        resumeUpload();
+    });
+
+    document.getElementById('btnListParts').addEventListener('click', async () => {
+        try {
+            const uploadId = document.getElementById('queryUploadId').value.trim();
+            const objectName = document.getElementById('objectName').value.trim();
+            if (!uploadId || !objectName) return alert('请填写 UploadId 和 ObjectName');
+            const bucketName = '';
+            const data = await listParts(uploadId, bucketName, objectName);
+            const parts = data.parts || [];
+            const info = `共 ${parts.length} 片段，isTruncated=${data.isTruncated}`;
+            document.getElementById('listPartsInfo').textContent = info;
+            const rows = parts.map(p => `<tr><td>${p.partNumber}</td><td>${p.eTag}</td><td>${p.size}</td></tr>`).join('');
+            const html = `<table border="1" cellspacing="0" cellpadding="6"><thead><tr><th>PartNumber</th><th>ETag</th><th>Size</th></tr></thead><tbody>${rows}</tbody></table>`;
+            document.getElementById('partsResult').innerHTML = html;
+            log('查询分片成功');
+        } catch (e) {
+            console.error(e);
+            log('错误: ' + e.message);
+            alert('查询失败: ' + (e.message || e));
+        }
+    });
+
+    document.getElementById('btnAbort').addEventListener('click', async () => {
+        try {
+            const uploadId = document.getElementById('queryUploadId').value.trim();
+            const objectName = document.getElementById('objectName').value.trim();
+            if (!uploadId || !objectName) return alert('请填写 UploadId 和 ObjectName');
+            const bucketName = '';
+            await abort(uploadId, bucketName, objectName);
+            log('已终止分片上传任务: ' + uploadId);
+            // 清理进度条、UploadId、分片展示和本地状态
+            setProgress(0);
+            document.getElementById('queryUploadId').value = '';
+            document.getElementById('partsResult').innerHTML = '';
+            document.getElementById('listPartsInfo').textContent = '';
+            clearState(bucketName, objectName);
+            alert('终止成功，已清空进度与 UploadId');
+        } catch (e) {
+            console.error(e);
+            log('错误: ' + e.message);
+            alert('终止失败: ' + (e.message || e));
+        }
+    });
+
+    document.getElementById('btnClearState').addEventListener('click', () => {
+        const objectName = document.getElementById('objectName').value.trim();
+        if (!objectName) return alert('请填写 ObjectName');
+        const bucketName = '';
+        clearState(bucketName, objectName);
+        alert('已清除本地记录');
     });
 </script>
 </body>

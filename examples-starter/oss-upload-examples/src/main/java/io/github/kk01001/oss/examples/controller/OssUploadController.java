@@ -102,4 +102,54 @@ public class OssUploadController {
         CompleteMultipartUploadResult res = ossClient.completeMultipartUpload(mergeDTO);
         return ApiResponse.ok(Map.of("location", String.valueOf(res.getLocation())));
     }
+
+    @PostMapping("/listParts")
+    public ApiResponse<Map<String, Object>> listParts(@RequestBody Map<String, String> req) {
+        String bucket = StrUtil.blankToDefault(req.get("bucketName"), ossProperties.getBucketName());
+        String object = req.get("objectName");
+        String uploadId = req.get("uploadId");
+        if (StrUtil.hasBlank(object, uploadId)) {
+            return ApiResponse.fail(400);
+        }
+        var listing = ossClient.listParts(bucket, object, uploadId);
+        var parts = listing.getParts().stream()
+                .map(p -> Map.of(
+                        "partNumber", p.getPartNumber(),
+                        "eTag", p.getETag(),
+                        "size", p.getSize()
+                ))
+                .toList();
+        return ApiResponse.ok(Map.of(
+                "isTruncated", listing.isTruncated(),
+                "nextPartNumberMarker", listing.getNextPartNumberMarker(),
+                "maxParts", listing.getMaxParts(),
+                "parts", parts
+        ));
+    }
+
+    @PostMapping("/abort")
+    public ApiResponse<Void> abort(@RequestBody Map<String, String> req) {
+        String bucket = StrUtil.blankToDefault(req.get("bucketName"), ossProperties.getBucketName());
+        String object = req.get("objectName");
+        String uploadId = req.get("uploadId");
+        if (StrUtil.hasBlank(object, uploadId)) {
+            return ApiResponse.fail(400);
+        }
+        ossClient.abortMultipartUpload(bucket, object, uploadId);
+        return ApiResponse.ok();
+    }
+
+    @PostMapping("/putObject")
+    public ApiResponse<Map<String, String>> putObject(@RequestParam(value = "bucketName", required = false) String bucketName,
+                                                      @RequestParam("objectName") String objectName,
+                                                      @RequestPart("file") MultipartFile file) throws Exception {
+        if (StrUtil.isBlank(objectName) || Objects.isNull(file)) {
+            return ApiResponse.fail(400);
+        }
+        String bucket = StrUtil.blankToDefault(bucketName, ossProperties.getBucketName());
+        long start = System.currentTimeMillis();
+        var res = ossClient.putObject(bucket, objectName, file.getInputStream());
+        log.info("putObject cost: {}ms", System.currentTimeMillis() - start);
+        return ApiResponse.ok(Map.of("eTag", res.getETag()));
+    }
 }

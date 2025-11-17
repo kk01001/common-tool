@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OSS 管理</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .card { border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin-bottom: 16px; }
+        .row { margin-bottom: 8px; }
+        label { display: inline-block; width: 140px; }
+        input, select { padding: 6px; width: 280px; }
+        button { padding: 6px 12px; margin-right: 8px; }
+        .result { margin-top: 10px; padding: 10px; border: 1px dashed #ccc; white-space: pre-wrap; }
+        .actions { margin-top: 8px; }
+        .hint { color: #666; font-size: 12px; }
+        .nav { margin-bottom: 16px; }
+        .nav a { margin-right: 10px; }
+    </style>
+</head>
+<body>
+<div class="nav">
+    <a href="index.html">上传示例</a>
+    <a href="download.html">下载示例</a>
+    <strong>OSS 管理</strong>
+    <span class="hint"> | 本页提供创建桶、设置 ACL、验证 AK/SK</span>
+    <span style="float:right" class="hint">端口：8032</span>
+</div>
+
+<div class="card">
+    <h3>桶管理</h3>
+    <div class="row">
+        <label for="bucketName">桶名</label>
+        <input id="bucketName" placeholder="例如：demo-bucket" />
+    </div>
+    <div class="actions">
+        <button onclick="createBucket()">创建桶</button>
+        <button onclick="listBuckets()">列出所有桶</button>
+        <button onclick="deleteBucket()">删除桶</button>
+    </div>
+    <div class="row">
+        <label for="aclSelect">桶权限(ACL)</label>
+        <select id="aclSelect">
+            <option value="private">private</option>
+            <option value="public-read">public-read</option>
+            <option value="public-read-write">public-read-write</option>
+            <option value="bucket-owner-read">bucket-owner-read</option>
+            <option value="bucket-owner-full-control">bucket-owner-full-control</option>
+        </select>
+        <button onclick="setBucketAcl()">设置权限</button>
+    </div>
+    <div id="bucketResult" class="result"></div>
+    <div class="hint">不指定桶名时，设置权限默认使用服务器配置的桶。</div>
+</div>
+
+<div class="card">
+    <h3>AK/SK 验证</h3>
+    <div class="row">
+        <label for="endpoint">Endpoint</label>
+        <input id="endpoint" placeholder="https://oss.example.com" />
+    </div>
+    <div class="row">
+        <label for="region">Region</label>
+        <input id="region" placeholder="例如：us-east-1" />
+    </div>
+    <div class="row">
+        <label for="accessKey">AccessKey</label>
+        <input id="accessKey" placeholder="AK" />
+    </div>
+    <div class="row">
+        <label for="accessSecret">AccessSecret</label>
+        <input id="accessSecret" placeholder="SK" type="password" />
+    </div>
+    <div class="row">
+        <label for="pathStyleAccess">PathStyleAccess</label>
+        <input id="pathStyleAccess" type="checkbox" checked />
+    </div>
+    <div class="row">
+        <label for="chunkedDisabled">禁用分块编码</label>
+        <input id="chunkedDisabled" type="checkbox" />
+    </div>
+    <div class="actions">
+        <button onclick="validateCredentials()">验证连接</button>
+    </div>
+    <div class="hint">本接口仅验证凭据有效性，不修改服务器运行时配置。如需更新服务端 AK/SK，请修改配置并重启应用。</div>
+    <div id="credResult" class="result"></div>
+    <div class="hint">提示：服务端当前配置不会在此页面直接展示以避免泄露敏感信息。</div>
+</div>
+
+<script>
+    async function postJson(url, body) {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body || {})
+        });
+        return await res.json();
+    }
+
+    async function createBucket() {
+        const bucketName = document.getElementById('bucketName').value.trim();
+        const out = document.getElementById('bucketResult');
+        out.textContent = '创建中...';
+        const resp = await postJson('/api/oss/admin/createBucket', { bucketName });
+        if (resp.code === 0) {
+            out.textContent = `创建成功：${bucketName}`;
+        } else {
+            out.textContent = `创建失败：code=${resp.code}, msg=${resp.message || ''}`;
+        }
+    }
+
+    async function listBuckets() {
+        const out = document.getElementById('bucketResult');
+        out.textContent = '查询中...';
+        const resp = await postJson('/api/oss/admin/listBuckets', {});
+        if (resp.code === 0) {
+            const names = (resp.data || []).map(b => b.name).join('\n');
+            out.textContent = names ? `桶列表:\n${names}` : '无桶';
+        } else {
+            out.textContent = `查询失败：code=${resp.code}, msg=${resp.message || ''}`;
+        }
+    }
+
+    async function deleteBucket() {
+        const bucketName = document.getElementById('bucketName').value.trim();
+        const out = document.getElementById('bucketResult');
+        if (!bucketName) { out.textContent = '请填写桶名'; return; }
+        out.textContent = '删除中...';
+        const resp = await postJson('/api/oss/admin/deleteBucket', { bucketName });
+        if (resp.code === 0) {
+            out.textContent = `删除成功：${bucketName}`;
+        } else {
+            out.textContent = `删除失败：code=${resp.code}, msg=${resp.message || ''}`;
+        }
+    }
+
+    async function setBucketAcl() {
+        const bucketName = document.getElementById('bucketName').value.trim();
+        const acl = document.getElementById('aclSelect').value;
+        const out = document.getElementById('bucketResult');
+        out.textContent = '设置中...';
+        const resp = await postJson('/api/oss/admin/setBucketAcl', { bucketName, acl });
+        if (resp.code === 0) {
+            out.textContent = `设置成功：bucket=${bucketName || '(默认配置桶)'}, acl=${acl}`;
+        } else {
+            out.textContent = `设置失败：code=${resp.code}, msg=${resp.message || ''}`;
+        }
+    }
+
+    async function validateCredentials() {
+        const endpoint = document.getElementById('endpoint').value.trim();
+        const region = document.getElementById('region').value.trim();
+        const accessKey = document.getElementById('accessKey').value.trim();
+        const accessSecret = document.getElementById('accessSecret').value.trim();
+        const pathStyleAccess = document.getElementById('pathStyleAccess').checked;
+        const chunkedEncodingDisabled = document.getElementById('chunkedDisabled').checked;
+        const out = document.getElementById('credResult');
+        out.textContent = '验证中...';
+        const body = { endpoint, region, accessKey, accessSecret, pathStyleAccess, chunkedEncodingDisabled };
+        const resp = await postJson('/api/oss/admin/validateCredentials', body);
+        if (resp.code === 0 && resp.data) {
+            if (resp.data.success) {
+                out.textContent = `验证成功，bucketCount=${resp.data.bucketCount}`;
+            } else {
+                out.textContent = `验证失败：${resp.data.error || '未知错误'}`;
+            }
+        } else {
+            out.textContent = `请求失败：code=${resp.code}, msg=${resp.message || ''}`;
+        }
+    }
+</script>
+</body>
+</html>

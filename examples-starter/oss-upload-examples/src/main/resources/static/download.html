@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OSS 下载示例</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 24px; }
+        .row { margin-bottom: 12px; }
+        label { display: inline-block; width: 140px; }
+        input[type="text"], input[type="number"] { width: 320px; padding: 6px; }
+        button { margin-right: 8px; padding: 6px 12px; }
+        .url-box { margin-top: 8px; background: #f6f8fa; padding: 8px; border-radius: 4px; }
+        .meta-box { margin-top: 8px; background: #f6f8fa; padding: 8px; border-radius: 4px; }
+        .hint { color: #666; font-size: 12px; }
+        .preview-container { margin-top: 8px; background: #fff; padding: 8px; border: 1px solid #e5e7eb; border-radius: 4px; }
+    </style>
+    <script>
+        async function postJson(url, data) {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`HTTP ${res.status}: ${text}`);
+            }
+            return res.json();
+        }
+
+        function getInputs() {
+            const bucketName = document.getElementById('bucketName').value.trim();
+            const objectName = document.getElementById('objectName').value.trim();
+            const expiresSeconds = Number(document.getElementById('expires').value || 900);
+            return { bucketName, objectName, expiresSeconds };
+        }
+
+        function setUrl(url) {
+            const urlEl = document.getElementById('downloadUrl');
+            urlEl.textContent = url || '';
+            urlEl.dataset.url = url || '';
+        }
+
+        function setMeta(meta) {
+            const metaEl = document.getElementById('meta');
+            metaEl.textContent = meta ? JSON.stringify(meta, null, 2) : '';
+        }
+
+        async function genUrl() {
+            try {
+                const { bucketName, objectName, expiresSeconds } = getInputs();
+                if (!objectName) {
+                    alert('请输入对象名称 objectName');
+                    return;
+                }
+                const payload = { objectName, expiresSeconds };
+                if (bucketName) payload.bucketName = bucketName;
+                const resp = await postJson('/api/oss/downloadUrl', payload);
+                if (resp && resp.code === 0 && resp.data && resp.data.url) {
+                    setUrl(resp.data.url);
+                } else {
+                    alert('生成下载链接失败');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('生成下载链接异常: ' + e.message);
+            }
+        }
+
+        async function queryMeta() {
+            try {
+                const { bucketName, objectName } = getInputs();
+                if (!objectName) {
+                    alert('请输入对象名称 objectName');
+                    return;
+                }
+                const payload = { objectName };
+                if (bucketName) payload.bucketName = bucketName;
+                const resp = await postJson('/api/oss/metadata', payload);
+                if (resp && resp.code === 0 && resp.data) {
+                    setMeta(resp.data);
+                } else {
+                    alert('获取元数据失败');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('获取元数据异常: ' + e.message);
+            }
+        }
+
+        function openDownload() {
+            const url = document.getElementById('downloadUrl').dataset.url;
+            if (!url) {
+                alert('请先生成下载链接');
+                return;
+            }
+            window.open(url, '_blank');
+        }
+
+        async function copyUrl() {
+            const url = document.getElementById('downloadUrl').dataset.url;
+            if (!url) {
+                alert('请先生成下载链接');
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(url);
+                alert('已复制下载链接到剪贴板');
+            } catch (e) {
+                console.error(e);
+                alert('复制失败: ' + e.message);
+            }
+        }
+
+        function gotoUpload() {
+            window.location.href = '/index.html';
+        }
+
+        async function simpleUpload() {
+            try {
+                const { bucketName, objectName } = getInputs();
+                const fileInput = document.getElementById('uploadFile');
+                const file = fileInput.files && fileInput.files[0];
+                if (!file) {
+                    alert('请选择要上传的文件');
+                    return;
+                }
+                let targetObjectName = objectName;
+                if (!targetObjectName) {
+                    targetObjectName = file.name;
+                    document.getElementById('objectName').value = targetObjectName;
+                }
+                const form = new FormData();
+                form.append('objectName', targetObjectName);
+                if (bucketName) form.append('bucketName', bucketName);
+                form.append('file', file);
+                const res = await fetch('/api/oss/putObject', { method: 'POST', body: form });
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(`HTTP ${res.status}: ${text}`);
+                }
+                const data = await res.json();
+                if (data && data.code === 0) {
+                    const etag = data.data && data.data.eTag;
+                    document.getElementById('uploadResult').textContent = `上传成功，ETag: ${etag || ''}`;
+                } else {
+                    document.getElementById('uploadResult').textContent = '上传失败';
+                }
+            } catch (e) {
+                console.error(e);
+                alert('上传异常: ' + e.message);
+            }
+        }
+
+        async function preview() {
+            try {
+                const { bucketName, objectName } = getInputs();
+                if (!objectName) {
+                    alert('请输入对象名称 objectName');
+                    return;
+                }
+                let url = document.getElementById('downloadUrl').dataset.url;
+                if (!url) {
+                    await genUrl();
+                    url = document.getElementById('downloadUrl').dataset.url;
+                    if (!url) {
+                        alert('生成下载链接失败，无法预览');
+                        return;
+                    }
+                }
+
+                const payload = { objectName };
+                if (bucketName) payload.bucketName = bucketName;
+                let contentType = '';
+                try {
+                    const resp = await postJson('/api/oss/metadata', payload);
+                    contentType = (resp && resp.code === 0 && resp.data && resp.data.contentType) ? resp.data.contentType : '';
+                } catch (e) {
+                    console.warn('获取元数据失败，尝试通用预览:', e);
+                }
+
+                const imgEl = document.getElementById('previewImg');
+                const videoEl = document.getElementById('previewVideo');
+                const audioEl = document.getElementById('previewAudio');
+                const frameEl = document.getElementById('previewFrame');
+                [imgEl, videoEl, audioEl, frameEl].forEach(el => { el.style.display = 'none'; el.removeAttribute('src'); });
+
+                if (contentType && contentType.startsWith('image/')) {
+                    imgEl.src = url;
+                    imgEl.style.display = 'block';
+                } else if (contentType && contentType.startsWith('video/')) {
+                    videoEl.src = url;
+                    videoEl.style.display = 'block';
+                } else if (contentType && contentType.startsWith('audio/')) {
+                    audioEl.src = url;
+                    audioEl.style.display = 'block';
+                } else {
+                    frameEl.src = url;
+                    frameEl.style.display = 'block';
+                }
+
+                document.getElementById('previewContainer').style.display = 'block';
+            } catch (e) {
+                console.error(e);
+                alert('预览异常: ' + e.message);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>OSS 下载示例</h2>
+    <div class="row">
+        <label for="bucketName">Bucket 名称(可选):</label>
+        <input id="bucketName" type="text" placeholder="留空使用默认 bucket" />
+    </div>
+    <div class="row">
+        <label for="objectName">对象名称:</label>
+        <input id="objectName" type="text" placeholder="例如：folder/file.txt" />
+    </div>
+    <div class="row">
+        <label for="expires">链接有效期(秒):</label>
+        <input id="expires" type="number" min="1" value="900" />
+        <span class="hint">默认 900 秒（15 分钟）</span>
+    </div>
+
+    <div class="row">
+        <label for="uploadFile">选择文件(直传):</label>
+        <input id="uploadFile" type="file" />
+    </div>
+
+    <div class="row">
+        <button onclick="genUrl()">生成下载链接</button>
+        <button onclick="openDownload()">打开下载</button>
+        <button onclick="copyUrl()">复制链接</button>
+        <button onclick="preview()">预览</button>
+        <button onclick="queryMeta()">获取元数据</button>
+        <button onclick="gotoUpload()">上传</button>
+        <button onclick="simpleUpload()">上传文件（不分片）</button>
+    </div>
+
+    <div class="row">
+        <div class="url-box">
+            <strong>下载链接：</strong>
+            <div id="downloadUrl" class="hint" data-url=""></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="meta-box">
+            <strong>对象元数据：</strong>
+            <pre id="meta"></pre>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="hint" id="uploadResult"></div>
+    </div>
+
+    <div class="row">
+        <div id="previewContainer" class="preview-container" style="display:none">
+            <strong>预览：</strong>
+            <img id="previewImg" style="max-width:100%;display:none" alt="image preview" />
+            <video id="previewVideo" style="max-width:100%;display:none" controls></video>
+            <audio id="previewAudio" style="width:100%;display:none" controls></audio>
+            <iframe id="previewFrame" style="width:100%;height:420px;border:1px solid #ddd;display:none"></iframe>
+        </div>
+    </div>
+
+    <div class="row">
+        <a href="/index.html">返回上传示例</a>
+    </div>
+</body>
+</html>

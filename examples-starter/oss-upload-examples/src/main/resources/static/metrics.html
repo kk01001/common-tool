@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OSS 指标监控</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .nav { margin-bottom: 16px; }
+        .nav a { margin-right: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .card { border: 1px solid #ddd; border-radius: 8px; padding: 16px; }
+        .card h3 { margin: 0 0 6px 0; font-size: 16px; color: #333; }
+        .value { font-size: 28px; font-weight: bold; color: #0b3; }
+        .hint { color: #666; font-size: 12px; }
+        .row { margin-bottom: 8px; }
+        label { display: inline-block; width: 120px; }
+        input, select { padding: 6px; }
+        button { padding: 6px 12px; }
+    </style>
+</head>
+<body>
+<div class="nav">
+    <a href="index.html">上传示例</a>
+    <a href="download.html">下载示例</a>
+    <a href="manage.html">OSS 管理</a>
+    <strong>指标监控</strong>
+    <span style="float:right" class="hint">端口：8033</span>
+    <div class="row" style="margin-top:8px;">
+        <label for="bucketSelect">选择桶</label>
+        <select id="bucketSelect"></select>
+        <button onclick="refreshMetrics()">Sync</button>
+        <span class="hint" id="serverInfo"></span>
+    </div>
+    <div class="hint">本页以 MinIO 控制台风格展示关键指标（演示用途）。</div>
+    <hr />
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Buckets</h3>
+        <div class="value" id="bucketCount">-</div>
+    </div>
+    <div class="card">
+        <h3>Objects</h3>
+        <div class="value" id="objectCount">-</div>
+    </div>
+    <div class="card">
+        <h3>Reported Usage</h3>
+        <div class="value" id="usageGiB">-</div>
+        <div class="hint" id="usageBytes"></div>
+    </div>
+    <div class="card">
+        <h3>Endpoint</h3>
+        <div class="value" id="endpoint">-</div>
+        <div class="hint" id="region">-</div>
+    </div>
+    <div class="card">
+        <h3>Uptime</h3>
+        <div class="value" id="uptime">-</div>
+        <div class="hint" id="serverTime">-</div>
+    </div>
+    <div class="card">
+        <h3>Bucket</h3>
+        <div class="value" id="bucketName">-</div>
+        <div class="hint">当前扫描的桶</div>
+    </div>
+    <div class="card" style="grid-column: span 3;">
+        <h3>日志</h3>
+        <pre id="log" style="height: 160px; overflow:auto; background:#f8f8f8; padding:8px;">Ready.</pre>
+    </div>
+    </div>
+
+<script>
+    function log(s) {
+        const el = document.getElementById('log');
+        el.textContent += "\n" + s;
+        el.scrollTop = el.scrollHeight;
+    }
+
+    async function postJson(url, body) {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body || {})
+        });
+        return await res.json();
+    }
+
+    async function initBuckets() {
+        const resp = await postJson('/api/oss/admin/listBuckets', {});
+        const sel = document.getElementById('bucketSelect');
+        sel.innerHTML = '';
+        if (resp.code === 0 && Array.isArray(resp.data)) {
+            resp.data.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.name; opt.textContent = b.name; sel.appendChild(opt);
+            });
+        }
+    }
+
+    function toGiB(bytes) {
+        return (bytes / (1024 * 1024 * 1024)).toFixed(2);
+    }
+
+    function msToUptime(ms) {
+        const sec = Math.floor(ms / 1000);
+        const d = Math.floor(sec / 86400);
+        const h = Math.floor((sec % 86400) / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        return `${d}d ${h}h ${m}m`;
+    }
+
+    async function refreshMetrics() {
+        const bucketName = document.getElementById('bucketSelect').value;
+        log('Sync metrics for bucket=' + bucketName + '...');
+        const resp = await postJson('/api/oss/admin/metrics', { bucketName });
+        if (resp.code === 0) {
+            const d = resp.data || {};
+            document.getElementById('bucketCount').textContent = d.bucketCount ?? '-';
+            document.getElementById('objectCount').textContent = d.objectCount ?? '-';
+            document.getElementById('usageGiB').textContent = d.usageBytes != null ? toGiB(d.usageBytes) + ' GiB' : '-';
+            document.getElementById('usageBytes').textContent = d.usageBytes != null ? (d.usageBytes + ' bytes') : '';
+            document.getElementById('endpoint').textContent = d.endpoint ?? '-';
+            document.getElementById('region').textContent = 'Region: ' + (d.region ?? '-');
+            document.getElementById('uptime').textContent = msToUptime(d.uptimeMs || 0);
+            document.getElementById('serverTime').textContent = 'ServerTime: ' + (d.serverTime ?? '-');
+            document.getElementById('bucketName').textContent = d.bucketName ?? '-';
+            log('Sync done. objectCount=' + d.objectCount + ', usageBytes=' + d.usageBytes);
+        } else {
+            log('Sync failed: code=' + resp.code + ', msg=' + (resp.message || ''));
+        }
+    }
+
+    (async function main() {
+        await initBuckets();
+        await refreshMetrics();
+    })();
+</script>
+</body>
+</html>

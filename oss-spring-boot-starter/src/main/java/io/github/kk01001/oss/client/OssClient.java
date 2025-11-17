@@ -90,6 +90,27 @@ public interface OssClient {
     UploadPartResult uploadPart(ChunkDTO chunkDTO);
 
     /**
+     * 查询已上传的分片列表（断点续传用）
+     * AmazonS3：<a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListParts.html">...</a>
+     *
+     * @param bucketName 桶名称
+     * @param objectName 对象名称
+     * @param uploadId   分片上传任务ID
+     * @return PartListing 分片列表
+     */
+    PartListing listParts(String bucketName, String objectName, String uploadId);
+
+    /**
+     * 终止分片上传任务（清理未合并的分片）
+     * AmazonS3：<a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_AbortMultipartUpload.html">...</a>
+     *
+     * @param bucketName 桶名称
+     * @param objectName 对象名称
+     * @param uploadId   分片上传任务ID
+     */
+    void abortMultipartUpload(String bucketName, String objectName, String uploadId);
+
+    /**
      * 完成分片任务
      *
      * @param chunkMergeDTO 分片合并参数

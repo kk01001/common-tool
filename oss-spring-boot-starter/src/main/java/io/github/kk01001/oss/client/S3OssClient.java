@@ -136,6 +136,28 @@ public class S3OssClient implements OssClient {
     }
 
     /**
+     * 查询分片列表
+     * AmazonS3：<a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListParts.html">...</a>
+     */
+    @Override
+    @SneakyThrows
+    public PartListing listParts(String bucketName, String objectName, String uploadId) {
+        ListPartsRequest request = new ListPartsRequest(bucketName, objectName, uploadId);
+        return amazonS3.listParts(request);
+    }
+
+    /**
+     * 终止分片上传
+     * AmazonS3：<a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_AbortMultipartUpload.html">...</a>
+     */
+    @Override
+    @SneakyThrows
+    public void abortMultipartUpload(String bucketName, String objectName, String uploadId) {
+        AbortMultipartUploadRequest request = new AbortMultipartUploadRequest(bucketName, objectName, uploadId);
+        amazonS3.abortMultipartUpload(request);
+    }
+
+    /**
      * 通过bucketName和objectName获取对象
      * AmazonS3：<a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html">...</a>
      */
