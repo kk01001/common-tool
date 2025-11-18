@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>OSS 分片上传测试</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; }
+    .row { margin-bottom: 12px; }
+    #progressContainer { width: 100%; background: #eee; border-radius: 6px; height: 16px; overflow: hidden; }
+    #progressBar { height: 100%; width: 0; background: #4caf50; transition: width 0.1s ease; }
+    .log { white-space: pre-wrap; background: #f7f7f7; padding: 8px; border: 1px solid #ddd; height: 160px; overflow: auto; }
+    .parts { font-size: 12px; color: #555; }
+    input[type="text"], input[type="number"] { width: 320px; padding: 6px; }
+  </style>
+</head>
+<body>
+<h2>OSS 分片上传（含进度条）</h2>
+
+<div class="row">
+  <label>ObjectName：</label>
+  <input id="objectName" type="text" placeholder="例如：uploads/demo.bin" value="uploads/demo.bin" />
+</div>
+
+<div class="row">
+  <label>分片大小（MB）：</label>
+  <input id="chunkSizeMb" type="number" min="1" max="100" value="5" />
+</div>
+
+<div class="row">
+  <input id="fileInput" type="file" />
+  <button id="startBtn">开始上传</button>
+</div>
+
+<div class="row">
+  <div id="progressContainer"><div id="progressBar"></div></div>
+  <div class="parts" id="partsInfo"></div>
+</div>
+
+<div class="row">
+  <div class="log" id="log"></div>
+  <button id="resetBtn">重置</button>
+</div>
+
+<script>
+  const apiBase = '/test/oss';
+  const logBox = document.getElementById('log');
+  const progressBar = document.getElementById('progressBar');
+  const partsInfo = document.getElementById('partsInfo');
+
+  function log(msg) {
+    const ts = new Date().toLocaleTimeString();
+    logBox.textContent += `[${ts}] ${msg}\n`;
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  function setProgress(percent) {
+    progressBar.style.width = Math.min(100, Math.max(0, percent)) + '%';
+  }
+
+  async function initiateUpload(objectName) {
+    const form = new FormData();
+    form.append('objectName', objectName);
+    const resp = await fetch(`${apiBase}/initiate`, { method: 'POST', body: form });
+    if (!resp.ok) throw new Error(`initiate http ${resp.status}`);
+    const data = await resp.json();
+    if (data.code !== 0) throw new Error(data.message || 'initiate failed');
+    return data.data; // { uploadId, bucketName, objectName }
+  }
+
+  function uploadChunk({ uploadId, objectName }, file, partNumber, chunkBlob, currentChunkSize, totalSize, onProgress) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${apiBase}/upload-part`);
+      xhr.responseType = 'json';
+
+      xhr.upload.onprogress = (evt) => {
+        if (evt.lengthComputable && typeof onProgress === 'function') {
+          onProgress(evt.loaded, evt.total);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const res = xhr.response;
+          if (res && res.code === 0) {
+            resolve(res.data); // { partNumber, eTag }
+          } else {
+            reject(new Error(res && res.message ? res.message : 'upload-part failed'));
+          }
+        } else {
+          reject(new Error(`upload-part http ${xhr.status}`));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error('upload-part network error'));
+
+      const form = new FormData();
+      form.append('uploadId', uploadId);
+      form.append('objectName', objectName);
+      form.append('partNumber', String(partNumber));
+      form.append('currentChunkSize', String(currentChunkSize));
+      form.append('totalSize', String(totalSize));
+      form.append('lastPart', String(false));
+      form.append('file', chunkBlob, file.name + `.part${partNumber}`);
+      xhr.send(form);
+    });
+  }
+
+  async function completeUpload(uploadId, objectName) {
+    const form = new FormData();
+    form.append('uploadId', uploadId);
+    form.append('objectName', objectName);
+    const resp = await fetch(`${apiBase}/complete`, { method: 'POST', body: form });
+    if (!resp.ok) throw new Error(`complete http ${resp.status}`);
+    const data = await resp.json();
+    if (data.code !== 0) throw new Error(data.message || 'complete failed');
+    return data.data; // { bucketName, objectName }
+  }
+
+  document.getElementById('startBtn').addEventListener('click', async () => {
+    try {
+      const file = document.getElementById('fileInput').files[0];
+      const objectName = document.getElementById('objectName').value.trim();
+      const chunkSizeMb = Number(document.getElementById('chunkSizeMb').value || 5);
+      if (!file) return alert('请选择文件');
+      if (!objectName) return alert('请输入 ObjectName');
+
+      const chunkSize = chunkSizeMb * 1024 * 1024;
+      const totalSize = file.size;
+      const totalParts = Math.ceil(totalSize / chunkSize);
+      let uploadedBytes = 0;
+      setProgress(0);
+      partsInfo.textContent = `总分片：${totalParts}`;
+      log(`开始分片上传：文件大小 ${totalSize} 字节，分片大小 ${chunkSize} 字节，共 ${totalParts} 片`);
+
+      const init = await initiateUpload(objectName);
+      log(`发起分片任务成功，uploadId=${init.uploadId}`);
+
+      for (let partNumber = 1; partNumber <= totalParts; partNumber++) {
+        const start = (partNumber - 1) * chunkSize;
+        const end = Math.min(start + chunkSize, totalSize);
+        const chunkBlob = file.slice(start, end);
+        const currentChunkSize = end - start;
+
+        log(`上传第 ${partNumber}/${totalParts} 片，大小=${currentChunkSize}`);
+
+        const partRes = await uploadChunk(init, file, partNumber, chunkBlob, currentChunkSize, totalSize, (loaded, partTotal) => {
+          // 计算总进度：已完成分片的大小 + 当前分片已上传大小
+          const baseUploaded = (partNumber - 1) * chunkSize;
+          const currentUploaded = Math.min(loaded, currentChunkSize);
+          const totalUploaded = baseUploaded + currentUploaded;
+          const percent = (totalUploaded / totalSize) * 100;
+          setProgress(percent);
+        });
+
+        uploadedBytes += currentChunkSize;
+        setProgress((uploadedBytes / totalSize) * 100);
+        log(`第 ${partNumber} 片上传完成，ETag=${partRes.eTag}`);
+      }
+
+      const comp = await completeUpload(init.uploadId, init.objectName);
+      setProgress(100);
+      log(`分片合并完成：${comp.bucketName}/${comp.objectName}`);
+    } catch (e) {
+      log(`错误：${e.message || e}`);
+      alert(e.message || e);
+    }
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    setProgress(0);
+    logBox.textContent = '';
+    partsInfo.textContent = '';
+    document.getElementById('fileInput').value = '';
+  });
+</script>
+</body>
+</html>

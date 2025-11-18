@@ -39,6 +39,7 @@
         <module>i18n-spring-boot-starter</module>
         <module>local-message-spring-boot-starter</module>
         <module>mqtt-spring-boot-starter</module>
+        <module>ffmpeg-spring-boot-starter</module>
         <module>examples-starter</module>
     </modules>
 

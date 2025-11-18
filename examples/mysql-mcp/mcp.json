@@ -1,0 +1,66 @@
+{
+    "name": "mysql",
+    "description": "MySQL 元数据查询工具",
+    "version": "1.0.0",
+    "commands": {
+        "list_tables": {
+            "description": "列出所有表",
+            "command": "python C:\\github\\common-tool\\examples\\mysql-mcp\\mysql_mcp.py list_tables"
+        },
+        "describe_table": {
+            "description": "查看表结构",
+            "command": "python C:\\github\\common-tool\\examples\\mysql-mcp\\mysql_mcp.py describe_table {table_name}",
+            "args": {
+                "table_name": {
+                    "type": "string",
+                    "description": "表名"
+                }
+            }
+        },
+        "query_data": {
+            "description": "查询表数据",
+            "command": "python C:\\github\\common-tool\\examples\\mysql-mcp\\mysql_mcp.py query_data {table_name} {limit}",
+            "args": {
+                "table_name": {
+                    "type": "string",
+                    "description": "表名"
+                },
+                "limit": {
+                    "type": "number",
+                    "description": "限制返回的记录数",
+                    "default": 10
+                }
+            }
+        }
+    },
+    "setup": {
+        "requirements": ["mysql-connector-python", "tabulate", "python-dotenv"],
+        "env": {
+            "MYSQL_HOST": {
+                "type": "string",
+                "description": "MySQL 主机地址",
+                "default": "10.255.1.6"
+            },
+            "MYSQL_PORT": {
+                "type": "number",
+                "description": "MySQL 端口号",
+                "default": 3300
+            },
+            "MYSQL_USER": {
+                "type": "string",
+                "description": "MySQL 用户名",
+                "default": "root"
+            },
+            "MYSQL_PASSWORD": {
+                "type": "string",
+                "description": "MySQL 密码",
+                "default": "cqt@1234"
+            },
+            "MYSQL_DATABASE": {
+                "type": "string",
+                "description": "MySQL 数据库名",
+                "default": "test"
+            }
+        }
+    }
+} 

@@ -1,0 +1,32 @@
+server:
+  port: 8036
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  web:
+    resources:
+      add-mappings: true
+      static-locations:
+        - classpath:/static/
+        - file:${ffmpeg.workDir}
+
+ffmpeg:
+  enabled: true
+  # 可选：指定 ffmpeg/ffprobe 路径（不指定则使用系统环境变量中的 ffmpeg/ffprobe）
+  ffmpegPath: "C:\\data\\soft\\ffmpeg-master-latest-win64-gpl\\ffmpeg-master-latest-win64-gpl\\bin\\ffmpeg.exe"
+  ffprobePath: "C:\\data\\soft\\ffmpeg-master-latest-win64-gpl\\ffmpeg-master-latest-win64-gpl\\bin\\ffprobe.exe"
+  # 工作目录（用于承载上传与输出，同时作为静态资源目录暴露）
+  workDir: ${user.dir}/hls
+  # 命令执行超时时间（秒）
+  timeoutSeconds: 600
+  # 默认分片类型（ts 或 fmp4）
+  segmentType: fmp4
+  # 分片时长（秒）
+  hlsTime: 6
+  # 音频码率（如 128k）
+  audioBitrate: 128k
+  # 采样率（如 48000）
+  sampleRate: 48000

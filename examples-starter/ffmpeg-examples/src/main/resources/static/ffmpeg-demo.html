@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FFmpeg 示例：上传 MP3 转 HLS 并播放</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 24px; }
+    .box { border: 1px solid #ddd; padding: 16px; border-radius: 8px; margin-bottom: 16px; }
+    label { display: inline-block; width: 160px; }
+    input[type="text"], input[type="number"], select { width: 240px; }
+    button { margin-top: 8px; padding: 6px 12px; }
+    pre { background: #f6f8fa; padding: 12px; overflow: auto; }
+    #player { width: 100%; max-width: 800px; background: #000; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+  <h2>上传 MP3 转 m3u8 并播放</h2>
+
+  <div class="box">
+    <div>
+      <label>选择音频文件：</label>
+      <input id="file" type="file" accept="audio/mpeg,audio/mp3,audio/aac" />
+    </div>
+    <div>
+      <label>分片类型：</label>
+      <select id="segmentType">
+        <option value="fmp4" selected>fmp4</option>
+        <option value="ts">ts</option>
+      </select>
+    </div>
+    <div>
+      <label>分片时长（秒）：</label>
+      <input id="hlsTime" type="number" value="6" min="1" />
+    </div>
+    <div>
+      <label>音频码率：</label>
+      <input id="audioBitrate" type="text" value="128k" />
+    </div>
+    <div>
+      <label>采样率：</label>
+      <input id="sampleRate" type="number" value="48000" min="8000" step="1000" />
+    </div>
+    <div>
+      <button id="btnUpload">上传并转换</button>
+      <button id="btnProbe" disabled>获取媒体文件信息（ffprobe）</button>
+    </div>
+  </div>
+
+  <div class="box">
+    <video id="player" controls></video>
+    <div id="playInfo"></div>
+  </div>
+
+  <div class="box">
+    <h3>ffprobe 结果</h3>
+    <pre id="probeOut">(上传并转换成功后可点击“获取媒体文件信息”)</pre>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let lastData = null; // 缓存最近一次转换结果
+
+    async function uploadAndConvert() {
+      const file = $("file").files[0];
+      if (!file) { alert("请先选择文件"); return; }
+
+      const form = new FormData();
+      form.append("file", file);
+      form.append("segmentType", $("segmentType").value);
+      form.append("hlsTime", $("hlsTime").value);
+      form.append("audioBitrate", $("audioBitrate").value);
+      form.append("sampleRate", $("sampleRate").value);
+
+      $("btnUpload").disabled = true;
+      $("btnUpload").innerText = "转换中...";
+      try {
+        const resp = await fetch("/api/ffmpeg/audio/hls/upload", { method: "POST", body: form });
+        const json = await resp.json();
+        if (json.code !== 0) { throw new Error(json.message || "转换失败"); }
+        const data = json.data;
+        lastData = data;
+        $("btnProbe").disabled = false;
+
+        // 播放 m3u8
+        const url = data.m3u8Path; // 例如：/outputs/<uuid>/output.m3u8
+        $("playInfo").innerText = `播放地址：${url}`;
+        const video = $("player");
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(url);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED, function () { video.play(); });
+        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+          video.src = url; video.addEventListener("loadedmetadata", () => { video.play(); });
+        } else {
+          alert("当前浏览器不支持 HLS 播放");
+        }
+      } catch (e) {
+        alert(e.message);
+      } finally {
+        $("btnUpload").disabled = false;
+        $("btnUpload").innerText = "上传并转换";
+      }
+    }
+
+    async function doProbe() {
+      if (!lastData || !lastData.inputPath) { alert("请先完成上传并转换"); return; }
+      try {
+        const resp = await fetch("/api/ffmpeg/ffprobe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ inputPath: lastData.inputPath })
+        });
+        const json = await resp.json();
+        if (json.code !== 0) { throw new Error(json.message || "ffprobe 失败"); }
+        $("probeOut").textContent = json.data.rawJson;
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+
+    $("btnUpload").addEventListener("click", uploadAndConvert);
+    $("btnProbe").addEventListener("click", doProbe);
+  </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+server:
+  port: 8081
+
+spring:
+  mvc:
+    static-path-pattern: /**
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+
+oss:
+  enable: true
+  accessKey: assistant
+  accessSecret: assistant@2020
+  endpoint: http://10.255.1.8:19000
+  region: us-east-1
+  pathStyleAccess: true
+  maxConnections: 100
+  bucketName: test

@@ -21,6 +21,7 @@
     <modules>
         <module>oss-upload-examples</module>
         <module>mqtt-examples</module>
+        <module>ffmpeg-examples</module>
     </modules>
 
 </project>
