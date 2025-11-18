@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PostgreSQL 示例：MyBatis CRUD 演示</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 24px; }
+    .box { border: 1px solid #ddd; padding: 16px; border-radius: 8px; margin-bottom: 16px; }
+    label { display: inline-block; width: 120px; }
+    input[type="text"], input[type="number"] { width: 220px; }
+    button { margin-top: 8px; padding: 6px 12px; }
+    pre { background: #f6f8fa; padding: 12px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h2>PostgreSQL 示例（MyBatis）</h2>
+
+  <div class="box">
+    <button id="btnInit">初始化表 demo_user</button>
+    <div id="initOut"></div>
+  </div>
+
+  <div class="box">
+    <h3>新增</h3>
+    <div><label>用户名：</label><input id="c_username" type="text" /></div>
+    <div><label>邮箱：</label><input id="c_email" type="text" /></div>
+    <button id="btnCreate">新增</button>
+    <div id="createOut"></div>
+  </div>
+
+  <div class="box">
+    <h3>查询</h3>
+    <div><label>用户ID：</label><input id="g_id" type="number" /></div>
+    <button id="btnGet">查询</button>
+    <pre id="getOut"></pre>
+  </div>
+
+  <div class="box">
+    <h3>更新</h3>
+    <div><label>用户ID：</label><input id="u_id" type="number" /></div>
+    <div><label>用户名：</label><input id="u_username" type="text" /></div>
+    <div><label>邮箱：</label><input id="u_email" type="text" /></div>
+    <button id="btnUpdate">更新</button>
+    <div id="updateOut"></div>
+  </div>
+
+  <div class="box">
+    <h3>删除</h3>
+    <div><label>用户ID：</label><input id="d_id" type="number" /></div>
+    <button id="btnDelete">删除</button>
+    <div id="deleteOut"></div>
+  </div>
+
+  <div class="box">
+    <h3>分页</h3>
+    <div><label>页码：</label><input id="p_pageNumber" type="number" value="1" /></div>
+    <div><label>每页条数：</label><input id="p_pageSize" type="number" value="10" /></div>
+    <div><label>关键词：</label><input id="p_keyword" type="text" /></div>
+    <button id="btnPage">查询</button>
+    <pre id="pageOut"></pre>
+  </div>
+
+  <div class="box">
+    <h3>事务演示</h3>
+    <button id="btnTx">执行事务并回滚</button>
+    <div id="txOut"></div>
+  </div>
+
+  <script>
+    const postJson = async (url, body) => {
+      const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+      return resp.json();
+    };
+
+    document.getElementById('btnInit').addEventListener('click', async () => {
+      const r = await postJson('/api/postgres/init');
+      document.getElementById('initOut').innerText = r.code === 0 ? '已初始化' : ('失败: ' + r.message);
+    });
+
+    document.getElementById('btnCreate').addEventListener('click', async () => {
+      const r = await postJson('/api/postgres/create', { username: document.getElementById('c_username').value, email: document.getElementById('c_email').value });
+      document.getElementById('createOut').innerText = r.code === 0 ? ('新ID: ' + r.data) : ('失败: ' + r.message);
+    });
+
+    document.getElementById('btnGet').addEventListener('click', async () => {
+      const r = await postJson('/api/postgres/get', { id: Number(document.getElementById('g_id').value) });
+      document.getElementById('getOut').textContent = JSON.stringify(r, null, 2);
+    });
+
+    document.getElementById('btnUpdate').addEventListener('click', async () => {
+      const r = await postJson('/api/postgres/update', { id: Number(document.getElementById('u_id').value), username: document.getElementById('u_username').value, email: document.getElementById('u_email').value });
+      document.getElementById('updateOut').innerText = r.code === 0 ? ('成功: ' + r.data) : ('失败: ' + r.message);
+    });
+
+    document.getElementById('btnDelete').addEventListener('click', async () => {
+      const r = await postJson('/api/postgres/delete', { id: Number(document.getElementById('d_id').value) });
+      document.getElementById('deleteOut').innerText = r.code === 0 ? ('成功: ' + r.data) : ('失败: ' + r.message);
+    });
+
+    document.getElementById('btnPage').addEventListener('click', async () => {
+      const r = await postJson('/api/postgres/page', { pageNumber: Number(document.getElementById('p_pageNumber').value), pageSize: Number(document.getElementById('p_pageSize').value), keyword: document.getElementById('p_keyword').value });
+      document.getElementById('pageOut').textContent = JSON.stringify(r, null, 2);
+    });
+
+    document.getElementById('btnTx').addEventListener('click', async () => {
+      const r = await postJson('/api/postgres/tx-demo');
+      document.getElementById('txOut').innerText = r.code === 0 ? '已回滚' : ('失败: ' + r.message);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS demo_user (
+  id BIGSERIAL PRIMARY KEY,
+  username VARCHAR(64) NOT NULL,
+  email VARCHAR(128),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);

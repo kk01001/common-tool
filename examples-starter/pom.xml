@@ -22,6 +22,7 @@
         <module>oss-upload-examples</module>
         <module>mqtt-examples</module>
         <module>ffmpeg-examples</module>
+        <module>postgres-examples</module>
     </modules>
 
 </project>

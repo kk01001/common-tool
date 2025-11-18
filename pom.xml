@@ -334,6 +334,11 @@
                     <publishingServerId>${serverId}</publishingServerId>
                     <excludeArtifacts>
                         <artifact>examples</artifact>
+                        <artifact>examples-starter</artifact>
+                        <artifact>oss-upload-examples</artifact>
+                        <artifact>mqtt-examples</artifact>
+                        <artifact>ffmpeg-examples</artifact>
+                        <artifact>postgres-examples</artifact>
                     </excludeArtifacts>
                     <autoPublish>true</autoPublish>
                 </configuration>

@@ -1,0 +1,21 @@
+server:
+  port: 8037
+
+spring:
+  datasource:
+    url: jdbc:postgresql://10.255.1.221:5000/demo
+    username: postgres
+    password: postgres@2020
+    driver-class-name: org.postgresql.Driver
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  web:
+    resources:
+      add-mappings: true
+      static-locations:
+        - classpath:/static/
+
+mybatis:
+  mapper-locations: classpath:/mapper/**/*.xml
+  type-aliases-package: io.github.kk01001.postgres.examples.entity
