@@ -170,6 +170,42 @@ public class MqttTemplate {
         return future;
     }
 
+    public void sendDelayed(String topic, String payload, int delaySeconds) throws MqttException {
+        if (delaySeconds <= 0 || delaySeconds > 4_294_967) {
+            throw new IllegalArgumentException("invalid delaySeconds");
+        }
+        String delayedTopic = "$delayed/" + delaySeconds + "/" + topic;
+        send(delayedTopic, payload, properties.getProducer().getDefaultQos(), properties.getProducer().getDefaultRetained());
+    }
+
+    public void sendDelayed(String topic, byte[] payload, int delaySeconds) throws MqttException {
+        if (delaySeconds <= 0 || delaySeconds > 4_294_967) {
+            throw new IllegalArgumentException("invalid delaySeconds");
+        }
+        String delayedTopic = "$delayed/" + delaySeconds + "/" + topic;
+        send(delayedTopic, payload, properties.getProducer().getDefaultQos(), properties.getProducer().getDefaultRetained());
+    }
+
+    public CompletableFuture<Void> sendDelayedAsync(String topic, String payload, int delaySeconds) {
+        if (delaySeconds <= 0 || delaySeconds > 4_294_967) {
+            CompletableFuture<Void> f = new CompletableFuture<>();
+            f.completeExceptionally(new IllegalArgumentException("invalid delaySeconds"));
+            return f;
+        }
+        String delayedTopic = "$delayed/" + delaySeconds + "/" + topic;
+        return sendAsync(delayedTopic, payload, properties.getProducer().getDefaultQos(), properties.getProducer().getDefaultRetained());
+    }
+
+    public CompletableFuture<Void> sendDelayedAsync(String topic, byte[] payload, int delaySeconds) {
+        if (delaySeconds <= 0 || delaySeconds > 4_294_967) {
+            CompletableFuture<Void> f = new CompletableFuture<>();
+            f.completeExceptionally(new IllegalArgumentException("invalid delaySeconds"));
+            return f;
+        }
+        String delayedTopic = "$delayed/" + delaySeconds + "/" + topic;
+        return sendAsync(delayedTopic, payload, properties.getProducer().getDefaultQos(), properties.getProducer().getDefaultRetained());
+    }
+
     /**
      * 发送 MqttMessage 对象
      *

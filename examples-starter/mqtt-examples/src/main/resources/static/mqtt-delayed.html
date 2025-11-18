@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>MQTT 延迟发布测试</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #111; color: #eee; margin:0; }
+        .bar { padding: 12px 16px; background: #1e1e1e; display:flex; gap:12px; align-items:center; }
+        input { padding:6px 8px; border-radius:4px; border:1px solid #444; background:#222; color:#eee; }
+        button { padding:6px 12px; border:none; border-radius:4px; background:#0a6ed1; color:#fff; cursor:pointer; }
+        .status { margin-left:auto; font-weight:bold; }
+        .content { padding: 12px 16px; }
+        #log { background:#000; color:#0f0; font-family: Consolas, monospace; padding:10px; height:300px; overflow:auto; border-radius:8px; }
+    </style>
+    <script>
+        let client = null;
+        let connected = false;
+        const topic = 'demo/delay';
+
+        function log(msg) {
+            const line = document.createElement('div');
+            const t = new Date().toLocaleTimeString();
+            line.textContent = `[${t}] ${msg}`;
+            document.getElementById('log').appendChild(line);
+            document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+        }
+
+        function connect() {
+            const url = 'ws://10.255.1.21:8083/mqtt';
+            const opts = { clientId: 'delay-web-' + Math.random().toString(16).slice(2), clean: true, reconnectPeriod: 2000, keepalive: 60, protocolId: 'MQTT', protocolVersion: 4 };
+            client = mqtt.connect(url, opts);
+            client.on('connect', () => { connected = true; document.getElementById('status').textContent = '已连接'; client.subscribe(topic, { qos: 1 }); log('已连接并订阅 ' + topic); });
+            client.on('reconnect', () => { document.getElementById('status').textContent = '重连中...'; });
+            client.on('error', (e) => { document.getElementById('status').textContent = '错误: ' + (e && e.message || e); });
+            client.on('close', () => { connected = false; document.getElementById('status').textContent = '未连接'; });
+            client.on('message', (t, payload) => { log(`收到消息: topic=${t}, payload=${payload.toString()}`); });
+        }
+
+        function send() {
+            const delaySeconds = Number(document.getElementById('delay').value || '0');
+            const message = document.getElementById('message').value.trim();
+            if (!delaySeconds || delaySeconds <= 0) { alert('请输入合理的延迟秒数'); return; }
+            if (!message) { alert('请输入消息内容'); return; }
+            const body = { topic, delaySeconds, payload: message };
+            fetch('/api/mqtt/delay/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            }).then(res => {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                log(`已请求发送: 延迟=${delaySeconds}s, 内容=${message}`);
+            }).catch(e => alert('发送失败: ' + (e && e.message || e)));
+        }
+
+        window.addEventListener('load', connect);
+    </script>
+</head>
+<body>
+<div class="bar">
+    <span>延迟秒数</span>
+    <input id="delay" type="number" value="5" min="1" max="4294967" />
+    <span>消息</span>
+    <input id="message" type="text" placeholder="请输入要发送的消息" style="flex:1;" />
+    <button onclick="send()">发送</button>
+    <span id="status" class="status">未连接</span>
+</div>
+<div class="content">
+    <div id="log"></div>
+    <p style="color:#999;font-size:12px;">订阅主题: demo/delay，后端发送主题: $delayed/{秒数}/demo/delay</p>
+    <p style="color:#999;font-size:12px;">注意：延迟发布为企业版功能，需在 EMQX 启用延迟发布。</p>
+</div>
+</body>
+</html>
