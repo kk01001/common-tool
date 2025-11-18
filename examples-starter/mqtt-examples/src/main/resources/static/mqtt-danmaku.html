@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>MQTT 弹幕演示</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #111; color: #eee; margin:0; }
+        .topbar { padding: 12px 16px; background: #1e1e1e; display:flex; gap:12px; align-items:center; flex-wrap: wrap; }
+        .topbar input, .topbar select { padding:6px 8px; border-radius:4px; border:1px solid #444; background:#222; color:#eee; }
+        .topbar button { padding:6px 12px; border:none; border-radius:4px; background:#0a6ed1; color:#fff; cursor:pointer; }
+        .status { margin-left:auto; font-weight:bold; }
+        .canvas { position: relative; height: calc(100vh - 60px); overflow: hidden; background: #000; }
+        .dm { position: absolute; white-space: nowrap; will-change: transform; font-weight: 600; }
+        .panel { position:absolute; left:16px; bottom:16px; background:#1e1e1e; padding:10px; border-radius:8px; display:flex; gap:8px; align-items:center; }
+        .panel input { min-width: 220px; }
+        .row { display:flex; gap:12px; align-items:center; width:100%; flex-wrap: wrap; margin-top:8px; }
+        .row input, .row select { flex: 1 1 220px; }
+        .inputbar { padding: 12px 16px; background: #1e1e1e; position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; box-shadow: 0 -2px 12px rgba(0,0,0,.3); }
+    </style>
+    <script>
+        let client = null;
+        let connected = false;
+        let subToken = null;
+        const lanes = Array.from({length: 10}, (_, i) => i);
+
+        function randLane() { return lanes[Math.floor(Math.random() * lanes.length)]; }
+
+        function addDanmaku(text, color = '#fff', fontSize = 20) {
+            const canvas = document.querySelector('.canvas');
+            const dm = document.createElement('div');
+            dm.className = 'dm';
+            dm.textContent = text;
+            dm.style.color = color || '#fff';
+            dm.style.fontSize = `${fontSize}px`;
+            const lane = randLane();
+            const top = 20 + lane * 32;
+            dm.style.top = `${top}px`;
+            dm.style.left = `${canvas.clientWidth + 20}px`;
+            canvas.appendChild(dm);
+
+            const duration = 8000 + Math.random() * 4000;
+            const start = performance.now();
+            const total = canvas.clientWidth + dm.clientWidth + 40;
+            function step(ts) {
+                const p = Math.min(1, (ts - start) / duration);
+                const x = -total * p;
+                dm.style.transform = `translateX(${x}px)`;
+                if (p < 1) requestAnimationFrame(step); else dm.remove();
+            }
+            requestAnimationFrame(step);
+        }
+
+        function connect() {
+            const brokerUrl = document.getElementById('brokerUrl').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const version = Number(document.getElementById('mqttVersion').value);
+            const clientId = `dm-web-${Math.random().toString(16).slice(2)}`;
+            const opts = {
+                clientId,
+                clean: true,
+                reconnectPeriod: 2000,
+                keepalive: 60,
+                connectTimeout: 30_000,
+                protocolId: 'MQTT',
+                protocolVersion: version,
+                resubscribe: true,
+                username: username || undefined,
+                password: password || undefined
+            };
+            client = mqtt.connect(brokerUrl, opts);
+            client.on('connect', () => { connected = true; setStatus('已连接'); });
+            client.on('reconnect', () => setStatus('重连中...'));
+            client.on('error', (e) => setStatus('连接错误: ' + (e && e.message || e)));
+            client.on('close', () => { connected = false; setStatus('未连接'); });
+            client.on('message', (topic, payload) => {
+                try {
+                    const obj = JSON.parse(payload.toString());
+                    addDanmaku(obj.text, obj.color, obj.fontSize || 20);
+                } catch (e) {
+                    addDanmaku(payload.toString());
+                }
+            });
+        }
+
+        function setStatus(text) { document.getElementById('status').textContent = text; }
+
+        function subscribe() {
+            if (!client || !connected) { alert('请先连接'); return; }
+            const videoId = document.getElementById('videoId').value.trim();
+            if (!videoId) { alert('请输入视频ID'); return; }
+            const topic = `video/${videoId}/danmaku`;
+            client.subscribe(topic, { qos: 1 }, (err, granted) => {
+                if (err) { alert('订阅失败: ' + err.message); return; }
+                subToken = topic;
+                setStatus('已订阅: ' + topic);
+            });
+        }
+
+        function unsubscribe() {
+            if (!client || !connected || !subToken) return;
+            client.unsubscribe(subToken, () => setStatus('已取消订阅'));
+            subToken = null;
+        }
+
+        function sendDanmaku() {
+            const videoId = document.getElementById('videoId').value.trim();
+            const userId = document.getElementById('userId').value.trim();
+            const text = document.getElementById('text').value.trim();
+            const color = document.getElementById('color').value.trim();
+            const fontSize = Number(document.getElementById('fontSize').value || '20');
+            if (!videoId || !text) { alert('请输入视频ID与弹幕内容'); return; }
+            const body = { videoId, userId, text, color, fontSize };
+            fetch('/api/danmaku/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            }).then(async (res) => {
+                if (!res.ok) { throw new Error('HTTP ' + res.status); }
+                try { await res.json(); } catch (_) {}
+            }).catch((e) => {
+                alert('发送失败: ' + (e && e.message || e));
+            });
+        }
+
+        function layout() {
+            const topbar = document.querySelector('.topbar');
+            const inputbar = document.querySelector('.inputbar');
+            const canvas = document.querySelector('.canvas');
+            if (!topbar || !inputbar || !canvas) return;
+            const h = Math.max(200, window.innerHeight - topbar.offsetHeight - inputbar.offsetHeight);
+            canvas.style.height = `${h}px`;
+        }
+
+        window.addEventListener('load', () => {
+            const textInput = document.getElementById('text');
+            if (textInput) {
+                textInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); sendDanmaku(); }
+                });
+            }
+            layout();
+            window.addEventListener('resize', layout);
+        });
+    </script>
+</head>
+<body>
+<div class="topbar">
+  <div class="row">
+    <input id="brokerUrl" type="text" value="ws://10.255.1.21:8083/mqtt" placeholder="ws://host:8083/mqtt" />
+    <select id="mqttVersion"><option value="4" selected>3.1.1</option><option value="5">5.0</option></select>
+    <input id="username" type="text" placeholder="用户名(可选)" />
+    <input id="password" type="text" placeholder="密码(可选)" />
+    <button onclick="connect()">连接</button>
+    <span id="status" class="status">未连接</span>
+  </div>
+  <div class="row">
+    <input id="videoId" type="text" placeholder="视频ID" />
+    <button onclick="subscribe()">订阅</button>
+    <button onclick="unsubscribe()">取消订阅</button>
+  </div>
+</div>
+  <div class="canvas"></div>
+  <div class="inputbar">
+    <div class="row">
+      <input id="userId" type="text" placeholder="用户ID" />
+      <input id="text" type="text" placeholder="弹幕内容" />
+      <input id="color" type="text" placeholder="#fff 或 red" />
+      <input id="fontSize" type="number" value="20" min="12" max="60" />
+      <button onclick="sendDanmaku()">发送弹幕</button>
+    </div>
+  </div>
+</body>
+</html>
