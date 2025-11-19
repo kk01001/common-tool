@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>线程池监控Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .controls h3 {
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-field label {
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-field input,
+        .form-field select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            color: white;
+        }
+
+        .pools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
+        }
+
+        .pool-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .pool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .pool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .pool-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .metric-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-weight: 700;
+            color: #333;
+        }
+
+        .progress-bar {
+            height: 24px;
+            background: #f0f0f0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .metric-highlight {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.4em;
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🚀 线程池监控 Dashboard</h1>
+
+        <div class="controls">
+            <h3>📝 任务提交</h3>
+            <div class="control-group">
+                <div class="form-field">
+                    <label for="poolName">线程池名称</label>
+                    <select id="poolName">
+                        <option value="demo-pool">demo-pool</option>
+                        <option value="order-pool">order-pool</option>
+                        <option value="async-pool">async-pool</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="taskCount">任务数量</label>
+                    <input type="number" id="taskCount" value="10" min="1" max="1000">
+                </div>
+                <div class="form-field">
+                    <label for="sleepTime">任务耗时 (ms)</label>
+                    <input type="number" id="sleepTime" value="1000" min="100" max="60000">
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-primary" onclick="submitTasks()">🎯 提交任务</button>
+                <button class="btn-success" onclick="submitFast()">⚡ 快速任务 (100个)</button>
+                <button class="btn-danger" onclick="stressTest()">🔥 压力测试</button>
+                <button class="btn-info" onclick="refreshMetrics()">🔄 刷新指标</button>
+            </div>
+        </div>
+
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+
+        <div class="pools-grid" id="poolsGrid"></div>
+    </div>
+
+    <script>
+        let refreshInterval;
+
+        // 页面加载时开始自动刷新
+        window.addEventListener('load', () => {
+            refreshMetrics();
+            refreshInterval = setInterval(refreshMetrics, 3000);
+        });
+
+        async function submitTasks() {
+            const poolName = document.getElementById('poolName').value;
+            const count = document.getElementById('taskCount').value;
+            const sleepMs = document.getElementById('sleepTime').value;
+
+            try {
+                const response = await fetch(`/api/threadpool/submit?poolName=${poolName}&count=${count}&sleepMs=${sleepMs}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(`成功提交 ${result.submitted} 个任务到 ${poolName}`, 'success');
+                    setTimeout(refreshMetrics, 500);
+                } else {
+                    showAlert(result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('提交任务失败: ' + error.message, 'error');
+            }
+        }
+
+        async function submitFast() {
+            document.getElementById('taskCount').value = 100;
+            document.getElementById('sleepTime').value = 500;
+            await submitTasks();
+        }
+
+        async function stressTest() {
+            const poolName = document.getElementById('poolName').value;
+
+            if (!confirm(`确定要对 ${poolName} 进行压力测试吗？这将提交200个长时间任务。`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/threadpool/stress?poolName=${poolName}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                showAlert(result.message, 'success');
+                setTimeout(refreshMetrics, 1000);
+            } catch (error) {
+                showAlert('压力测试失败: ' + error.message, 'error');
+            }
+        }
+
+        async function refreshMetrics() {
+            try {
+                const response = await fetch('/api/threadpool/metrics');
+                const metrics = await response.json();
+                renderPools(metrics);
+            } catch (error) {
+                console.error('刷新指标失败:', error);
+            }
+        }
+
+        function renderPools(metricsMap) {
+            const grid = document.getElementById('poolsGrid');
+            grid.innerHTML = '';
+
+            Object.entries(metricsMap).forEach(([poolName, metrics]) => {
+                const card = createPoolCard(poolName, metrics);
+                grid.appendChild(card);
+            });
+        }
+
+        function createPoolCard(poolName, metrics) {
+            const card = document.createElement('div');
+            card.className = 'pool-card';
+
+            const queueUsage = metrics.queueUsageRatio * 100;
+            const activeRatio = metrics.activeThreadRatio * 100;
+
+            let status = 'status-active';
+            if (queueUsage > 80 || activeRatio > 90) {
+                status = 'status-danger';
+            } else if (queueUsage > 60 || activeRatio > 70) {
+                status = 'status-warning';
+            }
+
+            card.innerHTML = `
+                <div class="pool-header">
+                    <span class="pool-name">${poolName}</span>
+                    <span class="status-badge ${status}">
+                        ${metrics.shutdown ? '已关闭' : '运行中'}
+                    </span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">活跃线程</span>
+                    <span class="metric-value metric-highlight">${metrics.activeThreadCount}</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">线程池大小</span>
+                    <span class="metric-value">${metrics.poolSize} / ${metrics.maxPoolSize}</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">队列大小</span>
+                    <span class="metric-value">${metrics.queueSize} / ${metrics.queueCapacity}</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">已完成任务</span>
+                    <span class="metric-value">${metrics.completedTaskCount}</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">拒绝次数</span>
+                    <span class="metric-value" style="color: ${metrics.rejectCount > 0 ? '#dc3545' : '#28a745'}">
+                        ${metrics.rejectCount}
+                    </span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">队列使用率</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${queueUsage}%; background: ${getProgressColor(queueUsage)}">
+                        ${queueUsage.toFixed(1)}%
+                    </div>
+                </div>
+
+                <div class="metric-row" style="margin-top: 10px;">
+                    <span class="metric-label">线程活跃比</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${activeRatio}%; background: ${getProgressColor(activeRatio)}">
+                        ${activeRatio.toFixed(1)}%
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function getProgressColor(percentage) {
+            if (percentage > 80) return 'linear-gradient(90deg, #ee0979 0%, #ff6a00 100%)';
+            if (percentage > 60) return 'linear-gradient(90deg, #f093fb 0%, #f5576c 100%)';
+            return 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)';
+        }
+
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            document.body.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

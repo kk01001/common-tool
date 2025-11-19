@@ -40,6 +40,7 @@
         <module>local-message-spring-boot-starter</module>
         <module>mqtt-spring-boot-starter</module>
         <module>ffmpeg-spring-boot-starter</module>
+        <module>dynamic-threadpool-spring-boot-starter</module>
         <module>examples-starter</module>
     </modules>
 
@@ -339,6 +340,7 @@
                         <artifact>mqtt-examples</artifact>
                         <artifact>ffmpeg-examples</artifact>
                         <artifact>postgres-examples</artifact>
+                        <artifact>threadpool-example</artifact>
                     </excludeArtifacts>
                     <autoPublish>true</autoPublish>
                 </configuration>

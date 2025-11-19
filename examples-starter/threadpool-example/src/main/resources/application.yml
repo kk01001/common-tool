@@ -1,0 +1,75 @@
+spring:
+  application:
+    name: threadpool-example
+
+server:
+  port: 8037
+
+# Dynamic ThreadPool Configuration
+dynamic-threadpool:
+  enabled: true
+  
+  global:
+    corePoolSize: 5
+    maxPoolSize: 10
+    queueCapacity: 100
+    keepAliveTime: 60s
+    threadNamePrefix: demo-
+    allowCoreThreadTimeout: false
+    enableTtl: true  # 启用 TTL
+  
+  pools:
+    order-pool:
+      corePoolSize: 10
+      maxPoolSize: 20
+      queueCapacity: 200
+      threadNamePrefix: order-
+      enableTtl: true
+      auto-init: true
+    
+    async-pool:
+      corePoolSize: 5
+      maxPoolSize: 15
+      queueCapacity: 50
+      threadNamePrefix: async-
+      auto-init: true
+      enableTtl: true
+  
+  monitor:
+    enabled: true
+    enableActuator: true
+    enableMetrics: true
+    collectInterval: 5s
+  
+  alarm:
+    enabled: true
+    queueUsageThreshold: 0.8
+    activeThreadRatioThreshold: 0.9
+    rejectCountThreshold: 10
+    alarmInterval: 1m
+    channelType: WECHAT  # 可选: LOG, WECHAT, DINGTALK, ALL
+    wechatWebhook: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=6c04cbb9-42fb-47d4-8e11-f9003a3608cd
+    # dingTalkWebhook: https://oapi.dingtalk.com/robot/send?access_token=YOUR_TOKEN
+    # mentionedAll: false
+    # mentionedMobileList:
+    #   - "13800138000"
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# Logging
+logging:
+  level:
+    io.github.kk01001: DEBUG
+    root: INFO

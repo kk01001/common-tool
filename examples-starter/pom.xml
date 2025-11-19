@@ -23,6 +23,7 @@
         <module>mqtt-examples</module>
         <module>ffmpeg-examples</module>
         <module>postgres-examples</module>
+        <module>threadpool-example</module>
     </modules>
 
 </project>

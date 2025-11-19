@@ -309,6 +309,61 @@ public class CustomMqttConfig {
 }
 ```
 
+### 共享订阅（负载均衡消费）
+
+共享订阅用于在多个订阅者之间做负载均衡。同一条消息会投递到所有“组”，但每个组内仅一个客户端接收。适合后端处理集群，不适合前端广播。
+
+前缀与格式：
+
+- 带组共享订阅：`$share/<group>/<original-topic>` 示例：`$share/danmaku/video/+/danmaku`
+- 无组共享订阅（特例）：`$queue/<original-topic>` 示例：`$queue/video/123/danmaku`
+
+代码示例：
+
+```java
+@Component
+public class SharedListener {
+    @MqttMessageListener(topics = "$share/metrics/app/+/event", qos = 1)
+    public void handle(String topic, String payload) {
+        // 该组内多实例均衡接收
+    }
+}
+```
+
+最佳实践：
+
+- 前端广播订阅原始主题；后端消费用 `$share/<group>/...`
+- 使用 `clean_session=true` 或 MQTT v5 短会话过期，避免断线期间队列积压
+- 不在共享订阅上使用保留消息，避免历史消息误分配
+
+### 延迟发布（EMQX 扩展）
+
+EMQX 支持通过特殊主题前缀延迟发布：`$delayed/{DelayInterval}/{TopicName}`。例如：`$delayed/10/demo/delay` 表示 10 秒后发布到 `demo/delay`。
+
+Starter 已封装延迟发布方法：
+
+```java
+@Service
+@RequiredArgsConstructor
+public class DelaySender {
+    private final MqttTemplate mqttTemplate;
+
+    public void send(String msg) throws MqttException {
+        // 同步延迟发布
+        mqttTemplate.sendDelayed("demo/delay", msg, 10);
+
+        // 异步延迟发布
+        mqttTemplate.sendDelayedAsync("demo/delay", msg, 5)
+            .whenComplete((v, ex) -> { /* 结果处理 */ });
+    }
+}
+```
+
+注意：
+
+- `delaySeconds` 范围为 `1..4294967`
+- 延迟发布为 EMQX 企业版功能，需在 Dashboard 启用“延迟发布”
+
 ## 注意事项
 
 1. **客户端 ID**：如果不指定 `client-id`，系统会自动生成一个唯一的客户端 ID
@@ -316,6 +371,8 @@ public class CustomMqttConfig {
 3. **自动重连**：启用自动重连后，连接断开时会自动尝试重连，并重新订阅所有主题
 4. **线程池**：消息消费使用独立的线程池，避免阻塞 MQTT 客户端的回调线程
 5. **QoS 选择**：根据业务需求选择合适的 QoS 级别，平衡性能和可靠性
+6. **共享订阅与广播**：前端广播请使用原始主题订阅；共享订阅用于后端负载均衡
+7. **延迟发布**：使用 `$delayed/秒数/原始主题` 语义或封装方法；评估业务对延迟语义的依赖
 
 ## 兼容性
 
@@ -329,6 +386,8 @@ public class CustomMqttConfig {
 - [快速开始指南](QUICKSTART.md) - 5 分钟快速上手
 - [使用指南](USAGE.md) - 详细的使用说明和工作原理
 - [高级功能](ADVANCED.md) - SSL/TLS、拦截器、监控等高级功能
+- [共享订阅](https://docs.emqx.com/zh/emqx/v5.8/messaging/mqtt-shared-subscription.html)
+- [延迟发布](https://docs.emqx.com/zh/emqx/v5.8/messaging/mqtt-delayed-publish.html)
 
 ## 参考文档
 
