@@ -281,6 +281,127 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* 配置修改弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+            margin: 0;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .config-form .form-field {
+            margin-bottom: 20px;
+        }
+
+        .config-form .form-field label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .config-form .form-field input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            font-size: 12px;
+            margin-top: 10px;
+            width: 100%;
+        }
     </style>
 </head>
 
@@ -323,6 +444,41 @@
         </div>
 
         <div class="pools-grid" id="poolsGrid"></div>
+    </div>
+
+    <!-- 配置修改弹窗 -->
+    <div id="configModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ 修改线程池配置</h2>
+                <button class="close-btn" onclick="closeConfigModal()">&times;</button>
+            </div>
+            <form class="config-form">
+                <input type="hidden" id="editPoolName">
+                <div class="form-field">
+                    <label for="editCorePoolSize">核心线程数</label>
+                    <input type="number" id="editCorePoolSize" min="1" max="1000" required>
+                </div>
+                <div class="form-field">
+                    <label for="editMaxPoolSize">最大线程数</label>
+                    <input type="number" id="editMaxPoolSize" min="1" max="1000" required>
+                </div>
+                <div class="form-field">
+                    <label for="editQueueCapacity">队列容量</label>
+                    <input type="number" id="editQueueCapacity" min="0" max="10000" required>
+                    <small style="color: #999; margin-top: 4px; display: block;">ℹ️ 仅 RESIZABLE_LINKED_BLOCKING_QUEUE
+                        类型支持动态修改</small>
+                </div>
+                <div class="form-field">
+                    <label for="editKeepAliveSeconds">线程存活时间 (秒)</label>
+                    <input type="number" id="editKeepAliveSeconds" min="0" max="3600" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeConfigModal()">取消</button>
+                    <button type="button" class="btn-update" onclick="updatePoolConfig()">💾 保存配置</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -451,6 +607,31 @@
                 </div>
 
                 <div class="metric-row">
+                    <span class="metric-label">线程存活时间</span>
+                    <span class="metric-value">${metrics.keepAliveTime || 0}s</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">拒绝策略</span>
+                    <span class="metric-value">${metrics.rejectedPolicyType || 'N/A'}</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">队列类型</span>
+                    <span class="metric-value">${metrics.queueType || 'N/A'}</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">线程名称前缀</span>
+                    <span class="metric-value">${metrics.threadNamePrefix || 'N/A'}</span>
+                </div>
+
+                <div class="metric-row">
+                    <span class="metric-label">核心线程超时</span>
+                    <span class="metric-value">${metrics.allowCoreThreadTimeout ? '允许' : '不允许'}</span>
+                </div>
+
+                <div class="metric-row">
                     <span class="metric-label">队列使用率</span>
                 </div>
                 <div class="progress-bar">
@@ -467,6 +648,13 @@
                         ${activeRatio.toFixed(1)}%
                     </div>
                 </div>
+                
+                <button class="btn-edit" onclick="openConfigModal('${poolName}', {
+                    corePoolSize: ${metrics.corePoolSize},
+                    maxPoolSize: ${metrics.maxPoolSize},
+                    queueCapacity: ${metrics.queueCapacity},
+                    keepAliveTime: ${metrics.keepAliveTime || 60}
+                })">⚙️ 编辑配置</button>
             `;
 
             return card;
@@ -487,6 +675,60 @@
             setTimeout(() => {
                 alert.remove();
             }, 3000);
+        }
+
+        // 配置修改相关函数
+        function openConfigModal(poolName, metrics) {
+            document.getElementById('editPoolName').value = poolName;
+            document.getElementById('editCorePoolSize').value = metrics.corePoolSize;
+            document.getElementById('editMaxPoolSize').value = metrics.maxPoolSize;
+            document.getElementById('editQueueCapacity').value = metrics.queueCapacity;
+            document.getElementById('editKeepAliveSeconds').value = metrics.keepAliveTime || 60;
+            document.getElementById('configModal').style.display = 'block';
+        }
+
+        function closeConfigModal() {
+            document.getElementById('configModal').style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            const modal = document.getElementById('configModal');
+            if (event.target == modal) {
+                closeConfigModal();
+            }
+        }
+
+        async function updatePoolConfig() {
+            const poolName = document.getElementById('editPoolName').value;
+            const corePoolSize = parseInt(document.getElementById('editCorePoolSize').value);
+            const maxPoolSize = parseInt(document.getElementById('editMaxPoolSize').value);
+            const queueCapacity = parseInt(document.getElementById('editQueueCapacity').value);
+            const keepAliveSeconds = parseInt(document.getElementById('editKeepAliveSeconds').value);
+
+            if (maxPoolSize < corePoolSize) {
+                showAlert('最大线程数不能小于核心线程数！', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/actuator/dynamic-threadpool/${poolName}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ corePoolSize, maxPoolSize, queueCapacity, keepAliveSeconds })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(`线程池 [${poolName}] 配置更新成功！`, 'success');
+                    closeConfigModal();
+                    setTimeout(refreshMetrics, 500);
+                } else {
+                    showAlert(result.message || '配置更新失败', 'error');
+                }
+            } catch (error) {
+                showAlert('配置更新失败: ' + error.message, 'error');
+            }
         }
     </script>
 </body>

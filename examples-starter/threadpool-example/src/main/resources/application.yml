@@ -26,6 +26,7 @@ dynamic-threadpool:
       threadNamePrefix: order-
       enableTtl: true
       auto-init: true
+      queue-type: RESIZABLE_LINKED_BLOCKING_QUEUE
     
     async-pool:
       corePoolSize: 5
@@ -34,6 +35,8 @@ dynamic-threadpool:
       threadNamePrefix: async-
       auto-init: true
       enableTtl: true
+      allow-core-thread-timeout: true
+      queue-type: RESIZABLE_LINKED_BLOCKING_QUEUE
   
   monitor:
     enabled: true

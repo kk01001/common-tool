@@ -1,8 +1,10 @@
 package io.github.kk01001.threadpool.wrapper;
 
+import com.alibaba.ttl.threadpool.TtlExecutors;
 import io.github.kk01001.threadpool.alarm.ThreadPoolAlarmHandler;
 import io.github.kk01001.threadpool.model.ThreadPoolConfig;
 import io.github.kk01001.threadpool.model.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.queue.ResizableLinkedBlockingQueue;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -88,6 +90,11 @@ public class DynamicThreadPoolWrapper {
             executor.allowCoreThreadTimeOut(true);
         }
 
+        // 如果启用 TTL，使用 TTL 包装器包装 Executor
+        if (Boolean.TRUE.equals(config.getEnableTtl())) {
+            return wrapWithTtl(executor);
+        }
+
         return executor;
     }
 
@@ -97,10 +104,12 @@ public class DynamicThreadPoolWrapper {
     private BlockingQueue<Runnable> createWorkQueue(ThreadPoolConfig config) {
         int capacity = config.getQueueCapacity();
         return switch (config.getQueueType()) {
+            case RESIZABLE_LINKED_BLOCKING_QUEUE ->
+                    new io.github.kk01001.threadpool.queue.ResizableLinkedBlockingQueue<>(capacity);
+            case LINKED_BLOCKING_QUEUE -> new LinkedBlockingQueue<>(capacity);
             case ARRAY_BLOCKING_QUEUE -> new ArrayBlockingQueue<>(capacity);
             case SYNCHRONOUS_QUEUE -> new SynchronousQueue<>();
             case PRIORITY_BLOCKING_QUEUE -> new PriorityBlockingQueue<>(capacity);
-            default -> new LinkedBlockingQueue<>(capacity);
         };
     }
 
@@ -109,25 +118,27 @@ public class DynamicThreadPoolWrapper {
      */
     private ThreadFactory createThreadFactory(ThreadPoolConfig config) {
         AtomicLong threadNumber = new AtomicLong(1);
-        ThreadFactory basicFactory = runnable -> {
+        return runnable -> {
             Thread thread = new Thread(runnable);
             thread.setName(config.getThreadNamePrefix() + threadNumber.getAndIncrement());
             thread.setDaemon(false);
             return thread;
         };
+    }
 
-        // 如果启用 TTL，使用 TTL 包装器
-        if (Boolean.TRUE.equals(config.getEnableTtl())) {
-            try {
-                Class<?> ttlExecutorsClass = Class.forName("com.alibaba.ttl.threadpool.TtlExecutors");
-                java.lang.reflect.Method getTtlExecutorServiceMethod = ttlExecutorsClass.getMethod("getTtlThreadFactory", ThreadFactory.class);
-                return (ThreadFactory) getTtlExecutorServiceMethod.invoke(null, basicFactory);
-            } catch (Exception e) {
-                log.warn("TTL is enabled but TtlExecutors not found, using basic thread factory. Error: {}", e.getMessage());
-            }
+    /**
+     * 使用 TTL 包装 Executor
+     */
+    private MonitoredThreadPoolExecutor wrapWithTtl(MonitoredThreadPoolExecutor executor) {
+        try {
+            // 并记录 TTL 已启用
+            log.info("TTL wrapper enabled for thread pool [{}]", config.getPoolName());
+            // 注意：TTL 的包装是在任务提交时自动处理的，不需要替换 executor
+            return (MonitoredThreadPoolExecutor) TtlExecutors.getTtlExecutor(executor);
+        } catch (Exception e) {
+            log.warn("Failed to wrap executor with TTL, using basic executor. Error: {}", e.getMessage());
+            return executor;
         }
-
-        return basicFactory;
     }
 
     /**
@@ -151,7 +162,7 @@ public class DynamicThreadPoolWrapper {
         String oldConfigStr = formatConfig(config);
         String newConfigStr = formatConfig(newConfig);
 
-        log.info("Updating thread pool [{}] config from {} to {}", poolName, oldConfigStr, newConfigStr);
+        log.info("Updating thread pool [{}] config from [{}] to [{}]", poolName, oldConfigStr, newConfigStr);
 
         // 更新核心线程数
         if (!newConfig.getCorePoolSize().equals(config.getCorePoolSize())) {
@@ -180,6 +191,20 @@ public class DynamicThreadPoolWrapper {
             executor.allowCoreThreadTimeOut(newConfig.getAllowCoreThreadTimeout());
             log.info("Thread pool [{}] allow core thread timeout updated: {} -> {}",
                     poolName, config.getAllowCoreThreadTimeout(), newConfig.getAllowCoreThreadTimeout());
+        }
+
+        // 更新队列容量（如果使用的是可调整容量的队列）
+        if (!newConfig.getQueueCapacity().equals(config.getQueueCapacity())) {
+            BlockingQueue<Runnable> queue = executor.getQueue();
+            if (queue instanceof ResizableLinkedBlockingQueue resizableQueue) {
+                resizableQueue.setCapacity(newConfig.getQueueCapacity());
+                log.info("Thread pool [{}] queue capacity updated: {} -> {}",
+                        poolName, config.getQueueCapacity(), newConfig.getQueueCapacity());
+            } else {
+                log.warn("Thread pool [{}] queue capacity change detected: {} -> {}, but current queue type [{}] does not support dynamic resizing. " +
+                                "Only RESIZABLE_LINKED_BLOCKING_QUEUE supports dynamic capacity modification.",
+                        poolName, config.getQueueCapacity(), newConfig.getQueueCapacity(), config.getQueueType());
+            }
         }
 
         this.config = newConfig;
@@ -228,6 +253,11 @@ public class DynamicThreadPoolWrapper {
                 .shutdown(executor.isShutdown())
                 .terminated(executor.isTerminated())
                 .collectTime(LocalDateTime.now())
+                .keepAliveTime(config.getKeepAliveTime().toSeconds())
+                .rejectedPolicyType(config.getRejectedPolicyType() != null ? config.getRejectedPolicyType().toString() : null)
+                .allowCoreThreadTimeout(config.getAllowCoreThreadTimeout())
+                .threadNamePrefix(config.getThreadNamePrefix())
+                .queueType(config.getQueueType() != null ? config.getQueueType().toString() : null)
                 .build();
     }
 

@@ -76,10 +76,10 @@ public class ThreadPoolConfig {
      */
     public RejectedExecutionHandler getRejectedExecutionHandler() {
         return switch (rejectedPolicyType) {
-            case CALLER_RUNS_POLICY -> new ThreadPoolExecutor.CallerRunsPolicy();
+            case ABORT_POLICY -> new ThreadPoolExecutor.AbortPolicy();
             case DISCARD_OLDEST_POLICY -> new ThreadPoolExecutor.DiscardOldestPolicy();
             case DISCARD_POLICY -> new ThreadPoolExecutor.DiscardPolicy();
-            default -> new ThreadPoolExecutor.AbortPolicy();
+            default -> new ThreadPoolExecutor.CallerRunsPolicy();
         };
     }
 

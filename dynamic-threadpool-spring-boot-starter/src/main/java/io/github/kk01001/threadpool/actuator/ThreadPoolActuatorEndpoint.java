@@ -4,14 +4,12 @@ import io.github.kk01001.threadpool.model.ThreadPoolConfig;
 import io.github.kk01001.threadpool.model.ThreadPoolMetrics;
 import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
 import io.github.kk01001.threadpool.wrapper.DynamicThreadPoolWrapper;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -94,28 +92,31 @@ public class ThreadPoolActuatorEndpoint {
         result.put("poolName", poolName);
         result.put("success", true);
         result.put("message", "Thread pool configuration updated successfully");
-        result.put("oldConfig", currentConfig);
-        result.put("newConfig", newConfig);
+
+        // 返回简化的配置信息，避免序列化问题
+        Map<String, Object> oldConfigMap = new HashMap<>();
+        oldConfigMap.put("corePoolSize", currentConfig.getCorePoolSize());
+        oldConfigMap.put("maxPoolSize", currentConfig.getMaxPoolSize());
+        oldConfigMap.put("queueCapacity", currentConfig.getQueueCapacity());
+        oldConfigMap.put("keepAliveTime", currentConfig.getKeepAliveTime());
+        oldConfigMap.put("rejectedPolicyType", currentConfig.getRejectedPolicyType());
+        oldConfigMap.put("allowCoreThreadTimeout", currentConfig.getAllowCoreThreadTimeout());
+        oldConfigMap.put("threadNamePrefix", currentConfig.getThreadNamePrefix());
+        oldConfigMap.put("queueType", currentConfig.getQueueType());
+
+        Map<String, Object> newConfigMap = new HashMap<>();
+        newConfigMap.put("corePoolSize", newConfig.getCorePoolSize());
+        newConfigMap.put("maxPoolSize", newConfig.getMaxPoolSize());
+        newConfigMap.put("queueCapacity", newConfig.getQueueCapacity());
+        newConfigMap.put("keepAliveTime", newConfig.getKeepAliveTime());
+        newConfigMap.put("rejectedPolicyType", newConfig.getRejectedPolicyType());
+        newConfigMap.put("allowCoreThreadTimeout", newConfig.getAllowCoreThreadTimeout());
+        newConfigMap.put("threadNamePrefix", newConfig.getThreadNamePrefix());
+        newConfigMap.put("queueType", newConfig.getQueueType());
+        
+        result.put("oldConfig", oldConfigMap);
+        result.put("newConfig", newConfigMap);
 
         return result;
-    }
-
-    /**
-     * 获取线程池列表
-     * GET /actuator/dynamic-threadpool/list
-     */
-    @ReadOperation
-    public PoolListResponse list() {
-        Collection<String> poolNames = registry.getAllPoolNames();
-        PoolListResponse response = new PoolListResponse();
-        response.setTotal(poolNames.size());
-        response.setPoolNames(poolNames);
-        return response;
-    }
-
-    @Data
-    public static class PoolListResponse {
-        private Integer total;
-        private Collection<String> poolNames;
     }
 }

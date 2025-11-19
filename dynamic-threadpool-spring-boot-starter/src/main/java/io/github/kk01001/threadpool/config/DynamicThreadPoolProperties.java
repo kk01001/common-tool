@@ -251,22 +251,27 @@ public class DynamicThreadPoolProperties {
      */
     public enum QueueType {
         /**
-         * 链表阻塞队列
+         * 链表阻塞队列（标准，不支持动态调整容量）
          */
         LINKED_BLOCKING_QUEUE,
 
         /**
-         * 数组阻塞队列
+         * 可调整容量的链表阻塞队列（支持动态调整容量）
+         */
+        RESIZABLE_LINKED_BLOCKING_QUEUE,
+
+        /**
+         * 数组阻塞队列（不支持动态调整容量）
          */
         ARRAY_BLOCKING_QUEUE,
 
         /**
-         * 同步队列
+         * 同步队列（无容量概念）
          */
         SYNCHRONOUS_QUEUE,
 
         /**
-         * 优先级队列
+         * 优先级队列（不支持动态调整容量）
          */
         PRIORITY_BLOCKING_QUEUE
     }

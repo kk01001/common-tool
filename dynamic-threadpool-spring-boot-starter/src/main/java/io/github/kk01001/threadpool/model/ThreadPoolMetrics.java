@@ -102,4 +102,29 @@ public class ThreadPoolMetrics {
      * 采集时间
      */
     private LocalDateTime collectTime;
+
+    /**
+     * 线程存活时间（秒）
+     */
+    private Long keepAliveTime;
+
+    /**
+     * 拒绝策略类型
+     */
+    private String rejectedPolicyType;
+
+    /**
+     * 是否允许核心线程超时
+     */
+    private Boolean allowCoreThreadTimeout;
+
+    /**
+     * 线程名称前缀
+     */
+    private String threadNamePrefix;
+
+    /**
+     * 队列类型
+     */
+    private String queueType;
 }
