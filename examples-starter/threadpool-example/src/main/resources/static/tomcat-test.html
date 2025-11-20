@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomcat 线程池测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .test-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .test-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            color: white;
+        }
+
+        .metrics-display {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .metric-item:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            color: #333;
+            font-weight: 700;
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🌐 Tomcat 线程池测试</h1>
+
+        <div class="nav-links">
+            <a href="/">← 返回主页</a>
+        </div>
+
+        <!-- 第三方线程池选择 -->
+        <div class="test-section">
+            <h2>📋 选择第三方线程池</h2>
+            <div class="form-group">
+                <label for="thirdPartyPool">第三方线程池</label>
+                <select id="thirdPartyPool">
+                    <option value="">加载中...</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button class="btn-info" onclick="loadThirdPartyPools()">🔄 刷新列表</button>
+                <button class="btn-primary" onclick="getPoolMetrics()">📊 查看指标</button>
+            </div>
+        </div>
+
+        <!-- 指标显示 -->
+        <div class="test-section" id="metricsSection" style="display: none;">
+            <div class="section-header">
+                <h2>📊 线程池指标</h2>
+                <button id="autoRefreshBtn" class="btn-success" onclick="toggleAutoRefresh()">▶️ 开启自动刷新</button>
+            </div>
+            <div class="metrics-display" id="metricsDisplay"></div>
+        </div>
+
+        <!-- HTTP 压力测试 -->
+        <div class="test-section">
+            <h2>🔥 HTTP 压力测试</h2>
+            <p style="color: #666; margin-bottom: 15px;">通过发送大量 HTTP 请求来测试 Tomcat 线程池</p>
+            <div class="form-group">
+                <label for="requestCount">请求数量</label>
+                <input type="number" id="requestCount" value="100" min="1" max="1000">
+            </div>
+            <div class="form-group">
+                <label for="concurrency">并发数</label>
+                <input type="number" id="concurrency" value="10" min="1" max="100">
+            </div>
+            <div class="btn-group">
+                <button class="btn-danger" onclick="startStressTest()">🚀 开始压测</button>
+                <button class="btn-success" onclick="testSingleRequest()">⚡ 单次请求</button>
+            </div>
+        </div>
+
+        <!-- 配置更新 -->
+        <div class="test-section">
+            <h2>⚙️ 动态配置更新</h2>
+            <div class="form-group">
+                <label for="minThreads">最小线程数 (corePoolSize)</label>
+                <input type="number" id="minThreads" value="10" min="1" max="500">
+            </div>
+            <div class="form-group">
+                <label for="maxThreads">最大线程数 (maxPoolSize)</label>
+                <input type="number" id="maxThreads" value="200" min="1" max="1000">
+            </div>
+            <div class="form-group">
+                <label for="queueCapacity">队列容量 (queueCapacity)</label>
+                <input type="number" id="queueCapacity" value="1000" min="0" max="10000">
+            </div>
+            <div class="form-group">
+                <label for="keepAliveSeconds">线程存活时间/秒 (keepAliveSeconds)</label>
+                <input type="number" id="keepAliveSeconds" value="60" min="0" max="3600">
+            </div>
+            <div class="btn-group">
+                <button class="btn-primary" onclick="updateTomcatConfig()">💾 更新配置</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let refreshInterval;
+        let metricsRefreshInterval;
+        let autoRefreshEnabled = false;
+
+        // 页面加载时自动加载第三方线程池列表
+        window.addEventListener('load', () => {
+            loadThirdPartyPools();
+            refreshInterval = setInterval(loadThirdPartyPools, 5000);
+        });
+
+        // 切换自动刷新
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            const btn = document.getElementById('autoRefreshBtn');
+
+            if (autoRefreshEnabled) {
+                btn.textContent = '⏸️ 停止自动刷新';
+                btn.style.background = 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)';
+                startMetricsAutoRefresh();
+            } else {
+                btn.textContent = '▶️ 开启自动刷新';
+                btn.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+                stopMetricsAutoRefresh();
+            }
+        }
+
+        // 开始自动刷新指标（1秒一次）
+        function startMetricsAutoRefresh() {
+            getPoolMetrics(); // 立即刷新一次
+            metricsRefreshInterval = setInterval(getPoolMetrics, 1000);
+        }
+
+        // 停止自动刷新指标
+        function stopMetricsAutoRefresh() {
+            if (metricsRefreshInterval) {
+                clearInterval(metricsRefreshInterval);
+                metricsRefreshInterval = null;
+            }
+        }
+
+        // 加载第三方线程池列表
+        async function loadThirdPartyPools() {
+            try {
+                const response = await fetch('/actuator/dynamic-threadpool');
+                const data = await response.json();
+
+                const select = document.getElementById('thirdPartyPool');
+                const currentValue = select.value;
+                select.innerHTML = '';
+
+                // 只显示第三方线程池
+                const thirdPartyPools = Object.keys(data.pools || {}).filter(name =>
+                    name.startsWith('tomcat:') || name.startsWith('dubbo:') || name.startsWith('hikari:')
+                );
+
+                if (thirdPartyPools.length === 0) {
+                    select.innerHTML = '<option value="">没有找到第三方线程池</option>';
+                    return;
+                }
+
+                thirdPartyPools.forEach(poolName => {
+                    const option = document.createElement('option');
+                    option.value = poolName;
+                    option.textContent = poolName;
+                    if (poolName === currentValue) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+
+                // 如果没有选中值，选中第一个
+                if (!currentValue && thirdPartyPools.length > 0) {
+                    select.value = thirdPartyPools[0];
+                }
+            } catch (error) {
+                console.error('加载第三方线程池失败:', error);
+                showAlert('加载失败: ' + error.message, 'error');
+            }
+        }
+
+        // 获取线程池指标
+        async function getPoolMetrics() {
+            const poolName = document.getElementById('thirdPartyPool').value;
+            if (!poolName) {
+                showAlert('请选择一个线程池', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/actuator/dynamic-threadpool/${poolName}`);
+                const metrics = await response.json();
+
+                displayMetrics(metrics);
+                document.getElementById('metricsSection').style.display = 'block';
+            } catch (error) {
+                console.error('获取指标失败:', error);
+            }
+        }
+
+        // 显示指标
+        function displayMetrics(metrics) {
+            const display = document.getElementById('metricsDisplay');
+            display.innerHTML = `
+                <div class="metric-item">
+                    <span class="metric-label">线程池名称</span>
+                    <span class="metric-value">${metrics.poolName}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">核心线程数</span>
+                    <span class="metric-value">${metrics.corePoolSize}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">最大线程数</span>
+                    <span class="metric-value">${metrics.maxPoolSize}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">活跃线程数</span>
+                    <span class="metric-value" style="color: #f5576c;">${metrics.activeThreadCount}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">当前线程数</span>
+                    <span class="metric-value">${metrics.poolSize}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">历史最大线程数</span>
+                    <span class="metric-value">${metrics.largestPoolSize}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">队列大小</span>
+                    <span class="metric-value">${metrics.queueSize} / ${metrics.queueCapacity}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">已完成任务</span>
+                    <span class="metric-value">${metrics.completedTaskCount}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">总任务数</span>
+                    <span class="metric-value">${metrics.taskCount}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">线程活跃比</span>
+                    <span class="metric-value">${(metrics.activeThreadRatio * 100).toFixed(2)}%</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">队列类型</span>
+                    <span class="metric-value">${metrics.queueType || 'N/A'}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">拒绝策略</span>
+                    <span class="metric-value">${metrics.rejectedPolicyType || 'N/A'}</span>
+                </div>
+            `;
+        }
+
+        // 单次请求测试
+        async function testSingleRequest() {
+            try {
+                const start = Date.now();
+                const response = await fetch('/api/tomcat/test');
+                const result = await response.json();
+                const duration = Date.now() - start;
+
+                showAlert(`请求成功！耗时: ${duration}ms`, 'success');
+                setTimeout(getPoolMetrics, 500);
+            } catch (error) {
+                showAlert('请求失败: ' + error.message, 'error');
+            }
+        }
+
+        // 压力测试
+        async function startStressTest() {
+            const requestCount = parseInt(document.getElementById('requestCount').value);
+            const concurrency = parseInt(document.getElementById('concurrency').value);
+
+            if (!confirm(`确定要发送 ${requestCount} 个请求（并发 ${concurrency}）吗？`)) {
+                return;
+            }
+
+            showAlert(`开始压测: ${requestCount} 个请求, 并发 ${concurrency}`, 'info');
+
+            try {
+                const response = await fetch(`/api/tomcat/stress?count=${requestCount}&concurrency=${concurrency}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+
+                showAlert(result.message || '压测完成', 'success');
+                setTimeout(getPoolMetrics, 1000);
+            } catch (error) {
+                showAlert('压测失败: ' + error.message, 'error');
+            }
+        }
+
+        // 更新 Tomcat 配置
+        async function updateTomcatConfig() {
+            const poolName = document.getElementById('thirdPartyPool').value;
+            if (!poolName) {
+                showAlert('请选择一个线程池', 'error');
+                return;
+            }
+
+            const corePoolSize = parseInt(document.getElementById('minThreads').value);
+            const maxPoolSize = parseInt(document.getElementById('maxThreads').value);
+            const queueCapacity = parseInt(document.getElementById('queueCapacity').value);
+            const keepAliveSeconds = parseInt(document.getElementById('keepAliveSeconds').value);
+
+            if (corePoolSize > maxPoolSize) {
+                showAlert('最小线程数不能大于最大线程数', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/actuator/dynamic-threadpool/${poolName}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        corePoolSize: corePoolSize,
+                        maxPoolSize: maxPoolSize,
+                        queueCapacity: queueCapacity,
+                        keepAliveSeconds: keepAliveSeconds
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(`配置更新成功！`, 'success');
+                    setTimeout(getPoolMetrics, 500);
+                } else {
+                    showAlert(result.message || '配置更新失败', 'error');
+                }
+            } catch (error) {
+                showAlert('配置更新失败: ' + error.message, 'error');
+            }
+        }
+
+        // 显示提示
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            document.body.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
