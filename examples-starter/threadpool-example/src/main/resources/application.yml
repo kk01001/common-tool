@@ -56,6 +56,17 @@ dynamic-threadpool:
     # mentionedAll: false
     # mentionedMobileList:
     #   - "13800138000"
+  
+  # 第三方线程池管理（Tomcat 线程池）
+  third-party:
+    enabled: true
+    pools:
+      - type: TOMCAT
+        name: main
+        enabled: true
+        max-threads: 200
+        min-threads: 10
+        max-connections: 10000
 
 # Actuator Configuration
 management:

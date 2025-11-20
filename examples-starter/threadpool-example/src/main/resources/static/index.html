@@ -539,6 +539,16 @@
 
         async function refreshMetrics() {
             try {
+                const response = await fetch('/actuator/dynamic-threadpool');
+                const data = await response.json();
+                renderPools(data.pools || {});  // 提取 pools 对象
+            } catch (error) {
+                console.error('刷新指标失败:', error);
+            }
+        }
+
+        async function refreshMetrics() {
+            try {
                 const response = await fetch('/api/threadpool/metrics');
                 const metrics = await response.json();
                 renderPools(metrics);
@@ -730,6 +740,23 @@
                 showAlert('配置更新失败: ' + error.message, 'error');
             }
         }
+    </script>
+    body: JSON.stringify({ corePoolSize, maxPoolSize, queueCapacity, keepAliveSeconds })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+    showAlert(`线程池 [${poolName}] 配置更新成功！`, 'success');
+    closeConfigModal();
+    setTimeout(refreshMetrics, 500);
+    } else {
+    showAlert(result.message || '配置更新失败', 'error');
+    }
+    } catch (error) {
+    showAlert('配置更新失败: ' + error.message, 'error');
+    }
+    }
     </script>
 </body>
 

@@ -30,13 +30,13 @@ public class ThreadPoolActuatorEndpoint {
     }
 
     /**
-     * 查询所有线程池
+     * 查询所有线程池（包括第三方）
      * GET /actuator/dynamic-threadpool
      */
     @ReadOperation
     public Map<String, Object> getAllThreadPools() {
         Map<String, Object> result = new HashMap<>();
-        Map<String, ThreadPoolMetrics> metricsMap = registry.collectAllMetrics();
+        Map<String, ThreadPoolMetrics> metricsMap = registry.collectAllMetricsIncludingThirdParty();
 
         result.put("total", metricsMap.size());
         result.put("pools", metricsMap);
@@ -45,20 +45,28 @@ public class ThreadPoolActuatorEndpoint {
     }
 
     /**
-     * 查询指定线程池
+     * 查询指定线程池（支持业务线程池和第三方线程池）
      * GET /actuator/dynamic-threadpool/{poolName}
      */
     @ReadOperation
     public ThreadPoolMetrics getThreadPool(@Selector String poolName) {
+        // 先查找业务线程池
         DynamicThreadPoolWrapper wrapper = registry.getThreadPool(poolName);
-        if (wrapper == null) {
-            throw new IllegalArgumentException("Thread pool not found: " + poolName);
+        if (wrapper != null) {
+            return wrapper.collectMetrics();
         }
-        return wrapper.collectMetrics();
+        
+        // 再查找第三方线程池
+        var adapter = registry.getThirdPartyAdapter(poolName);
+        if (adapter != null) {
+            return adapter.collectMetrics();
+        }
+        
+        throw new IllegalArgumentException("Thread pool not found: " + poolName);
     }
 
     /**
-     * 更新线程池配置
+     * 更新线程池配置（支持业务线程池和第三方线程池）
      * POST /actuator/dynamic-threadpool/{poolName}
      */
     @WriteOperation
@@ -67,10 +75,27 @@ public class ThreadPoolActuatorEndpoint {
                                                 Integer maxPoolSize,
                                                 Integer queueCapacity,
                                                 Long keepAliveSeconds) {
+        // 先尝试业务线程池
         DynamicThreadPoolWrapper wrapper = registry.getThreadPool(poolName);
-        if (wrapper == null) {
-            throw new IllegalArgumentException("Thread pool not found: " + poolName);
+        if (wrapper != null) {
+            return updateBusinessThreadPool(wrapper, poolName, corePoolSize, maxPoolSize, queueCapacity, keepAliveSeconds);
         }
+        
+        // 再尝试第三方线程池
+        var adapter = registry.getThirdPartyAdapter(poolName);
+        if (adapter != null) {
+            return updateThirdPartyThreadPool(adapter, poolName, corePoolSize, maxPoolSize, queueCapacity, keepAliveSeconds);
+        }
+        
+        throw new IllegalArgumentException("Thread pool not found: " + poolName);
+    }
+    
+    /**
+     * 更新业务线程池配置
+     */
+    private Map<String, Object> updateBusinessThreadPool(DynamicThreadPoolWrapper wrapper, String poolName,
+                                                          Integer corePoolSize, Integer maxPoolSize,
+                                                          Integer queueCapacity, Long keepAliveSeconds) {
 
         ThreadPoolConfig currentConfig = wrapper.getConfig();
         ThreadPoolConfig.ThreadPoolConfigBuilder newConfigBuilder = ThreadPoolConfig.builder()
@@ -117,6 +142,76 @@ public class ThreadPoolActuatorEndpoint {
         result.put("oldConfig", oldConfigMap);
         result.put("newConfig", newConfigMap);
 
+        return result;
+    }
+    
+    /**
+     * 更新第三方线程池配置
+     */
+    private Map<String, Object> updateThirdPartyThreadPool(
+            io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolAdapter adapter,
+            String poolName, Integer corePoolSize, Integer maxPoolSize,
+            Integer queueCapacity, Long keepAliveSeconds) {
+        
+        io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig currentConfig = adapter.getConfig();
+        
+        // 构建新配置
+        io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig.ThirdPartyThreadPoolConfigBuilder builder = 
+            io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig.builder()
+                .poolName(poolName);
+        
+        // 设置参数（使用新值或保持原值）
+        if (maxPoolSize != null) {
+            builder.maxThreads(maxPoolSize);
+        } else if (currentConfig != null) {
+            builder.maxThreads(currentConfig.getMaxThreads());
+        }
+        
+        if (corePoolSize != null) {
+            builder.minThreads(corePoolSize);  // 第三方线程池使用 minThreads
+        } else if (currentConfig != null) {
+            builder.minThreads(currentConfig.getMinThreads());
+        }
+        
+        if (queueCapacity != null) {
+            builder.queueCapacity(queueCapacity);
+        } else if (currentConfig != null) {
+            builder.queueCapacity(currentConfig.getQueueCapacity());
+        }
+        
+        if (keepAliveSeconds != null) {
+            builder.keepAliveTime(keepAliveSeconds);
+        } else if (currentConfig != null) {
+            builder.keepAliveTime(currentConfig.getKeepAliveTime());
+        }
+        
+        io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig newConfig = builder.build();
+        adapter.updateConfig(newConfig);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("poolName", poolName);
+        result.put("success", true);
+        result.put("message", "Third-party thread pool configuration updated successfully");
+        result.put("poolType", adapter.getPoolType().getDescription());
+        
+        // 返回配置信息
+        Map<String, Object> oldConfigMap = new HashMap<>();
+        if (currentConfig != null) {
+            oldConfigMap.put("maxThreads", currentConfig.getMaxThreads());
+            oldConfigMap.put("minThreads", currentConfig.getMinThreads());
+            oldConfigMap.put("queueCapacity", currentConfig.getQueueCapacity());
+            oldConfigMap.put("keepAliveTime", currentConfig.getKeepAliveTime());
+        }
+        
+        Map<String, Object> newConfigMap = new HashMap<>();
+        newConfigMap.put("maxThreads", newConfig.getMaxThreads());
+        newConfigMap.put("minThreads", newConfig.getMinThreads());
+        newConfigMap.put("queueCapacity", newConfig.getQueueCapacity());
+        newConfigMap.put("keepAliveTime", newConfig.getKeepAliveTime());
+        
+        result.put("oldConfig", oldConfigMap);
+        result.put("newConfig", newConfigMap);
+        
         return result;
     }
 }

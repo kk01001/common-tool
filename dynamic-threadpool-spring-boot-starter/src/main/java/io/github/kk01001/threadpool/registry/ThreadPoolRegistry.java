@@ -24,6 +24,11 @@ public class ThreadPoolRegistry {
     private final Map<String, DynamicThreadPoolWrapper> threadPools = new ConcurrentHashMap<>();
 
     /**
+     * 第三方线程池适配器映射表
+     */
+    private final Map<String, io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolAdapter> thirdPartyAdapters = new ConcurrentHashMap<>();
+
+    /**
      * 注册线程池
      */
     public void register(String poolName, DynamicThreadPoolWrapper wrapper) {
@@ -100,6 +105,59 @@ public class ThreadPoolRegistry {
      */
     public int size() {
         return threadPools.size();
+    }
+
+    /**
+     * 注册第三方线程池适配器
+     */
+    public void registerThirdPartyAdapter(io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolAdapter adapter) {
+        if (adapter == null) {
+            return;
+        }
+        String poolName = adapter.getPoolName();
+        if (thirdPartyAdapters.containsKey(poolName)) {
+            log.warn("Third-party thread pool adapter [{}] already exists, will be replaced", poolName);
+        }
+        thirdPartyAdapters.put(poolName, adapter);
+        log.info("Third-party thread pool adapter [{}] registered successfully", poolName);
+    }
+
+    /**
+     * 获取第三方线程池适配器
+     */
+    public io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolAdapter getThirdPartyAdapter(String poolName) {
+        return thirdPartyAdapters.get(poolName);
+    }
+
+    /**
+     * 收集所有线程池指标（包括第三方）
+     */
+    public Map<String, ThreadPoolMetrics> collectAllMetricsIncludingThirdParty() {
+        Map<String, ThreadPoolMetrics> metricsMap = new ConcurrentHashMap<>();
+        
+        // 收集业务线程池指标
+        threadPools.forEach((name, wrapper) -> {
+            try {
+                ThreadPoolMetrics metrics = wrapper.collectMetrics();
+                metricsMap.put(name, metrics);
+            } catch (Exception e) {
+                log.error("Failed to collect metrics for thread pool [{}]", name, e);
+            }
+        });
+        
+        // 收集第三方线程池指标
+        thirdPartyAdapters.forEach((name, adapter) -> {
+            try {
+                ThreadPoolMetrics metrics = adapter.collectMetrics();
+                if (metrics != null) {
+                    metricsMap.put(name, metrics);
+                }
+            } catch (Exception e) {
+                log.error("Failed to collect metrics for third-party thread pool [{}]", name, e);
+            }
+        });
+        
+        return metricsMap;
     }
 
     /**

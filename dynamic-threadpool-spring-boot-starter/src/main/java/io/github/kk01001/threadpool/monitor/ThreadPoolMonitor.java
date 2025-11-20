@@ -33,7 +33,7 @@ public class ThreadPoolMonitor {
     }
 
     /**
-     * 定时采集指标
+     * 定时采集指标（包括第三方线程池）
      */
     @Scheduled(fixedDelayString = "#{@dynamicThreadPoolProperties.monitor.collectInterval.toMillis()}")
     public void collectMetrics() {
@@ -41,7 +41,8 @@ public class ThreadPoolMonitor {
             return;
         }
 
-        Map<String, ThreadPoolMetrics> metricsMap = registry.collectAllMetrics();
+        // 收集所有线程池指标（包括业务线程池和第三方线程池）
+        Map<String, ThreadPoolMetrics> metricsMap = registry.collectAllMetricsIncludingThirdParty();
         metricsMap.forEach((poolName, metrics) -> {
             try {
                 publishMetrics(metrics);
@@ -96,10 +97,10 @@ public class ThreadPoolMonitor {
     }
 
     /**
-     * 获取所有线程池指标
+     * 获取所有线程池指标（包括第三方）
      */
     public Map<String, ThreadPoolMetrics> getAllMetrics() {
-        return registry.collectAllMetrics();
+        return registry.collectAllMetricsIncludingThirdParty();
     }
 
     /**
