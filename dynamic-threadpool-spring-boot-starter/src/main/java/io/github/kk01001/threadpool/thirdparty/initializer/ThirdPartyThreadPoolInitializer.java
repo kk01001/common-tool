@@ -1,6 +1,9 @@
-package io.github.kk01001.threadpool.thirdparty;
+package io.github.kk01001.threadpool.thirdparty.initializer;
 
 import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
+import io.github.kk01001.threadpool.thirdparty.ThirdPartyPoolType;
+import io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolProperties;
+import io.github.kk01001.threadpool.thirdparty.adapter.TomcatThreadPoolAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
@@ -14,16 +17,13 @@ import org.springframework.context.ApplicationListener;
  */
 @Slf4j
 public class ThirdPartyThreadPoolInitializer implements ApplicationListener<WebServerInitializedEvent> {
-    
-    private final ThirdPartyThreadPoolManager manager;
+
     private final ThirdPartyThreadPoolProperties properties;
     private final ThreadPoolRegistry registry;
     
     public ThirdPartyThreadPoolInitializer(
-            ThirdPartyThreadPoolManager manager,
             ThirdPartyThreadPoolProperties properties,
             ThreadPoolRegistry registry) {
-        this.manager = manager;
         this.properties = properties;
         this.registry = registry;
     }
@@ -47,10 +47,8 @@ public class ThirdPartyThreadPoolInitializer implements ApplicationListener<WebS
             
             try {
                 // 直接创建 Tomcat 适配器，传入 WebServer
-                if (poolConfig.getType() == io.github.kk01001.threadpool.thirdparty.ThirdPartyPoolType.TOMCAT) {
-                    io.github.kk01001.threadpool.thirdparty.adapter.TomcatThreadPoolAdapter adapter = 
-                        new io.github.kk01001.threadpool.thirdparty.adapter.TomcatThreadPoolAdapter(
-                            poolConfig.getName(), event.getWebServer());
+                if (poolConfig.getType() == ThirdPartyPoolType.TOMCAT) {
+                    TomcatThreadPoolAdapter adapter = new TomcatThreadPoolAdapter(poolConfig.getName(), event.getWebServer());
                     
                     if (adapter.isAvailable()) {
                         // 注册到 ThreadPoolRegistry 以便统一管理

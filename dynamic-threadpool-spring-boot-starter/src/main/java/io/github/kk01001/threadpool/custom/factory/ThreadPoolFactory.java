@@ -1,8 +1,8 @@
-package io.github.kk01001.threadpool.factory;
+package io.github.kk01001.threadpool.custom.factory;
 
-import io.github.kk01001.threadpool.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.model.ThreadPoolConfig;
-import io.github.kk01001.threadpool.wrapper.DynamicThreadPoolWrapper;
+import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
+import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
+import io.github.kk01001.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
 
 /**
  * 线程池工厂

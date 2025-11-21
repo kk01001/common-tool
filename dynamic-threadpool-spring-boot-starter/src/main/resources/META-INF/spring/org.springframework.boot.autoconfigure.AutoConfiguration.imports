@@ -1,2 +1,2 @@
 io.github.kk01001.threadpool.DynamicThreadPoolAutoConfiguration
-io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolAutoConfiguration
+io.github.kk01001.threadpool.ThirdPartyThreadPoolAutoConfiguration

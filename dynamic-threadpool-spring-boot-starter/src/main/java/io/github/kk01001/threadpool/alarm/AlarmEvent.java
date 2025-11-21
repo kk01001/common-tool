@@ -1,5 +1,6 @@
-package io.github.kk01001.threadpool.model;
+package io.github.kk01001.threadpool.alarm;
 
+import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

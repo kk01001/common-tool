@@ -3,8 +3,8 @@ package io.github.kk01001.threadpool.alarm.notifier;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import io.github.kk01001.threadpool.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.model.AlarmEvent;
+import io.github.kk01001.threadpool.alarm.AlarmEvent;
+import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
 import lombok.extern.slf4j.Slf4j;
 
 /**

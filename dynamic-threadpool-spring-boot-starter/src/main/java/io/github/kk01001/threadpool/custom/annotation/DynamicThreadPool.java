@@ -1,6 +1,10 @@
-package io.github.kk01001.threadpool.annotation;
+package io.github.kk01001.threadpool.custom.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 动态线程池注解

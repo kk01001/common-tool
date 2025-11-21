@@ -1,6 +1,6 @@
 package io.github.kk01001.threadpool.alarm.notifier;
 
-import io.github.kk01001.threadpool.model.AlarmEvent;
+import io.github.kk01001.threadpool.alarm.AlarmEvent;
 import lombok.extern.slf4j.Slf4j;
 
 /**

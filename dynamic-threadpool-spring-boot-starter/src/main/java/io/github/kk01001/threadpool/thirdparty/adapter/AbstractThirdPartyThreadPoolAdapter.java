@@ -1,6 +1,8 @@
-package io.github.kk01001.threadpool.thirdparty;
+package io.github.kk01001.threadpool.thirdparty.adapter;
 
-import io.github.kk01001.threadpool.model.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.thirdparty.ThirdPartyPoolType;
+import io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig;
 import lombok.extern.slf4j.Slf4j;
 
 /**

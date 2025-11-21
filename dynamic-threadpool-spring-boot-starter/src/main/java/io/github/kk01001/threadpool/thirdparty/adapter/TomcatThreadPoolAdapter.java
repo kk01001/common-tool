@@ -1,17 +1,14 @@
 package io.github.kk01001.threadpool.thirdparty.adapter;
 
-import io.github.kk01001.threadpool.model.ThreadPoolMetrics;
-import io.github.kk01001.threadpool.thirdparty.AbstractThirdPartyThreadPoolAdapter;
+import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
 import io.github.kk01001.threadpool.thirdparty.ThirdPartyPoolType;
 import io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.ProtocolHandler;
-import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.springframework.boot.web.embedded.tomcat.TomcatWebServer;
 import org.springframework.boot.web.server.WebServer;
-import org.springframework.context.ApplicationContext;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.BlockingQueue;

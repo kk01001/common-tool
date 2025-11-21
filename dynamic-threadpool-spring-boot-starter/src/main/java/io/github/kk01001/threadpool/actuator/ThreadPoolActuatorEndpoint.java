@@ -1,9 +1,9 @@
 package io.github.kk01001.threadpool.actuator;
 
-import io.github.kk01001.threadpool.model.ThreadPoolConfig;
-import io.github.kk01001.threadpool.model.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
+import io.github.kk01001.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
 import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
-import io.github.kk01001.threadpool.wrapper.DynamicThreadPoolWrapper;
+import io.github.kk01001.threadpool.thirdparty.adapter.ThirdPartyThreadPoolAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
@@ -149,7 +149,7 @@ public class ThreadPoolActuatorEndpoint {
      * 更新第三方线程池配置
      */
     private Map<String, Object> updateThirdPartyThreadPool(
-            io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolAdapter adapter,
+            ThirdPartyThreadPoolAdapter adapter,
             String poolName, Integer corePoolSize, Integer maxPoolSize,
             Integer queueCapacity, Long keepAliveSeconds) {
         

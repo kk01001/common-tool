@@ -1,6 +1,8 @@
-package io.github.kk01001.threadpool.thirdparty;
+package io.github.kk01001.threadpool.thirdparty.adapter;
 
-import io.github.kk01001.threadpool.model.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.thirdparty.ThirdPartyPoolType;
+import io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig;
 
 /**
  * 第三方线程池适配器接口 (适配器模式)

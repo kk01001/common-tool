@@ -1,9 +1,8 @@
 package io.github.kk01001.threadpool.alarm;
 
+import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
 import io.github.kk01001.threadpool.alarm.notifier.AlarmNotifier;
-import io.github.kk01001.threadpool.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.model.AlarmEvent;
-import io.github.kk01001.threadpool.model.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
 import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

@@ -1,10 +1,10 @@
-package io.github.kk01001.threadpool.initializer;
+package io.github.kk01001.threadpool.custom.initializer;
 
-import io.github.kk01001.threadpool.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.factory.ThreadPoolFactory;
-import io.github.kk01001.threadpool.model.ThreadPoolConfig;
+import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
+import io.github.kk01001.threadpool.custom.factory.ThreadPoolFactory;
+import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
+import io.github.kk01001.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
 import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
-import io.github.kk01001.threadpool.wrapper.DynamicThreadPoolWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

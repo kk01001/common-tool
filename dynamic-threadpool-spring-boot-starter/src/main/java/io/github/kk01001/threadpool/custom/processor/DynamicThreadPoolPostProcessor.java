@@ -1,10 +1,10 @@
-package io.github.kk01001.threadpool.processor;
+package io.github.kk01001.threadpool.custom.processor;
 
-import io.github.kk01001.threadpool.annotation.DynamicThreadPool;
-import io.github.kk01001.threadpool.factory.ThreadPoolFactory;
-import io.github.kk01001.threadpool.model.ThreadPoolConfig;
+import io.github.kk01001.threadpool.custom.annotation.DynamicThreadPool;
+import io.github.kk01001.threadpool.custom.factory.ThreadPoolFactory;
+import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
+import io.github.kk01001.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
 import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
-import io.github.kk01001.threadpool.wrapper.DynamicThreadPoolWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;

@@ -1,9 +1,9 @@
-package io.github.kk01001.threadpool.wrapper;
+package io.github.kk01001.threadpool.custom.wrapper;
 
 import com.alibaba.ttl.threadpool.TtlExecutors;
+import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
 import io.github.kk01001.threadpool.alarm.ThreadPoolAlarmHandler;
-import io.github.kk01001.threadpool.model.ThreadPoolConfig;
-import io.github.kk01001.threadpool.model.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
 import io.github.kk01001.threadpool.queue.ResizableLinkedBlockingQueue;
 import lombok.Getter;
 import lombok.Setter;

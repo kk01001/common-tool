@@ -1,7 +1,7 @@
 package io.github.kk01001.example.threadpool.config;
 
-import io.github.kk01001.threadpool.annotation.DynamicThreadPool;
-import io.github.kk01001.threadpool.factory.ThreadPoolFactory;
+import io.github.kk01001.threadpool.custom.annotation.DynamicThreadPool;
+import io.github.kk01001.threadpool.custom.factory.ThreadPoolFactory;
 import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

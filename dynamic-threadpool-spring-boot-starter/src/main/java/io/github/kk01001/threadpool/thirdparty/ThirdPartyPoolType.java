@@ -1,10 +1,13 @@
 package io.github.kk01001.threadpool.thirdparty;
 
+import lombok.Getter;
+
 /**
  * 第三方线程池类型枚举
  * 
  * @author kk01001
  */
+@Getter
 public enum ThirdPartyPoolType {
     
     /**
@@ -44,12 +47,5 @@ public enum ThirdPartyPoolType {
         this.code = code;
         this.description = description;
     }
-    
-    public String getCode() {
-        return code;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
+
 }

@@ -1,7 +1,7 @@
-package io.github.kk01001.threadpool.monitor;
+package io.github.kk01001.threadpool.custom.monitor;
 
-import io.github.kk01001.threadpool.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.model.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
 import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;

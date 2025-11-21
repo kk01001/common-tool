@@ -1,4 +1,4 @@
-package io.github.kk01001.threadpool.model;
+package io.github.kk01001.threadpool.actuator;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

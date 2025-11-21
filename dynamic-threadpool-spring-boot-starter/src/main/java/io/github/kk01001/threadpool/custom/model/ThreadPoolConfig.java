@@ -1,6 +1,6 @@
-package io.github.kk01001.threadpool.model;
+package io.github.kk01001.threadpool.custom.model;
 
-import io.github.kk01001.threadpool.config.DynamicThreadPoolProperties;
+import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

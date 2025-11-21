@@ -1,4 +1,4 @@
-package io.github.kk01001.threadpool.config;
+package io.github.kk01001.threadpool.custom.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

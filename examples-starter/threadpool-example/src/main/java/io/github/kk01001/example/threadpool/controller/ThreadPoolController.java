@@ -1,9 +1,9 @@
 package io.github.kk01001.example.threadpool.controller;
 
 import com.alibaba.ttl.TransmittableThreadLocal;
-import io.github.kk01001.threadpool.model.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
 import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
-import io.github.kk01001.threadpool.wrapper.DynamicThreadPoolWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

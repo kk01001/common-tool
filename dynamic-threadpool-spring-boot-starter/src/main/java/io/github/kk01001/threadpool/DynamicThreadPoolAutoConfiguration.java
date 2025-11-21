@@ -2,11 +2,12 @@ package io.github.kk01001.threadpool;
 
 import io.github.kk01001.threadpool.actuator.ThreadPoolActuatorEndpoint;
 import io.github.kk01001.threadpool.alarm.ThreadPoolAlarmHandler;
-import io.github.kk01001.threadpool.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.factory.ThreadPoolFactory;
-import io.github.kk01001.threadpool.handler.ThreadPoolRefreshHandler;
-import io.github.kk01001.threadpool.monitor.ThreadPoolMonitor;
-import io.github.kk01001.threadpool.processor.DynamicThreadPoolPostProcessor;
+import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
+import io.github.kk01001.threadpool.custom.factory.ThreadPoolFactory;
+import io.github.kk01001.threadpool.custom.handler.ThreadPoolRefreshHandler;
+import io.github.kk01001.threadpool.custom.initializer.ThreadPoolAutoInitializer;
+import io.github.kk01001.threadpool.custom.monitor.ThreadPoolMonitor;
+import io.github.kk01001.threadpool.custom.processor.DynamicThreadPoolPostProcessor;
 import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -60,12 +61,12 @@ public class DynamicThreadPoolAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public io.github.kk01001.threadpool.initializer.ThreadPoolAutoInitializer threadPoolAutoInitializer(
+    public ThreadPoolAutoInitializer threadPoolAutoInitializer(
             DynamicThreadPoolProperties properties,
             ThreadPoolFactory factory,
             ThreadPoolRegistry registry) {
         log.info("Initializing ThreadPoolAutoInitializer");
-        return new io.github.kk01001.threadpool.initializer.ThreadPoolAutoInitializer(properties, factory, registry);
+        return new ThreadPoolAutoInitializer(properties, factory, registry);
     }
 
     /**

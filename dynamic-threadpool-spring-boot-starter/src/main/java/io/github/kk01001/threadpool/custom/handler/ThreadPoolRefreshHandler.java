@@ -1,7 +1,7 @@
-package io.github.kk01001.threadpool.handler;
+package io.github.kk01001.threadpool.custom.handler;
 
-import io.github.kk01001.threadpool.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.model.ThreadPoolConfig;
+import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
+import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
 import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;

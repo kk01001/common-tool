@@ -1,8 +1,9 @@
 package io.github.kk01001.threadpool.registry;
 
-import io.github.kk01001.threadpool.model.ThreadPoolConfig;
-import io.github.kk01001.threadpool.model.ThreadPoolMetrics;
-import io.github.kk01001.threadpool.wrapper.DynamicThreadPoolWrapper;
+import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
+import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
+import io.github.kk01001.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
+import io.github.kk01001.threadpool.thirdparty.adapter.ThirdPartyThreadPoolAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
@@ -26,7 +27,7 @@ public class ThreadPoolRegistry {
     /**
      * 第三方线程池适配器映射表
      */
-    private final Map<String, io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolAdapter> thirdPartyAdapters = new ConcurrentHashMap<>();
+    private final Map<String, ThirdPartyThreadPoolAdapter> thirdPartyAdapters = new ConcurrentHashMap<>();
 
     /**
      * 注册线程池
@@ -110,7 +111,7 @@ public class ThreadPoolRegistry {
     /**
      * 注册第三方线程池适配器
      */
-    public void registerThirdPartyAdapter(io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolAdapter adapter) {
+    public void registerThirdPartyAdapter(ThirdPartyThreadPoolAdapter adapter) {
         if (adapter == null) {
             return;
         }
@@ -125,7 +126,7 @@ public class ThreadPoolRegistry {
     /**
      * 获取第三方线程池适配器
      */
-    public io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolAdapter getThirdPartyAdapter(String poolName) {
+    public ThirdPartyThreadPoolAdapter getThirdPartyAdapter(String poolName) {
         return thirdPartyAdapters.get(poolName);
     }
 
