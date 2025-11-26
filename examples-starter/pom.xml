@@ -24,6 +24,7 @@
         <module>ffmpeg-examples</module>
         <module>postgres-examples</module>
         <module>threadpool-example</module>
+        <module>mybatis-plus-example</module>
     </modules>
 
 </project>

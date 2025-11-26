@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据权限演示 - MyBatis Plus 示例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #00acc1;
+        }
+
+        .info-box h3 {
+            color: #00838f;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #00695c;
+            line-height: 1.6;
+        }
+
+        .demo-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .demo-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-tech {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .badge-product {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .badge-market {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .code-block .keyword {
+            color: #ff79c6;
+        }
+
+        .code-block .string {
+            color: #f1fa8c;
+        }
+
+        .code-block .comment {
+            color: #6272a4;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #555;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 数据权限演示</h1>
+            <a href="/" class="btn btn-secondary">🏠 返回首页</a>
+        </div>
+
+        <div class="info-box">
+            <h3>📚 什么是数据权限?</h3>
+            <p>
+                数据权限是一种细粒度的权限控制机制,它可以在 SQL 查询时自动添加过滤条件,
+                确保用户只能访问其有权限查看的数据。MyBatis Plus 提供了强大的数据权限拦截器,
+                可以轻松实现基于部门、角色等维度的数据隔离。
+            </p>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 按部门过滤数据</h2>
+            <p style="color: #666; margin-bottom: 15px;">
+                模拟不同部门的用户查看数据,演示数据权限的效果
+            </p>
+
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterByDepartment('')">全部数据</button>
+                <button class="filter-btn" onclick="filterByDepartment('技术部')">技术部</button>
+                <button class="filter-btn" onclick="filterByDepartment('产品部')">产品部</button>
+                <button class="filter-btn" onclick="filterByDepartment('市场部')">市场部</button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>邮箱</th>
+                            <th>年龄</th>
+                            <th>部门</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr>
+                            <td colspan="5" class="loading">加载中...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>💡 功能特性</h2>
+            <ul class="feature-list">
+                <li>自动在 SQL 中添加数据权限过滤条件</li>
+                <li>支持多种权限类型(本人、本部门、本部门及下级等)</li>
+                <li>基于注解的权限配置,使用简单</li>
+                <li>支持自定义权限处理器</li>
+                <li>与 MyBatis Plus 无缝集成</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h2>📝 代码示例</h2>
+            <p style="color: #666; margin-bottom: 10px;">使用 @DataPermission 注解配置数据权限:</p>
+            <div class="code-block">
+                <span class="comment">// 在 Mapper 方法上添加数据权限注解</span>
+                <span class="keyword">@DataPermission</span>(
+                type = DataPermissionType.SELF_AND_SUB,
+                column = <span class="string">"department"</span>
+                )
+                <span class="keyword">List</span>&lt;User&gt; selectUserList();
+
+                <span class="comment">// 或在 Service 方法上使用</span>
+                <span class="keyword">@DataPermission</span>(
+                type = DataPermissionType.SELF,
+                column = <span class="string">"user_id"</span>
+                )
+                <span class="keyword">public</span> List&lt;User&gt; getUserList() {
+                <span class="keyword">return</span> userMapper.selectList(<span class="keyword">null</span>);
+                }
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔧 配置说明</h2>
+            <p style="color: #666; margin-bottom: 10px;">在 application.yml 中配置数据权限:</p>
+            <div class="code-block">
+                <span class="comment"># MyBatis Plus 数据权限配置</span>
+                mybatis-plus:
+                data-permission:
+                enabled: <span class="keyword">true</span>
+                <span class="comment"># 默认权限类型</span>
+                default-type: SELF_AND_SUB
+                <span class="comment"># 权限字段映射</span>
+                column-mapping:
+                department: dept_id
+                user: user_id
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDepartment = '';
+
+        // 页面加载时获取所有数据
+        window.onload = function () {
+            loadUsers();
+        };
+
+        // 加载用户数据
+        function loadUsers() {
+            const url = currentDepartment
+                ? `/api/users/department/${encodeURIComponent(currentDepartment)}`
+                : '/api/users?current=1&size=100';
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const users = data.data || (Array.isArray(data.data) ? data.data : []);
+                        renderUserTable(users);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('userTableBody').innerHTML =
+                        '<tr><td colspan="5" class="empty">加载失败,请重试</td></tr>';
+                });
+        }
+
+        // 渲染用户表格
+        function renderUserTable(users) {
+            const tbody = document.getElementById('userTableBody');
+
+            // 如果是分页数据,提取 records
+            const userList = Array.isArray(users) ? users : (users.records || []);
+
+            if (userList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty">暂无数据</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = userList.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email || '-'}</td>
+                    <td>${user.age || '-'}</td>
+                    <td>${getDepartmentBadge(user.department)}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 按部门过滤
+        function filterByDepartment(department) {
+            currentDepartment = department;
+
+            // 更新按钮状态
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 重新加载数据
+            loadUsers();
+        }
+
+        // 获取部门徽章
+        function getDepartmentBadge(department) {
+            if (!department) return '-';
+            const badgeClass = department === '技术部' ? 'badge-tech' :
+                department === '产品部' ? 'badge-product' :
+                    'badge-market';
+            return `<span class="badge ${badgeClass}">${department}</span>`;
+        }
+    </script>
+</body>
+
+</html>

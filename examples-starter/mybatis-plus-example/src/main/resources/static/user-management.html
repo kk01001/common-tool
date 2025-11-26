@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - MyBatis Plus 示例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.9em;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination .page-info {
+            color: #666;
+            font-weight: 600;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .close {
+            font-size: 2em;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-tech {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .badge-product {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .badge-market {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="header">
+        <h1>👥 用户管理系统</h1>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="showAddModal()">➕ 添加用户</button>
+            <a href="/" class="btn btn-secondary">🏠 返回首页</a>
+        </div>
+    </div>
+
+    <div class="search-box">
+        <input type="text" class="search-input" id="searchInput" placeholder="搜索用户名或邮箱...">
+        <button class="btn btn-primary" onclick="searchUsers()">🔍 搜索</button>
+        <button class="btn btn-secondary" onclick="loadUsers()">🔄 刷新</button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>用户名</th>
+                <th>邮箱</th>
+                <th>年龄</th>
+                <th>部门</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="userTableBody">
+            <tr>
+                <td colspan="7" class="loading">加载中...</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- 添加/编辑用户模态框 -->
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">添加用户</h2>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <form id="userForm" onsubmit="saveUser(event)">
+            <input type="hidden" id="userId">
+            <div class="form-group">
+                <label for="username">用户名 *</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">邮箱</label>
+                <input type="email" id="email">
+            </div>
+            <div class="form-group">
+                <label for="age">年龄</label>
+                <input type="number" id="age" min="1" max="150">
+            </div>
+            <div class="form-group">
+                <label for="department">部门</label>
+                <select id="department">
+                    <option value="">请选择</option>
+                    <option value="技术部">技术部</option>
+                    <option value="产品部">产品部</option>
+                    <option value="市场部">市场部</option>
+                    <option value="运营部">运营部</option>
+                    <option value="人事部">人事部</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                <button type="submit" class="btn btn-primary">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let currentPage = 1;
+    let pageSize = 10;
+    let totalPages = 1;
+
+    // 页面加载时获取用户列表
+    window.onload = function () {
+        loadUsers();
+    };
+
+    // 加载用户列表
+    function loadUsers() {
+        fetch(`/api/users?current=${currentPage}&size=${pageSize}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderUserTable(data.data);
+                    renderPagination(data.total, data.current, data.size);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('userTableBody').innerHTML =
+                    '<tr><td colspan="7" class="empty">加载失败,请重试</td></tr>';
+            });
+    }
+
+    // 渲染用户表格
+    function renderUserTable(users) {
+        const tbody = document.getElementById('userTableBody');
+        if (users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty">暂无数据</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email || '-'}</td>
+                    <td>${user.age || '-'}</td>
+                    <td>${getDepartmentBadge(user.department)}</td>
+                    <td>${formatDateTime(user.createTime)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-success btn-small" onclick="editUser(${user.id})">编辑</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteUser(${user.id})">删除</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+    }
+
+    // 渲染分页
+    function renderPagination(total, current, size) {
+        totalPages = Math.ceil(total / size);
+        const pagination = document.getElementById('pagination');
+
+        pagination.innerHTML = `
+                <button onclick="changePage(1)" ${current === 1 ? 'disabled' : ''}>首页</button>
+                <button onclick="changePage(${current - 1})" ${current === 1 ? 'disabled' : ''}>上一页</button>
+                <span class="page-info">第 ${current} / ${totalPages} 页 (共 ${total} 条)</span>
+                <button onclick="changePage(${current + 1})" ${current >= totalPages ? 'disabled' : ''}>下一页</button>
+                <button onclick="changePage(${totalPages})" ${current >= totalPages ? 'disabled' : ''}>末页</button>
+            `;
+    }
+
+    // 切换页码
+    function changePage(page) {
+        if (page < 1 || page > totalPages) return;
+        currentPage = page;
+        loadUsers();
+    }
+
+    // 显示添加模态框
+    function showAddModal() {
+        document.getElementById('modalTitle').textContent = '添加用户';
+        document.getElementById('userForm').reset();
+        document.getElementById('userId').value = '';
+        document.getElementById('userModal').style.display = 'block';
+    }
+
+    // 编辑用户
+    function editUser(id) {
+        fetch(`/api/users/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    const user = data.data;
+                    document.getElementById('modalTitle').textContent = '编辑用户';
+                    document.getElementById('userId').value = user.id;
+                    document.getElementById('username').value = user.username;
+                    document.getElementById('email').value = user.email || '';
+                    document.getElementById('age').value = user.age || '';
+                    document.getElementById('department').value = user.department || '';
+                    document.getElementById('userModal').style.display = 'block';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // 保存用户
+    function saveUser(event) {
+        event.preventDefault();
+
+        const id = document.getElementById('userId').value;
+        const user = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value || null,
+            age: document.getElementById('age').value ? parseInt(document.getElementById('age').value) : null,
+            department: document.getElementById('department').value || null
+        };
+
+        const url = id ? `/api/users/${id}` : '/api/users';
+        const method = id ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(user)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeModal();
+                    loadUsers();
+                } else {
+                    alert('操作失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败,请重试');
+            });
+    }
+
+    // 删除用户
+    function deleteUser(id) {
+        // if (!confirm('确定要删除这个用户吗?')) return;
+
+        fetch(`/api/users/${id}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    loadUsers();
+                } else {
+                    alert('删除失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('删除失败,请重试');
+            });
+    }
+
+    // 搜索用户
+    function searchUsers() {
+        const keyword = document.getElementById('searchInput').value.trim();
+        if (!keyword) {
+            loadUsers();
+            return;
+        }
+
+        fetch(`/api/users/search?keyword=${encodeURIComponent(keyword)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderUserTable(data.data);
+                    document.getElementById('pagination').innerHTML = '';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // 关闭模态框
+    function closeModal() {
+        document.getElementById('userModal').style.display = 'none';
+    }
+
+    // 获取部门徽章
+    function getDepartmentBadge(department) {
+        if (!department) return '-';
+        const badgeClass = department === '技术部' ? 'badge-tech' :
+            department === '产品部' ? 'badge-product' :
+                'badge-market';
+        return `<span class="badge ${badgeClass}">${department}</span>`;
+    }
+
+    // 格式化日期时间
+    function formatDateTime(dateTime) {
+        if (!dateTime) return '-';
+        const date = new Date(dateTime);
+        return date.toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    // 点击模态框外部关闭
+    window.onclick = function (event) {
+        const modal = document.getElementById('userModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    };
+</script>
+</body>
+
+</html>

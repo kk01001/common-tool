@@ -1,6 +1,5 @@
 package io.github.kk01001.mybatis;
 
-import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
@@ -43,7 +42,7 @@ public class MybatisPlusConfiguration {
         // interceptor.addInnerInterceptor(new IllegalSQLInnerInterceptor());
 
         // 分页插件 如果配置多个插件, 切记分页最后添加
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
 
         // 乐观锁插件
         interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
