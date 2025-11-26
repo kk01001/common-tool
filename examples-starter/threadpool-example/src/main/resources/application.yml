@@ -1,6 +1,26 @@
 spring:
   application:
     name: threadpool-example
+  
+  # 数据源配置 (H2 内存数据库)
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+    hikari:
+      pool-name: HikariPool-Main
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  # H2 控制台配置
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
 server:
   port: 8037
@@ -67,6 +87,12 @@ dynamic-threadpool:
         max-threads: 200
         min-threads: 10
         max-connections: 10000
+      
+      - type: HIKARI
+        name: main
+        enabled: true
+        max-threads: 10
+        min-threads: 5
 
 # Actuator Configuration
 management:

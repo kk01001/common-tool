@@ -49,9 +49,6 @@ public class DynamicThreadPoolPostProcessor implements BeanPostProcessor {
             }
         }
 
-        if (beanName.contains("dynamicThreadPoolProperties")) {
-            log.info("ThreadPoolProperties: {}", bean);
-        }
         return bean;
     }
 

@@ -6,6 +6,7 @@ import io.github.kk01001.threadpool.thirdparty.initializer.ThirdPartyThreadPoolI
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,8 +24,9 @@ public class ThirdPartyThreadPoolAutoConfiguration {
     @Bean
     public ThirdPartyThreadPoolInitializer thirdPartyThreadPoolInitializer(
             ThirdPartyThreadPoolProperties properties,
-            ThreadPoolRegistry registry) {
+            ThreadPoolRegistry registry,
+            ApplicationContext applicationContext) {
         log.info("Initializing ThirdPartyThreadPoolInitializer");
-        return new ThirdPartyThreadPoolInitializer(properties, registry);
+        return new ThirdPartyThreadPoolInitializer(properties, registry, applicationContext);
     }
 }

@@ -68,6 +68,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Hikari 连接池适配器支持 -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
