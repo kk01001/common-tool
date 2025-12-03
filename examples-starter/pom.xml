@@ -25,6 +25,7 @@
         <module>postgres-examples</module>
         <module>threadpool-example</module>
         <module>mybatis-plus-example</module>
+        <module>graphql-examples</module>
     </modules>
 
 </project>

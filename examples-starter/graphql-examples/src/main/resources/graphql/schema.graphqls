@@ -1,0 +1,69 @@
+scalar DateTime
+scalar Long
+
+directive @uppercase on FIELD_DEFINITION
+
+type Query {
+  books(page: Int = 1, size: Int = 10): BookPage!
+  bookById(id: ID!): Book
+  me: String
+}
+
+type BookPage {
+  content: [Book!]!
+  totalElements: Int!
+  totalPages: Int!
+}
+
+type Book {
+  id: ID!
+  title: String!
+  author: Author
+  description: String
+  price: Float
+  formattedTitle: String @uppercase
+  publishDate: DateTime
+  coverImage: String
+}
+
+type Author {
+  id: ID!
+  name: String!
+}
+
+input CreateBookInput {
+  id: ID!
+  title: String!
+  authorId: ID!
+  publishDate: DateTime
+  coverImage: String
+}
+
+input UpdateBookTitleInput {
+  id: ID!
+  title: String!
+}
+
+input CreateAuthorInput {
+  id: ID!
+  name: String!
+}
+
+input UpdateAuthorNameInput {
+  id: ID!
+  name: String!
+}
+
+type Mutation {
+  createBook(input: CreateBookInput!): Book!
+  updateBookTitle(input: UpdateBookTitleInput!): Book!
+  deleteBook(id: ID!): Boolean!
+
+  createAuthor(input: CreateAuthorInput!): Author!
+  updateAuthorName(input: UpdateAuthorNameInput!): Author!
+  deleteAuthor(id: ID!): Boolean!
+}
+
+type Subscription {
+  bookCreated: Book!
+}

@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS authors (
+  id BIGINT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS books (
+  id BIGINT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  author_id BIGINT NOT NULL,
+  description VARCHAR(255),
+  price DOUBLE,
+  publish_date TIMESTAMP
+);
+
