@@ -26,6 +26,7 @@
         <module>threadpool-example</module>
         <module>mybatis-plus-example</module>
         <module>graphql-examples</module>
+        <module>seata-example-parent</module>
     </modules>
 
 </project>

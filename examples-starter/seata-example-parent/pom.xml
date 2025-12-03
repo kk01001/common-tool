@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.kk01001</groupId>
+        <artifactId>examples-starter</artifactId>
+        <version>2.4.8</version>
+    </parent>
+
+    <artifactId>seata-example-parent</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>seata-common</module>
+        <module>account-service</module>
+        <module>order-service</module>
+        <module>storage-service</module>
+        <module>business-service</module>
+        <module>gateway-service</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <spring-boot.version>4.0.0</spring-boot.version>
+        <spring-cloud-alibaba.version>2025.0.0.0</spring-cloud-alibaba.version>
+        <spring-cloud.version>2025.1.0</spring-cloud.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--spring boot-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!--spring cloud-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+            <version>4.5.0</version>
+        </dependency>
+    </dependencies>
+
+</project>

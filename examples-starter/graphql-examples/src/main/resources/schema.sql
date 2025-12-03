@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS books (
   author_id BIGINT NOT NULL,
   description VARCHAR(255),
   price DOUBLE,
-  publish_date TIMESTAMP
+  publish_date TIMESTAMP,
+  cover_image VARCHAR(255)
 );
 

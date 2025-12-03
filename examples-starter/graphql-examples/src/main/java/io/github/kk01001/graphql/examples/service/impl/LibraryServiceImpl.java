@@ -112,6 +112,7 @@ public class LibraryServiceImpl implements LibraryService {
         entity.setTitle(input.getTitle());
         entity.setAuthorId(input.getAuthorId());
         entity.setPublishDate(input.getPublishDate() != null ? input.getPublishDate().toLocalDateTime() : null);
+        entity.setCoverImage(input.getCoverImage());
         bookRepository.save(entity);
         Book book = toBook(entity);
         eventPublisher.publishEvent(new BookCreatedEvent(this, book));
@@ -185,7 +186,8 @@ public class LibraryServiceImpl implements LibraryService {
 
     private Book toBook(BookEntity e) {
         return new Book(e.getId(), e.getTitle(), e.getAuthorId(), e.getDescription(), e.getPrice(),
-                e.getPublishDate() != null ? e.getPublishDate().atOffset(java.time.ZoneOffset.UTC) : null);
+                e.getPublishDate() != null ? e.getPublishDate().atOffset(java.time.ZoneOffset.UTC) : null,
+                e.getCoverImage());
     }
 
     private Author toAuthor(AuthorEntity e) {

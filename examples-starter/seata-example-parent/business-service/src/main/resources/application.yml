@@ -1,0 +1,46 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: business-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 10.255.1.8:8848
+        group: seata
+        namespace: cloud
+        username: seata
+        password: seata
+      config:
+        server-addr: 10.255.1.8:8848
+        group: seata
+        namespace: cloud
+        username: seata
+        password: seata
+        file-extension: yaml
+
+seata:
+  enabled: true
+  application-id: ${spring.application.name}
+  tx-service-group: seata
+  service:
+    vgroup-mapping:
+      my_test_tx_group: default
+  registry:
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: 10.255.1.8:8848
+      namespace: cloud
+      group: seata
+      username: seata
+      password: seata
+  config:
+    type: nacos
+    nacos:
+      server-addr: 10.255.1.8:8848
+      namespace: cloud
+      group: seata
+      username: seata
+      password: seata

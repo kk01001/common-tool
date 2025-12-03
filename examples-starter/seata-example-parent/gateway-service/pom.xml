@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.kk01001</groupId>
+        <artifactId>seata-example-parent</artifactId>
+        <version>2.4.8</version>
+    </parent>
+
+    <artifactId>gateway-service</artifactId>
+
+    <dependencies>
+        <!-- Gateway -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
+        </dependency>
+        
+        <!-- LoadBalancer (Required for Spring Cloud Gateway) -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+
+        <!-- Bucket4j & Caffeine for Rate Limiting -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j-core</artifactId>
+            <version>8.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bucket4j</groupId>
+            <artifactId>bucket4j-caffeine</artifactId>
+            <version>8.10.1</version>
+        </dependency>
+
+        <!-- Redis Reactive (Required for Dynamic Routing) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+        </dependency>
+
+        <!-- Actuator (Required for Dynamic Route Management) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+    </dependencies>
+</project>
