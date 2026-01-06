@@ -53,6 +53,7 @@ public class SerializationTestService {
         results.add(testJsonSerialization(user, "test:json:" + uuid, iterations));
         results.add(testProtobufSerialization(user, "test:protobuf:" + uuid, iterations));
         results.add(testKryoSerialization(user, "test:kryo:" + uuid, iterations));
+        // results.add(testKryo5Serialization(user, "test:kryo5:" + uuid, iterations));
         // results.add(testFstSerialization(user, "test:fst:" + uuid, iterations));
 
         return results;
@@ -181,7 +182,6 @@ public class SerializationTestService {
 
             for (int i = 0; i < iterations; i++) {
                 RBucket<User> bucket = redissonClient.getBucket(key, new ProtobufCodec(User.class));
-
                 long iterStart = System.nanoTime();
 
                 long startWrite = System.nanoTime();
@@ -231,6 +231,59 @@ public class SerializationTestService {
                 byte[] kryoBytes = baos.toByteArray();
 
                 RBucket<byte[]> bucket = redissonClient.getBucket(key, new org.redisson.codec.KryoCodec());
+
+                long iterStart = System.nanoTime();
+
+                long startWrite = System.nanoTime();
+                bucket.set(kryoBytes);
+                totalWrite += (System.nanoTime() - startWrite);
+
+                long startRead = System.nanoTime();
+                byte[] retrieved = bucket.get();
+                Input input = new Input(new ByteArrayInputStream(retrieved));
+                User deserializedUser = kryo.readObject(input, User.class);
+                input.close();
+                totalRead += (System.nanoTime() - startRead);
+
+                long startDelete = System.nanoTime();
+                bucket.delete();
+                totalDelete += (System.nanoTime() - startDelete);
+
+                long iterTime = (System.nanoTime() - iterStart) / 1_000_000;
+                maxTime = Math.max(maxTime, iterTime);
+                minTime = Math.min(minTime, iterTime);
+            }
+
+            long writeMs = totalWrite / 1_000_000;
+            long readMs = totalRead / 1_000_000;
+            long deleteMs = totalDelete / 1_000_000;
+            long totalMs = writeMs + readMs + deleteMs;
+            long avgMs = totalMs / iterations;
+
+            LOGGER.info("{} - Write: {}ms, Read: {}ms, Delete: {}ms, Total: {}ms, Max: {}ms, Min: {}ms, Avg: {}ms, Iterations: {}",
+                    codecType, writeMs, readMs, deleteMs, totalMs, maxTime, minTime, avgMs, iterations);
+
+            return new SerializationResultVO(codecType, writeMs, readMs, deleteMs, totalMs, iterations, maxTime, minTime, avgMs, true, null);
+        } catch (Exception e) {
+            LOGGER.error("Error testing {} serialization", codecType, e);
+            return new SerializationResultVO(codecType, 0, 0, 0, 0, iterations, 0, 0, 0, false, e.getMessage());
+        }
+    }
+
+    private SerializationResultVO testKryo5Serialization(User user, String key, int iterations) {
+        String codecType = "KRYO5";
+        try {
+            long totalWrite = 0, totalRead = 0, totalDelete = 0;
+            long maxTime = Long.MIN_VALUE, minTime = Long.MAX_VALUE;
+
+            for (int i = 0; i < iterations; i++) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                Output output = new Output(baos);
+                kryo.writeObject(output, user);
+                output.close();
+                byte[] kryoBytes = baos.toByteArray();
+
+                RBucket<byte[]> bucket = redissonClient.getBucket(key, new org.redisson.codec.Kryo5Codec());
 
                 long iterStart = System.nanoTime();
 

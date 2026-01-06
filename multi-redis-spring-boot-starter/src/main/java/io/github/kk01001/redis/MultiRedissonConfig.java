@@ -4,8 +4,8 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
 import org.redisson.client.codec.StringCodec;
-import org.redisson.codec.FstCodec;
 import org.redisson.codec.JsonJacksonCodec;
+import org.redisson.codec.Kryo5Codec;
 import org.redisson.codec.KryoCodec;
 import org.redisson.codec.ProtobufCodec;
 import org.redisson.config.Config;
@@ -131,8 +131,8 @@ public class MultiRedissonConfig {
                 }
             case "KRYO":
                 return new KryoCodec();
-            case "FST":
-                return new FstCodec();
+            case "KRYO5":
+                return new Kryo5Codec();
             case "STRING":
             default:
                 return StringCodec.INSTANCE;

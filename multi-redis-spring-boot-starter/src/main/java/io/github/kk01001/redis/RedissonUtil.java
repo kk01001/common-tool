@@ -123,6 +123,16 @@ public class RedissonUtil {
     }
 
     /**
+     * 设置字符串值 Codec
+     */
+    public <V> Boolean set(String key, V value, Codec codec) {
+        return write(() -> {
+            redissonClient.getBucket(key, codec).set(value);
+            return true;
+        }, () -> redissonClient2.getBucket(key, codec).set(value), "setBucketCodec");
+    }
+
+    /**
      * 设置字符串值和过期时间
      */
     public <V> Boolean set(String key, V value, Duration duration) {
@@ -130,6 +140,16 @@ public class RedissonUtil {
             redissonClient.getBucket(key).set(value, duration);
             return true;
         }, () -> redissonClient2.getBucket(key).set(value, duration), "setBucketExpire");
+    }
+
+    /**
+     * 设置字符串值和过期时间 Codec
+     */
+    public <V> Boolean set(String key, V value, Duration duration, Codec codec) {
+        return write(() -> {
+            redissonClient.getBucket(key, codec).set(value, duration);
+            return true;
+        }, () -> redissonClient2.getBucket(key, codec).set(value, duration), "setBucketExpireCodec");
     }
 
     /**
@@ -153,6 +173,14 @@ public class RedissonUtil {
     }
 
     /**
+     * 获取字符串值 Codec
+     */
+    public <V> V get(String key, Codec codec) {
+        RBucket<V> bucket = redissonClient.getBucket(key, codec);
+        return bucket.get();
+    }
+
+    /**
      * 获取字符串值
      */
     public <V> V get(String key) {
@@ -170,14 +198,6 @@ public class RedissonUtil {
             return null;
         }
         return objectMapper.readValue(data, clazz);
-    }
-
-    /**
-     * 使用指定编码器获取值
-     */
-    public <V> V get(Codec codec, String key) {
-        RBucket<V> bucket = redissonClient.getBucket(key, codec);
-        return bucket.get();
     }
 
     // ====================== Hash 操作 ======================
