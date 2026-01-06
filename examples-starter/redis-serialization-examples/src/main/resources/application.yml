@@ -1,0 +1,13 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: redis-serialization-examples
+  profiles:
+    active: cluster
+
+logging:
+  level:
+    io.github.kk01001: DEBUG
+

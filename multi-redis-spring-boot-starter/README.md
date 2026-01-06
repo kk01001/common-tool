@@ -29,6 +29,7 @@
 - **机房位置标识**：通过配置标识不同Redis集群的机房位置，便于业务逻辑选择
 - **线程池优化**：使用Java 21虚拟线程处理异步操作，提高性能和资源利用率
 - **内存优化**：针对不同的机房集群参数进行了细致的内存和连接池优化
+- **多种序列化方式**：支持 STRING、JSON、Protobuf、Kryo、FST 五种序列化方式，可根据场景选择最优方案
 
 ## 技术栈 🛠️
 
@@ -64,6 +65,7 @@ spring:
       response-timeout: 3000     # 响应超时时间
       master-connection-pool-size: 100  # 主节点连接池大小
       slave-connection-pool-size: 100   # 从节点连接池大小
+      codec-type: STRING         # 序列化方式: STRING, JSON, PROTOBUF, KRYO, FST
       
       # 主集群配置
       cluster:
@@ -366,6 +368,55 @@ public class DirectRedisAccessService {
 }
 ```
 
+## 序列化方式选择 🎯
+
+本 Starter 支持五种序列化方式，可通过 `codec-type` 配置选择：
+
+### 1. STRING（默认）
+- **特点**：将对象序列化为 JSON 字符串
+- **优点**：易于调试，可读性好
+- **缺点**：内存占用较大
+- **适用场景**：开发调试、简单场景
+
+### 2. JSON
+- **特点**：使用 Jackson 进行 JSON 序列化
+- **优点**：跨语言支持，可读性好
+- **缺点**：内存占用中等
+- **适用场景**：需要跨语言访问的场景
+
+### 3. PROTOBUF
+- **特点**：使用 Protostuff 进行二进制序列化（Redisson 内置）
+- **优点**：内存占用最小，性能好，无需定义 proto 文件
+- **缺点**：不可读，二进制格式
+- **适用场景**：对内存敏感的场景
+- **注意**：需要 protostuff-runtime 依赖
+
+### 4. KRYO
+- **特点**：高效的 Java 二进制序列化
+- **优点**：速度快，内存占用小
+- **缺点**：仅支持 Java
+- **适用场景**：纯 Java 应用，追求性能
+
+### 5. FST
+- **特点**：Fast Serialization 快速序列化
+- **优点**：序列化速度最快
+- **缺点**：内存占用略大于 Kryo
+- **适用场景**：对速度要求极高的场景
+
+### 性能对比示例
+
+查看 [redis-serialization-examples](../examples-starter/redis-serialization-examples) 模块，运行示例查看实际性能对比。
+
+一般性能排序（仅供参考，实际情况取决于数据结构）：
+
+| 序列化方式 | 内存占用 | 序列化速度 | 反序列化速度 | 可读性 |
+| --------- | ------- | --------- | ----------- | ------ |
+| STRING    | ★★☆☆☆   | ★★★☆☆     | ★★★☆☆       | ★★★★★  |
+| JSON      | ★★★☆☆   | ★★★☆☆     | ★★★☆☆       | ★★★★★  |
+| PROTOBUF  | ★★★★★   | ★★★★☆     | ★★★★☆       | ☆☆☆☆☆  |
+| KRYO      | ★★★★☆   | ★★★★☆     | ★★★★☆       | ☆☆☆☆☆  |
+| FST       | ★★★★☆   | ★★★★★     | ★★★★★       | ☆☆☆☆☆  |
+
 ## 配置参数详解
 
 ### 公共配置
@@ -376,6 +427,7 @@ public class DirectRedisAccessService {
 | spring.data.redis.connection-timeout | Integer | 5000 | 连接超时时间(毫秒) |
 | spring.data.redis.response-timeout | Integer | 3000 | 响应超时时间(毫秒) |
 | spring.data.redis.idle-connection-timeout | Integer | 10000 | 空闲连接超时时间(毫秒) |
+| spring.data.redis.codec-type | String | STRING | 序列化方式: STRING, JSON, PROTOBUF, KRYO, FST |
 | spring.data.redis.master-connection-pool-size | Integer | 100 | 主节点连接池大小 |
 | spring.data.redis.slave-connection-pool-size | Integer | 128 | 从节点连接池大小 |
 | spring.data.redis.retry-attempts | Integer | 3 | 重试次数 |

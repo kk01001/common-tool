@@ -83,6 +83,9 @@ public class RedissonUtil {
     @PostConstruct
     public void initClient() {
         String location = redisProperties.getCluster().getLocation();
+        if (!StringUtils.hasText(location)) {
+            return;
+        }
         REDISSON_CLIENT_MAP.put(location, redissonClient);
         if (Optional.ofNullable(redissonClient2).isPresent()) {
             String location2 = redisProperties.getCluster2().getLocation();

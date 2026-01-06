@@ -99,6 +99,12 @@ public class MultiRedisProperties implements Serializable {
     private boolean checkSlotsCoverage = true;
 
     /**
+     * Codec type: STRING, JSON, PROTOBUF, KRYO, FST
+     * Default is STRING
+     */
+    private String codecType = "STRING";
+
+    /**
      * jedis 连接池
      */
     private Jedis jedis;

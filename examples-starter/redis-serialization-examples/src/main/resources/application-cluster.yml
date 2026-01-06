@@ -1,0 +1,23 @@
+server:
+  port: 8381
+
+spring:
+  application:
+    name: redis-serialization-examples
+  data:
+    redis:
+      password: ${REDIS_PASSWORD:Cqt@redis2021}
+      connection-timeout: 5000
+      response-timeout: 3000
+      codec-type: PROTOBUF  # STRING, JSON, PROTOBUF, KRYO, FST
+      # Cluster mode configuration
+      cluster:
+        active: true
+        nodes:
+          - ${REDIS_HOST:10.255.1.11}:${REDIS_PORT:9100}
+        max-redirects: 3
+        netty-threads: 32
+
+logging:
+  level:
+    io.github.kk01001: DEBUG

@@ -27,6 +27,7 @@
         <module>mybatis-plus-example</module>
         <module>graphql-examples</module>
         <module>seata-example-parent</module>
+        <module>redis-serialization-examples</module>
     </modules>
 
 </project>

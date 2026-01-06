@@ -2,7 +2,12 @@ package io.github.kk01001.redis;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.Codec;
 import org.redisson.client.codec.StringCodec;
+import org.redisson.codec.FstCodec;
+import org.redisson.codec.JsonJacksonCodec;
+import org.redisson.codec.KryoCodec;
+import org.redisson.codec.ProtobufCodec;
 import org.redisson.config.Config;
 import org.redisson.config.TransportMode;
 import org.slf4j.Logger;
@@ -47,7 +52,7 @@ public class MultiRedissonConfig {
     public RedissonClient redissonClient() {
         MultiRedisProperties.Cluster cluster = redisProperties.getCluster();
         Config config = getConfig(cluster);
-        config.setCodec(StringCodec.INSTANCE);
+        config.setCodec(getCodec(redisProperties.getCodecType()));
         String osName = System.getProperty("os.name");
         if (StringUtils.hasLength(osName) && osName.contains(LINUX)) {
             LOGGER.info("redisson use epoll...");
@@ -66,7 +71,7 @@ public class MultiRedissonConfig {
     public RedissonClient redissonClient2() {
         MultiRedisProperties.Cluster cluster2 = redisProperties.getCluster2();
         Config config = getConfig(cluster2);
-        config.setCodec(StringCodec.INSTANCE);
+        config.setCodec(getCodec(redisProperties.getCodecType()));
         String osName = System.getProperty("os.name");
         if (StringUtils.hasLength(osName) && osName.contains(LINUX)) {
             config.setTransportMode(TransportMode.EPOLL);
@@ -82,7 +87,7 @@ public class MultiRedissonConfig {
     public RedissonClient redissonClient3() {
         MultiRedisProperties.Cluster cluster3 = redisProperties.getCluster3();
         Config config = getConfig(cluster3);
-        config.setCodec(StringCodec.INSTANCE);
+        config.setCodec(getCodec(redisProperties.getCodecType()));
         String osName = System.getProperty("os.name");
         if (StringUtils.hasLength(osName) && osName.contains(LINUX)) {
             config.setTransportMode(TransportMode.EPOLL);
@@ -91,6 +96,47 @@ public class MultiRedissonConfig {
         config.setCheckLockSyncedSlaves(redisProperties.isCheckLockSyncedSlaves());
         config.setSlavesSyncTimeout(redisProperties.getSlavesSyncTimeout());
         return Redisson.create(config);
+    }
+
+    /**
+     * Get codec based on configuration
+     * <p>
+     * Supported codec types:
+     * - STRING: String codec (default)
+     * - JSON: Jackson JSON codec
+     * - PROTOBUF: Protobuf codec (requires protostuff-runtime dependency)
+     * - KRYO: Kryo codec (requires kryo dependency)
+     * - FST: FST codec (requires fst dependency)
+     */
+    private Codec getCodec(String codecType) {
+        if (codecType == null) {
+            codecType = "STRING";
+        }
+
+        LOGGER.info("Using codec type: {}", codecType);
+
+        switch (codecType.toUpperCase()) {
+            case "JSON":
+                return new JsonJacksonCodec();
+            case "PROTOBUF":
+                // Redisson's ProtobufCodec requires a class parameter
+                // For generic usage, we use Object.class which will use Protostuff
+                // Note: This requires protostuff-runtime dependency
+                try {
+                    return new ProtobufCodec(Object.class);
+                } catch (Exception e) {
+                    LOGGER.warn("Failed to create ProtobufCodec, falling back to JsonJacksonCodec. " +
+                            "Make sure protostuff-runtime dependency is included.", e);
+                    return StringCodec.INSTANCE;
+                }
+            case "KRYO":
+                return new KryoCodec();
+            case "FST":
+                return new FstCodec();
+            case "STRING":
+            default:
+                return StringCodec.INSTANCE;
+        }
     }
 
     @SuppressWarnings("all")

@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: redis-serialization-examples
+  data:
+    redis:
+      password: ${REDIS_PASSWORD:}
+      connection-timeout: 5000
+      response-timeout: 3000
+      codec-type: STRING  # STRING, JSON, PROTOBUF, KRYO, FST
+      # Standalone mode configuration (for testing without cluster)
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+logging:
+  level:
+    io.github.kk01001: DEBUG
