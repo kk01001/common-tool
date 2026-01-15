@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点赞排行榜</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-size: 2.5em;
+        }
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .col-main {
+            flex: 2;
+            min-width: 400px;
+        }
+        .col-side {
+            flex: 1;
+            min-width: 300px;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f5576c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        .leaderboard-list {
+            list-style: none;
+        }
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+        .leaderboard-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .leaderboard-item.top-1 {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+            color: white;
+        }
+        .leaderboard-item.top-2 {
+            background: linear-gradient(135deg, #c0c0c0 0%, #a8a8a8 100%);
+            color: white;
+        }
+        .leaderboard-item.top-3 {
+            background: linear-gradient(135deg, #cd7f32 0%, #b87333 100%);
+            color: white;
+        }
+        .rank-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 15px;
+            background: white;
+            color: #333;
+        }
+        .top-1 .rank-badge { background: #fff3cd; color: #856404; }
+        .top-2 .rank-badge { background: #e2e3e5; color: #383d41; }
+        .top-3 .rank-badge { background: #ffeeba; color: #856404; }
+        .member-info {
+            flex: 1;
+        }
+        .member-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .member-likes {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+        .like-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+        .like-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+        }
+        .top-1 .like-btn,
+        .top-2 .like-btn,
+        .top-3 .like-btn {
+            background: rgba(255,255,255,0.3);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #f5576c;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .result-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            flex: 1;
+        }
+        .search-box .btn {
+            width: auto;
+            margin: 0;
+        }
+        .member-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .member-card .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 36px;
+        }
+        .member-card .name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .member-card .likes-count {
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .member-card .rank-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .nav-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        @keyframes likeAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .like-animation {
+            animation: likeAnimation 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="nav-link">← 返回首页</a>
+        <h1>🏆 点赞排行榜</h1>
+        <p class="subtitle">使用 Redis ZSet 实现的实时排行榜系统</p>
+
+        <!-- 统计信息 -->
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value" id="totalMembers">0</div>
+                <div class="stat-label">参与人数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="topMember">-</div>
+                <div class="stat-label">榜首</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="topLikes">0</div>
+                <div class="stat-label">最高点赞</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- 排行榜 -->
+            <div class="col-main">
+                <div class="card">
+                    <h2>📊 实时排行榜</h2>
+                    <ul class="leaderboard-list" id="leaderboardList">
+                        <li class="empty-state">
+                            <div class="icon">📋</div>
+                            <div>暂无数据，请添加成员</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 操作面板 -->
+            <div class="col-side">
+                <!-- 添加成员 -->
+                <div class="card">
+                    <h2>➕ 添加成员</h2>
+                    <div class="form-group">
+                        <label>成员名称</label>
+                        <input type="text" id="newMemberName" placeholder="请输入成员名称">
+                    </div>
+                    <button class="btn btn-primary" onclick="addMember()">添加到排行榜</button>
+                </div>
+
+                <!-- 查询成员 -->
+                <div class="card">
+                    <h2>🔍 查询成员</h2>
+                    <div class="search-box">
+                        <input type="text" id="searchMemberId" placeholder="输入成员名称">
+                        <button class="btn btn-primary" onclick="searchMember()">查询</button>
+                    </div>
+                    <div id="memberCard" style="display: none;">
+                        <div class="member-card">
+                            <div class="avatar" id="memberAvatar">👤</div>
+                            <div class="name" id="memberName"></div>
+                            <div class="likes-count">❤️ <span id="memberLikes">0</span></div>
+                            <div class="rank-info">排名：第 <span id="memberRank">-</span> 名</div>
+                        </div>
+                        <button class="btn btn-primary" onclick="likeMember(document.getElementById('memberName').textContent)">
+                            ❤️ 点赞
+                        </button>
+                        <button class="btn btn-danger" onclick="removeMember(document.getElementById('memberName').textContent)">
+                            🗑️ 移除
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 快捷操作 -->
+                <div class="card">
+                    <h2>⚡ 快捷操作</h2>
+                    <button class="btn btn-success" onclick="initDemo()">初始化测试数据</button>
+                    <button class="btn btn-secondary" onclick="refreshLeaderboard()">刷新排行榜</button>
+                    <button class="btn btn-warning" onclick="popMinMember()" style="background: #fd7e14;">淘汰末位成员</button>
+                    <button class="btn btn-danger" onclick="clearLeaderboard()">清空排行榜</button>
+                    <div class="result-box" id="operationResult"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+
+        async function request(url, method = 'GET', data = null) {
+            const options = { method };
+            if (data) {
+                options.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+                options.body = new URLSearchParams(data);
+            }
+            const response = await fetch(API_BASE + url, options);
+            return response.json();
+        }
+
+        // 加载排行榜
+        async function loadLeaderboard() {
+            try {
+                const result = await request('/leaderboard/top?limit=20');
+                const listEl = document.getElementById('leaderboardList');
+                
+                if (!result.rankings || result.rankings.length === 0) {
+                    listEl.innerHTML = `
+                        <li class="empty-state">
+                            <div class="icon">📋</div>
+                            <div>暂无数据，请添加成员</div>
+                        </li>
+                    `;
+                    return;
+                }
+                
+                listEl.innerHTML = result.rankings.map((item, index) => {
+                    const topClass = index < 3 ? `top-${index + 1}` : '';
+                    const medal = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : ''));
+                    return `
+                        <li class="leaderboard-item ${topClass}">
+                            <div class="rank-badge">${medal || item.rank}</div>
+                            <div class="member-info">
+                                <div class="member-name">${item.memberId}</div>
+                                <div class="member-likes">❤️ ${item.likes} 赞</div>
+                            </div>
+                            <button class="like-btn" onclick="likeMember('${item.memberId}', this)">
+                                👍 点赞
+                            </button>
+                        </li>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error('加载排行榜失败:', e);
+            }
+        }
+
+        // 加载统计信息
+        async function loadStats() {
+            try {
+                const result = await request('/leaderboard/stats');
+                document.getElementById('totalMembers').textContent = result.totalMembers || 0;
+                document.getElementById('topMember').textContent = result.topMember || '-';
+                document.getElementById('topLikes').textContent = result.topLikes || 0;
+            } catch (e) {
+                console.error('加载统计失败:', e);
+            }
+        }
+
+        // 刷新所有数据
+        async function refreshLeaderboard() {
+            await Promise.all([loadLeaderboard(), loadStats()]);
+            showResult('排行榜已刷新');
+        }
+
+        // 添加成员
+        async function addMember() {
+            const name = document.getElementById('newMemberName').value.trim();
+            if (!name) {
+                showResult('请输入成员名称');
+                return;
+            }
+            
+            const result = await request('/leaderboard/member/add', 'POST', { name });
+            showResult(JSON.stringify(result, null, 2));
+            document.getElementById('newMemberName').value = '';
+            refreshLeaderboard();
+        }
+
+        // 点赞
+        async function likeMember(memberId, btnElement) {
+            if (btnElement) {
+                btnElement.classList.add('like-animation');
+                setTimeout(() => btnElement.classList.remove('like-animation'), 300);
+            }
+            
+            const result = await request('/leaderboard/like/' + encodeURIComponent(memberId), 'POST');
+            showResult(`${memberId} 获得点赞！当前 ${result.currentLikes} 赞，排名第 ${result.rank}`);
+            refreshLeaderboard();
+            
+            // 如果是从查询结果点赞，更新显示
+            if (document.getElementById('memberName').textContent === memberId) {
+                document.getElementById('memberLikes').textContent = result.currentLikes;
+                document.getElementById('memberRank').textContent = result.rank;
+            }
+        }
+
+        // 查询成员
+        async function searchMember() {
+            const memberId = document.getElementById('searchMemberId').value.trim();
+            if (!memberId) {
+                showResult('请输入成员名称');
+                return;
+            }
+            
+            const result = await request('/leaderboard/member/' + encodeURIComponent(memberId));
+            
+            const cardEl = document.getElementById('memberCard');
+            if (result.exists) {
+                cardEl.style.display = 'block';
+                document.getElementById('memberName').textContent = result.memberId;
+                document.getElementById('memberLikes').textContent = result.likes;
+                document.getElementById('memberRank').textContent = result.rank || '-';
+                document.getElementById('memberAvatar').textContent = result.memberId.charAt(0);
+            } else {
+                cardEl.style.display = 'none';
+                showResult('成员不存在');
+            }
+        }
+
+        // 移除成员
+        async function removeMember(memberId) {
+            if (!confirm(`确定要移除 "${memberId}" 吗？`)) return;
+            
+            const result = await request('/leaderboard/member/' + encodeURIComponent(memberId), 'DELETE');
+            showResult(JSON.stringify(result, null, 2));
+            document.getElementById('memberCard').style.display = 'none';
+            refreshLeaderboard();
+        }
+
+        // 初始化测试数据
+        async function initDemo() {
+            const result = await request('/leaderboard/init-demo', 'POST');
+            showResult(JSON.stringify(result, null, 2));
+            refreshLeaderboard();
+        }
+
+        // 淘汰末位成员
+        async function popMinMember() {
+            if (!confirm('确定要淘汰分数最低的成员吗？')) return;
+            
+            const result = await request('/leaderboard/pop-min', 'DELETE');
+            showResult(JSON.stringify(result, null, 2));
+            refreshLeaderboard();
+        }
+
+        // 清空排行榜
+        async function clearLeaderboard() {
+            if (!confirm('确定要清空排行榜吗？此操作不可恢复！')) return;
+            
+            const result = await request('/leaderboard/clear', 'DELETE');
+            showResult(JSON.stringify(result, null, 2));
+            document.getElementById('memberCard').style.display = 'none';
+            refreshLeaderboard();
+        }
+
+        // 显示结果
+        function showResult(message) {
+            document.getElementById('operationResult').textContent = message;
+        }
+
+        // 初始加载
+        refreshLeaderboard();
+        
+        // 每5秒自动刷新
+        setInterval(refreshLeaderboard, 5000);
+    </script>
+</body>
+</html>

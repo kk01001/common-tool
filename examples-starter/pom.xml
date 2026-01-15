@@ -28,6 +28,7 @@
         <module>graphql-examples</module>
         <module>seata-example-parent</module>
         <module>redis-serialization-examples</module>
+        <module>multi-redisson-example</module>
     </modules>
 
 </project>

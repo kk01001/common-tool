@@ -15,6 +15,7 @@
         <module>examples</module>
         <module>common-tool-spring-boot-starter</module>
         <module>multi-redis-spring-boot-starter</module>
+        <module>multi-redisson-spring-boot-starter</module>
         <module>mybatis-plus-spring3-boot-starter</module>
         <module>xxl-job-spring-boot-starter</module>
         <module>oss-spring-boot-starter</module>
@@ -60,7 +61,7 @@
         <hutool.version>5.8.29</hutool.version>
         <aws.s3.version>1.12.761</aws.s3.version>
         <easyexcel.version>4.0.1</easyexcel.version>
-        <redisson.version>3.39.0</redisson.version>
+        <redisson.version>3.52.0</redisson.version>
         <transmittable.thread.local.version>2.14.5</transmittable.thread.local.version>
         <mybatis.plus.version>3.5.14</mybatis.plus.version>
         <dynamic.datasource.version>4.3.1</dynamic.datasource.version>
@@ -343,6 +344,9 @@
                         <artifact>threadpool-example</artifact>
                         <artifact>mybatis-plus-example</artifact>
                         <artifact>graphql-examples</artifact>
+                        <artifact>redis-serialization-examples</artifact>
+                        <artifact>multi-redisson-example</artifact>
+                        <artifact>seata-example-parent</artifact>
                     </excludeArtifacts>
                     <autoPublish>true</autoPublish>
                 </configuration>

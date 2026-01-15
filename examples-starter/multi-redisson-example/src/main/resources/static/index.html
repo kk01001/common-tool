@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi Redisson 测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .nav-links {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .nav-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 25px;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        .nav-link.active {
+            background: rgba(255,255,255,0.4);
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        .row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .col {
+            flex: 1;
+            min-width: 300px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        .metric-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .metric-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        .status-ok { color: #28a745; }
+        .status-error { color: #dc3545; }
+        #metricsPanel {
+            margin-bottom: 20px;
+        }
+        .auto-refresh {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .auto-refresh input[type="checkbox"] {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Multi Redisson 双写测试</h1>
+        <div class="nav-links">
+            <a href="/" class="nav-link active">🔧 基础测试</a>
+            <a href="/leaderboard.html" class="nav-link">🏆 点赞排行榜</a>
+        </div>
+
+        <!-- 监控面板 -->
+        <div class="card" id="metricsPanel">
+            <h2>📊 监控指标</h2>
+            <div class="auto-refresh">
+                <input type="checkbox" id="autoRefresh" checked>
+                <label for="autoRefresh" style="display: inline; margin: 0;">自动刷新 (3秒)</label>
+                <button class="btn btn-info" onclick="loadMetrics()">刷新</button>
+            </div>
+            <div class="metrics" id="metricsDisplay">
+                <div class="metric-item">
+                    <div class="metric-value" id="metricSubmitted">0</div>
+                    <div class="metric-label">提交任务数</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="metricSuccess">0</div>
+                    <div class="metric-label">成功次数</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="metricFailure">0</div>
+                    <div class="metric-label">失败次数</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="metricSuccessRate">100%</div>
+                    <div class="metric-label">成功率</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="metricActiveThreads">0</div>
+                    <div class="metric-label">活跃线程</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="metricQueueSize">0</div>
+                    <div class="metric-label">队列大小</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- String 操作 -->
+            <div class="col">
+                <div class="card">
+                    <h2>📝 String 操作</h2>
+                    <div class="form-group">
+                        <label>Key</label>
+                        <input type="text" id="stringKey" value="test:string:key">
+                    </div>
+                    <div class="form-group">
+                        <label>Value</label>
+                        <input type="text" id="stringValue" value="Hello World">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="stringSet()">SET</button>
+                        <button class="btn btn-success" onclick="stringGet()">GET</button>
+                        <button class="btn btn-danger" onclick="stringDelete()">DELETE</button>
+                    </div>
+                    <div class="result" id="stringResult"></div>
+                </div>
+            </div>
+
+            <!-- 计数器操作 -->
+            <div class="col">
+                <div class="card">
+                    <h2>🔢 计数器操作</h2>
+                    <div class="form-group">
+                        <label>Key</label>
+                        <input type="text" id="counterKey" value="test:counter">
+                    </div>
+                    <div class="form-group">
+                        <label>Delta</label>
+                        <input type="number" id="counterDelta" value="1">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="counterIncr()">INCR</button>
+                        <button class="btn btn-danger" onclick="counterDecr()">DECR</button>
+                    </div>
+                    <div class="result" id="counterResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Set 操作 -->
+            <div class="col">
+                <div class="card">
+                    <h2>📦 Set 操作</h2>
+                    <div class="form-group">
+                        <label>Key</label>
+                        <input type="text" id="setKey" value="test:set">
+                    </div>
+                    <div class="form-group">
+                        <label>Value</label>
+                        <input type="text" id="setValue" value="member1">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="setAdd()">SADD</button>
+                        <button class="btn btn-success" onclick="setMembers()">SMEMBERS</button>
+                        <button class="btn btn-danger" onclick="setPop()">SPOP (随机)</button>
+                    </div>
+                    <div class="result" id="setResult"></div>
+                </div>
+            </div>
+
+            <!-- Hash 操作 -->
+            <div class="col">
+                <div class="card">
+                    <h2>🗂️ Hash 操作</h2>
+                    <div class="form-group">
+                        <label>Key</label>
+                        <input type="text" id="hashKey" value="test:hash">
+                    </div>
+                    <div class="form-group">
+                        <label>Field</label>
+                        <input type="text" id="hashField" value="name">
+                    </div>
+                    <div class="form-group">
+                        <label>Value</label>
+                        <input type="text" id="hashValue" value="张三">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="hashSet()">HSET</button>
+                        <button class="btn btn-success" onclick="hashGet()">HGET</button>
+                        <button class="btn btn-info" onclick="hashGetAll()">HGETALL</button>
+                    </div>
+                    <div class="result" id="hashResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- 批量测试 -->
+            <div class="col">
+                <div class="card">
+                    <h2>⚡ 批量写入测试</h2>
+                    <div class="form-group">
+                        <label>写入数量</label>
+                        <input type="number" id="batchCount" value="100">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="batchWrite()">开始测试</button>
+                    </div>
+                    <div class="result" id="batchResult"></div>
+                </div>
+            </div>
+
+            <!-- 集群对比 -->
+            <div class="col">
+                <div class="card">
+                    <h2>🔍 集群数据对比</h2>
+                    <div class="form-group">
+                        <label>Key</label>
+                        <input type="text" id="compareKey" value="test:string:key">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="compareValue()">对比值</button>
+                        <button class="btn btn-info" onclick="getClusters()">集群信息</button>
+                    </div>
+                    <div class="result" id="compareResult"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+
+        async function request(url, method = 'GET', data = null) {
+            const options = { method };
+            if (data) {
+                options.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+                options.body = new URLSearchParams(data);
+            }
+            const response = await fetch(API_BASE + url, options);
+            return response.json();
+        }
+
+        function showResult(elementId, data) {
+            document.getElementById(elementId).textContent = JSON.stringify(data, null, 2);
+        }
+
+        // String 操作
+        async function stringSet() {
+            const key = document.getElementById('stringKey').value;
+            const value = document.getElementById('stringValue').value;
+            const result = await request('/redis/string/set', 'POST', { key, value });
+            showResult('stringResult', result);
+        }
+
+        async function stringGet() {
+            const key = document.getElementById('stringKey').value;
+            const result = await request('/redis/string/get?key=' + encodeURIComponent(key));
+            showResult('stringResult', result);
+        }
+
+        async function stringDelete() {
+            const key = document.getElementById('stringKey').value;
+            const result = await request('/redis/string/delete?key=' + encodeURIComponent(key), 'DELETE');
+            showResult('stringResult', result);
+        }
+
+        // 计数器操作
+        async function counterIncr() {
+            const key = document.getElementById('counterKey').value;
+            const delta = document.getElementById('counterDelta').value;
+            const result = await request('/redis/counter/incr', 'POST', { key, delta });
+            showResult('counterResult', result);
+        }
+
+        async function counterDecr() {
+            const key = document.getElementById('counterKey').value;
+            const delta = document.getElementById('counterDelta').value;
+            const result = await request('/redis/counter/decr', 'POST', { key, delta });
+            showResult('counterResult', result);
+        }
+
+        // Set 操作
+        async function setAdd() {
+            const key = document.getElementById('setKey').value;
+            const value = document.getElementById('setValue').value;
+            const result = await request('/redis/set/add', 'POST', { key, value });
+            showResult('setResult', result);
+        }
+
+        async function setMembers() {
+            const key = document.getElementById('setKey').value;
+            const result = await request('/redis/set/members?key=' + encodeURIComponent(key));
+            showResult('setResult', result);
+        }
+
+        async function setPop() {
+            const key = document.getElementById('setKey').value;
+            const result = await request('/redis/set/pop', 'POST', { key });
+            showResult('setResult', result);
+        }
+
+        // Hash 操作
+        async function hashSet() {
+            const key = document.getElementById('hashKey').value;
+            const field = document.getElementById('hashField').value;
+            const value = document.getElementById('hashValue').value;
+            const result = await request('/redis/hash/set', 'POST', { key, field, value });
+            showResult('hashResult', result);
+        }
+
+        async function hashGet() {
+            const key = document.getElementById('hashKey').value;
+            const field = document.getElementById('hashField').value;
+            const result = await request('/redis/hash/get?key=' + encodeURIComponent(key) + '&field=' + encodeURIComponent(field));
+            showResult('hashResult', result);
+        }
+
+        async function hashGetAll() {
+            const key = document.getElementById('hashKey').value;
+            const result = await request('/redis/hash/getAll?key=' + encodeURIComponent(key));
+            showResult('hashResult', result);
+        }
+
+        // 批量测试
+        async function batchWrite() {
+            const count = document.getElementById('batchCount').value;
+            document.getElementById('batchResult').textContent = '正在执行...';
+            const result = await request('/redis/batch/write', 'POST', { count });
+            showResult('batchResult', result);
+        }
+
+        // 集群对比
+        async function compareValue() {
+            const key = document.getElementById('compareKey').value;
+            const result = await request('/redis/compare?key=' + encodeURIComponent(key));
+            showResult('compareResult', result);
+        }
+
+        async function getClusters() {
+            const result = await request('/redis/clusters');
+            showResult('compareResult', result);
+        }
+
+        // 监控指标
+        async function loadMetrics() {
+            try {
+                const result = await request('/redis/metrics');
+                document.getElementById('metricSubmitted').textContent = result.totalSubmitted || 0;
+                document.getElementById('metricSuccess').textContent = result.totalSuccess || 0;
+                document.getElementById('metricFailure').textContent = result.totalFailure || 0;
+                document.getElementById('metricSuccessRate').textContent = result.successRate || '100%';
+                
+                if (result.threadPool) {
+                    document.getElementById('metricActiveThreads').textContent = result.threadPool.activeCount || 0;
+                    document.getElementById('metricQueueSize').textContent = result.threadPool.queueSize || 0;
+                }
+            } catch (e) {
+                console.error('Failed to load metrics:', e);
+            }
+        }
+
+        // 自动刷新
+        setInterval(() => {
+            if (document.getElementById('autoRefresh').checked) {
+                loadMetrics();
+            }
+        }, 3000);
+
+        // 初始加载
+        loadMetrics();
+    </script>
+</body>
+</html>

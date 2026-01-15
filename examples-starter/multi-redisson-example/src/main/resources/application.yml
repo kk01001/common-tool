@@ -1,0 +1,118 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: multi-redisson-example
+
+# Redisson 多集群配置
+redisson:
+  multi:
+    enabled: true
+    # 主集群名称
+    primary: primary
+    # 备份集群名称（双写目标）
+    secondary: secondary
+    # 启用双写
+    dual-write-enabled: true
+    # 双写线程池配置
+    dual-write-thread-pool:
+      core-pool-size: 4
+      max-pool-size: 8
+      queue-capacity: 10000
+      keep-alive-seconds: 60
+      thread-name-prefix: dual-write-
+
+    # Redis 实例配置
+    instances:
+      # 主集群（机房A）- Cluster 模式
+      primary:
+        mode: cluster
+        cluster:
+          password: 123456
+          node-addresses:
+            - redis://127.0.0.1:8100
+            - redis://127.0.0.1:8101
+            - redis://127.0.0.1:8102
+          scan-interval: 5000
+          read-mode: MASTER
+          master-connection-pool-size: 64
+          master-connection-minimum-idle-size: 24
+          slave-connection-pool-size: 64
+          slave-connection-minimum-idle-size: 24
+          connect-timeout: 10000
+          timeout: 3000
+          retry-attempts: 3
+          # 重试延迟策略配置
+          retry-delay:
+            # 类型: CONSTANT, EQUAL_JITTER(默认), FULL_JITTER, DECORRELATED_JITTER
+            type: EQUAL_JITTER
+            # 最小延迟（毫秒）
+            min-delay: 1000
+            # 最大延迟（毫秒）
+            max-delay: 2000
+          # 故障节点检测器配置
+          failed-node-detector:
+            # 类型: CONNECTION(默认), COMMANDS, COMMANDS_TIMEOUT
+            type: CONNECTION
+            # 检查间隔（毫秒）
+            check-interval: 180000
+            # 失败命令限制（仅对 COMMANDS/COMMANDS_TIMEOUT 有效）
+            failed-commands-limit: 3
+
+        threads: 16
+        netty-threads: 32
+        codec: org.redisson.client.codec.StringCodec
+
+      # 备份集群（机房B）- Cluster 模式
+      secondary:
+        mode: cluster
+        cluster:
+          password: 123456
+          node-addresses:
+            - redis://127.0.0.1:8100
+            - redis://127.0.0.1:8101
+            - redis://127.0.0.1:8102
+          scan-interval: 5000
+          read-mode: MASTER
+          master-connection-pool-size: 64
+          master-connection-minimum-idle-size: 24
+          slave-connection-pool-size: 64
+          slave-connection-minimum-idle-size: 24
+          connect-timeout: 10000
+          timeout: 3000
+          retry-attempts: 3
+          # 重试延迟策略配置
+          retry-delay:
+            # 类型: CONSTANT, EQUAL_JITTER(默认), FULL_JITTER, DECORRELATED_JITTER
+            type: EQUAL_JITTER
+            # 最小延迟（毫秒）
+            min-delay: 1000
+            # 最大延迟（毫秒）
+            max-delay: 2000
+          # 故障节点检测器配置
+          failed-node-detector:
+            # 类型: CONNECTION(默认), COMMANDS, COMMANDS_TIMEOUT
+            type: COMMANDS
+            # 检查间隔（毫秒）
+            check-interval: 180000
+            # 失败命令限制（仅对 COMMANDS/COMMANDS_TIMEOUT 有效）
+            failed-commands-limit: 3
+
+        threads: 16
+        netty-threads: 32
+        codec: org.redisson.client.codec.StringCodec
+
+# Actuator 配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,dualwrite
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    io.github.kk01001.redisson: DEBUG
