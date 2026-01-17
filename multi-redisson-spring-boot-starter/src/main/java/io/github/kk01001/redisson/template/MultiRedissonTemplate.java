@@ -1,5 +1,6 @@
 package io.github.kk01001.redisson.template;
 
+import io.github.kk01001.redisson.circuitbreaker.DualWriteCircuitBreaker;
 import io.github.kk01001.redisson.holder.RedissonClientHolder;
 import io.github.kk01001.redisson.monitor.DualWriteMetrics;
 import io.github.kk01001.redisson.properties.MultiRedissonProperties;
@@ -72,12 +73,7 @@ public class MultiRedissonTemplate {
     private final ExecutorService dualWriteExecutor;
 
     /**
-     * 是否启用双写
-     */
-    private final boolean dualWriteEnabled;
-
-    /**
-     * 配置属性
+     * 配置属性（用于动态读取配置）
      */
     private final MultiRedissonProperties properties;
 
@@ -86,32 +82,47 @@ public class MultiRedissonTemplate {
      */
     private final DualWriteMetrics metrics;
 
+    /**
+     * 双写熔断器
+     */
+    private final DualWriteCircuitBreaker circuitBreaker;
+
+    /**
+     * 批量操作
+     */
+    private final BatchOperations batchOperations;
+
     public MultiRedissonTemplate(RedissonClientHolder holder,
                                  MultiRedissonProperties properties,
                                  ExecutorService dualWriteExecutor,
-                                 DualWriteMetrics metrics) {
+                                 DualWriteMetrics metrics,
+                                 DualWriteCircuitBreaker circuitBreaker) {
         this.properties = properties;
         this.primaryClient = holder.getPrimary();
         this.metrics = metrics;
-        this.dualWriteEnabled = properties.isDualWriteEnabled()
-                && StringUtils.hasText(properties.getSecondary());
+        this.circuitBreaker = circuitBreaker;
+        this.dualWriteExecutor = dualWriteExecutor;
 
-        if (this.dualWriteEnabled) {
+        // 获取备份客户端（如果配置了）
+        if (StringUtils.hasText(properties.getSecondary())) {
             this.secondaryClient = holder.getClientOrNull(properties.getSecondary());
             if (this.secondaryClient == null) {
-                log.warn("Secondary client '{}' not found, dual write disabled",
+                log.warn("Secondary client '{}' not found, dual write will be disabled",
                         properties.getSecondary());
             }
         } else {
             this.secondaryClient = null;
         }
 
-        this.dualWriteExecutor = dualWriteExecutor;
+        // 初始化批量操作（传入 properties 支持动态配置）
+        this.batchOperations = new BatchOperations(primaryClient, secondaryClient, 
+                dualWriteExecutor, properties);
 
-        log.info("MultiRedissonTemplate initialized, dualWriteEnabled: {}, primary: {}, secondary: {}",
-                this.dualWriteEnabled && this.secondaryClient != null,
+        log.info("MultiRedissonTemplate initialized, dualWriteEnabled: {}, primary: {}, secondary: {}, circuitBreaker: {}",
+                isDualWriteEnabled(),
                 properties.getPrimary(),
-                properties.getSecondary());
+                properties.getSecondary(),
+                properties.getCircuitBreaker().isEnabled());
     }
 
     /**
@@ -119,6 +130,20 @@ public class MultiRedissonTemplate {
      */
     public DualWriteMetrics getMetrics() {
         return metrics;
+    }
+
+    /**
+     * 获取熔断器
+     */
+    public DualWriteCircuitBreaker getCircuitBreaker() {
+        return circuitBreaker;
+    }
+
+    /**
+     * 获取批量操作
+     */
+    public BatchOperations batch() {
+        return batchOperations;
     }
 
     /**
@@ -136,10 +161,10 @@ public class MultiRedissonTemplate {
     }
 
     /**
-     * 是否启用双写
+     * 是否启用双写（动态读取配置）
      */
     public boolean isDualWriteEnabled() {
-        return dualWriteEnabled && secondaryClient != null;
+        return properties.isDualWriteEnabled() && secondaryClient != null;
     }
 
     // ====================== String 操作 ======================
@@ -455,30 +480,57 @@ public class MultiRedissonTemplate {
     // ====================== List 操作 ======================
 
     /**
-     * 添加 List 元素
+     * 从左侧添加 List 元素（头部插入）
      */
     @SafeVarargs
     public final <V> Boolean lpush(String key, V... values) {
+        return write(() -> {
+            RList<V> list = primaryClient.getList(key);
+            return list.addAll(0, Arrays.asList(values));
+        }, () -> {
+            RList<V> list = secondaryClient.getList(key);
+            list.addAll(0, Arrays.asList(values));
+        }, "lpush");
+    }
+
+    /**
+     * 从右侧添加 List 元素（尾部插入）
+     */
+    @SafeVarargs
+    public final <V> Boolean rpush(String key, V... values) {
         return write(() -> {
             RList<V> list = primaryClient.getList(key);
             return list.addAll(Arrays.asList(values));
         }, () -> {
             RList<V> list = secondaryClient.getList(key);
             list.addAll(Arrays.asList(values));
-        }, "lpush");
+        }, "rpush");
     }
 
     /**
-     * 批量添加 List 元素
+     * 从左侧批量添加 List 元素
      */
     public <V> Boolean lpushAll(String key, List<V> values) {
+        return write(() -> {
+            RList<V> list = primaryClient.getList(key);
+            return list.addAll(0, values);
+        }, () -> {
+            RList<V> list = secondaryClient.getList(key);
+            list.addAll(0, values);
+        }, "lpushAll");
+    }
+
+    /**
+     * 从右侧批量添加 List 元素
+     */
+    public <V> Boolean rpushAll(String key, List<V> values) {
         return write(() -> {
             RList<V> list = primaryClient.getList(key);
             return list.addAll(values);
         }, () -> {
             RList<V> list = secondaryClient.getList(key);
             list.addAll(values);
-        }, "lpushAll");
+        }, "rpushAll");
     }
 
     /**
@@ -1404,6 +1456,12 @@ public class MultiRedissonTemplate {
             return;
         }
 
+        // 检查熔断器是否允许请求
+        if (!circuitBreaker.allowRequest()) {
+            log.debug("Circuit breaker is open, skip secondary write for {}", actionName);
+            return;
+        }
+
         try {
             if (metrics != null) {
                 metrics.recordSubmit();
@@ -1414,11 +1472,15 @@ public class MultiRedissonTemplate {
                     if (metrics != null) {
                         metrics.recordSuccess(actionName);
                     }
+                    // 记录熔断器成功
+                    circuitBreaker.recordSuccess();
                 } catch (Exception e) {
                     log.error("Redis {} operation failed on secondary", actionName, e);
                     if (metrics != null) {
                         metrics.recordFailure(actionName);
                     }
+                    // 记录熔断器失败
+                    circuitBreaker.recordFailure();
                 }
             });
         } catch (Exception e) {
@@ -1426,6 +1488,8 @@ public class MultiRedissonTemplate {
             if (metrics != null) {
                 metrics.recordSubmitFailure();
             }
+            // 提交失败也记录为熔断器失败
+            circuitBreaker.recordFailure();
         }
     }
 }

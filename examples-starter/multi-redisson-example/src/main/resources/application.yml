@@ -108,7 +108,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,dualwrite
+        include: health,info,redissondualwrite,redissoncircuitbreaker
   endpoint:
     health:
       show-details: always

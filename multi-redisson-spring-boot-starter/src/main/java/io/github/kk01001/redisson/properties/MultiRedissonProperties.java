@@ -43,6 +43,11 @@ public class MultiRedissonProperties {
     private DualWriteThreadPool dualWriteThreadPool = new DualWriteThreadPool();
 
     /**
+     * 双写熔断器配置
+     */
+    private CircuitBreaker circuitBreaker = new CircuitBreaker();
+
+    /**
      * 多个 Redis 实例配置
      * key: 实例名称
      * value: 实例配置
@@ -85,5 +90,43 @@ public class MultiRedissonProperties {
          * 是否允许核心线程超时
          */
         private boolean allowCoreThreadTimeOut = false;
+    }
+
+    /**
+     * 双写熔断器配置
+     */
+    @Setter
+    @Getter
+    public static class CircuitBreaker {
+
+        /**
+         * 是否启用熔断器
+         */
+        private boolean enabled = false;
+
+        /**
+         * 失败率阈值（百分比），达到此阈值触发熔断
+         */
+        private double failureRateThreshold = 50.0;
+
+        /**
+         * 滑动窗口大小（毫秒），在此时间窗口内统计失败率
+         */
+        private long slidingWindowSize = 60000;
+
+        /**
+         * 最小请求数量，只有达到此数量才会计算失败率
+         */
+        private int minimumNumberOfCalls = 10;
+
+        /**
+         * 熔断打开状态持续时间（毫秒），之后进入半开状态
+         */
+        private long waitDurationInOpenState = 30000;
+
+        /**
+         * 半开状态下允许通过的请求数量
+         */
+        private int permittedCallsInHalfOpenState = 5;
     }
 }

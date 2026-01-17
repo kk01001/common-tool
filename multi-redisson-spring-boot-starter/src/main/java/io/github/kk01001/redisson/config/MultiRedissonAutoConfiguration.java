@@ -1,8 +1,11 @@
 package io.github.kk01001.redisson.config;
 
+import io.github.kk01001.redisson.circuitbreaker.DualWriteCircuitBreaker;
 import io.github.kk01001.redisson.factory.RedissonClientFactory;
 import io.github.kk01001.redisson.factory.RedissonClientFactoryImpl;
+import io.github.kk01001.redisson.health.RedissonHealthIndicator;
 import io.github.kk01001.redisson.holder.RedissonClientHolder;
+import io.github.kk01001.redisson.monitor.CircuitBreakerEndpoint;
 import io.github.kk01001.redisson.monitor.DualWriteEndpoint;
 import io.github.kk01001.redisson.monitor.DualWriteMetrics;
 import io.github.kk01001.redisson.properties.MultiRedissonProperties;
@@ -164,14 +167,24 @@ public class MultiRedissonAutoConfiguration {
     }
 
     /**
+     * 创建双写熔断器（单例）
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public DualWriteCircuitBreaker dualWriteCircuitBreaker() {
+        return new DualWriteCircuitBreaker(properties.getCircuitBreaker());
+    }
+
+    /**
      * 创建多集群操作模板
      */
     @Bean
     @ConditionalOnMissingBean
     public MultiRedissonTemplate multiRedissonTemplate(RedissonClientHolder holder,
                                                        ExecutorService dualWriteExecutor,
-                                                       DualWriteMetrics metrics) {
-        return new MultiRedissonTemplate(holder, properties, dualWriteExecutor, metrics);
+                                                       DualWriteMetrics metrics,
+                                                       DualWriteCircuitBreaker circuitBreaker) {
+        return new MultiRedissonTemplate(holder, properties, dualWriteExecutor, metrics, circuitBreaker);
     }
 
     /**
@@ -181,8 +194,29 @@ public class MultiRedissonAutoConfiguration {
     @ConditionalOnClass(name = "org.springframework.boot.actuate.endpoint.annotation.Endpoint")
     @ConditionalOnAvailableEndpoint(endpoint = DualWriteEndpoint.class)
     @ConditionalOnMissingBean
-    public DualWriteEndpoint dualWriteEndpoint(DualWriteMetrics metrics) {
-        return new DualWriteEndpoint(metrics);
+    public DualWriteEndpoint dualWriteEndpoint(DualWriteMetrics metrics, DualWriteCircuitBreaker circuitBreaker) {
+        return new DualWriteEndpoint(metrics, circuitBreaker);
+    }
+
+    /**
+     * 创建 Redisson 健康检查指示器
+     */
+    @Bean
+    @ConditionalOnClass(name = "org.springframework.boot.actuate.health.HealthIndicator")
+    @ConditionalOnMissingBean(name = "redissonHealthIndicator")
+    public RedissonHealthIndicator redissonHealthIndicator(RedissonClientHolder holder) {
+        return new RedissonHealthIndicator(holder);
+    }
+
+    /**
+     * 创建熔断器操作端点
+     */
+    @Bean
+    @ConditionalOnClass(name = "org.springframework.boot.actuate.endpoint.annotation.Endpoint")
+    @ConditionalOnAvailableEndpoint(endpoint = CircuitBreakerEndpoint.class)
+    @ConditionalOnMissingBean
+    public CircuitBreakerEndpoint circuitBreakerEndpoint(DualWriteCircuitBreaker circuitBreaker) {
+        return new CircuitBreakerEndpoint(circuitBreaker);
     }
 
     /**

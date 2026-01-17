@@ -1,11 +1,14 @@
 package io.github.kk01001.redisson.monitor;
 
+import io.github.kk01001.redisson.circuitbreaker.DualWriteCircuitBreaker;
 import org.springframework.boot.actuate.endpoint.annotation.DeleteOperation;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,21 +18,23 @@ import java.util.Map;
  * @date 2026-01-15 16:00:00
  * @description 双写监控 Actuator 端点
  * <p>
- * 访问路径：/actuator/dualwrite
+ * 访问路径：/actuator/redissondualwrite
  * </p>
  */
-@Endpoint(id = "dualwrite")
+@Endpoint(id = "redissondualwrite")
 public class DualWriteEndpoint {
 
     private final DualWriteMetrics metrics;
+    private final DualWriteCircuitBreaker circuitBreaker;
 
-    public DualWriteEndpoint(DualWriteMetrics metrics) {
+    public DualWriteEndpoint(DualWriteMetrics metrics, DualWriteCircuitBreaker circuitBreaker) {
         this.metrics = metrics;
+        this.circuitBreaker = circuitBreaker;
     }
 
     /**
      * 获取所有监控信息
-     * GET /actuator/dualwrite
+     * GET /actuator/redissondualwrite
      */
     @ReadOperation
     public Map<String, Object> info() {
@@ -77,12 +82,29 @@ public class DualWriteEndpoint {
         operations.put("failure", metrics.getOperationFailureCount());
         result.put("operations", operations);
 
+        // 熔断器状态
+        if (circuitBreaker != null) {
+            DualWriteCircuitBreaker.CircuitBreakerStats cbStats = circuitBreaker.getStats();
+            Map<String, Object> cb = new LinkedHashMap<>();
+            cb.put("state", cbStats.state().name());
+            cb.put("totalCalls", cbStats.totalCalls());
+            cb.put("successCalls", cbStats.successCalls());
+            cb.put("failureCalls", cbStats.failureCalls());
+            cb.put("failureRate", String.format("%.2f%%", cbStats.failureRate()));
+            if (cbStats.openTimestamp() > 0) {
+                cb.put("openTime", LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(cbStats.openTimestamp()), ZoneId.systemDefault())
+                        .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            }
+            result.put("circuitBreaker", cb);
+        }
+
         return result;
     }
 
     /**
      * 获取指定类型的监控信息
-     * GET /actuator/dualwrite/{type}
+     * GET /actuator/redissondualwrite/{type}
      *
      * @param type overview | threadPool | operations
      */
@@ -121,7 +143,25 @@ public class DualWriteEndpoint {
                 result.put("success", metrics.getOperationSuccessCount());
                 result.put("failure", metrics.getOperationFailureCount());
             }
-            default -> result.put("error", "Unknown type: " + type + ". Available: overview, threadPool, operations");
+            case "circuitBreaker" -> {
+                if (circuitBreaker != null) {
+                    DualWriteCircuitBreaker.CircuitBreakerStats cbStats = circuitBreaker.getStats();
+                    result.put("state", cbStats.state().name());
+                    result.put("totalCalls", cbStats.totalCalls());
+                    result.put("successCalls", cbStats.successCalls());
+                    result.put("failureCalls", cbStats.failureCalls());
+                    result.put("failureRate", String.format("%.2f%%", cbStats.failureRate()));
+                    if (cbStats.openTimestamp() > 0) {
+                        result.put("openTime", LocalDateTime.ofInstant(
+                                        Instant.ofEpochMilli(cbStats.openTimestamp()), ZoneId.systemDefault())
+                                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    }
+                } else {
+                    result.put("message", "Circuit breaker not configured");
+                }
+            }
+            default ->
+                    result.put("error", "Unknown type: " + type + ". Available: overview, threadPool, operations, circuitBreaker");
         }
 
         return result;
@@ -129,7 +169,7 @@ public class DualWriteEndpoint {
 
     /**
      * 重置统计数据
-     * DELETE /actuator/dualwrite
+     * DELETE /actuator/redissondualwrite
      */
     @DeleteOperation
     public Map<String, Object> reset() {
