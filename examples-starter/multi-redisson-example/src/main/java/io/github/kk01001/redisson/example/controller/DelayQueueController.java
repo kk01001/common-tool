@@ -1,8 +1,7 @@
 package io.github.kk01001.redisson.example.controller;
 
+import io.github.kk01001.redisson.template.MultiRedissonTemplate;
 import jakarta.annotation.PreDestroy;
-import org.redisson.api.RScoredSortedSet;
-import org.redisson.api.RedissonClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,22 +34,22 @@ public class DelayQueueController {
     private static final String ZSET_KEY = "demo:delay:zset";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private final RedissonClient redissonClient;
-    
+    private final MultiRedissonTemplate redissonTemplate;
+
     /**
      * 消费者线程（定时轮询）
      */
     private ScheduledExecutorService consumerExecutor;
     private final AtomicBoolean running = new AtomicBoolean(false);
-    
+
     /**
      * 已处理的消息记录
      */
     private final List<ProcessedMessage> processedMessages = new CopyOnWriteArrayList<>();
     private final AtomicLong totalProcessed = new AtomicLong(0);
 
-    public DelayQueueController(RedissonClient redissonClient) {
-        this.redissonClient = redissonClient;
+    public DelayQueueController(MultiRedissonTemplate redissonTemplate) {
+        this.redissonTemplate = redissonTemplate;
     }
 
     @PreDestroy
@@ -70,28 +69,27 @@ public class DelayQueueController {
             @RequestParam String message,
             @RequestParam(defaultValue = "10") long delay,
             @RequestParam(defaultValue = "SECONDS") String unit) {
-        
+
         Map<String, Object> result = new LinkedHashMap<>();
-        
+
         TimeUnit timeUnit = TimeUnit.valueOf(unit.toUpperCase());
         String now = LocalDateTime.now().format(FORMATTER);
         long executeTime = System.currentTimeMillis() + timeUnit.toMillis(delay);
         String expectedTime = LocalDateTime.now().plus(delay, toChronoUnit(timeUnit)).format(FORMATTER);
-        
+
         // 构建消息（包含创建时间和预期执行时间）
         String fullMessage = String.format("%s|%s|%s|%d", message, now, expectedTime, System.nanoTime());
-        
+
         // 添加到 ZSet，score 为执行时间戳
-        RScoredSortedSet<String> zset = redissonClient.getScoredSortedSet(ZSET_KEY);
-        zset.add(executeTime, fullMessage);
-        
+        redissonTemplate.zadd(ZSET_KEY, fullMessage, executeTime);
+
         result.put("success", true);
         result.put("message", message);
         result.put("addTime", now);
         result.put("expectedExecuteTime", expectedTime);
         result.put("delay", delay);
         result.put("unit", unit);
-        
+
         return result;
     }
 
@@ -102,19 +100,18 @@ public class DelayQueueController {
     public Map<String, Object> addOrderTimeout(
             @RequestParam String orderId,
             @RequestParam(defaultValue = "30") long timeoutSeconds) {
-        
+
         Map<String, Object> result = new LinkedHashMap<>();
-        
+
         String now = LocalDateTime.now().format(FORMATTER);
         long executeTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(timeoutSeconds);
         String expectedTime = LocalDateTime.now().plusSeconds(timeoutSeconds).format(FORMATTER);
-        
+
         // 构建订单超时消息
         String message = String.format("ORDER_TIMEOUT|%s|%s|%s|%d", orderId, now, expectedTime, System.nanoTime());
-        
-        RScoredSortedSet<String> zset = redissonClient.getScoredSortedSet(ZSET_KEY);
-        zset.add(executeTime, message);
-        
+
+        redissonTemplate.zadd(ZSET_KEY, message, executeTime);
+
         result.put("success", true);
         result.put("type", "ORDER_TIMEOUT");
         result.put("orderId", orderId);
@@ -122,7 +119,7 @@ public class DelayQueueController {
         result.put("timeoutTime", expectedTime);
         result.put("timeoutSeconds", timeoutSeconds);
         result.put("message", String.format("订单 %s 将在 %d 秒后自动取消（如未支付）", orderId, timeoutSeconds));
-        
+
         return result;
     }
 
@@ -134,25 +131,24 @@ public class DelayQueueController {
             @RequestParam String content,
             @RequestParam String userId,
             @RequestParam(defaultValue = "5") long delaySeconds) {
-        
+
         Map<String, Object> result = new LinkedHashMap<>();
-        
+
         String now = LocalDateTime.now().format(FORMATTER);
         long executeTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(delaySeconds);
         String expectedTime = LocalDateTime.now().plusSeconds(delaySeconds).format(FORMATTER);
-        
+
         String message = String.format("REMINDER|%s|%s|%s|%s|%d", userId, content, now, expectedTime, System.nanoTime());
-        
-        RScoredSortedSet<String> zset = redissonClient.getScoredSortedSet(ZSET_KEY);
-        zset.add(executeTime, message);
-        
+
+        redissonTemplate.zadd(ZSET_KEY, message, executeTime);
+
         result.put("success", true);
         result.put("type", "REMINDER");
         result.put("userId", userId);
         result.put("content", content);
         result.put("createTime", now);
         result.put("reminderTime", expectedTime);
-        
+
         return result;
     }
 
@@ -162,27 +158,27 @@ public class DelayQueueController {
     @PostMapping("/consumer/start")
     public Map<String, Object> startConsumer() {
         Map<String, Object> result = new LinkedHashMap<>();
-        
+
         if (running.get()) {
             result.put("success", false);
             result.put("message", "消费者已在运行中");
             return result;
         }
-        
+
         running.set(true);
         consumerExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "delay-queue-consumer");
             t.setDaemon(true);
             return t;
         });
-        
+
         // 每 500ms 轮询一次
         consumerExecutor.scheduleAtFixedRate(this::pollAndProcess, 0, 500, TimeUnit.MILLISECONDS);
-        
+
         result.put("success", true);
         result.put("message", "消费者已启动（轮询间隔 500ms）");
         result.put("status", "RUNNING");
-        
+
         return result;
     }
 
@@ -192,24 +188,24 @@ public class DelayQueueController {
     @PostMapping("/consumer/stop")
     public Map<String, Object> stopConsumer() {
         Map<String, Object> result = new LinkedHashMap<>();
-        
+
         if (!running.get()) {
             result.put("success", false);
             result.put("message", "消费者未运行");
             return result;
         }
-        
+
         running.set(false);
-        
+
         if (consumerExecutor != null) {
             consumerExecutor.shutdownNow();
             consumerExecutor = null;
         }
-        
+
         result.put("success", true);
         result.put("message", "消费者已停止");
         result.put("status", "STOPPED");
-        
+
         return result;
     }
 
@@ -219,13 +215,11 @@ public class DelayQueueController {
     @GetMapping("/status")
     public Map<String, Object> getStatus() {
         Map<String, Object> result = new LinkedHashMap<>();
-        
-        RScoredSortedSet<String> zset = redissonClient.getScoredSortedSet(ZSET_KEY);
-        
+
         result.put("consumerRunning", running.get());
-        result.put("queueSize", zset.size());
+        result.put("queueSize", redissonTemplate.zcard(ZSET_KEY));
         result.put("totalProcessed", totalProcessed.get());
-        
+
         // 最近处理的消息
         int showCount = Math.min(10, processedMessages.size());
         List<Map<String, Object>> recentMessages = new ArrayList<>();
@@ -238,7 +232,7 @@ public class DelayQueueController {
             recentMessages.add(m);
         }
         result.put("recentProcessed", recentMessages);
-        
+
         return result;
     }
 
@@ -248,13 +242,12 @@ public class DelayQueueController {
     @GetMapping("/pending")
     public Map<String, Object> getPendingMessages() {
         Map<String, Object> result = new LinkedHashMap<>();
-        
-        RScoredSortedSet<String> zset = redissonClient.getScoredSortedSet(ZSET_KEY);
-        Collection<String> pending = zset.valueRange(0, -1);
-        
+
+        Collection<String> pending = redissonTemplate.zgetAll(ZSET_KEY);
+
         result.put("count", pending.size());
         result.put("messages", pending);
-        
+
         return result;
     }
 
@@ -264,15 +257,14 @@ public class DelayQueueController {
     @PostMapping("/clear")
     public Map<String, Object> clearQueue() {
         Map<String, Object> result = new LinkedHashMap<>();
-        
-        RScoredSortedSet<String> zset = redissonClient.getScoredSortedSet(ZSET_KEY);
-        zset.clear();
+
+        redissonTemplate.zclear(ZSET_KEY);
         processedMessages.clear();
         totalProcessed.set(0);
-        
+
         result.put("success", true);
         result.put("message", "队列已清空");
-        
+
         return result;
     }
 
@@ -283,17 +275,16 @@ public class DelayQueueController {
         if (!running.get()) {
             return;
         }
-        
+
         try {
-            RScoredSortedSet<String> zset = redissonClient.getScoredSortedSet(ZSET_KEY);
             long now = System.currentTimeMillis();
-            
+
             // 获取所有到期的消息（score <= 当前时间）
-            Collection<String> expiredMessages = zset.valueRange(0, true, now, true);
-            
+            Collection<String> expiredMessages = redissonTemplate.zrangeByScore(ZSET_KEY, 0, now);
+
             for (String message : expiredMessages) {
                 // 尝试移除（原子操作，防止重复消费）
-                boolean removed = zset.remove(message);
+                boolean removed = redissonTemplate.zremove(ZSET_KEY, message);
                 if (removed) {
                     processMessage(message);
                 }
@@ -309,7 +300,7 @@ public class DelayQueueController {
     private void processMessage(String message) {
         String processedTime = LocalDateTime.now().format(FORMATTER);
         String[] parts = message.split("\\|");
-        
+
         String actualDelay = "N/A";
         if (parts.length >= 3) {
             try {
@@ -322,7 +313,7 @@ public class DelayQueueController {
             } catch (Exception ignored) {
             }
         }
-        
+
         // 根据消息类型处理
         if (message.startsWith("ORDER_TIMEOUT|")) {
             // 处理订单超时
@@ -338,11 +329,11 @@ public class DelayQueueController {
         } else {
             System.out.println("[延迟消息] " + parts[0]);
         }
-        
+
         // 记录处理结果
         processedMessages.add(new ProcessedMessage(message, processedTime, actualDelay));
         totalProcessed.incrementAndGet();
-        
+
         // 保持最近100条记录
         while (processedMessages.size() > 100) {
             processedMessages.remove(0);

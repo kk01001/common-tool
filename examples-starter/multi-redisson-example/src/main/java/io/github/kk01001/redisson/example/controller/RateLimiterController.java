@@ -1,10 +1,7 @@
 package io.github.kk01001.redisson.example.controller;
 
 import io.github.kk01001.redisson.template.MultiRedissonTemplate;
-import org.redisson.api.RRateLimiter;
 import org.redisson.api.RateIntervalUnit;
-import org.redisson.api.RateType;
-import org.redisson.api.RedissonClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,9 +25,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class RateLimiterController {
 
     private static final String RATE_LIMITER_KEY = "demo:ratelimiter:";
-    private static final String COUNTER_KEY = "demo:counter:";
 
-    private final RedissonClient redissonClient;
     private final MultiRedissonTemplate redissonTemplate;
 
     /**
@@ -39,8 +34,7 @@ public class RateLimiterController {
     private final Map<String, AtomicLong> successCount = new ConcurrentHashMap<>();
     private final Map<String, AtomicLong> rejectCount = new ConcurrentHashMap<>();
 
-    public RateLimiterController(RedissonClient redissonClient, MultiRedissonTemplate redissonTemplate) {
-        this.redissonClient = redissonClient;
+    public RateLimiterController(MultiRedissonTemplate redissonTemplate) {
         this.redissonTemplate = redissonTemplate;
     }
 
@@ -50,7 +44,7 @@ public class RateLimiterController {
      * @param name     限流器名称
      * @param rate     速率（每个时间单位允许的请求数）
      * @param interval 时间间隔
-     * @param unit     时间单位（SECOND/MINUTE/HOUR）
+     * @param unit     时间单位（SECONDS/MINUTES/HOURS）
      */
     @PostMapping("/init")
     public Map<String, Object> initRateLimiter(
@@ -61,14 +55,14 @@ public class RateLimiterController {
 
         Map<String, Object> result = new LinkedHashMap<>();
 
-        RRateLimiter rateLimiter = redissonClient.getRateLimiter(RATE_LIMITER_KEY + name);
+        String key = RATE_LIMITER_KEY + name;
 
         // 删除旧配置
-        rateLimiter.delete();
+        redissonTemplate.deleteRateLimiter(key);
 
         // 设置新配置
         RateIntervalUnit rateUnit = RateIntervalUnit.valueOf(unit.toUpperCase());
-        boolean success = rateLimiter.trySetRate(RateType.OVERALL, rate, interval, rateUnit);
+        boolean success = redissonTemplate.trySetRateLimiter(key, rate, interval, rateUnit);
 
         // 重置统计
         successCount.put(name, new AtomicLong(0));
@@ -91,9 +85,9 @@ public class RateLimiterController {
     public Map<String, Object> getConfig(@RequestParam(defaultValue = "api") String name) {
         Map<String, Object> result = new LinkedHashMap<>();
 
-        RRateLimiter rateLimiter = redissonClient.getRateLimiter(RATE_LIMITER_KEY + name);
+        String key = RATE_LIMITER_KEY + name;
 
-        if (!rateLimiter.isExists()) {
+        if (!redissonTemplate.rateLimiterExists(key)) {
             result.put("exists", false);
             result.put("message", "限流器不存在，请先初始化");
             return result;
@@ -101,7 +95,7 @@ public class RateLimiterController {
 
         result.put("exists", true);
         result.put("name", name);
-        result.put("availablePermits", rateLimiter.availablePermits());
+        result.put("availablePermits", redissonTemplate.getRateLimiterAvailablePermits(key));
         result.put("successCount", successCount.getOrDefault(name, new AtomicLong(0)).get());
         result.put("rejectCount", rejectCount.getOrDefault(name, new AtomicLong(0)).get());
 
@@ -109,7 +103,7 @@ public class RateLimiterController {
     }
 
     /**
-     * 尝试获取令牌（非阻塞）
+     * 尝试获取许可
      */
     @PostMapping("/acquire")
     public Map<String, Object> tryAcquire(@RequestParam(defaultValue = "api") String name,
@@ -119,27 +113,27 @@ public class RateLimiterController {
         result.put("name", name);
         result.put("requestedPermits", permits);
 
-        RRateLimiter rateLimiter = redissonClient.getRateLimiter(RATE_LIMITER_KEY + name);
+        String key = RATE_LIMITER_KEY + name;
 
-        if (!rateLimiter.isExists()) {
+        if (!redissonTemplate.rateLimiterExists(key)) {
             result.put("success", false);
             result.put("message", "限流器不存在，请先初始化");
             return result;
         }
 
-        boolean acquired = rateLimiter.tryAcquire(permits);
+        boolean acquired = redissonTemplate.tryAcquireRateLimiter(key, permits);
 
         if (acquired) {
             successCount.computeIfAbsent(name, k -> new AtomicLong(0)).incrementAndGet();
             result.put("success", true);
-            result.put("message", "✅ 获取令牌成功，请求通过");
+            result.put("message", "✅ 获取许可成功");
         } else {
             rejectCount.computeIfAbsent(name, k -> new AtomicLong(0)).incrementAndGet();
             result.put("success", false);
             result.put("message", "❌ 请求被限流，请稍后重试");
         }
 
-        result.put("availablePermits", rateLimiter.availablePermits());
+        result.put("availablePermits", redissonTemplate.getRateLimiterAvailablePermits(key));
         result.put("totalSuccess", successCount.getOrDefault(name, new AtomicLong(0)).get());
         result.put("totalReject", rejectCount.getOrDefault(name, new AtomicLong(0)).get());
 
@@ -147,7 +141,7 @@ public class RateLimiterController {
     }
 
     /**
-     * 模拟 API 请求（带限流）
+     * 模拟 API 调用（带限流）
      */
     @GetMapping("/api-call")
     public Map<String, Object> apiCall(@RequestParam(defaultValue = "api") String name,
@@ -156,23 +150,24 @@ public class RateLimiterController {
         result.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS")));
         result.put("userId", userId);
 
-        RRateLimiter rateLimiter = redissonClient.getRateLimiter(RATE_LIMITER_KEY + name);
+        String key = RATE_LIMITER_KEY + name;
 
-        if (!rateLimiter.isExists()) {
+        if (!redissonTemplate.rateLimiterExists(key)) {
             // 默认初始化：每秒10个请求
-            rateLimiter.trySetRate(RateType.OVERALL, 10, 1, RateIntervalUnit.SECONDS);
+            redissonTemplate.trySetRateLimiter(key, 10, 1, RateIntervalUnit.SECONDS);
         }
 
-        if (rateLimiter.tryAcquire()) {
+        if (redissonTemplate.tryAcquireRateLimiter(key)) {
             successCount.computeIfAbsent(name, k -> new AtomicLong(0)).incrementAndGet();
 
             // 模拟业务处理
             result.put("success", true);
-            result.put("message", "API 调用成功");
+            result.put("code", 200);
+            result.put("message", "请求成功");
             result.put("data", Map.of(
                     "userId", userId,
-                    "processTime", System.currentTimeMillis(),
-                    "result", "业务处理完成"
+                    "timestamp", System.currentTimeMillis(),
+                    "info", "这是模拟的业务数据"
             ));
         } else {
             rejectCount.computeIfAbsent(name, k -> new AtomicLong(0)).incrementAndGet();
@@ -186,7 +181,7 @@ public class RateLimiterController {
     }
 
     /**
-     * 用户级别限流（每个用户独立限流）
+     * 用户级别限流
      */
     @PostMapping("/user-limit")
     public Map<String, Object> userRateLimit(@RequestParam String userId,
@@ -196,22 +191,20 @@ public class RateLimiterController {
         result.put("userId", userId);
 
         String userLimiterKey = RATE_LIMITER_KEY + "user:" + userId;
-        RRateLimiter rateLimiter = redissonClient.getRateLimiter(userLimiterKey);
 
         // 为每个用户设置独立限流：每秒 rate 个请求
-        if (!rateLimiter.isExists()) {
-            rateLimiter.trySetRate(RateType.OVERALL, rate, 1, RateIntervalUnit.SECONDS);
+        if (!redissonTemplate.rateLimiterExists(userLimiterKey)) {
+            redissonTemplate.trySetRateLimiter(userLimiterKey, rate, 1, RateIntervalUnit.SECONDS);
             result.put("initialized", true);
         }
 
-        if (rateLimiter.tryAcquire()) {
+        if (redissonTemplate.tryAcquireRateLimiter(userLimiterKey)) {
             result.put("success", true);
-            result.put("message", "用户请求通过");
-            result.put("availablePermits", rateLimiter.availablePermits());
+            result.put("message", "请求成功");
         } else {
             result.put("success", false);
-            result.put("message", "用户 " + userId + " 请求过于频繁");
-            result.put("availablePermits", rateLimiter.availablePermits());
+            result.put("message", String.format("用户 %s 请求过于频繁", userId));
+            result.put("availablePermits", redissonTemplate.getRateLimiterAvailablePermits(userLimiterKey));
         }
 
         return result;

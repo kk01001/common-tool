@@ -277,6 +277,10 @@
         <button class="nav-tab" onclick="showTab('ratelimiter')">⏱️ 限流器</button>
         <button class="nav-tab" onclick="showTab('bloom')">🌸 布隆过滤器</button>
         <button class="nav-tab" onclick="showTab('delay')">⏰ 延迟队列</button>
+        <button class="nav-tab" onclick="showTab('semaphore')">🚦 信号量</button>
+        <button class="nav-tab" onclick="showTab('pubsub')">📢 发布订阅</button>
+        <button class="nav-tab" onclick="showTab('geo')">📍 地理位置</button>
+        <button class="nav-tab" onclick="showTab('signin')">📅 签到系统</button>
     </div>
 
     <!-- 秒杀/分布式锁 -->
@@ -566,6 +570,252 @@
             </div>
         </div>
     </div>
+
+    <!-- 信号量 -->
+    <div id="tab-semaphore" class="tab-content">
+        <div class="grid-2">
+            <div class="card">
+                <h2>🚦 分布式信号量 Demo</h2>
+                <div class="alert alert-info">
+                    演示使用信号量控制并发资源访问，如停车场车位管理
+                </div>
+
+                <h3>1. 初始化停车场</h3>
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label>车位数量</label>
+                        <input type="number" id="parking-spaces" value="5">
+                    </div>
+                    <button class="btn btn-primary" onclick="initParking()">初始化停车场</button>
+                </div>
+
+                <h3>2. 车辆进出</h3>
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label>车牌号</label>
+                        <input type="text" id="car-number" value="京A12345">
+                    </div>
+                    <button class="btn btn-success" onclick="parkingEnter()">🚗 车辆入场</button>
+                    <button class="btn btn-warning" onclick="parkingExit()">🚙 车辆出场</button>
+                </div>
+
+                <h3>3. 批量测试</h3>
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label>车辆数</label>
+                        <input type="number" id="parking-batch" value="8">
+                    </div>
+                    <button class="btn btn-danger" onclick="batchParking()">批量入场测试</button>
+                </div>
+
+                <div class="result-box" id="semaphore-result">等待操作...</div>
+            </div>
+
+            <div class="card">
+                <h2>📊 停车场状态</h2>
+                <button class="btn btn-info" onclick="getParkingStatus()">刷新状态</button>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="value" id="parking-available">-</div>
+                        <div class="label">空余车位</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning" id="parking-message">请先初始化停车场</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 发布订阅 -->
+    <div id="tab-pubsub" class="tab-content">
+        <div class="grid-2">
+            <div class="card">
+                <h2>📢 发布订阅 Demo</h2>
+                <div class="alert alert-info">
+                    演示 Redis 发布订阅实现实时消息推送
+                </div>
+
+                <h3>1. 订阅主题</h3>
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label>主题</label>
+                        <input type="text" id="pubsub-topic" value="news">
+                    </div>
+                    <div class="form-group">
+                        <label>订阅者</label>
+                        <input type="text" id="pubsub-subscriber" value="user1">
+                    </div>
+                    <button class="btn btn-success" onclick="subscribe()">订阅</button>
+                    <button class="btn btn-warning" onclick="unsubscribe()">取消订阅</button>
+                </div>
+
+                <h3>2. 发布消息</h3>
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label>消息内容</label>
+                        <input type="text" id="pubsub-message" value="Hello World!">
+                    </div>
+                    <button class="btn btn-primary" onclick="publish()">📤 发布消息</button>
+                    <button class="btn btn-info" onclick="publishBatch()">批量发布(5条)</button>
+                </div>
+
+                <div class="result-box" id="pubsub-result">等待操作...</div>
+            </div>
+
+            <div class="card">
+                <h2>📨 接收的消息</h2>
+                <button class="btn btn-info" onclick="getMessages()">刷新消息</button>
+                <button class="btn btn-danger" onclick="clearPubSub()">清空记录</button>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="value" id="pubsub-published">0</div>
+                        <div class="label">已发布</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="value" id="pubsub-received">0</div>
+                        <div class="label">已接收</div>
+                    </div>
+                </div>
+
+                <h3>消息列表</h3>
+                <ul class="list-group" id="pubsub-messages">
+                    <li>暂无消息</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 地理位置 -->
+    <div id="tab-geo" class="tab-content">
+        <div class="grid-2">
+            <div class="card">
+                <h2>📍 地理位置 Demo</h2>
+                <div class="alert alert-info">
+                    演示附近的商家/人搜索功能
+                </div>
+
+                <h3>1. 初始化测试数据</h3>
+                <button class="btn btn-primary" onclick="initShops()">初始化北京商家数据</button>
+
+                <h3>2. 搜索附近商家</h3>
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label>经度</label>
+                        <input type="number" step="0.000001" id="geo-longitude" value="116.397428">
+                    </div>
+                    <div class="form-group">
+                        <label>纬度</label>
+                        <input type="number" step="0.000001" id="geo-latitude" value="39.90923">
+                    </div>
+                    <div class="form-group">
+                        <label>半径(km)</label>
+                        <input type="number" id="geo-radius" value="5">
+                    </div>
+                    <button class="btn btn-success" onclick="searchNearby()">🔍 搜索</button>
+                </div>
+
+                <h3>3. 基于商家搜索</h3>
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label>商家名称</label>
+                        <select id="geo-shop-name">
+                            <option value="天安门广场">天安门广场</option>
+                            <option value="王府井商城">王府井商城</option>
+                            <option value="望京SOHO">望京SOHO</option>
+                            <option value="三里屯太古里">三里屯太古里</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-info" onclick="searchNearbyMember()">搜索附近商家</button>
+                </div>
+
+                <h3>4. 计算距离</h3>
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label>商家1</label>
+                        <input type="text" id="geo-from" value="天安门广场">
+                    </div>
+                    <div class="form-group">
+                        <label>商家2</label>
+                        <input type="text" id="geo-to" value="王府井商城">
+                    </div>
+                    <button class="btn btn-warning" onclick="calcDistance()">📏 计算距离</button>
+                </div>
+
+                <div class="result-box" id="geo-result">等待操作...</div>
+            </div>
+
+            <div class="card">
+                <h2>🗺️ 商家列表</h2>
+                <button class="btn btn-info" onclick="listShops()">刷新列表</button>
+
+                <ul class="list-group" id="geo-shops">
+                    <li>请先初始化数据</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 签到系统 -->
+    <div id="tab-signin" class="tab-content">
+        <div class="grid-2">
+            <div class="card">
+                <h2>📅 签到系统 Demo</h2>
+                <div class="alert alert-info">
+                    演示基于 BitSet 的高效签到功能
+                </div>
+
+                <h3>1. 用户签到</h3>
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label>用户ID</label>
+                        <input type="text" id="signin-userId" value="user001">
+                    </div>
+                    <button class="btn btn-success" onclick="signIn()">✅ 签到</button>
+                </div>
+
+                <h3>2. 补签（7天内）</h3>
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label>补签日期</label>
+                        <input type="date" id="signin-retroDate">
+                    </div>
+                    <button class="btn btn-warning" onclick="retroactiveSignIn()">📝 补签</button>
+                </div>
+
+                <h3>3. 查询签到</h3>
+                <div class="btn-group">
+                    <button class="btn btn-info" onclick="getMonthlyStats()">📊 本月统计</button>
+                    <button class="btn btn-info" onclick="getConsecutiveDays()">🔥 连续签到</button>
+                    <button class="btn btn-danger" onclick="resetSignIn()">重置签到</button>
+                </div>
+
+                <div class="result-box" id="signin-result">等待操作...</div>
+            </div>
+
+            <div class="card">
+                <h2>📊 签到状态</h2>
+                <button class="btn btn-info" onclick="getMonthlyStats()">刷新状态</button>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="value" id="signin-monthly">0</div>
+                        <div class="label">本月签到</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="value" id="signin-consecutive">0</div>
+                        <div class="label">连续签到</div>
+                    </div>
+                </div>
+
+                <h3>签到日历</h3>
+                <div id="signin-calendar" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px;">
+                    <!-- 日历将动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -829,6 +1079,199 @@
             getDelayStatus();
         }
     }, 2000);
+
+    // ========== 信号量 Demo ==========
+    async function initParking() {
+        const spaces = document.getElementById('parking-spaces').value;
+        const result = await request('/api/semaphore/parking/init', 'POST', {spaces});
+        document.getElementById('semaphore-result').textContent = JSON.stringify(result, null, 2);
+        getParkingStatus();
+    }
+
+    async function parkingEnter() {
+        const carNumber = document.getElementById('car-number').value;
+        const result = await request('/api/semaphore/parking/enter', 'POST', {carNumber});
+        document.getElementById('semaphore-result').textContent = JSON.stringify(result, null, 2);
+        getParkingStatus();
+    }
+
+    async function parkingExit() {
+        const carNumber = document.getElementById('car-number').value;
+        const result = await request('/api/semaphore/parking/exit', 'POST', {carNumber});
+        document.getElementById('semaphore-result').textContent = JSON.stringify(result, null, 2);
+        getParkingStatus();
+    }
+
+    async function batchParking() {
+        const count = parseInt(document.getElementById('parking-batch').value);
+        const results = [];
+        for (let i = 1; i <= count; i++) {
+            const result = await request('/api/semaphore/parking/enter', 'POST', {carNumber: '测试车辆' + i});
+            results.push({car: '测试车辆' + i, success: result.success, message: result.message});
+        }
+        document.getElementById('semaphore-result').textContent = JSON.stringify(results, null, 2);
+        getParkingStatus();
+    }
+
+    async function getParkingStatus() {
+        const result = await request('/api/semaphore/parking/status');
+        document.getElementById('parking-available').textContent = result.availableSpaces;
+        document.getElementById('parking-message').textContent = result.message;
+    }
+
+    // ========== 发布订阅 Demo ==========
+    async function subscribe() {
+        const topic = document.getElementById('pubsub-topic').value;
+        const subscriber = document.getElementById('pubsub-subscriber').value;
+        const result = await request('/api/pubsub/subscribe', 'POST', {topic, subscriber});
+        document.getElementById('pubsub-result').textContent = JSON.stringify(result, null, 2);
+    }
+
+    async function unsubscribe() {
+        const topic = document.getElementById('pubsub-topic').value;
+        const subscriber = document.getElementById('pubsub-subscriber').value;
+        const result = await request('/api/pubsub/unsubscribe', 'POST', {topic, subscriber});
+        document.getElementById('pubsub-result').textContent = JSON.stringify(result, null, 2);
+    }
+
+    async function publish() {
+        const topic = document.getElementById('pubsub-topic').value;
+        const message = document.getElementById('pubsub-message').value;
+        const result = await request('/api/pubsub/publish', 'POST', {topic, message});
+        document.getElementById('pubsub-result').textContent = JSON.stringify(result, null, 2);
+        setTimeout(getMessages, 500);
+    }
+
+    async function publishBatch() {
+        const topic = document.getElementById('pubsub-topic').value;
+        const result = await request('/api/pubsub/publish/batch', 'POST', {topic, count: 5});
+        document.getElementById('pubsub-result').textContent = JSON.stringify(result, null, 2);
+        setTimeout(getMessages, 500);
+    }
+
+    async function getMessages() {
+        const topic = document.getElementById('pubsub-topic').value;
+        const result = await request('/api/pubsub/messages?topic=' + topic);
+        const topicsResult = await request('/api/pubsub/topics');
+
+        document.getElementById('pubsub-published').textContent = topicsResult.totalPublished || 0;
+        document.getElementById('pubsub-received').textContent = topicsResult.totalReceived || 0;
+
+        const list = document.getElementById('pubsub-messages');
+        if (result.messages && result.messages.length > 0) {
+            list.innerHTML = result.messages.map(m =>
+                `<li><b>[${m.subscriber}]</b> ${m.receiveTime}<br>${m.message}</li>`
+            ).join('');
+        } else {
+            list.innerHTML = '<li>暂无消息</li>';
+        }
+    }
+
+    async function clearPubSub() {
+        await request('/api/pubsub/clear', 'POST');
+        getMessages();
+    }
+
+    // ========== 地理位置 Demo ==========
+    async function initShops() {
+        const result = await request('/api/geo/shops/init', 'POST');
+        document.getElementById('geo-result').textContent = JSON.stringify(result, null, 2);
+        listShops();
+    }
+
+    async function searchNearby() {
+        const longitude = document.getElementById('geo-longitude').value;
+        const latitude = document.getElementById('geo-latitude').value;
+        const radius = document.getElementById('geo-radius').value;
+        const result = await request(`/api/geo/nearby?longitude=${longitude}&latitude=${latitude}&radius=${radius}&unit=KILOMETERS`);
+        document.getElementById('geo-result').textContent = JSON.stringify(result, null, 2);
+    }
+
+    async function searchNearbyMember() {
+        const name = document.getElementById('geo-shop-name').value;
+        const radius = document.getElementById('geo-radius').value;
+        const result = await request(`/api/geo/nearby/member?name=${encodeURIComponent(name)}&radius=${radius}&unit=KILOMETERS`);
+        document.getElementById('geo-result').textContent = JSON.stringify(result, null, 2);
+    }
+
+    async function calcDistance() {
+        const name1 = document.getElementById('geo-from').value;
+        const name2 = document.getElementById('geo-to').value;
+        const result = await request(`/api/geo/distance?name1=${encodeURIComponent(name1)}&name2=${encodeURIComponent(name2)}&unit=METERS`);
+        document.getElementById('geo-result').textContent = JSON.stringify(result, null, 2);
+    }
+
+    async function listShops() {
+        const result = await request('/api/geo/list?type=shops');
+        const list = document.getElementById('geo-shops');
+        if (result.locations && result.locations.length > 0) {
+            list.innerHTML = result.locations.map(l =>
+                `<li><b>${l.name}</b><br><small>经度: ${l.longitude.toFixed(6)}, 纬度: ${l.latitude.toFixed(6)}</small></li>`
+            ).join('');
+        } else {
+            list.innerHTML = '<li>暂无数据</li>';
+        }
+    }
+
+    // ========== 签到系统 Demo ==========
+    async function signIn() {
+        const userId = document.getElementById('signin-userId').value;
+        const result = await request('/api/signin/checkin', 'POST', {userId});
+        document.getElementById('signin-result').textContent = JSON.stringify(result, null, 2);
+        getMonthlyStats();
+        getConsecutiveDays();
+    }
+
+    async function retroactiveSignIn() {
+        const userId = document.getElementById('signin-userId').value;
+        const date = document.getElementById('signin-retroDate').value;
+        if (!date) {
+            alert('请选择补签日期');
+            return;
+        }
+        const result = await request('/api/signin/retroactive', 'POST', {userId, date});
+        document.getElementById('signin-result').textContent = JSON.stringify(result, null, 2);
+        getMonthlyStats();
+    }
+
+    async function getMonthlyStats() {
+        const userId = document.getElementById('signin-userId').value;
+        const result = await request('/api/signin/monthly?userId=' + userId);
+        document.getElementById('signin-result').textContent = JSON.stringify(result, null, 2);
+        document.getElementById('signin-monthly').textContent = result.signedDays || 0;
+
+        // 渲染日历
+        const calendar = document.getElementById('signin-calendar');
+        if (result.calendar && result.calendar.length > 0) {
+            calendar.innerHTML = result.calendar.map(day => {
+                const style = day.signed
+                    ? 'background: #4CAF50; color: white;'
+                    : 'background: #f0f0f0; color: #666;';
+                return `<div style="${style} padding: 8px; text-align: center; border-radius: 4px;">${day.day}</div>`;
+            }).join('');
+        }
+    }
+
+    async function getConsecutiveDays() {
+        const userId = document.getElementById('signin-userId').value;
+        const result = await request('/api/signin/consecutive?userId=' + userId);
+        document.getElementById('signin-consecutive').textContent = result.consecutiveDays || 0;
+    }
+
+    async function resetSignIn() {
+        const userId = document.getElementById('signin-userId').value;
+        const result = await request('/api/signin/reset', 'POST', {userId});
+        document.getElementById('signin-result').textContent = JSON.stringify(result, null, 2);
+        getMonthlyStats();
+        getConsecutiveDays();
+    }
+
+    // 设置默认补签日期为昨天
+    document.addEventListener('DOMContentLoaded', () => {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        document.getElementById('signin-retroDate').value = yesterday.toISOString().split('T')[0];
+    });
 </script>
 </body>
 </html>

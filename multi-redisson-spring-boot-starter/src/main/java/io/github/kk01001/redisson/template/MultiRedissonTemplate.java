@@ -23,6 +23,8 @@ import org.redisson.api.RMap;
 import org.redisson.api.RReadWriteLock;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RSet;
+import org.redisson.api.RateIntervalUnit;
+import org.redisson.api.RateType;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.geo.GeoSearchArgs;
 import org.redisson.client.codec.Codec;
@@ -942,10 +944,11 @@ public class MultiRedissonTemplate {
      * 搜索指定位置附近的成员（带距离）
      */
     public <V> Map<V, Double> searchGeoWithDistance(String key, double longitude, double latitude,
-                                                    double radius, GeoUnit unit) {
+                                                    double radius, GeoUnit unit, int count) {
         RGeo<V> geo = primaryClient.getGeo(key);
         return geo.searchWithDistance(GeoSearchArgs.from(longitude, latitude)
                 .radius(radius, unit)
+                .count(count)
                 .order(GeoOrder.ASC));
     }
 
@@ -1396,6 +1399,277 @@ public class MultiRedissonTemplate {
      */
     public long getExpire(String key) {
         return primaryClient.getBucket(key).remainTimeToLive();
+    }
+
+    // ====================== 信号量操作 ======================
+
+    /**
+     * 初始化信号量许可数量
+     *
+     * @param key     信号量 key
+     * @param permits 许可数量
+     * @return 是否设置成功
+     */
+    public boolean trySetSemaphorePermits(String key, int permits) {
+        return primaryClient.getSemaphore(key).trySetPermits(permits);
+    }
+
+    /**
+     * 获取信号量可用许可数
+     *
+     * @param key 信号量 key
+     * @return 可用许可数
+     */
+    public int getSemaphoreAvailablePermits(String key) {
+        return primaryClient.getSemaphore(key).availablePermits();
+    }
+
+    /**
+     * 尝试获取信号量许可（非阻塞）
+     *
+     * @param key 信号量 key
+     * @return 是否获取成功
+     */
+    public boolean tryAcquireSemaphore(String key) {
+        return primaryClient.getSemaphore(key).tryAcquire();
+    }
+
+    /**
+     * 尝试获取信号量许可（带超时）
+     *
+     * @param key      信号量 key
+     * @param waitTime 等待时间
+     * @param unit     时间单位
+     * @return 是否获取成功
+     */
+    public boolean tryAcquireSemaphore(String key, long waitTime, TimeUnit unit) throws InterruptedException {
+        return primaryClient.getSemaphore(key).tryAcquire(waitTime, unit);
+    }
+
+    /**
+     * 尝试获取多个信号量许可（带超时）
+     *
+     * @param key      信号量 key
+     * @param permits  许可数量
+     * @param waitTime 等待时间
+     * @param unit     时间单位
+     * @return 是否获取成功
+     */
+    public boolean tryAcquireSemaphore(String key, int permits, long waitTime, TimeUnit unit) throws InterruptedException {
+        return primaryClient.getSemaphore(key).tryAcquire(permits, waitTime, unit);
+    }
+
+    /**
+     * 释放信号量许可
+     *
+     * @param key 信号量 key
+     */
+    public void releaseSemaphore(String key) {
+        primaryClient.getSemaphore(key).release();
+    }
+
+    /**
+     * 释放多个信号量许可
+     *
+     * @param key     信号量 key
+     * @param permits 许可数量
+     */
+    public void releaseSemaphore(String key, int permits) {
+        primaryClient.getSemaphore(key).release(permits);
+    }
+
+    /**
+     * 获取可过期信号量的许可（到期自动释放）
+     *
+     * @param key       信号量 key
+     * @param waitTime  等待时间
+     * @param leaseTime 租约时间（到期自动释放）
+     * @param unit      时间单位
+     * @return 许可ID（用于手动释放），获取失败返回 null
+     */
+    public String tryAcquireExpirableSemaphore(String key, long waitTime, long leaseTime, TimeUnit unit) throws InterruptedException {
+        return primaryClient.getPermitExpirableSemaphore(key).tryAcquire(waitTime, leaseTime, unit);
+    }
+
+    /**
+     * 初始化可过期信号量的许可数量
+     *
+     * @param key     信号量 key
+     * @param permits 许可数量
+     * @return 是否设置成功
+     */
+    public boolean trySetExpirableSemaphorePermits(String key, int permits) {
+        return primaryClient.getPermitExpirableSemaphore(key).trySetPermits(permits);
+    }
+
+    /**
+     * 释放可过期信号量的许可
+     *
+     * @param key      信号量 key
+     * @param permitId 许可ID
+     */
+    public void releaseExpirableSemaphore(String key, String permitId) {
+        primaryClient.getPermitExpirableSemaphore(key).release(permitId);
+    }
+
+    // ====================== 发布订阅操作 ======================
+
+    /**
+     * 发布消息到主题
+     *
+     * @param topic   主题名称
+     * @param message 消息内容
+     * @return 接收到消息的订阅者数量
+     */
+    public <T> long publish(String topic, T message) {
+        return primaryClient.getTopic(topic).publish(message);
+    }
+
+    /**
+     * 订阅主题
+     *
+     * @param topic    主题名称
+     * @param type     消息类型
+     * @param listener 消息监听器
+     * @return 监听器ID（用于取消订阅）
+     */
+    public <T> int subscribe(String topic, Class<T> type, java.util.function.BiConsumer<CharSequence, T> listener) {
+        return primaryClient.getTopic(topic).addListener(type, (channel, msg) -> listener.accept(channel, msg));
+    }
+
+    /**
+     * 取消订阅
+     *
+     * @param topic      主题名称
+     * @param listenerId 监听器ID
+     */
+    public void unsubscribe(String topic, int listenerId) {
+        primaryClient.getTopic(topic).removeListener(listenerId);
+    }
+
+    /**
+     * 获取主题的订阅者数量
+     *
+     * @param topic 主题名称
+     * @return 订阅者数量
+     */
+    public int countSubscribers(String topic) {
+        return primaryClient.getTopic(topic).countListeners();
+    }
+
+    // ====================== 限流器操作 ======================
+
+    /**
+     * 初始化限流器
+     *
+     * @param key      限流器 key
+     * @param rate     速率
+     * @param interval 时间间隔
+     * @param unit     时间单位
+     * @return 是否设置成功
+     */
+    public boolean trySetRateLimiter(String key, long rate, long interval, RateIntervalUnit unit) {
+        return primaryClient.getRateLimiter(key).trySetRate(RateType.OVERALL, rate, interval, unit);
+    }
+
+    /**
+     * 尝试获取限流器许可（非阻塞）
+     *
+     * @param key 限流器 key
+     * @return 是否获取成功
+     */
+    public boolean tryAcquireRateLimiter(String key) {
+        return primaryClient.getRateLimiter(key).tryAcquire();
+    }
+
+    /**
+     * 尝试获取多个限流器许可（非阻塞）
+     *
+     * @param key     限流器 key
+     * @param permits 许可数量
+     * @return 是否获取成功
+     */
+    public boolean tryAcquireRateLimiter(String key, long permits) {
+        return primaryClient.getRateLimiter(key).tryAcquire(permits);
+    }
+
+    /**
+     * 获取限流器可用许可数
+     *
+     * @param key 限流器 key
+     * @return 可用许可数
+     */
+    public long getRateLimiterAvailablePermits(String key) {
+        return primaryClient.getRateLimiter(key).availablePermits();
+    }
+
+    /**
+     * 检查限流器是否存在
+     *
+     * @param key 限流器 key
+     * @return 是否存在
+     */
+    public boolean rateLimiterExists(String key) {
+        return primaryClient.getRateLimiter(key).isExists();
+    }
+
+    /**
+     * 删除限流器
+     *
+     * @param key 限流器 key
+     * @return 是否删除成功
+     */
+    public boolean deleteRateLimiter(String key) {
+        return primaryClient.getRateLimiter(key).delete();
+    }
+
+    // ====================== ZSet 扩展操作（延迟队列用） ======================
+
+    /**
+     * 获取指定分数范围内的元素数量
+     *
+     * @param key 键
+     * @param min 最小分数
+     * @param max 最大分数
+     * @return 元素数量
+     */
+    public int zcount(String key, double min, double max) {
+        return primaryClient.getScoredSortedSet(key).count(min, true, max, true);
+    }
+
+    /**
+     * 移除 ZSet 中的元素
+     *
+     * @param key    键
+     * @param member 元素
+     * @return 是否移除成功
+     */
+    public <V> boolean zremove(String key, V member) {
+        return write(() -> primaryClient.getScoredSortedSet(key).remove(member),
+                () -> secondaryClient.getScoredSortedSet(key).remove(member),
+                "zremove");
+    }
+
+    /**
+     * 获取 ZSet 所有元素
+     *
+     * @param key 键
+     * @return 元素集合
+     */
+    public <V> Collection<V> zgetAll(String key) {
+        return primaryClient.<V>getScoredSortedSet(key).readAll();
+    }
+
+    /**
+     * 清空 ZSet
+     *
+     * @param key 键
+     * @return 是否成功
+     */
+    public boolean zclear(String key) {
+        return write(() -> primaryClient.getScoredSortedSet(key).delete(),
+                () -> secondaryClient.getScoredSortedSet(key).delete(),
+                "zclear");
     }
 
     // ====================== 私有方法 ======================
