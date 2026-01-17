@@ -7,6 +7,10 @@ Redisson 多集群自动配置组件，支持一个 Spring Boot 服务连接多�
 - ✅ **多实例支持**：支持配置任意数量的 Redis 实例
 - ✅ **多模式支持**：支持单机（Single）、哨兵（Sentinel）、主从（Master-Slave）、集群（Cluster）四种模式
 - ✅ **双写支持**：支持双机房双写，备份集群异步写入
+- ✅ **双写熔断**：支持熔断降级，备份集群故障时自动熔断，防止雪崩
+- ✅ **健康检查**：集成 Spring Boot Actuator HealthIndicator
+- ✅ **批量操作**：支持 Redis Pipeline 批量操作
+- ✅ **动态配置**：支持 Nacos 等配置中心动态刷新配置
 - ✅ **完整配置**：覆盖 Redisson 所有常用配置项
 - ✅ **灵活注入**：支持 `@Primary`、`@Qualifier`、`RedissonClientHolder` 三种方式获取客户端
 - ✅ **统一操作模板**：`MultiRedissonTemplate` 封装双写逻辑，对业务透明
@@ -91,7 +95,7 @@ redisson:
           database: 0
 ```
 
-#### 双机房双写配置
+#### 双机房双写配置（含熔断）
 
 ```yaml
 redisson:
@@ -111,6 +115,20 @@ redisson:
       keep-alive-seconds: 60
       thread-name-prefix: dual-write-
       allow-core-thread-time-out: false
+    
+    # 熔断器配置
+    circuit-breaker:
+      enabled: true
+      # 失败率阈值（百分比）
+      failure-rate-threshold: 50
+      # 滑动窗口大小
+      sliding-window-size: 100
+      # 最小调用次数（达到后才计算失败率）
+      minimum-number-of-calls: 10
+      # 熔断开启后等待时间（毫秒）
+      wait-duration-in-open-state: 60000
+      # 半开状态允许的调用次数
+      permitted-calls-in-half-open-state: 10
     
     instances:
       # 机房A - 主集群
@@ -237,6 +255,40 @@ public class RedisService {
 }
 ```
 
+#### 方式三：使用批量操作
+
+```java
+@Service
+public class BatchService {
+    
+    @Autowired
+    private MultiRedissonTemplate redissonTemplate;
+    
+    public void batchDemo() {
+        // 使用 Pipeline 批量操作
+        redissonTemplate.batch().execute(batch -> {
+            // 批量设置
+            RBucketAsync<String> bucket1 = batch.getBucket("key1");
+            RBucketAsync<String> bucket2 = batch.getBucket("key2");
+            bucket1.setAsync("value1");
+            bucket2.setAsync("value2");
+            
+            // 批量 Hash 操作
+            RMapAsync<String, String> map = batch.getMap("myMap");
+            map.putAsync("field1", "value1");
+            map.putAsync("field2", "value2");
+        });
+        
+        // 带返回值的批量操作
+        BatchResult<?> result = redissonTemplate.batch().executeWithResult(batch -> {
+            batch.getBucket("key1").getAsync();
+            batch.getBucket("key2").getAsync();
+        });
+        List<?> responses = result.getResponses();
+    }
+}
+```
+
 ## 双写特性说明
 
 ### 工作原理
@@ -255,11 +307,34 @@ public class RedisService {
 | `pollFirst/pollLast` | 弹出队首/队尾元素 | 删除该指定元素 |
 | `takeBlockingQueue` | 阻塞取出元素 | 删除该指定元素 |
 
+### 双写熔断机制
+
+当备份集群出现故障时，熔断器会自动触发保护机制：
+
+**熔断状态流转：**
+
+```
+CLOSED (正常) ──失败率超阈值──> OPEN (熔断)
+    ↑                              │
+    │                         等待超时
+    │                              ↓
+    └───探测成功───── HALF_OPEN (半开)
+```
+
+**状态说明：**
+
+| 状态 | 说明 |
+|------|------|
+| `CLOSED` | 正常状态，双写正常执行 |
+| `OPEN` | 熔断状态，跳过备份集群写入 |
+| `HALF_OPEN` | 半开状态，允许少量请求探测备份集群 |
+
 ### 双写失败处理
 
 - 备份集群写入失败不影响主流程
 - 失败会记录错误日志，可配合监控告警
 - 线程池满时使用 `CallerRunsPolicy`，由调用线程执行
+- 熔断开启后自动跳过备份集群写入，避免资源浪费
 
 ## 配置说明
 
@@ -282,6 +357,17 @@ public class RedisService {
 | `dual-write-thread-pool.keep-alive-seconds` | 线程空闲时间（秒） | `60` |
 | `dual-write-thread-pool.thread-name-prefix` | 线程名称前缀 | `dual-write-` |
 | `dual-write-thread-pool.allow-core-thread-time-out` | 是否允许核心线程超时 | `false` |
+
+### 熔断器配置
+
+| 配置项 | 说明 | 默认值 |
+|--------|------|--------|
+| `circuit-breaker.enabled` | 是否启用熔断器 | `false` |
+| `circuit-breaker.failure-rate-threshold` | 失败率阈值（百分比） | `50` |
+| `circuit-breaker.sliding-window-size` | 滑动窗口大小 | `100` |
+| `circuit-breaker.minimum-number-of-calls` | 最小调用次数 | `10` |
+| `circuit-breaker.wait-duration-in-open-state` | 熔断等待时间（毫秒） | `60000` |
+| `circuit-breaker.permitted-calls-in-half-open-state` | 半开状态允许调用次数 | `10` |
 
 ### 实例通用配置
 
@@ -308,7 +394,6 @@ public class RedisService {
 | `connectTimeout` | 连接超时（毫秒） | `10000` |
 | `timeout` | 命令超时（毫秒） | `3000` |
 | `retryAttempts` | 重试次数 | `3` |
-| `retryInterval` | 重试间隔（毫秒） | `1500` |
 
 ### 哨兵模式配置 (sentinel)
 
@@ -384,6 +469,17 @@ public class RedisService {
 | `spop(key)` | 随机弹出元素 | ✅ (特殊) |
 | `spop(key, count)` | 随机弹出多个元素 | ✅ (特殊) |
 
+### List 操作
+
+| 方法 | 说明 | 双写 |
+|------|------|------|
+| `lpush(key, values...)` | 从左侧插入 | ✅ |
+| `rpush(key, values...)` | 从右侧插入 | ✅ |
+| `lpop(key)` | 从左侧弹出 | ✅ |
+| `rpop(key)` | 从右侧弹出 | ✅ |
+| `lrange(key, start, end)` | 获取范围元素 | ❌ |
+| `llen(key)` | 获取列表长度 | ❌ |
+
 ### ZSet 操作
 
 | 方法 | 说明 | 双写 |
@@ -405,6 +501,15 @@ public class RedisService {
 | `exists(key)` | 判断是否存在 | ❌ |
 | `getExpire(key)` | 获取过期时间 | ❌ |
 
+### 批量操作
+
+| 方法 | 说明 |
+|------|------|
+| `batch()` | 获取批量操作实例 |
+| `batch().execute(consumer)` | 执行批量操作（无返回值） |
+| `batch().executeWithResult(consumer)` | 执行批量操作（有返回值） |
+| `batch().executeAsync(consumer)` | 异步执行批量操作 |
+
 ## RedissonClientHolder API
 
 | 方法 | 说明 |
@@ -420,7 +525,7 @@ public class RedisService {
 
 ## 监控端点
 
-启用 Actuator 后，可通过 `/actuator/dualwrite` 端点查看双写监控信息。
+启用 Actuator 后，提供以下监控端点：
 
 ### 配置
 
@@ -429,20 +534,42 @@ management:
   endpoints:
     web:
       exposure:
-        include: dualwrite,health,info
+        include: health,info,redissondualwrite,redissoncircuitbreaker
+  endpoint:
+    health:
+      show-details: always
 ```
 
-### 端点接口
+### 健康检查
+
+自动集成 Spring Boot Actuator 健康检查，访问 `/actuator/health` 可查看所有 Redis 实例的连接状态。
+
+```json
+{
+  "status": "UP",
+  "components": {
+    "redisson": {
+      "status": "UP",
+      "details": {
+        "dc-a": "UP",
+        "dc-b": "UP"
+      }
+    }
+  }
+}
+```
+
+### 双写监控端点
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| GET | `/actuator/dualwrite` | 获取所有监控信息 |
-| GET | `/actuator/dualwrite/overview` | 获取统计概览 |
-| GET | `/actuator/dualwrite/threadPool` | 获取线程池状态 |
-| GET | `/actuator/dualwrite/operations` | 获取各操作统计 |
-| DELETE | `/actuator/dualwrite` | 重置统计数据 |
+| GET | `/actuator/redissondualwrite` | 获取所有监控信息 |
+| GET | `/actuator/redissondualwrite/overview` | 获取统计概览 |
+| GET | `/actuator/redissondualwrite/threadPool` | 获取线程池状态 |
+| GET | `/actuator/redissondualwrite/operations` | 获取各操作统计 |
+| DELETE | `/actuator/redissondualwrite` | 重置统计数据 |
 
-### 响应示例
+#### 响应示例
 
 ```json
 {
@@ -487,6 +614,38 @@ management:
 }
 ```
 
+### 熔断器端点
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/actuator/redissoncircuitbreaker` | 获取熔断器状态和配置 |
+| POST | `/actuator/redissoncircuitbreaker/open` | 强制开启熔断 |
+| POST | `/actuator/redissoncircuitbreaker/close` | 强制关闭熔断 |
+| POST | `/actuator/redissoncircuitbreaker/reset` | 重置熔断器统计 |
+
+#### 响应示例
+
+```json
+{
+  "timestamp": "2026-01-15T16:30:00",
+  "status": {
+    "state": "CLOSED",
+    "totalCalls": 1000,
+    "successCalls": 995,
+    "failureCalls": 5,
+    "failureRate": "0.50%"
+  },
+  "config": {
+    "enabled": true,
+    "failureRateThreshold": 50,
+    "slidingWindowSize": 100,
+    "minimumNumberOfCalls": 10,
+    "waitDurationInOpenState": 60000,
+    "permittedCallsInHalfOpenState": 10
+  }
+}
+```
+
 ### 监控指标说明
 
 | 指标 | 说明 |
@@ -501,6 +660,25 @@ management:
 | `poolUsageRate` | 线程池使用率 |
 | `queueUsageRate` | 队列使用率 |
 
+## 动态配置（Nacos）
+
+熔断器配置和双写开关支持通过 Nacos 等配置中心动态刷新，无需重启应用。
+
+### 配置示例
+
+```yaml
+# Nacos 配置
+redisson:
+  multi:
+    dual-write-enabled: true  # 可动态开关双写
+    circuit-breaker:
+      enabled: true
+      failure-rate-threshold: 50  # 可动态调整阈值
+      wait-duration-in-open-state: 60000
+```
+
+修改 Nacos 配置后，配置会自动刷新生效。
+
 ## 注意事项
 
 1. **地址格式**：Redis 地址需要包含协议前缀，如 `redis://host:port` 或 `rediss://host:port`（SSL）
@@ -508,6 +686,8 @@ management:
 3. **Bean 名称**：每个实例会注册为 `{name}RedissonClient` 的 Bean，如 `masterRedissonClient`
 4. **生命周期**：Spring 容器关闭时会自动关闭所有 RedissonClient 连接
 5. **EPOLL**：Linux 环境下建议设置 `transportMode: EPOLL` 或 `AUTO` 以获得更好的性能
+6. **熔断器**：建议在生产环境启用熔断器，防止备份集群故障影响主业务
+7. **监控告警**：建议对双写失败率和熔断器状态设置监控告警
 
 ## License
 
