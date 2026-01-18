@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: sensitive-word-example
+
+# 敏感词配置
+sensitive-word:
+  enabled: true
+  # 是否忽略大小写
+  ignore-case: true
+  # 是否跳过空白字符
+  skip-whitespace: true
+  # 默认匹配类型
+  match-type: MIN_MATCH
+  # 默认处理类型
+  handle-type: REPLACE
+  # 替换字符
+  replace-char: '*'
+  # 高亮标签
+  highlight-start-tag: "<span style='color:red;font-weight:bold;'>"
+  highlight-end-tag: "</span>"
+  # 直接配置的敏感词
+  words:
+    - 敏感词
+    - 违禁词
+    - 测试敏感词
+    - 不良信息
+    - 违法
+    - 暴力
+  # 白名单
+  white-list:
+    - 测试
+  # 异常消息模板
+  exception-message: "内容包含敏感词：{}"

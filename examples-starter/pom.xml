@@ -29,6 +29,7 @@
         <module>seata-example-parent</module>
         <module>redis-serialization-examples</module>
         <module>multi-redisson-example</module>
+        <module>sensitive-word-example</module>
     </modules>
 
 </project>

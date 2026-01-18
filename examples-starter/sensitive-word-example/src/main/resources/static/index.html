@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>敏感词过滤示例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .card h2 {
+            color: #333;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #667eea;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: 500;
+        }
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .result {
+            margin-top: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+        .result.show {
+            display: block;
+        }
+        .result pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #333;
+        }
+        .result.error {
+            background: #fff5f5;
+            border-left: 4px solid #f5576c;
+        }
+        .result.success {
+            background: #f0fff4;
+            border-left: 4px solid #38ef7d;
+        }
+        .sensitive {
+            color: red;
+            font-weight: bold;
+            background: #ffebee;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 16px;
+        }
+        .stat-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-item .number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .stat-item .label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>敏感词过滤组件示例</h1>
+        
+        <!-- 统计信息 -->
+        <div class="card">
+            <h2>统计信息</h2>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="number" id="wordCount">-</div>
+                    <div class="label">敏感词数量</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- 文本检测 -->
+            <div class="card">
+                <h2>文本检测</h2>
+                <div class="form-group">
+                    <label>输入文本</label>
+                    <textarea id="checkText" placeholder="请输入需要检测的文本...">这是一段包含敏感词和违禁词的测试文本</textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="checkText()">检测敏感词</button>
+                    <button class="btn btn-success" onclick="replaceText()">替换敏感词</button>
+                    <button class="btn btn-warning" onclick="highlightText()">高亮敏感词</button>
+                </div>
+                <div class="result" id="checkResult"></div>
+            </div>
+
+            <!-- 注解测试 -->
+            <div class="card">
+                <h2>注解测试</h2>
+                <div class="form-group">
+                    <label>输入文本</label>
+                    <textarea id="annotationText" placeholder="请输入需要检测的文本...">这是包含敏感词的文本</textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-warning" onclick="testAnnotationException()">检测（抛异常）</button>
+                    <button class="btn btn-success" onclick="testAnnotationReplace()">检测（自动替换）</button>
+                </div>
+                <div class="result" id="annotationResult"></div>
+            </div>
+
+            <!-- 敏感词管理 -->
+            <div class="card">
+                <h2>敏感词管理</h2>
+                <div class="form-group">
+                    <label>敏感词</label>
+                    <input type="text" id="newWord" placeholder="输入要添加的敏感词">
+                </div>
+                <div class="form-group">
+                    <label>分类（可选）</label>
+                    <input type="text" id="wordCategory" placeholder="输入分类">
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="addWord()">添加敏感词</button>
+                    <button class="btn btn-warning" onclick="removeWord()">移除敏感词</button>
+                    <button class="btn btn-info" onclick="addWhiteList()">添加白名单</button>
+                </div>
+                <div class="result" id="manageResult"></div>
+            </div>
+
+            <!-- 对象检测 -->
+            <div class="card">
+                <h2>对象检测（字段级注解）</h2>
+                <div class="form-group">
+                    <label>标题</label>
+                    <input type="text" id="objTitle" placeholder="输入标题" value="这是标题包含敏感词">
+                </div>
+                <div class="form-group">
+                    <label>内容</label>
+                    <textarea id="objContent" placeholder="输入内容">这是内容包含违禁词和不良信息</textarea>
+                </div>
+                <div class="form-group">
+                    <label>作者</label>
+                    <input type="text" id="objAuthor" placeholder="输入作者" value="作者名">
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="checkObject()">检测对象</button>
+                </div>
+                <div class="result" id="objectResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取敏感词数量
+        function loadStats() {
+            fetch('/api/sensitive/count')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('wordCount').textContent = data.count;
+                });
+        }
+
+        // 检测文本
+        function checkText() {
+            const text = document.getElementById('checkText').value;
+            fetch('/api/sensitive/check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            })
+            .then(res => res.json())
+            .then(data => showResult('checkResult', data, 'success'));
+        }
+
+        // 替换敏感词
+        function replaceText() {
+            const text = document.getElementById('checkText').value;
+            fetch('/api/sensitive/replace', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, replaceChar: '*' })
+            })
+            .then(res => res.json())
+            .then(data => showResult('checkResult', data, 'success'));
+        }
+
+        // 高亮敏感词
+        function highlightText() {
+            const text = document.getElementById('checkText').value;
+            fetch('/api/sensitive/highlight', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const resultDiv = document.getElementById('checkResult');
+                resultDiv.className = 'result show success';
+                resultDiv.innerHTML = `
+                    <p><strong>高亮结果：</strong></p>
+                    <div>${data.processedText}</div>
+                    <p><strong>检测到 ${data.sensitiveWordCount} 个敏感词</strong></p>
+                `;
+            });
+        }
+
+        // 测试注解（抛异常）
+        function testAnnotationException() {
+            const text = document.getElementById('annotationText').value;
+            fetch('/api/sensitive/checkWithAnnotation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(text)
+            })
+            .then(res => res.json())
+            .then(data => {
+                const type = data.success ? 'success' : 'error';
+                showResult('annotationResult', data, type);
+            });
+        }
+
+        // 测试注解（自动替换）
+        function testAnnotationReplace() {
+            const text = document.getElementById('annotationText').value;
+            fetch('/api/sensitive/replaceWithAnnotation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(text)
+            })
+            .then(res => res.json())
+            .then(data => showResult('annotationResult', data, 'success'));
+        }
+
+        // 添加敏感词
+        function addWord() {
+            const word = document.getElementById('newWord').value;
+            const category = document.getElementById('wordCategory').value;
+            if (!word) {
+                alert('请输入敏感词');
+                return;
+            }
+            fetch('/api/sensitive/addWord', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ word, category })
+            })
+            .then(res => res.json())
+            .then(data => {
+                showResult('manageResult', data, 'success');
+                loadStats();
+            });
+        }
+
+        // 移除敏感词
+        function removeWord() {
+            const word = document.getElementById('newWord').value;
+            if (!word) {
+                alert('请输入敏感词');
+                return;
+            }
+            fetch('/api/sensitive/removeWord', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ word })
+            })
+            .then(res => res.json())
+            .then(data => {
+                showResult('manageResult', data, 'success');
+                loadStats();
+            });
+        }
+
+        // 添加白名单
+        function addWhiteList() {
+            const word = document.getElementById('newWord').value;
+            if (!word) {
+                alert('请输入词汇');
+                return;
+            }
+            fetch('/api/sensitive/addWhiteList', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ word })
+            })
+            .then(res => res.json())
+            .then(data => showResult('manageResult', data, 'success'));
+        }
+
+        // 检测对象
+        function checkObject() {
+            const title = document.getElementById('objTitle').value;
+            const content = document.getElementById('objContent').value;
+            const author = document.getElementById('objAuthor').value;
+            
+            fetch('/api/sensitive/checkObject', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, content, author })
+            })
+            .then(res => res.json())
+            .then(data => showResult('objectResult', data, 'success'));
+        }
+
+        // 显示结果
+        function showResult(elementId, data, type) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.className = `result show ${type}`;
+            resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+
+        // 页面加载时获取统计信息
+        loadStats();
+    </script>
+</body>
+</html>
