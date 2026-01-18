@@ -43,6 +43,7 @@
         <module>ffmpeg-spring-boot-starter</module>
         <module>dynamic-threadpool-spring-boot-starter</module>
         <module>sensitive-word-spring-boot-starter</module>
+        <module>signature-spring-boot-starter</module>
         <module>examples-starter</module>
     </modules>
 

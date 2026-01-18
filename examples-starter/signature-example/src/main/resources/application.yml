@@ -1,0 +1,59 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: signature-example
+
+# 签名验证配置
+signature:
+  enabled: true
+  # 签名算法
+  algorithm: HMAC_SHA256
+  # 时间戳有效期（5分钟）
+  timestamp-tolerance: 5m
+  # Nonce 有效期（10分钟）
+  nonce-ttl: 10m
+  # 是否启用时间戳验证
+  timestamp-enabled: true
+  # 是否启用 Nonce 验证（防重放）
+  nonce-enabled: true
+  # JSON Body 字段解析后参与签名排序（默认false，由注解控制）
+  parse-json-body: false
+  # JSON Body 字段前缀
+  json-body-prefix: "body."
+  # 签名参数配置
+  app-key-header: X-App-Key
+  signature-header: X-Signature
+  timestamp-header: X-Timestamp
+  nonce-header: X-Nonce
+  # 允许从请求参数获取签名信息
+  allow-query-params: true
+  # 排除路径（不进行签名验证）
+  exclude-paths:
+    - /api/public/**
+    - /api/tool/**
+    - /
+    - /index.html
+    - /favicon.ico
+    - /error
+    - /static/**
+  # 配置应用密钥（简单模式）
+  apps:
+    myapp: my-secret-key-123456
+    testapp: test-secret-key-654321
+    demo: demo-secret-key-abcdef
+  # 开启调试模式（生产环境请关闭）
+  debug: true
+  # 失败响应配置
+  response:
+    status: 401
+    content-type: application/json;charset=UTF-8
+    body: '{"success":false,"code":"${errorCode}","message":"${errorMessage}"}'
+
+logging:
+  level:
+    io:
+      github:
+        kk01001:
+          signature: debug

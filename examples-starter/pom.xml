@@ -30,6 +30,7 @@
         <module>redis-serialization-examples</module>
         <module>multi-redisson-example</module>
         <module>sensitive-word-example</module>
+        <module>signature-example</module>
     </modules>
 
 </project>

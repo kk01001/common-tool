@@ -47,6 +47,7 @@ Common Tool 是一个面向 Java Spring Boot 应用的工具集合，提供多�
     - [dict-spring-boot-starter](#dict-spring-boot-starter) - 数据字典管理
     - [ip2region-spring-boot-starter](#ip2region-spring-boot-starter) - IP地址归属地查询
     - [sensitive-word-spring-boot-starter](#sensitive-word-spring-boot-starter) - 敏感词过滤
+    - [signature-spring-boot-starter](#signature-spring-boot-starter) - API签名验证
   - [脚本与扩展](#脚本与扩展)
     - [script-spring-boot-starter](#script-spring-boot-starter) - 多语言脚本执行
     - [ffmpeg-spring-boot-starter](#ffmpeg-spring-boot-starter) - FFmpeg视频处理
@@ -94,6 +95,7 @@ Common Tool 是一个面向 Java Spring Boot 应用的工具集合，提供多�
 | [local-cache-spring-boot-starter](#local-cache-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/local-cache-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:local-cache-spring-boot-starter) | 本地缓存实现 |
 | [ffmpeg-spring-boot-starter](#ffmpeg-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/ffmpeg-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:ffmpeg-spring-boot-starter) | FFmpeg视频处理 |
 | [sensitive-word-spring-boot-starter](#sensitive-word-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/sensitive-word-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:sensitive-word-spring-boot-starter) | 敏感词过滤 |
+| [signature-spring-boot-starter](#signature-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/signature-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:signature-spring-boot-starter) | API签名验证 |
 
 ## 详细介绍
 
@@ -1248,6 +1250,64 @@ public Result<Article> submitArticle(@RequestBody Article article) {
 
 ---
 
+#### signature-spring-boot-starter
+
+API签名验证组件，支持防篡改、防重放攻击。
+
+##### 主要功能
+
+- **防篡改**：基于HMAC/SHA算法对请求参数签名，防止数据被篡改
+- **防重放**：基于Nonce + Timestamp机制，防止请求被重放攻击
+- **多种算法**：支持MD5、SHA1、SHA256、SHA512、HMAC-SHA256、HMAC-SHA512
+- **注解驱动**：支持`@SignatureVerify`和`@IgnoreSignature`注解
+- **存储接口**：NonceStore和AppSecretStore提供接口，由用户实现具体存储
+- **内置实现**：提供基于内存的默认实现（适合单机部署）
+
+##### 使用示例
+
+```java
+// 类级别启用签名验证
+@RestController
+@RequestMapping("/api")
+@SignatureVerify
+public class ApiController {
+    
+    @GetMapping("/data")
+    public Result getData() {
+        // 需要签名验证
+    }
+    
+    @PostMapping("/submit")
+    @SignatureVerify(verifyBody = true)
+    public Result submit(@RequestBody Data data) {
+        // 需要签名验证，包含请求体
+    }
+    
+    @GetMapping("/public")
+    @IgnoreSignature
+    public Result publicApi() {
+        // 忽略签名验证
+    }
+}
+
+// 自定义 NonceStore（Redis实现）
+@Component
+public class RedisNonceStore implements NonceStore {
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+    
+    @Override
+    public boolean storeIfAbsent(String nonce, Duration ttl) {
+        return Boolean.TRUE.equals(redisTemplate.opsForValue()
+                .setIfAbsent("signature:nonce:" + nonce, "1", ttl));
+    }
+}
+```
+
+[查看详细文档](./signature-spring-boot-starter/README.md)
+
+---
+
 ### 脚本与扩展
 
 #### script-spring-boot-starter
@@ -1393,6 +1453,7 @@ public class UserController {
 | 动态线程池管理 | dynamic-threadpool-spring-boot-starter |
 | 视频音频处理 | ffmpeg-spring-boot-starter |
 | 敏感词过滤/内容审核 | sensitive-word-spring-boot-starter |
+| API签名验证/防篡改 | signature-spring-boot-starter |
 
 ## 环境要求
 

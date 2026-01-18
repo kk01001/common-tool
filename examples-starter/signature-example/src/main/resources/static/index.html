@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API签名验证示例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .card h2 {
+            color: #1e3c72;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #2a5298;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: 500;
+        }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: 'Fira Code', monospace;
+        }
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(30, 60, 114, 0.4);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .result {
+            margin-top: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+        .result.show {
+            display: block;
+        }
+        .result pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #333;
+        }
+        .result.error {
+            background: #fff5f5;
+            border-left: 4px solid #f5576c;
+        }
+        .result.success {
+            background: #f0fff4;
+            border-left: 4px solid #38ef7d;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #ccc;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 12px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 16px;
+        }
+        .copy-btn {
+            padding: 4px 12px;
+            font-size: 12px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .copy-btn:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API 签名验证示例</h1>
+        
+        <!-- 配置信息 -->
+        <div class="card">
+            <h2>配置信息</h2>
+            <div class="info-box">
+                <p><strong>预置应用密钥：</strong></p>
+                <ul>
+                    <li>myapp: my-secret-key-123456</li>
+                    <li>testapp: test-secret-key-654321</li>
+                    <li>demo: demo-secret-key-abcdef</li>
+                </ul>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>选择应用</label>
+                    <select id="appSelect" onchange="updateAppInfo()">
+                        <option value="myapp|my-secret-key-123456">myapp</option>
+                        <option value="testapp|test-secret-key-654321">testapp</option>
+                        <option value="demo|demo-secret-key-abcdef">demo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>当前密钥</label>
+                    <input type="text" id="currentSecret" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- 签名生成 -->
+            <div class="card">
+                <h2>1. 生成签名</h2>
+                <div class="form-group">
+                    <label>业务参数（key=value，每行一个）</label>
+                    <textarea id="signParams" placeholder="param1=value1&#10;param2=value2">param1=hello
+param2=world</textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="generateSign()">生成签名</button>
+                </div>
+                <div class="result" id="signResult"></div>
+            </div>
+
+            <!-- 调用安全接口 -->
+            <div class="card">
+                <h2>2. 调用安全接口</h2>
+                <div class="form-group">
+                    <label>接口地址</label>
+                    <select id="apiEndpoint" onchange="updateRequestBodyPlaceholder()">
+                        <option value="GET|/api/secure/data|false">GET /api/secure/data</option>
+                        <option value="POST|/api/secure/submit|false">POST /api/secure/submit</option>
+                        <option value="POST|/api/secure/submitWithBody|true">POST /api/secure/submitWithBody (签名含Body)</option>
+                        <option value="POST|/api/secure/submitNested|true">POST /api/secure/submitNested (多级嵌套JSON)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>请求参数/Body</label>
+                    <textarea id="requestBody" placeholder="GET: param1=value1&param2=value2">param1=hello&param2=world</textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="callSecureApi()">发送请求（带签名）</button>
+                    <button class="btn btn-warning" onclick="callWithoutSign()">发送请求（不带签名）</button>
+                </div>
+                <div class="result" id="apiResult"></div>
+            </div>
+
+            <!-- 公开接口测试 -->
+            <div class="card">
+                <h2>3. 公开接口测试</h2>
+                <div class="info-box">
+                    公开接口使用 @IgnoreSignature 注解，无需签名验证
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-info" onclick="callPublicApi()">调用公开接口</button>
+                </div>
+                <div class="result" id="publicResult"></div>
+            </div>
+
+            <!-- 手动验证签名 -->
+            <div class="card">
+                <h2>4. 手动验证签名</h2>
+                <div class="form-group">
+                    <label>签名字符串</label>
+                    <input type="text" id="verifySign" placeholder="输入待验证的签名">
+                </div>
+                <div class="form-group">
+                    <label>时间戳</label>
+                    <input type="text" id="verifyTimestamp" placeholder="输入时间戳">
+                </div>
+                <div class="form-group">
+                    <label>Nonce</label>
+                    <input type="text" id="verifyNonce" placeholder="输入 Nonce">
+                </div>
+                <div class="form-group">
+                    <label>业务参数（key=value，每行一个）</label>
+                    <textarea id="verifyParams" placeholder="param1=value1&#10;param2=value2"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="verifySignature()">验证签名</button>
+                </div>
+                <div class="result" id="verifyResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化
+        updateAppInfo();
+
+        function updateAppInfo() {
+            const select = document.getElementById('appSelect');
+            const parts = select.value.split('|');
+            document.getElementById('currentSecret').value = parts[1];
+        }
+
+        function getAppInfo() {
+            const select = document.getElementById('appSelect');
+            const parts = select.value.split('|');
+            return { appKey: parts[0], appSecret: parts[1] };
+        }
+
+        function parseParams(str) {
+            const params = {};
+            str.split('\n').forEach(line => {
+                line = line.trim();
+                if (line && line.includes('=')) {
+                    const [key, ...valueParts] = line.split('=');
+                    params[key.trim()] = valueParts.join('=').trim();
+                }
+            });
+            return params;
+        }
+
+        // 生成签名
+        async function generateSign() {
+            const { appKey, appSecret } = getAppInfo();
+            const paramsStr = document.getElementById('signParams').value;
+            const params = parseParams(paramsStr);
+            
+            const body = {
+                appKey,
+                appSecret,
+                ...params
+            };
+            
+            try {
+                const res = await fetch('/api/tool/sign', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                showResult('signResult', data, data.success ? 'success' : 'error');
+                
+                // 填充验证表单
+                if (data.success) {
+                    document.getElementById('verifySign').value = data.data.signature;
+                    document.getElementById('verifyTimestamp').value = data.data.timestamp;
+                    document.getElementById('verifyNonce').value = data.data.nonce;
+                    document.getElementById('verifyParams').value = paramsStr;
+                }
+            } catch (e) {
+                showResult('signResult', { error: e.message }, 'error');
+            }
+        }
+
+        // 更新请求体占位符
+        function updateRequestBodyPlaceholder() {
+            const endpointSelect = document.getElementById('apiEndpoint');
+            const [method, path, verifyBody] = endpointSelect.value.split('|');
+            const textarea = document.getElementById('requestBody');
+            
+            if (method === 'GET') {
+                textarea.placeholder = 'GET: param1=value1&param2=value2';
+                textarea.value = 'param1=hello&param2=world';
+            } else if (path === '/api/secure/submitNested') {
+                textarea.placeholder = 'POST: 多级嵌套JSON（签名包含所有字段）';
+                textarea.value = JSON.stringify({
+                    "orderId": "ORD20260118001",
+                    "user": {
+                        "userId": "U001",
+                        "username": "张三",
+                        "phone": "13800138000"
+                    },
+                    "address": {
+                        "province": "广东省",
+                        "city": "深圳市",
+                        "detail": "南山区科技园xxx号"
+                    },
+                    "products": [
+                        {"productId": "P001", "name": "商品A", "quantity": 2, "price": 99.9},
+                        {"productId": "P002", "name": "商品B", "quantity": 1, "price": 199.9}
+                    ],
+                    "totalAmount": 399.7
+                }, null, 2);
+            } else if (verifyBody === 'true') {
+                textarea.placeholder = 'POST: JSON格式（签名包含Body内容）';
+                textarea.value = '{"userId":"123","action":"transfer","data":"重要操作数据"}';
+            } else {
+                textarea.placeholder = 'POST: JSON格式';
+                textarea.value = '{"userId":"123","action":"test","data":"hello world"}';
+            }
+        }
+
+        // 调用安全接口
+        async function callSecureApi() {
+            const { appKey, appSecret } = getAppInfo();
+            const endpointSelect = document.getElementById('apiEndpoint');
+            const [method, path, verifyBody] = endpointSelect.value.split('|');
+            const bodyStr = document.getElementById('requestBody').value;
+            
+            let url = path;
+            let fetchOptions = {
+                method,
+                headers: {}
+            };
+            
+            if (method === 'GET') {
+                // 解析 query params
+                const queryParams = parseQueryString(bodyStr);
+                
+                // 生成签名
+                const signBody = { appKey, appSecret, ...queryParams };
+                const signRes = await fetch('/api/tool/sign', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(signBody)
+                });
+                const signData = await signRes.json();
+                
+                fetchOptions.headers['X-App-Key'] = appKey;
+                fetchOptions.headers['X-Signature'] = signData.data.signature;
+                fetchOptions.headers['X-Timestamp'] = signData.data.timestamp;
+                fetchOptions.headers['X-Nonce'] = signData.data.nonce;
+                
+                url = path + (bodyStr ? '?' + bodyStr : '');
+            } else if (verifyBody === 'true') {
+                // POST 请求 - 签名包含请求体内容（JSON格式）
+                // 先验证 JSON 格式
+                try {
+                    JSON.parse(bodyStr);
+                } catch (e) {
+                    showResult('apiResult', { error: 'POST 请求体必须是有效的 JSON 格式' }, 'error');
+                    return;
+                }
+                
+                const signBody = { appKey, appSecret, body: bodyStr };
+                const signRes = await fetch('/api/tool/signWithBody', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(signBody)
+                });
+                const signData = await signRes.json();
+                
+                fetchOptions.headers['X-App-Key'] = appKey;
+                fetchOptions.headers['X-Signature'] = signData.data.signature;
+                fetchOptions.headers['X-Timestamp'] = signData.data.timestamp;
+                fetchOptions.headers['X-Nonce'] = signData.data.nonce;
+                fetchOptions.headers['Content-Type'] = 'application/json';
+                fetchOptions.body = bodyStr;
+            } else {
+                // POST 请求 - 签名不包含请求体内容
+                const signBody = { appKey, appSecret };
+                const signRes = await fetch('/api/tool/sign', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(signBody)
+                });
+                const signData = await signRes.json();
+                
+                fetchOptions.headers['X-App-Key'] = appKey;
+                fetchOptions.headers['X-Signature'] = signData.data.signature;
+                fetchOptions.headers['X-Timestamp'] = signData.data.timestamp;
+                fetchOptions.headers['X-Nonce'] = signData.data.nonce;
+                fetchOptions.headers['Content-Type'] = 'application/json';
+                
+                // 确保是有效的 JSON
+                try {
+                    JSON.parse(bodyStr);
+                    fetchOptions.body = bodyStr;
+                } catch (e) {
+                    showResult('apiResult', { error: 'POST 请求体必须是有效的 JSON 格式' }, 'error');
+                    return;
+                }
+            }
+            
+            try {
+                const res = await fetch(url, fetchOptions);
+                const data = await res.json();
+                showResult('apiResult', { 
+                    status: res.status,
+                    headers: fetchOptions.headers,
+                    verifyBody: verifyBody === 'true',
+                    response: data 
+                }, res.ok ? 'success' : 'error');
+            } catch (e) {
+                showResult('apiResult', { error: e.message }, 'error');
+            }
+        }
+
+        // 不带签名调用
+        async function callWithoutSign() {
+            const endpointSelect = document.getElementById('apiEndpoint');
+            const [method, path] = endpointSelect.value.split('|');
+            const bodyStr = document.getElementById('requestBody').value;
+            
+            let url = path;
+            let fetchOptions = { method, headers: {} };
+            
+            if (method === 'GET') {
+                url = path + (bodyStr ? '?' + bodyStr : '');
+            } else {
+                fetchOptions.headers['Content-Type'] = 'application/json';
+                // 确保是有效的 JSON
+                try {
+                    JSON.parse(bodyStr);
+                    fetchOptions.body = bodyStr;
+                } catch (e) {
+                    showResult('apiResult', { error: 'POST 请求体必须是有效的 JSON 格式' }, 'error');
+                    return;
+                }
+            }
+            
+            try {
+                const res = await fetch(url, fetchOptions);
+                const data = await res.json();
+                showResult('apiResult', { 
+                    status: res.status,
+                    message: '未携带签名信息',
+                    response: data 
+                }, res.ok ? 'success' : 'error');
+            } catch (e) {
+                showResult('apiResult', { error: e.message }, 'error');
+            }
+        }
+
+        // 调用公开接口
+        async function callPublicApi() {
+            try {
+                const res = await fetch('/api/public/info');
+                const data = await res.json();
+                showResult('publicResult', data, 'success');
+            } catch (e) {
+                showResult('publicResult', { error: e.message }, 'error');
+            }
+        }
+
+        // 验证签名
+        async function verifySignature() {
+            const { appKey } = getAppInfo();
+            const signature = document.getElementById('verifySign').value;
+            const timestamp = document.getElementById('verifyTimestamp').value;
+            const nonce = document.getElementById('verifyNonce').value;
+            const paramsStr = document.getElementById('verifyParams').value;
+            const params = parseParams(paramsStr);
+            
+            const body = {
+                appKey,
+                signature,
+                timestamp,
+                nonce,
+                ...params
+            };
+            
+            try {
+                const res = await fetch('/api/tool/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                showResult('verifyResult', data, data.success ? 'success' : 'error');
+            } catch (e) {
+                showResult('verifyResult', { error: e.message }, 'error');
+            }
+        }
+
+        function parseQueryString(str) {
+            const params = {};
+            str.split('&').forEach(pair => {
+                const [key, value] = pair.split('=');
+                if (key) params[key.trim()] = value ? value.trim() : '';
+            });
+            return params;
+        }
+
+        function generateNonce() {
+            return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/x/g, () => 
+                Math.floor(Math.random() * 16).toString(16));
+        }
+
+        function showResult(elementId, data, type) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.className = `result show ${type}`;
+            resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+    </script>
+</body>
+</html>
