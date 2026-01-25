@@ -11,91 +11,161 @@ Common Tool 是一个面向 Java Spring Boot 应用的工具集合，提供多�
 
 ## 目录
 
-- [模块列表](#模块列表)
-- [详细介绍](#详细介绍)
-  - [基础工具](#基础工具)
-    - [common-tool-spring-boot-starter](#common-tool-spring-boot-starter) - 通用工具集
-    - [i18n-spring-boot-starter](#i18n-spring-boot-starter) - 国际化支持
-    - [design-pattern-spring-boot-starter](#design-pattern-spring-boot-starter) - 设计模式工具集
-  - [缓存与数据源](#缓存与数据源)
-    - [multi-redis-spring-boot-starter](#multi-redis-spring-boot-starter) - 多Redis源支持
-    - [multi-redisson-spring-boot-starter](#multi-redisson-spring-boot-starter) - 多Redisson数据源支持
-    - [local-cache-spring-boot-starter](#local-cache-spring-boot-starter) - 本地缓存实现
-    - [mybatis-plus-spring3-boot-starter](#mybatis-plus-spring3-boot-starter) - MyBatis-Plus集成
-  - [消息通信](#消息通信)
-    - [dynamic-mq-spring-boot-starter](#dynamic-mq-spring-boot-starter) - 动态消息队列管理
-    - [mqtt-spring-boot-starter](#mqtt-spring-boot-starter) - MQTT消息协议支持
-    - [robot-message-spring-boot-starter](#robot-message-spring-boot-starter) - 多平台机器人消息通知
-    - [push-spring-boot-starter](#push-spring-boot-starter) - 移动端推送服务
-    - [netty-spring-boot-starter](#netty-spring-boot-starter) - Netty与WebSocket支持
-  - [分布式组件](#分布式组件)
-    - [lock-spring-boot-starter](#lock-spring-boot-starter) - 分布式锁实现
-    - [rate-limiter-spring-boot-starter](#rate-limiter-spring-boot-starter) - 分布式限流组件
-    - [idempotent-spring-boot-starter](#idempotent-spring-boot-starter) - 接口幂等性保障
-    - [local-message-spring-boot-starter](#local-message-spring-boot-starter) - 本地消息表
-  - [任务调度与线程池](#任务调度与线程池)
-    - [xxl-job-spring-boot-starter](#xxl-job-spring-boot-starter) - XXL-JOB任务调度
-    - [dynamic-threadpool-spring-boot-starter](#dynamic-threadpool-spring-boot-starter) - 动态线程池
-    - [disruptor-spring-boot-starter](#disruptor-spring-boot-starter) - 高性能队列Disruptor
-  - [文件与存储](#文件与存储)
-    - [oss-spring-boot-starter](#oss-spring-boot-starter) - 对象存储服务
-    - [sftp-spring-boot-starter](#sftp-spring-boot-starter) - SFTP文件传输
-    - [excel-spring-boot-starter](#excel-spring-boot-starter) - Excel导入导出
-  - [数据处理](#数据处理)
-    - [desensitize-spring-boot-starter](#desensitize-spring-boot-starter) - 数据脱敏处理
-    - [crypto-spring-boot-starter](#crypto-spring-boot-starter) - 加密解密工具
-    - [dict-spring-boot-starter](#dict-spring-boot-starter) - 数据字典管理
-    - [ip2region-spring-boot-starter](#ip2region-spring-boot-starter) - IP地址归属地查询
-    - [sensitive-word-spring-boot-starter](#sensitive-word-spring-boot-starter) - 敏感词过滤
-    - [signature-spring-boot-starter](#signature-spring-boot-starter) - API签名验证
-  - [脚本与扩展](#脚本与扩展)
-    - [script-spring-boot-starter](#script-spring-boot-starter) - 多语言脚本执行
-    - [ffmpeg-spring-boot-starter](#ffmpeg-spring-boot-starter) - FFmpeg视频处理
-  - [接口文档](#接口文档)
-    - [docs-spring-boot-starter](#docs-spring-boot-starter) - API文档自动生成
-- [技术栈](#技术栈)
-- [如何选择合适的组件](#如何选择合适的组件)
-- [环境要求](#环境要求)
-- [贡献指南](#贡献指南)
-- [许可证](#许可证)
+- [Common Tool 工具集](#common-tool-工具集)
+  - [项目介绍](#项目介绍)
+  - [目录](#目录)
+  - [模块列表](#模块列表)
+  - [详细介绍](#详细介绍)
+    - [基础工具](#基础工具)
+      - [common-tool-spring-boot-starter](#common-tool-spring-boot-starter)
+        - [主要功能](#主要功能)
+        - [使用示例](#使用示例)
+      - [i18n-spring-boot-starter](#i18n-spring-boot-starter)
+        - [主要功能](#主要功能-1)
+        - [使用示例](#使用示例-1)
+      - [design-pattern-spring-boot-starter](#design-pattern-spring-boot-starter)
+        - [主要功能](#主要功能-2)
+        - [使用示例](#使用示例-2)
+    - [缓存与数据源](#缓存与数据源)
+      - [multi-redis-spring-boot-starter](#multi-redis-spring-boot-starter)
+        - [主要功能](#主要功能-3)
+        - [使用示例](#使用示例-3)
+      - [multi-redisson-spring-boot-starter](#multi-redisson-spring-boot-starter)
+        - [主要功能](#主要功能-4)
+        - [使用示例](#使用示例-4)
+      - [local-cache-spring-boot-starter](#local-cache-spring-boot-starter)
+        - [主要功能](#主要功能-5)
+        - [使用示例](#使用示例-5)
+      - [mybatis-plus-spring3-boot-starter](#mybatis-plus-spring3-boot-starter)
+        - [主要功能](#主要功能-6)
+        - [使用示例](#使用示例-6)
+    - [消息通信](#消息通信)
+      - [dynamic-mq-spring-boot-starter](#dynamic-mq-spring-boot-starter)
+        - [主要功能](#主要功能-7)
+        - [使用示例](#使用示例-7)
+      - [mqtt-spring-boot-starter](#mqtt-spring-boot-starter)
+        - [主要功能](#主要功能-8)
+        - [使用示例](#使用示例-8)
+      - [robot-message-spring-boot-starter](#robot-message-spring-boot-starter)
+        - [主要功能](#主要功能-9)
+        - [使用示例](#使用示例-9)
+      - [push-spring-boot-starter](#push-spring-boot-starter)
+        - [主要功能](#主要功能-10)
+        - [使用示例](#使用示例-10)
+      - [netty-spring-boot-starter](#netty-spring-boot-starter)
+        - [主要功能](#主要功能-11)
+        - [使用示例](#使用示例-11)
+    - [分布式组件](#分布式组件)
+      - [resilience4j-spring-boot-starter](#resilience4j-spring-boot-starter)
+        - [主要功能](#主要功能-12)
+        - [使用示例](#使用示例-12)
+        - [配置示例](#配置示例)
+      - [lock-spring-boot-starter](#lock-spring-boot-starter)
+        - [主要功能](#主要功能-13)
+        - [使用示例](#使用示例-13)
+      - [rate-limiter-spring-boot-starter](#rate-limiter-spring-boot-starter)
+        - [主要功能](#主要功能-14)
+        - [使用示例](#使用示例-14)
+      - [idempotent-spring-boot-starter](#idempotent-spring-boot-starter)
+        - [主要功能](#主要功能-15)
+        - [使用示例](#使用示例-15)
+      - [local-message-spring-boot-starter](#local-message-spring-boot-starter)
+        - [主要功能](#主要功能-16)
+        - [使用示例](#使用示例-16)
+    - [任务调度与线程池](#任务调度与线程池)
+      - [xxl-job-spring-boot-starter](#xxl-job-spring-boot-starter)
+        - [主要功能](#主要功能-17)
+        - [使用示例](#使用示例-17)
+      - [dynamic-threadpool-spring-boot-starter](#dynamic-threadpool-spring-boot-starter)
+        - [主要功能](#主要功能-18)
+        - [使用示例](#使用示例-18)
+      - [disruptor-spring-boot-starter](#disruptor-spring-boot-starter)
+        - [主要功能](#主要功能-19)
+        - [使用示例](#使用示例-19)
+    - [文件与存储](#文件与存储)
+      - [oss-spring-boot-starter](#oss-spring-boot-starter)
+        - [主要功能](#主要功能-20)
+        - [使用示例](#使用示例-20)
+      - [sftp-spring-boot-starter](#sftp-spring-boot-starter)
+        - [主要功能](#主要功能-21)
+        - [使用示例](#使用示例-21)
+      - [excel-spring-boot-starter](#excel-spring-boot-starter)
+        - [主要功能](#主要功能-22)
+        - [使用示例](#使用示例-22)
+    - [数据处理](#数据处理)
+      - [desensitize-spring-boot-starter](#desensitize-spring-boot-starter)
+        - [主要功能](#主要功能-23)
+        - [使用示例](#使用示例-23)
+      - [crypto-spring-boot-starter](#crypto-spring-boot-starter)
+        - [主要功能](#主要功能-24)
+        - [使用示例](#使用示例-24)
+      - [dict-spring-boot-starter](#dict-spring-boot-starter)
+        - [主要功能](#主要功能-25)
+        - [使用示例](#使用示例-25)
+      - [ip2region-spring-boot-starter](#ip2region-spring-boot-starter)
+        - [主要功能](#主要功能-26)
+        - [使用示例](#使用示例-26)
+      - [sensitive-word-spring-boot-starter](#sensitive-word-spring-boot-starter)
+        - [主要功能](#主要功能-27)
+        - [使用示例](#使用示例-27)
+      - [signature-spring-boot-starter](#signature-spring-boot-starter)
+        - [主要功能](#主要功能-28)
+        - [使用示例](#使用示例-28)
+    - [脚本与扩展](#脚本与扩展)
+      - [script-spring-boot-starter](#script-spring-boot-starter)
+        - [主要功能](#主要功能-29)
+        - [使用示例](#使用示例-29)
+      - [ffmpeg-spring-boot-starter](#ffmpeg-spring-boot-starter)
+        - [主要功能](#主要功能-30)
+        - [使用示例](#使用示例-30)
+    - [接口文档](#接口文档)
+      - [docs-spring-boot-starter](#docs-spring-boot-starter)
+        - [主要功能](#主要功能-31)
+        - [使用示例](#使用示例-31)
+  - [技术栈](#技术栈)
+  - [如何选择合适的组件](#如何选择合适的组件)
+  - [环境要求](#环境要求)
+  - [贡献指南](#贡献指南)
+  - [许可证](#许可证)
 
 ## 模块列表
 
 项目包含以下核心功能模块：
 
-| 模块名称 | 最新版本 | 主要功能 |
-| -------- | -------- | -------- |
-| [common-tool-spring-boot-starter](#common-tool-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/common-tool-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:common-tool-spring-boot-starter) | 通用工具集、分布式ID等 |
-| [i18n-spring-boot-starter](#i18n-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/i18n-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:i18n-spring-boot-starter) | 国际化支持 |
-| [xxl-job-spring-boot-starter](#xxl-job-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/xxl-job-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:xxl-job-spring-boot-starter) | XXL-JOB任务调度自动化集成 |
-| [robot-message-spring-boot-starter](#robot-message-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/robot-message-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:robot-message-spring-boot-starter) | 多平台机器人消息通知组件 |
-| [push-spring-boot-starter](#push-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/push-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:push-spring-boot-starter) | 移动端推送服务 |
-| [oss-spring-boot-starter](#oss-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/oss-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:oss-spring-boot-starter) | 对象存储服务集成 |
-| [script-spring-boot-starter](#script-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/script-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:script-spring-boot-starter) | 多语言脚本执行支持 |
-| [netty-spring-boot-starter](#netty-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/netty-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:netty-spring-boot-starter) | Netty服务器与WebSocket支持 |
-| [desensitize-spring-boot-starter](#desensitize-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/desensitize-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:desensitize-spring-boot-starter) | 数据脱敏处理组件 |
-| [multi-redis-spring-boot-starter](#multi-redis-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/multi-redis-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:multi-redis-spring-boot-starter) | 多Redis源支持 |
-| [multi-redisson-spring-boot-starter](#multi-redisson-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/multi-redisson-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:multi-redisson-spring-boot-starter) | 多Redisson数据源支持 |
-| [mybatis-plus-spring3-boot-starter](#mybatis-plus-spring3-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/mybatis-plus-spring3-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:mybatis-plus-spring3-boot-starter) | MyBatis-Plus与Spring Boot 3集成 |
-| [sftp-spring-boot-starter](#sftp-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/sftp-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:sftp-spring-boot-starter) | SFTP文件传输服务 |
-| [dynamic-mq-spring-boot-starter](#dynamic-mq-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/dynamic-mq-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:dynamic-mq-spring-boot-starter) | 动态消息队列管理 |
-| [mqtt-spring-boot-starter](#mqtt-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/mqtt-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:mqtt-spring-boot-starter) | MQTT消息协议支持 |
-| [rate-limiter-spring-boot-starter](#rate-limiter-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/rate-limiter-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:rate-limiter-spring-boot-starter) | 分布式限流组件 |
-| [lock-spring-boot-starter](#lock-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/lock-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:lock-spring-boot-starter) | 分布式锁实现 |
-| [idempotent-spring-boot-starter](#idempotent-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/idempotent-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:idempotent-spring-boot-starter) | 接口幂等性保障 |
-| [local-message-spring-boot-starter](#local-message-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/local-message-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:local-message-spring-boot-starter) | 本地消息表 |
-| [ip2region-spring-boot-starter](#ip2region-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/ip2region-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:ip2region-spring-boot-starter) | IP地址归属地查询 |
-| [docs-spring-boot-starter](#docs-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/docs-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:docs-spring-boot-starter) | API文档自动生成 |
-| [excel-spring-boot-starter](#excel-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/excel-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:excel-spring-boot-starter) | Excel导入导出处理 |
-| [crypto-spring-boot-starter](#crypto-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/crypto-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:crypto-spring-boot-starter) | 加密解密工具集成 |
-| [disruptor-spring-boot-starter](#disruptor-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/disruptor-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:disruptor-spring-boot-starter) | 高性能队列Disruptor集成 |
-| [dynamic-threadpool-spring-boot-starter](#dynamic-threadpool-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/dynamic-threadpool-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:dynamic-threadpool-spring-boot-starter) | 动态线程池管理 |
-| [dict-spring-boot-starter](#dict-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/dict-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:dict-spring-boot-starter) | 数据字典管理 |
-| [design-pattern-spring-boot-starter](#design-pattern-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/design-pattern-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:design-pattern-spring-boot-starter) | 设计模式工具集 |
-| [local-cache-spring-boot-starter](#local-cache-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/local-cache-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:local-cache-spring-boot-starter) | 本地缓存实现 |
-| [ffmpeg-spring-boot-starter](#ffmpeg-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/ffmpeg-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:ffmpeg-spring-boot-starter) | FFmpeg视频处理 |
-| [sensitive-word-spring-boot-starter](#sensitive-word-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/sensitive-word-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:sensitive-word-spring-boot-starter) | 敏感词过滤 |
-| [signature-spring-boot-starter](#signature-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/signature-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:signature-spring-boot-starter) | API签名验证 |
+| 模块名称                                                                          | 最新版本                                                                                                                                                                                                                  | 主要功能                        |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| [common-tool-spring-boot-starter](#common-tool-spring-boot-starter)               | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/common-tool-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:common-tool-spring-boot-starter)               | 通用工具集、分布式ID等          |
+| [i18n-spring-boot-starter](#i18n-spring-boot-starter)                             | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/i18n-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:i18n-spring-boot-starter)                             | 国际化支持                      |
+| [xxl-job-spring-boot-starter](#xxl-job-spring-boot-starter)                       | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/xxl-job-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:xxl-job-spring-boot-starter)                       | XXL-JOB任务调度自动化集成       |
+| [robot-message-spring-boot-starter](#robot-message-spring-boot-starter)           | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/robot-message-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:robot-message-spring-boot-starter)           | 多平台机器人消息通知组件        |
+| [push-spring-boot-starter](#push-spring-boot-starter)                             | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/push-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:push-spring-boot-starter)                             | 移动端推送服务                  |
+| [oss-spring-boot-starter](#oss-spring-boot-starter)                               | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/oss-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:oss-spring-boot-starter)                               | 对象存储服务集成                |
+| [script-spring-boot-starter](#script-spring-boot-starter)                         | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/script-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:script-spring-boot-starter)                         | 多语言脚本执行支持              |
+| [netty-spring-boot-starter](#netty-spring-boot-starter)                           | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/netty-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:netty-spring-boot-starter)                           | Netty服务器与WebSocket支持      |
+| [desensitize-spring-boot-starter](#desensitize-spring-boot-starter)               | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/desensitize-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:desensitize-spring-boot-starter)               | 数据脱敏处理组件                |
+| [multi-redis-spring-boot-starter](#multi-redis-spring-boot-starter)               | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/multi-redis-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:multi-redis-spring-boot-starter)               | 多Redis源支持                   |
+| [multi-redisson-spring-boot-starter](#multi-redisson-spring-boot-starter)         | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/multi-redisson-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:multi-redisson-spring-boot-starter)         | 多Redisson数据源支持            |
+| [mybatis-plus-spring3-boot-starter](#mybatis-plus-spring3-boot-starter)           | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/mybatis-plus-spring3-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:mybatis-plus-spring3-boot-starter)           | MyBatis-Plus与Spring Boot 3集成 |
+| [sftp-spring-boot-starter](#sftp-spring-boot-starter)                             | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/sftp-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:sftp-spring-boot-starter)                             | SFTP文件传输服务                |
+| [dynamic-mq-spring-boot-starter](#dynamic-mq-spring-boot-starter)                 | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/dynamic-mq-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:dynamic-mq-spring-boot-starter)                 | 动态消息队列管理                |
+| [mqtt-spring-boot-starter](#mqtt-spring-boot-starter)                             | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/mqtt-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:mqtt-spring-boot-starter)                             | MQTT消息协议支持                |
+| [rate-limiter-spring-boot-starter](#rate-limiter-spring-boot-starter)             | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/rate-limiter-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:rate-limiter-spring-boot-starter)             | 分布式限流组件                  |
+| [lock-spring-boot-starter](#lock-spring-boot-starter)                             | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/lock-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:lock-spring-boot-starter)                             | 分布式锁实现                    |
+| [idempotent-spring-boot-starter](#idempotent-spring-boot-starter)                 | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/idempotent-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:idempotent-spring-boot-starter)                 | 接口幂等性保障                  |
+| [local-message-spring-boot-starter](#local-message-spring-boot-starter)           | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/local-message-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:local-message-spring-boot-starter)           | 本地消息表                      |
+| [ip2region-spring-boot-starter](#ip2region-spring-boot-starter)                   | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/ip2region-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:ip2region-spring-boot-starter)                   | IP地址归属地查询                |
+| [docs-spring-boot-starter](#docs-spring-boot-starter)                             | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/docs-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:docs-spring-boot-starter)                             | API文档自动生成                 |
+| [excel-spring-boot-starter](#excel-spring-boot-starter)                           | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/excel-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:excel-spring-boot-starter)                           | Excel导入导出处理               |
+| [crypto-spring-boot-starter](#crypto-spring-boot-starter)                         | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/crypto-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:crypto-spring-boot-starter)                         | 加密解密工具集成                |
+| [disruptor-spring-boot-starter](#disruptor-spring-boot-starter)                   | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/disruptor-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:disruptor-spring-boot-starter)                   | 高性能队列Disruptor集成         |
+| [dynamic-threadpool-spring-boot-starter](#dynamic-threadpool-spring-boot-starter) | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/dynamic-threadpool-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:dynamic-threadpool-spring-boot-starter) | 动态线程池管理                  |
+| [dict-spring-boot-starter](#dict-spring-boot-starter)                             | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/dict-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:dict-spring-boot-starter)                             | 数据字典管理                    |
+| [design-pattern-spring-boot-starter](#design-pattern-spring-boot-starter)         | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/design-pattern-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:design-pattern-spring-boot-starter)         | 设计模式工具集                  |
+| [local-cache-spring-boot-starter](#local-cache-spring-boot-starter)               | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/local-cache-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:local-cache-spring-boot-starter)               | 本地缓存实现                    |
+| [ffmpeg-spring-boot-starter](#ffmpeg-spring-boot-starter)                         | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/ffmpeg-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:ffmpeg-spring-boot-starter)                         | FFmpeg视频处理                  |
+| [sensitive-word-spring-boot-starter](#sensitive-word-spring-boot-starter)         | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/sensitive-word-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:sensitive-word-spring-boot-starter)         | 敏感词过滤                      |
+| [signature-spring-boot-starter](#signature-spring-boot-starter)                   | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/signature-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:signature-spring-boot-starter)                   | API签名验证                     |
+| [resilience4j-spring-boot-starter](#resilience4j-spring-boot-starter)             | [![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/resilience4j-spring-boot-starter.svg)](https://search.maven.org/search?q=g:io.github.kk01001%20a:resilience4j-spring-boot-starter)             | Resilience4j容错组件            |
 
 ## 详细介绍
 
@@ -623,6 +693,125 @@ public class ChatEndpoint {
 ---
 
 ### 分布式组件
+
+#### resilience4j-spring-boot-starter
+
+Resilience4j 容错组件，提供熔断器、限流器、重试、舱壁、时间限制器等完整功能。
+
+##### 主要功能
+
+- **熔断器（Circuit Breaker）**：自动检测服务故障并触发熔断，防止故障扩散
+- **限流器（Rate Limiter）**：控制请求速率，防止系统过载
+- **重试（Retry）**：失败后自动重试，提高成功率
+- **舱壁（Bulkhead）**：限制并发调用数，实现资源隔离
+- **时间限制器（Time Limiter）**：控制方法执行超时
+- **组合使用**：支持多个功能组合使用
+- **多种降级策略**：支持异常、方法、默认值、null 四种降级策略
+- **灵活配置**：支持注解和配置文件两种配置方式
+
+##### 使用示例
+
+```java
+@Service
+public class OrderService {
+    
+    // 熔断器
+    @CircuitBreaker(
+        name = "orderService",
+        failureRateThreshold = 50.0f,
+        fallbackStrategy = FallbackStrategy.METHOD,
+        fallbackMethod = "createOrderFallback"
+    )
+    public Order createOrder(OrderRequest request) {
+        return remoteOrderService.create(request);
+    }
+    
+    public Order createOrderFallback(OrderRequest request, Throwable throwable) {
+        log.error("创建订单失败，使用降级逻辑", throwable);
+        return Order.failed();
+    }
+    
+    // 限流器
+    @RateLimiter(
+        name = "apiService",
+        limitForPeriod = 10,
+        fallbackStrategy = FallbackStrategy.METHOD,
+        fallbackMethod = "apiLimitFallback"
+    )
+    public ApiResponse callApi(ApiRequest request) {
+        return apiClient.call(request);
+    }
+    
+    public ApiResponse apiLimitFallback(ApiRequest request, Throwable throwable) {
+        return ApiResponse.error("请求过于频繁，请稍后重试");
+    }
+    
+    // 重试
+    @Retry(
+        name = "paymentService",
+        maxAttempts = 3,
+        waitDuration = 1000
+    )
+    public PaymentResult pay(PaymentRequest request) {
+        return paymentGateway.pay(request);
+    }
+    
+    // 舱壁
+    @Bulkhead(
+        name = "reportService",
+        maxConcurrentCalls = 5,
+        type = Bulkhead.Type.SEMAPHORE
+    )
+    public Report generateReport(ReportRequest request) {
+        return reportGenerator.generate(request);
+    }
+    
+    // 时间限制器
+    @TimeLimiter(
+        name = "searchService",
+        timeoutDuration = 3000
+    )
+    public SearchResult search(SearchQuery query) {
+        return searchEngine.search(query);
+    }
+    
+    // 组合使用
+    @Retry(name = "combined", maxAttempts = 3)
+    @CircuitBreaker(name = "combined")
+    @RateLimiter(name = "combined", limitForPeriod = 10)
+    public String callRemoteService() {
+        return remoteService.call();
+    }
+}
+```
+
+##### 配置示例
+
+```yaml
+resilience4j:
+  circuit-breaker:
+    instances:
+      orderService:
+        failure-rate-threshold: 50.0
+        slow-call-rate-threshold: 80.0
+        minimum-number-of-calls: 10
+  
+  rate-limiter:
+    instances:
+      apiService:
+        limit-for-period: 10
+        limit-refresh-period: 1000000000
+  
+  retry:
+    instances:
+      paymentService:
+        max-attempts: 3
+        wait-duration: 1000
+```
+
+[查看详细文档](./resilience4j-spring-boot-starter/README.md)
+
+---
 
 #### lock-spring-boot-starter
 
@@ -1433,27 +1622,28 @@ public class UserController {
 
 ## 如何选择合适的组件
 
-| 需求场景 | 推荐组件 |
-| -------- | -------- |
-| 基础工具支持（如字符串、日期处理等） | common-tool-spring-boot-starter |
-| 国际化多语言支持 | i18n-spring-boot-starter |
-| 分布式任务调度 | xxl-job-spring-boot-starter |
-| 机器人消息通知（钉钉、企业微信等） | robot-message-spring-boot-starter |
-| 移动端推送（APNs、FCM、极光等） | push-spring-boot-starter |
-| 对象存储服务 | oss-spring-boot-starter |
-| 脚本执行能力 | script-spring-boot-starter |
-| WebSocket/实时通信 | netty-spring-boot-starter |
-| MQTT物联网通信 | mqtt-spring-boot-starter |
-| 数据脱敏处理 | desensitize-spring-boot-starter |
-| 多Redis数据源 | multi-redis-spring-boot-starter / multi-redisson-spring-boot-starter |
-| 分布式锁 | lock-spring-boot-starter |
-| 接口限流 | rate-limiter-spring-boot-starter |
-| 接口幂等 | idempotent-spring-boot-starter |
-| 分布式事务最终一致性 | local-message-spring-boot-starter |
-| 动态线程池管理 | dynamic-threadpool-spring-boot-starter |
-| 视频音频处理 | ffmpeg-spring-boot-starter |
-| 敏感词过滤/内容审核 | sensitive-word-spring-boot-starter |
-| API签名验证/防篡改 | signature-spring-boot-starter |
+| 需求场景                             | 推荐组件                                                             |
+| ------------------------------------ | -------------------------------------------------------------------- |
+| 基础工具支持（如字符串、日期处理等） | common-tool-spring-boot-starter                                      |
+| 国际化多语言支持                     | i18n-spring-boot-starter                                             |
+| 分布式任务调度                       | xxl-job-spring-boot-starter                                          |
+| 机器人消息通知（钉钉、企业微信等）   | robot-message-spring-boot-starter                                    |
+| 移动端推送（APNs、FCM、极光等）      | push-spring-boot-starter                                             |
+| 对象存储服务                         | oss-spring-boot-starter                                              |
+| 脚本执行能力                         | script-spring-boot-starter                                           |
+| WebSocket/实时通信                   | netty-spring-boot-starter                                            |
+| MQTT物联网通信                       | mqtt-spring-boot-starter                                             |
+| 数据脱敏处理                         | desensitize-spring-boot-starter                                      |
+| 多Redis数据源                        | multi-redis-spring-boot-starter / multi-redisson-spring-boot-starter |
+| 分布式锁                             | lock-spring-boot-starter                                             |
+| 接口限流                             | rate-limiter-spring-boot-starter                                     |
+| 接口幂等                             | idempotent-spring-boot-starter                                       |
+| 分布式事务最终一致性                 | local-message-spring-boot-starter                                    |
+| 动态线程池管理                       | dynamic-threadpool-spring-boot-starter                               |
+| 视频音频处理                         | ffmpeg-spring-boot-starter                                           |
+| 敏感词过滤/内容审核                  | sensitive-word-spring-boot-starter                                   |
+| API签名验证/防篡改                   | signature-spring-boot-starter                                        |
+| 容错保护（熔断/限流/重试）           | resilience4j-spring-boot-starter                                     |
 
 ## 环境要求
 
