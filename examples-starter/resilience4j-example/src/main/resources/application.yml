@@ -1,0 +1,74 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: resilience4j-example
+
+# Resilience4j 配置
+resilience4j:
+  enabled: true
+  
+  circuit-breaker:
+    instances:
+      testCircuitBreaker:
+        failure-rate-threshold: 50.0
+        slow-call-rate-threshold: 80.0
+        slow-call-duration-threshold: 3000
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+      combined:
+        failure-rate-threshold: 60.0
+        minimum-number-of-calls: 3
+  
+  rate-limiter:
+    instances:
+      testRateLimiter:
+        limit-for-period: 5
+        limit-refresh-period: 1000000000  # 1秒（纳秒）
+        timeout-duration: 100
+      combined:
+        limit-for-period: 10
+        limit-refresh-period: 1000000000
+  
+  retry:
+    instances:
+      testRetry:
+        max-attempts: 3
+        wait-duration: 500
+      combined:
+        max-attempts: 2
+        wait-duration: 300
+  
+  bulkhead:
+    instances:
+      testBulkhead:
+        max-concurrent-calls: 3
+        max-wait-duration: 100
+  
+  time-limiter:
+    instances:
+      testTimeLimiter:
+        timeout-duration: 2000
+        cancel-running-future: true
+
+# Actuator 监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,circuitbreakers,ratelimiters,retries,bulkheads,timelimiters
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+
+# 日志配置
+logging:
+  level:
+    io.github.kk01001: DEBUG
+    io.github.resilience4j: DEBUG

@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resilience4j 示例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .icon {
+            font-size: 1.2em;
+        }
+
+        .card-desc {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .controls {
+            margin-bottom: 15px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .control-group input,
+        .control-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Resilience4j 示例</h1>
+            <p>测试熔断器、限流器、重试、舱壁、时间限制器等功能</p>
+        </div>
+
+        <div class="grid">
+            <!-- 熔断器 -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">⚡</span>
+                    熔断器 (Circuit Breaker)
+                </div>
+                <div class="card-desc">
+                    当失败率超过阈值时自动熔断，防止故障扩散
+                </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>失败率 (%)</label>
+                        <input type="number" id="cbFailureRate" value="50" min="0" max="100">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="testCircuitBreaker()">测试熔断器</button>
+                <div id="cbResult" class="result"></div>
+            </div>
+
+            <!-- 限流器 -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">🚦</span>
+                    限流器 (Rate Limiter)
+                </div>
+                <div class="card-desc">
+                    限制请求速率，每秒最多5个请求
+                </div>
+                <button class="btn btn-primary" onclick="testRateLimiter()">测试限流器</button>
+                <button class="btn btn-secondary" onclick="batchTestRateLimiter()">批量测试 (10次)</button>
+                <div id="rlResult" class="result"></div>
+            </div>
+
+            <!-- 重试 -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">🔄</span>
+                    重试 (Retry)
+                </div>
+                <div class="card-desc">
+                    失败后自动重试，最多3次
+                </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>失败率 (%)</label>
+                        <input type="number" id="retryFailureRate" value="70" min="0" max="100">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="testRetry()">测试重试</button>
+                <div id="retryResult" class="result"></div>
+            </div>
+
+            <!-- 舱壁 -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">🚢</span>
+                    舱壁 (Bulkhead)
+                </div>
+                <div class="card-desc">
+                    限制并发调用数，最多3个并发
+                </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>延迟时间 (ms)</label>
+                        <input type="number" id="bulkheadDelay" value="1000" min="0" max="10000">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="testBulkhead()">测试舱壁</button>
+                <button class="btn btn-secondary" onclick="batchTestBulkhead()">并发测试 (5次)</button>
+                <div id="bulkheadResult" class="result"></div>
+            </div>
+
+            <!-- 时间限制器 -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">⏱️</span>
+                    时间限制器 (Time Limiter)
+                </div>
+                <div class="card-desc">
+                    超时控制，超过2秒自动超时
+                </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>延迟时间 (ms)</label>
+                        <input type="number" id="tlDelay" value="3000" min="0" max="10000">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="testTimeLimiter()">测试时间限制器</button>
+                <div id="tlResult" class="result"></div>
+            </div>
+
+            <!-- 组合使用 -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">🎯</span>
+                    组合使用
+                </div>
+                <div class="card-desc">
+                    同时使用重试、熔断器、限流器
+                </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>失败率 (%)</label>
+                        <input type="number" id="combinedFailureRate" value="30" min="0" max="100">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="testCombined()">测试组合功能</button>
+                <div id="combinedResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="stats-card">
+            <div class="card-title">
+                <span class="icon">📊</span>
+                统计信息
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalCalls">0</div>
+                    <div class="stat-label">总调用次数</div>
+                </div>
+            </div>
+            <button class="btn btn-secondary" onclick="resetStats()" style="margin-top: 15px;">重置统计</button>
+        </div>
+
+        <div class="footer">
+            <p>Resilience4j Spring Boot Starter v2.4.8</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/resilience';
+
+        async function request(url, options = {}) {
+            try {
+                const response = await fetch(url, options);
+                return await response.json();
+            } catch (error) {
+                return { code: 500, message: error.message };
+            }
+        }
+
+        function showResult(elementId, data, isSuccess) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${isSuccess ? 'success' : 'error'}`;
+            element.innerHTML = `
+                <strong>${isSuccess ? '✅ 成功' : '❌ 失败'}</strong><br>
+                ${JSON.stringify(data, null, 2)}
+            `;
+            updateStats();
+        }
+
+        async function testCircuitBreaker() {
+            const failureRate = document.getElementById('cbFailureRate').value;
+            const result = await request(`${API_BASE}/circuit-breaker?failureRate=${failureRate}`);
+            showResult('cbResult', result.data, result.data.success);
+        }
+
+        async function testRateLimiter() {
+            const result = await request(`${API_BASE}/rate-limiter`);
+            showResult('rlResult', result.data, result.data.success);
+        }
+
+        async function batchTestRateLimiter() {
+            const results = [];
+            for (let i = 0; i < 10; i++) {
+                const result = await request(`${API_BASE}/rate-limiter`);
+                results.push(result.data);
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            const successCount = results.filter(r => r.success).length;
+            showResult('rlResult', {
+                total: 10,
+                success: successCount,
+                failed: 10 - successCount,
+                results: results
+            }, true);
+        }
+
+        async function testRetry() {
+            const failureRate = document.getElementById('retryFailureRate').value;
+            const result = await request(`${API_BASE}/retry?failureRate=${failureRate}`);
+            showResult('retryResult', result.data, result.data.success);
+        }
+
+        async function testBulkhead() {
+            const delay = document.getElementById('bulkheadDelay').value;
+            const result = await request(`${API_BASE}/bulkhead?delayMs=${delay}`);
+            showResult('bulkheadResult', result.data, result.data.success);
+        }
+
+        async function batchTestBulkhead() {
+            const delay = document.getElementById('bulkheadDelay').value;
+            const promises = [];
+            for (let i = 0; i < 5; i++) {
+                promises.push(request(`${API_BASE}/bulkhead?delayMs=${delay}`));
+            }
+            const results = await Promise.all(promises);
+            const successCount = results.filter(r => r.data.success).length;
+            showResult('bulkheadResult', {
+                total: 5,
+                success: successCount,
+                failed: 5 - successCount,
+                results: results.map(r => r.data)
+            }, true);
+        }
+
+        async function testTimeLimiter() {
+            const delay = document.getElementById('tlDelay').value;
+            const result = await request(`${API_BASE}/time-limiter?delayMs=${delay}`);
+            showResult('tlResult', result.data, result.data.success);
+        }
+
+        async function testCombined() {
+            const failureRate = document.getElementById('combinedFailureRate').value;
+            const result = await request(`${API_BASE}/combined?failureRate=${failureRate}`);
+            showResult('combinedResult', result.data, result.data.success);
+        }
+
+        async function updateStats() {
+            const result = await request(`${API_BASE}/stats`);
+            if (result.code === 200) {
+                document.getElementById('totalCalls').textContent = result.data.totalCalls;
+            }
+        }
+
+        async function resetStats() {
+            await request(`${API_BASE}/reset`, { method: 'POST' });
+            updateStats();
+            alert('统计信息已重置');
+        }
+
+        // 页面加载时更新统计
+        updateStats();
+    </script>
+</body>
+</html>
