@@ -21,7 +21,7 @@ redisson:
       max-pool-size: 8
       queue-capacity: 10000
       keep-alive-seconds: 60
-      thread-name-prefix: dual-write-
+      thread-name-prefix: redis-dual-write-
 
     # Redis 实例配置
     instances:
@@ -40,9 +40,10 @@ redisson:
           master-connection-minimum-idle-size: 24
           slave-connection-pool-size: 64
           slave-connection-minimum-idle-size: 24
-          connect-timeout: 10000
-          timeout: 3000
-          retry-attempts: 3
+          connect-timeout: 3000
+          timeout: 1000
+          check-slots-coverage: false
+          retry-attempts: 1
           # 重试延迟策略配置
           retry-delay:
             # 类型: CONSTANT, EQUAL_JITTER(默认), FULL_JITTER, DECORRELATED_JITTER
@@ -79,8 +80,9 @@ redisson:
           master-connection-minimum-idle-size: 24
           slave-connection-pool-size: 64
           slave-connection-minimum-idle-size: 24
-          connect-timeout: 10000
-          timeout: 3000
+          connect-timeout: 3000
+          timeout: 1000
+          check-slots-coverage: false
           retry-attempts: 3
           # 重试延迟策略配置
           retry-delay:

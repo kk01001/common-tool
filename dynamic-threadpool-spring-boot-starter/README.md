@@ -27,7 +27,7 @@ Dynamic ThreadPool 是一个强大的 Spring Boot Starter，提供线程池的�
 <dependency>
     <groupId>io.github.kk01001</groupId>
     <artifactId>dynamic-threadpool-spring-boot-starter</artifactId>
-    <version>2.4.8</version>
+    <version>2.4.8.1</version>
 </dependency>
 ```
 

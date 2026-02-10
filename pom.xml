@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.kk01001</groupId>
     <artifactId>common-tool</artifactId>
-    <version>2.4.8</version>
+    <version>2.4.8.1</version>
     <name>common-tool</name>
     <description>通用工具</description>
 
@@ -346,9 +346,17 @@
                         <artifact>threadpool-example</artifact>
                         <artifact>mybatis-plus-example</artifact>
                         <artifact>graphql-examples</artifact>
+                        <artifact>signature-example</artifact>
                         <artifact>redis-serialization-examples</artifact>
                         <artifact>multi-redisson-example</artifact>
+                        <artifact>sensitive-word-example</artifact>
                         <artifact>seata-example-parent</artifact>
+                        <artifact>seata-common</artifact>
+                        <artifact>account-service</artifact>
+                        <artifact>order-service</artifact>
+                        <artifact>storage-service</artifact>
+                        <artifact>business-service</artifact>
+                        <artifact>gateway-service</artifact>
                     </excludeArtifacts>
                     <autoPublish>true</autoPublish>
                 </configuration>

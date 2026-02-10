@@ -134,7 +134,7 @@ GET /api/serialization/test
 <dependency>
     <groupId>io.github.kk01001</groupId>
     <artifactId>multi-redis-spring-boot-starter</artifactId>
-    <version>2.4.8</version>
+    <version>2.4.8.1</version>
 </dependency>
 ```
 
