@@ -1,16 +1,13 @@
 package io.github.kk01001.redisson.health;
 
 import io.github.kk01001.redisson.holder.RedissonClientHolder;
-import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
 
-import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author kk01001
@@ -21,24 +18,9 @@ public class RedissonHealthIndicator extends AbstractHealthIndicator {
 
     private final RedissonClientHolder clientHolder;
 
-    /**
-     * 健康检查超时时间
-     */
-    private final Duration timeout;
-
-    /**
-     * 健康检查测试 Key 前缀
-     */
-    private static final String HEALTH_CHECK_KEY_PREFIX = "redisson:health:check:";
-
     public RedissonHealthIndicator(RedissonClientHolder clientHolder) {
-        this(clientHolder, Duration.ofSeconds(3));
-    }
-
-    public RedissonHealthIndicator(RedissonClientHolder clientHolder, Duration timeout) {
         super("Redisson health check failed");
         this.clientHolder = clientHolder;
-        this.timeout = timeout;
     }
 
     @Override
@@ -92,7 +74,12 @@ public class RedissonHealthIndicator extends AbstractHealthIndicator {
     }
 
     /**
-     * 检查单个客户端健康状态
+     * 健康检查固定 Key（只读，不产生脏数据）
+     */
+    private static final String HEALTH_CHECK_KEY = "redisson:health:ping";
+
+    /**
+     * 检查单个客户端健康状态（使用只读操作，不产生脏数据）
      */
     private ClientHealth checkClientHealth(String clientName) {
         long startTime = System.currentTimeMillis();
@@ -106,22 +93,9 @@ public class RedissonHealthIndicator extends AbstractHealthIndicator {
                 return new ClientHealth(false, 0, "Client is shutdown");
             }
 
-            // 执行 PING 测试
-            String testKey = HEALTH_CHECK_KEY_PREFIX + UUID.randomUUID().toString();
-            String testValue = "health-check-" + System.currentTimeMillis();
-
-            RBucket<String> bucket = client.getBucket(testKey);
-            bucket.set(testValue, Duration.ofSeconds(10));
-            String result = bucket.get();
-            bucket.delete();
-
+            client.getBucket(HEALTH_CHECK_KEY).isExists();
             long responseTime = System.currentTimeMillis() - startTime;
-
-            if (testValue.equals(result)) {
-                return new ClientHealth(true, responseTime, null);
-            } else {
-                return new ClientHealth(false, responseTime, "Value mismatch");
-            }
+            return new ClientHealth(true, responseTime, null);
 
         } catch (Exception e) {
             long responseTime = System.currentTimeMillis() - startTime;

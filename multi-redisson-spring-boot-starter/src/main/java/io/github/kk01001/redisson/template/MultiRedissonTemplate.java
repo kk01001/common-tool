@@ -4,6 +4,9 @@ import io.github.kk01001.redisson.circuitbreaker.DualWriteCircuitBreaker;
 import io.github.kk01001.redisson.holder.RedissonClientHolder;
 import io.github.kk01001.redisson.monitor.DualWriteMetrics;
 import io.github.kk01001.redisson.properties.MultiRedissonProperties;
+import io.github.kk01001.redisson.retry.DualWriteFailureHandler;
+import io.github.kk01001.redisson.retry.RetryTask;
+import io.github.kk01001.redisson.retry.RetryableRunnable;
 import org.redisson.api.GeoEntry;
 import org.redisson.api.GeoOrder;
 import org.redisson.api.GeoPosition;
@@ -36,6 +39,7 @@ import org.springframework.util.StringUtils;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,7 +58,7 @@ import java.util.function.Supplier;
  * - 备份集群：异步操作（通过线程池）
  * </p>
  */
-@SuppressWarnings("all")
+@SuppressWarnings("unchecked")
 public class MultiRedissonTemplate {
 
     private static final Logger log = LoggerFactory.getLogger(MultiRedissonTemplate.class);
@@ -90,6 +94,11 @@ public class MultiRedissonTemplate {
     private final DualWriteCircuitBreaker circuitBreaker;
 
     /**
+     * 双写失败处理器
+     */
+    private final DualWriteFailureHandler failureHandler;
+
+    /**
      * 批量操作
      */
     private final BatchOperations batchOperations;
@@ -98,12 +107,14 @@ public class MultiRedissonTemplate {
                                  MultiRedissonProperties properties,
                                  ExecutorService dualWriteExecutor,
                                  DualWriteMetrics metrics,
-                                 DualWriteCircuitBreaker circuitBreaker) {
+                                 DualWriteCircuitBreaker circuitBreaker,
+                                 DualWriteFailureHandler failureHandler) {
         this.properties = properties;
         this.primaryClient = holder.getPrimary();
         this.metrics = metrics;
         this.circuitBreaker = circuitBreaker;
         this.dualWriteExecutor = dualWriteExecutor;
+        this.failureHandler = failureHandler;
 
         // 获取备份客户端（如果配置了）
         if (StringUtils.hasText(properties.getSecondary())) {
@@ -116,9 +127,8 @@ public class MultiRedissonTemplate {
             this.secondaryClient = null;
         }
 
-        // 初始化批量操作（传入 properties 支持动态配置）
-        this.batchOperations = new BatchOperations(primaryClient, secondaryClient, 
-                dualWriteExecutor, properties);
+        this.batchOperations = new BatchOperations(primaryClient, secondaryClient,
+                dualWriteExecutor, properties, circuitBreaker, metrics, failureHandler);
 
         log.info("MultiRedissonTemplate initialized, dualWriteEnabled: {}, primary: {}, secondary: {}, circuitBreaker: {}",
                 isDualWriteEnabled(),
@@ -213,24 +223,26 @@ public class MultiRedissonTemplate {
 
     /**
      * 设置锁（如果不存在）
+     * <p>备份集群使用 set 而非 setIfAbsent，保证与主集群状态一致</p>
      */
     public <V> boolean setNx(String key, V value, Duration duration) {
         RBucket<V> bucket = primaryClient.getBucket(key);
         boolean result = bucket.setIfAbsent(value, duration);
         if (result && isDualWriteEnabled()) {
-            asyncWrite(() -> secondaryClient.getBucket(key).setIfAbsent(value, duration), "setNx");
+            asyncWrite(() -> secondaryClient.getBucket(key).set(value, duration), "setNx");
         }
         return result;
     }
 
     /**
      * 设置锁（如果不存在，指定编码器）
+     * <p>备份集群使用 set 而非 setIfAbsent，保证与主集群状态一致</p>
      */
     public <V> boolean setNx(Codec codec, String key, V value, Duration duration) {
         RBucket<V> bucket = primaryClient.getBucket(key, codec);
         boolean result = bucket.setIfAbsent(value, duration);
         if (result && isDualWriteEnabled()) {
-            asyncWrite(() -> secondaryClient.getBucket(key, codec).setIfAbsent(value, duration), "setNxWithCodec");
+            asyncWrite(() -> secondaryClient.getBucket(key, codec).set(value, duration), "setNxWithCodec");
         }
         return result;
     }
@@ -359,6 +371,87 @@ public class MultiRedissonTemplate {
     }
 
     /**
+     * 判断 hash 字段是否存在
+     */
+    public boolean hexists(String key, String field) {
+        RMap<String, ?> map = primaryClient.getMap(key);
+        return map.containsKey(field);
+    }
+
+    /**
+     * 获取 hash 所有字段名
+     */
+    public Set<String> hkeys(String key) {
+        RMap<String, ?> map = primaryClient.getMap(key);
+        return map.readAllKeySet();
+    }
+
+    /**
+     * 获取 hash 所有值
+     */
+    public <V> Collection<V> hvals(String key) {
+        RMap<String, V> map = primaryClient.getMap(key);
+        return map.readAllValues();
+    }
+
+    /**
+     * 设置 hash 字段（指定编码器）
+     */
+    public <V> void hset(Codec codec, String key, String field, V value) {
+        write(() -> {
+            RMap<String, V> map = primaryClient.getMap(key, codec);
+            map.put(field, value);
+            return null;
+        }, () -> {
+            RMap<String, V> map = secondaryClient.getMap(key, codec);
+            map.put(field, value);
+        }, "hsetWithCodec");
+    }
+
+    /**
+     * 获取 hash 字段值（指定编码器）
+     */
+    public <V> V hget(Codec codec, String key, String field) {
+        RMap<String, V> map = primaryClient.getMap(key, codec);
+        return map.get(field);
+    }
+
+    /**
+     * 获取所有 hash 字段和值（指定编码器）
+     */
+    public <K, V> Map<K, V> hgetAll(Codec codec, String key) {
+        RMap<K, V> map = primaryClient.getMap(key, codec);
+        return map.readAllMap();
+    }
+
+    /**
+     * 批量设置 hash 字段（指定编码器）
+     */
+    public <V> void hmset(Codec codec, String key, Map<String, V> map) {
+        write(() -> {
+            RMap<String, V> rMap = primaryClient.getMap(key, codec);
+            rMap.putAll(map);
+            return null;
+        }, () -> {
+            RMap<String, V> rMap = secondaryClient.getMap(key, codec);
+            rMap.putAll(map);
+        }, "hmsetWithCodec");
+    }
+
+    /**
+     * 仅当字段不存在时设置 hash 字段
+     */
+    public <V> V hsetNx(String key, String field, V value) {
+        return write(() -> {
+            RMap<String, V> map = primaryClient.getMap(key);
+            return map.putIfAbsent(field, value);
+        }, () -> {
+            RMap<String, V> map = secondaryClient.getMap(key);
+            map.put(field, value);
+        }, "hsetNx");
+    }
+
+    /**
      * hash 字段递增
      */
     public <V> V hincrby(String key, String field, Number value) {
@@ -477,6 +570,30 @@ public class MultiRedissonTemplate {
     public int scard(String key) {
         RSet<?> set = primaryClient.getSet(key);
         return set.size();
+    }
+
+    /**
+     * 获取两个 Set 的交集
+     */
+    public <V> Set<V> sinter(String key, String otherKey) {
+        RSet<V> set = primaryClient.getSet(key);
+        return set.readIntersection(otherKey);
+    }
+
+    /**
+     * 获取两个 Set 的并集
+     */
+    public <V> Set<V> sunion(String key, String otherKey) {
+        RSet<V> set = primaryClient.getSet(key);
+        return set.readUnion(otherKey);
+    }
+
+    /**
+     * 获取两个 Set 的差集
+     */
+    public <V> Set<V> sdiff(String key, String otherKey) {
+        RSet<V> set = primaryClient.getSet(key);
+        return set.readDiff(otherKey);
     }
 
     // ====================== List 操作 ======================
@@ -630,6 +747,14 @@ public class MultiRedissonTemplate {
     }
 
     /**
+     * 获取元素排名（从小到大）
+     */
+    public <V> Integer zrank(String key, V value) {
+        RScoredSortedSet<V> zset = primaryClient.getScoredSortedSet(key);
+        return zset.rank(value);
+    }
+
+    /**
      * 获取元素排名（从大到小）
      */
     public <V> Integer zrevrank(String key, V value) {
@@ -638,11 +763,69 @@ public class MultiRedissonTemplate {
     }
 
     /**
-     * 按分数从大到小返回元素
+     * 按索引范围获取元素（从小到大）
+     */
+    public <V> Collection<V> zrange(String key, int start, int end) {
+        RScoredSortedSet<V> zset = primaryClient.getScoredSortedSet(key);
+        return zset.valueRange(start, end);
+    }
+
+    /**
+     * 按索引范围获取元素（从大到小）
      */
     public <V> Collection<V> zrevrange(String key, int start, int end) {
         RScoredSortedSet<V> zset = primaryClient.getScoredSortedSet(key);
         return zset.valueRangeReversed(start, end);
+    }
+
+    /**
+     * 按索引范围获取元素和分数（从小到大）
+     */
+    public <V> Collection<ScoredEntry<V>> zrangeWithScores(String key, int start, int end) {
+        RScoredSortedSet<V> zset = primaryClient.getScoredSortedSet(key);
+        return zset.entryRange(start, end);
+    }
+
+    /**
+     * 按索引范围获取元素和分数（从大到小）
+     */
+    public <V> Collection<ScoredEntry<V>> zrevrangeWithScores(String key, int start, int end) {
+        RScoredSortedSet<V> zset = primaryClient.getScoredSortedSet(key);
+        return zset.entryRangeReversed(start, end);
+    }
+
+    /**
+     * 按分数范围获取元素和分数
+     */
+    public <V> Collection<ScoredEntry<V>> zrangeByScoreWithScores(String key, double min, double max) {
+        RScoredSortedSet<V> zset = primaryClient.getScoredSortedSet(key);
+        return zset.entryRange(min, true, max, true);
+    }
+
+    /**
+     * 按分数范围移除元素
+     */
+    public int zremrangeByScore(String key, double min, double max) {
+        return write(() -> {
+            RScoredSortedSet<?> zset = primaryClient.getScoredSortedSet(key);
+            return zset.removeRangeByScore(min, true, max, true);
+        }, () -> {
+            RScoredSortedSet<?> zset = secondaryClient.getScoredSortedSet(key);
+            zset.removeRangeByScore(min, true, max, true);
+        }, "zremrangeByScore");
+    }
+
+    /**
+     * 按排名范围移除元素
+     */
+    public int zremrangeByRank(String key, int start, int end) {
+        return write(() -> {
+            RScoredSortedSet<?> zset = primaryClient.getScoredSortedSet(key);
+            return zset.removeRangeByRank(start, end);
+        }, () -> {
+            RScoredSortedSet<?> zset = secondaryClient.getScoredSortedSet(key);
+            zset.removeRangeByRank(start, end);
+        }, "zremrangeByRank");
     }
 
     /**
@@ -1271,6 +1454,7 @@ public class MultiRedissonTemplate {
 
     /**
      * 比较并设置原子 Long 值
+     * <p>备份集群直接 set(update)，因为异步延迟导致备份集群当前值可能不等于 expect</p>
      *
      * @param key    键
      * @param expect 期望值
@@ -1280,13 +1464,14 @@ public class MultiRedissonTemplate {
     public boolean compareAndSetLong(String key, long expect, long update) {
         boolean result = primaryClient.getAtomicLong(key).compareAndSet(expect, update);
         if (result && isDualWriteEnabled()) {
-            asyncWrite(() -> secondaryClient.getAtomicLong(key).compareAndSet(expect, update), "compareAndSetLong");
+            asyncWrite(() -> secondaryClient.getAtomicLong(key).set(update), "compareAndSetLong");
         }
         return result;
     }
 
     /**
      * 比较并设置原子 Double 值
+     * <p>备份集群直接 set(update)，因为异步延迟导致备份集群当前值可能不等于 expect</p>
      *
      * @param key    键
      * @param expect 期望值
@@ -1296,7 +1481,7 @@ public class MultiRedissonTemplate {
     public boolean compareAndSetDouble(String key, double expect, double update) {
         boolean result = primaryClient.getAtomicDouble(key).compareAndSet(expect, update);
         if (result && isDualWriteEnabled()) {
-            asyncWrite(() -> secondaryClient.getAtomicDouble(key).compareAndSet(expect, update), "compareAndSetDouble");
+            asyncWrite(() -> secondaryClient.getAtomicDouble(key).set(update), "compareAndSetDouble");
         }
         return result;
     }
@@ -1319,34 +1504,38 @@ public class MultiRedissonTemplate {
 
     /**
      * 获取并递增原子 Long
+     * <p>备份集群直接 set(最终值)，避免增量操作累积误差</p>
      */
     public long getAndIncrement(String key) {
         return writeWithResult(() -> primaryClient.getAtomicLong(key).getAndIncrement(),
-                result -> secondaryClient.getAtomicLong(key).incrementAndGet(), "getAndIncrement");
+                oldValue -> secondaryClient.getAtomicLong(key).set(oldValue + 1), "getAndIncrement");
     }
 
     /**
      * 获取并递减原子 Long
+     * <p>备份集群直接 set(最终值)，避免增量操作累积误差</p>
      */
     public long getAndDecrement(String key) {
         return writeWithResult(() -> primaryClient.getAtomicLong(key).getAndDecrement(),
-                result -> secondaryClient.getAtomicLong(key).decrementAndGet(), "getAndDecrement");
+                oldValue -> secondaryClient.getAtomicLong(key).set(oldValue - 1), "getAndDecrement");
     }
 
     /**
      * 获取并增加原子 Long
+     * <p>备份集群直接 set(最终值)，避免增量操作累积误差</p>
      */
     public long getAndAdd(String key, long delta) {
         return writeWithResult(() -> primaryClient.getAtomicLong(key).getAndAdd(delta),
-                result -> secondaryClient.getAtomicLong(key).addAndGet(delta), "getAndAdd");
+                oldValue -> secondaryClient.getAtomicLong(key).set(oldValue + delta), "getAndAdd");
     }
 
     /**
      * 获取并增加原子 Double
+     * <p>备份集群直接 set(最终值)，避免增量操作累积误差</p>
      */
     public double getAndAddDouble(String key, double delta) {
         return writeWithResult(() -> primaryClient.getAtomicDouble(key).getAndAdd(delta),
-                result -> secondaryClient.getAtomicDouble(key).addAndGet(delta), "getAndAddDouble");
+                oldValue -> secondaryClient.getAtomicDouble(key).set(oldValue + delta), "getAndAddDouble");
     }
 
     // ====================== 通用操作 ======================
@@ -1362,19 +1551,20 @@ public class MultiRedissonTemplate {
     }
 
     /**
-     * 批量删除 key
+     * 批量删除 key（可变参数）
+     */
+    public void delete(String... keys) {
+        write(() -> {
+            primaryClient.getKeys().unlink(keys);
+            return null;
+        }, () -> secondaryClient.getKeys().unlink(keys), "deleteBatch");
+    }
+
+    /**
+     * 批量删除 key（集合）
      */
     public void delete(Collection<String> keys) {
-        write(() -> {
-            for (String key : keys) {
-                primaryClient.getBucket(key).unlink();
-            }
-            return null;
-        }, () -> {
-            for (String key : keys) {
-                secondaryClient.getBucket(key).unlink();
-            }
-        }, "deleteBatch");
+        delete(keys.toArray(new String[0]));
     }
 
     /**
@@ -1399,6 +1589,145 @@ public class MultiRedissonTemplate {
      */
     public long getExpire(String key) {
         return primaryClient.getBucket(key).remainTimeToLive();
+    }
+
+    /**
+     * 重命名 key
+     */
+    public void rename(String oldKey, String newKey) {
+        write(() -> {
+            primaryClient.getBucket(oldKey).rename(newKey);
+            return null;
+        }, () -> secondaryClient.getBucket(oldKey).rename(newKey), "rename");
+    }
+
+    /**
+     * 移除 key 的过期时间（持久化）
+     */
+    public boolean persist(String key) {
+        return write(() -> primaryClient.getBucket(key).clearExpire(),
+                () -> secondaryClient.getBucket(key).clearExpire(), "persist");
+    }
+
+    /**
+     * 按模式匹配查找 key（基于 SCAN 命令，不阻塞 Redis）
+     *
+     * @param pattern 匹配模式，如 "user:*"
+     * @return 匹配的 key 迭代器
+     */
+    public Iterable<String> scan(String pattern) {
+        return primaryClient.getKeys().getKeys(
+                org.redisson.api.options.KeysScanOptions.defaults().pattern(pattern));
+    }
+
+    /**
+     * 按模式匹配查找 key（指定每次扫描数量）
+     *
+     * @param pattern 匹配模式，如 "user:*"
+     * @param count   每次 SCAN 返回的近似数量
+     * @return 匹配的 key 迭代器
+     */
+    public Iterable<String> scan(String pattern, int count) {
+        return primaryClient.getKeys().getKeys(
+                org.redisson.api.options.KeysScanOptions.defaults().pattern(pattern).chunkSize(count));
+    }
+
+    /**
+     * 按模式匹配查找 key
+     *
+     * @param pattern 匹配模式，如 "user:*"
+     * @return 匹配的 key 集合
+     */
+    public Iterable<String> keys(String pattern) {
+        return primaryClient.getKeys().getKeys(
+                org.redisson.api.options.KeysScanOptions.defaults().pattern(pattern));
+    }
+
+    /**
+     * 批量判断 key 是否存在
+     *
+     * @param keys key 数组
+     * @return 存在的 key 数量
+     */
+    public long existsCount(String... keys) {
+        return primaryClient.getKeys().countExists(keys);
+    }
+
+    // ====================== SCAN 系列操作 ======================
+
+    /**
+     * 遍历 Hash 字段（HSCAN）
+     *
+     * @param key     Hash 的 key
+     * @param pattern 字段名匹配模式，如 "field:*"
+     * @return 匹配的字段和值的迭代器
+     */
+    public <K, V> Iterable<Map.Entry<K, V>> hscan(String key, String pattern) {
+        RMap<K, V> map = primaryClient.getMap(key);
+        return map.entrySet(pattern);
+    }
+
+    /**
+     * 遍历 Hash 字段（HSCAN，指定每次扫描数量）
+     *
+     * @param key     Hash 的 key
+     * @param pattern 字段名匹配模式
+     * @param count   每次 SCAN 返回的近似数量
+     * @return 匹配的字段和值的迭代器
+     */
+    public <K, V> Iterable<Map.Entry<K, V>> hscan(String key, String pattern, int count) {
+        RMap<K, V> map = primaryClient.getMap(key);
+        return map.entrySet(pattern, count);
+    }
+
+    /**
+     * 遍历 Set 元素（SSCAN）
+     *
+     * @param key     Set 的 key
+     * @param pattern 元素匹配模式
+     * @return 匹配的元素迭代器
+     */
+    public <V> Iterator<V> sscan(String key, String pattern) {
+        RSet<V> set = primaryClient.getSet(key);
+        return set.iterator(pattern);
+    }
+
+    /**
+     * 遍历 Set 元素（SSCAN，指定每次扫描数量）
+     *
+     * @param key     Set 的 key
+     * @param pattern 元素匹配模式
+     * @param count   每次 SCAN 返回的近似数量
+     * @return 匹配的元素迭代器
+     */
+    public <V> Iterator<V> sscan(String key, String pattern, int count) {
+        RSet<V> set = primaryClient.getSet(key);
+        return set.iterator(pattern, count);
+    }
+
+    /**
+     * 遍历 ZSet 元素（ZSCAN）
+     *
+     * @param key     ZSet 的 key
+     * @param pattern 元素匹配模式
+     * @return 匹配的元素迭代器
+     */
+    public <V> Iterator<V> zscan(String key, String pattern) {
+        RScoredSortedSet<V> zset = primaryClient.getScoredSortedSet(key);
+        return zset.iterator(pattern);
+    }
+
+    /**
+     * 遍历 ZSet 元素（ZSCAN，指定每次扫描数量）
+     *
+     * @param key     ZSet 的 key
+     * @param pattern 元素匹配模式
+     * @param count   每次 SCAN 返回的近似数量
+     * @return 匹配的元素迭代器
+     */
+    public <V> Iterator<V> zscan(String key, String pattern, int count) {
+        RScoredSortedSet<V> zset = primaryClient.getScoredSortedSet(key);
+        return zset.iterator(pattern, count);
     }
 
     // ====================== 信号量操作 ======================
@@ -1733,6 +2062,9 @@ public class MultiRedissonTemplate {
         // 检查熔断器是否允许请求
         if (!circuitBreaker.allowRequest()) {
             log.debug("Circuit breaker is open, skip secondary write for {}", actionName);
+            if (failureHandler != null) {
+                failureHandler.onCircuitBreakerSkip(new RetryTask(action, actionName));
+            }
             return;
         }
 
@@ -1740,7 +2072,7 @@ public class MultiRedissonTemplate {
             if (metrics != null) {
                 metrics.recordSubmit();
             }
-            dualWriteExecutor.execute(() -> {
+            dualWriteExecutor.execute(new RetryableRunnable(() -> {
                 try {
                     action.run();
                     if (metrics != null) {
@@ -1755,8 +2087,11 @@ public class MultiRedissonTemplate {
                     }
                     // 记录熔断器失败
                     circuitBreaker.recordFailure();
+                    if (failureHandler != null) {
+                        failureHandler.onWriteFailure(new RetryTask(action, actionName));
+                    }
                 }
-            });
+            }, actionName));
         } catch (Exception e) {
             log.error("Failed to submit {} task to dual write executor", actionName, e);
             if (metrics != null) {

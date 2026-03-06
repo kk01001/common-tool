@@ -48,6 +48,11 @@ public class MultiRedissonProperties {
     private CircuitBreaker circuitBreaker = new CircuitBreaker();
 
     /**
+     * 双写失败重试配置
+     */
+    private RetryConfig retry = new RetryConfig();
+
+    /**
      * 多个 Redis 实例配置
      * key: 实例名称
      * value: 实例配置
@@ -90,6 +95,59 @@ public class MultiRedissonProperties {
          * 是否允许核心线程超时
          */
         private boolean allowCoreThreadTimeOut = false;
+    }
+
+    /**
+     * 双写失败重试配置
+     */
+    @Setter
+    @Getter
+    public static class RetryConfig {
+
+        /**
+         * 是否启用重试
+         */
+        private boolean enabled = true;
+
+        /**
+         * 重试队列容量
+         */
+        private int queueCapacity = 50000;
+
+        /**
+         * 最大重试次数
+         */
+        private int maxRetryCount = 3;
+
+        /**
+         * 重试间隔（毫秒）
+         */
+        private long retryIntervalMs = 5000;
+
+        /**
+         * 退避乘数
+         */
+        private double backoffMultiplier = 2.0;
+
+        /**
+         * 最大重试间隔（毫秒）
+         */
+        private long maxRetryIntervalMs = 60000;
+
+        /**
+         * 死信队列容量
+         */
+        private int deadLetterCapacity = 10000;
+
+        /**
+         * 重试工作线程数
+         */
+        private int workerThreads = 2;
+
+        /**
+         * 每次调度处理的最大任务数
+         */
+        private int batchSize = 100;
     }
 
     /**

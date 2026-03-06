@@ -4,9 +4,12 @@ import io.github.kk01001.redisson.properties.MultiRedissonProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author kk01001
@@ -16,6 +19,10 @@ import java.util.concurrent.atomic.AtomicReference;
  * 当备份集群写入失败率过高时自动熔断，防止影响主流程性能。
  * 熔断后会定期尝试恢复。
  * 配置直接从 MultiRedissonProperties.CircuitBreaker 读取，支持 Nacos 动态刷新。
+ * </p>
+ * <p>
+ * 使用环形缓冲区实现基于计数的滑动窗口，保证窗口重置的原子性。
+ * 支持状态变更监听器，可用于触发恢复后的数据同步。
  * </p>
  */
 public class DualWriteCircuitBreaker {
@@ -28,21 +35,6 @@ public class DualWriteCircuitBreaker {
     private final AtomicReference<CircuitBreakerState> state = new AtomicReference<>(CircuitBreakerState.CLOSED);
 
     /**
-     * 滑动窗口内的失败次数
-     */
-    private final AtomicInteger failureCount = new AtomicInteger(0);
-
-    /**
-     * 滑动窗口内的成功次数
-     */
-    private final AtomicInteger successCount = new AtomicInteger(0);
-
-    /**
-     * 滑动窗口内的总请求数
-     */
-    private final AtomicInteger totalCount = new AtomicInteger(0);
-
-    /**
      * 熔断打开时间
      */
     private final AtomicLong openTime = new AtomicLong(0);
@@ -53,17 +45,23 @@ public class DualWriteCircuitBreaker {
     private final AtomicInteger halfOpenSuccessCount = new AtomicInteger(0);
 
     /**
-     * 上次重置窗口的时间
+     * 滑动窗口（环形缓冲区）
      */
-    private final AtomicLong lastResetTime = new AtomicLong(System.currentTimeMillis());
+    private final SlidingWindow slidingWindow;
 
     /**
      * 配置（直接引用 Properties，支持动态刷新）
      */
     private final MultiRedissonProperties.CircuitBreaker config;
 
+    /**
+     * 状态变更监听器列表
+     */
+    private final List<CircuitBreakerStateChangeListener> listeners = new CopyOnWriteArrayList<>();
+
     public DualWriteCircuitBreaker(MultiRedissonProperties.CircuitBreaker config) {
         this.config = config;
+        this.slidingWindow = new SlidingWindow(config.getSlidingWindowSize());
         log.info("DualWriteCircuitBreaker initialized with config: enabled={}, failureRateThreshold={}%, " +
                         "slidingWindowSize={}ms, minimumNumberOfCalls={}, waitDurationInOpenState={}ms, " +
                         "permittedCallsInHalfOpenState={}",
@@ -77,6 +75,20 @@ public class DualWriteCircuitBreaker {
      */
     public MultiRedissonProperties.CircuitBreaker getConfig() {
         return config;
+    }
+
+    /**
+     * 注册状态变更监听器
+     */
+    public void addStateChangeListener(CircuitBreakerStateChangeListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * 移除状态变更监听器
+     */
+    public void removeStateChangeListener(CircuitBreakerStateChangeListener listener) {
+        listeners.remove(listener);
     }
 
     /**
@@ -94,20 +106,18 @@ public class DualWriteCircuitBreaker {
                 return true;
 
             case OPEN:
-                // 检查是否到达恢复时间
                 long now = System.currentTimeMillis();
                 if (now - openTime.get() >= config.getWaitDurationInOpenState()) {
-                    // 尝试进入半开状态
                     if (state.compareAndSet(CircuitBreakerState.OPEN, CircuitBreakerState.HALF_OPEN)) {
                         halfOpenSuccessCount.set(0);
                         log.info("CircuitBreaker state changed: OPEN -> HALF_OPEN");
+                        notifyStateChange(CircuitBreakerState.OPEN, CircuitBreakerState.HALF_OPEN);
                     }
                     return true;
                 }
                 return false;
 
             case HALF_OPEN:
-                // 半开状态允许有限的请求通过
                 return halfOpenSuccessCount.get() < config.getPermittedCallsInHalfOpenState();
 
             default:
@@ -123,22 +133,19 @@ public class DualWriteCircuitBreaker {
             return;
         }
 
-        checkAndResetWindow();
-
         CircuitBreakerState currentState = state.get();
 
         if (currentState == CircuitBreakerState.HALF_OPEN) {
             int count = halfOpenSuccessCount.incrementAndGet();
             if (count >= config.getPermittedCallsInHalfOpenState()) {
-                // 半开状态下连续成功次数达到阈值，关闭熔断器
                 if (state.compareAndSet(CircuitBreakerState.HALF_OPEN, CircuitBreakerState.CLOSED)) {
-                    reset();
+                    slidingWindow.reset();
                     log.info("CircuitBreaker state changed: HALF_OPEN -> CLOSED (recovered)");
+                    notifyStateChange(CircuitBreakerState.HALF_OPEN, CircuitBreakerState.CLOSED);
                 }
             }
         } else if (currentState == CircuitBreakerState.CLOSED) {
-            successCount.incrementAndGet();
-            totalCount.incrementAndGet();
+            slidingWindow.recordSuccess();
         }
     }
 
@@ -150,21 +157,16 @@ public class DualWriteCircuitBreaker {
             return;
         }
 
-        checkAndResetWindow();
-
         CircuitBreakerState currentState = state.get();
 
         if (currentState == CircuitBreakerState.HALF_OPEN) {
-            // 半开状态下失败，重新打开熔断器
             if (state.compareAndSet(CircuitBreakerState.HALF_OPEN, CircuitBreakerState.OPEN)) {
                 openTime.set(System.currentTimeMillis());
                 log.warn("CircuitBreaker state changed: HALF_OPEN -> OPEN (failure in half-open)");
+                notifyStateChange(CircuitBreakerState.HALF_OPEN, CircuitBreakerState.OPEN);
             }
         } else if (currentState == CircuitBreakerState.CLOSED) {
-            failureCount.incrementAndGet();
-            totalCount.incrementAndGet();
-
-            // 检查是否需要打开熔断器
+            slidingWindow.recordFailure();
             checkFailureThreshold();
         }
     }
@@ -173,38 +175,18 @@ public class DualWriteCircuitBreaker {
      * 检查失败率是否达到阈值
      */
     private void checkFailureThreshold() {
-        int total = totalCount.get();
-        int failures = failureCount.get();
+        SlidingWindow.Snapshot snapshot = slidingWindow.getSnapshot();
 
-        // 需要达到最小请求数才进行熔断判断
-        if (total < config.getMinimumNumberOfCalls()) {
+        if (snapshot.totalCount() < config.getMinimumNumberOfCalls()) {
             return;
         }
 
-        double failureRate = (double) failures / total * 100;
-
-        if (failureRate >= config.getFailureRateThreshold()) {
+        if (snapshot.failureRate() >= config.getFailureRateThreshold()) {
             if (state.compareAndSet(CircuitBreakerState.CLOSED, CircuitBreakerState.OPEN)) {
                 openTime.set(System.currentTimeMillis());
                 log.warn("CircuitBreaker state changed: CLOSED -> OPEN, failureRate: {}%, threshold: {}%",
-                        String.format("%.2f", failureRate), config.getFailureRateThreshold());
-            }
-        }
-    }
-
-    /**
-     * 检查并重置滑动窗口
-     */
-    private void checkAndResetWindow() {
-        long now = System.currentTimeMillis();
-        long lastReset = lastResetTime.get();
-
-        if (now - lastReset >= config.getSlidingWindowSize()) {
-            if (lastResetTime.compareAndSet(lastReset, now)) {
-                // 重置窗口计数（但不重置状态）
-                failureCount.set(0);
-                successCount.set(0);
-                totalCount.set(0);
+                        String.format("%.2f", snapshot.failureRate()), config.getFailureRateThreshold());
+                notifyStateChange(CircuitBreakerState.CLOSED, CircuitBreakerState.OPEN);
             }
         }
     }
@@ -213,29 +195,32 @@ public class DualWriteCircuitBreaker {
      * 重置熔断器
      */
     public void reset() {
-        failureCount.set(0);
-        successCount.set(0);
-        totalCount.set(0);
+        slidingWindow.reset();
         halfOpenSuccessCount.set(0);
-        lastResetTime.set(System.currentTimeMillis());
     }
 
     /**
      * 强制打开熔断器
      */
     public void forceOpen() {
-        state.set(CircuitBreakerState.OPEN);
+        CircuitBreakerState prev = state.getAndSet(CircuitBreakerState.OPEN);
         openTime.set(System.currentTimeMillis());
         log.warn("CircuitBreaker force opened");
+        if (prev != CircuitBreakerState.OPEN) {
+            notifyStateChange(prev, CircuitBreakerState.OPEN);
+        }
     }
 
     /**
      * 强制关闭熔断器
      */
     public void forceClose() {
-        state.set(CircuitBreakerState.CLOSED);
+        CircuitBreakerState prev = state.getAndSet(CircuitBreakerState.CLOSED);
         reset();
         log.info("CircuitBreaker force closed");
+        if (prev != CircuitBreakerState.CLOSED) {
+            notifyStateChange(prev, CircuitBreakerState.CLOSED);
+        }
     }
 
     /**
@@ -249,19 +234,29 @@ public class DualWriteCircuitBreaker {
      * 获取统计信息
      */
     public CircuitBreakerStats getStats() {
-        int total = totalCount.get();
-        int failures = failureCount.get();
-        int successes = successCount.get();
-        double failureRate = total > 0 ? (double) failures / total * 100 : 0;
+        SlidingWindow.Snapshot snapshot = slidingWindow.getSnapshot();
 
         return new CircuitBreakerStats(
                 state.get(),
-                total,
-                successes,
-                failures,
-                failureRate,
+                snapshot.totalCount(),
+                snapshot.successCount(),
+                snapshot.failureCount(),
+                snapshot.failureRate(),
                 openTime.get()
         );
+    }
+
+    /**
+     * 通知状态变更
+     */
+    private void notifyStateChange(CircuitBreakerState from, CircuitBreakerState to) {
+        for (CircuitBreakerStateChangeListener listener : listeners) {
+            try {
+                listener.onStateChange(from, to);
+            } catch (Exception e) {
+                log.error("CircuitBreaker state change listener error, from={}, to={}", from, to, e);
+            }
+        }
     }
 
     /**
@@ -275,5 +270,85 @@ public class DualWriteCircuitBreaker {
             double failureRate,
             long openTimestamp
     ) {
+    }
+
+    /**
+     * 基于时间的滑动窗口，使用锁保证重置原子性
+     */
+    static class SlidingWindow {
+
+        private final long windowSizeMs;
+        private final ReentrantLock lock = new ReentrantLock();
+
+        private int failureCount;
+        private int successCount;
+        private int totalCount;
+        private long windowStartTime;
+
+        SlidingWindow(long windowSizeMs) {
+            this.windowSizeMs = windowSizeMs;
+            this.windowStartTime = System.currentTimeMillis();
+        }
+
+        void recordSuccess() {
+            lock.lock();
+            try {
+                rollWindowIfNeeded();
+                successCount++;
+                totalCount++;
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        void recordFailure() {
+            lock.lock();
+            try {
+                rollWindowIfNeeded();
+                failureCount++;
+                totalCount++;
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        Snapshot getSnapshot() {
+            lock.lock();
+            try {
+                rollWindowIfNeeded();
+                double rate = totalCount > 0 ? (double) failureCount / totalCount * 100 : 0;
+                return new Snapshot(totalCount, successCount, failureCount, rate);
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        void reset() {
+            lock.lock();
+            try {
+                failureCount = 0;
+                successCount = 0;
+                totalCount = 0;
+                windowStartTime = System.currentTimeMillis();
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        /**
+         * 如果当前时间超出窗口范围，重置计数器（原子操作，在锁内调用）
+         */
+        private void rollWindowIfNeeded() {
+            long now = System.currentTimeMillis();
+            if (now - windowStartTime >= windowSizeMs) {
+                failureCount = 0;
+                successCount = 0;
+                totalCount = 0;
+                windowStartTime = now;
+            }
+        }
+
+        record Snapshot(int totalCount, int successCount, int failureCount, double failureRate) {
+        }
     }
 }

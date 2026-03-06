@@ -1,6 +1,10 @@
 package io.github.kk01001.redisson.template;
 
+import io.github.kk01001.redisson.circuitbreaker.DualWriteCircuitBreaker;
+import io.github.kk01001.redisson.monitor.DualWriteMetrics;
 import io.github.kk01001.redisson.properties.MultiRedissonProperties;
+import io.github.kk01001.redisson.retry.DualWriteFailureHandler;
+import io.github.kk01001.redisson.retry.RetryTask;
 import org.redisson.api.BatchOptions;
 import org.redisson.api.BatchResult;
 import org.redisson.api.RBatch;
@@ -34,15 +38,24 @@ public class BatchOperations {
     private final RedissonClient secondaryClient;
     private final ExecutorService dualWriteExecutor;
     private final MultiRedissonProperties properties;
+    private final DualWriteCircuitBreaker circuitBreaker;
+    private final DualWriteMetrics metrics;
+    private final DualWriteFailureHandler failureHandler;
 
     public BatchOperations(RedissonClient primaryClient,
                            RedissonClient secondaryClient,
                            ExecutorService dualWriteExecutor,
-                           MultiRedissonProperties properties) {
+                           MultiRedissonProperties properties,
+                           DualWriteCircuitBreaker circuitBreaker,
+                           DualWriteMetrics metrics,
+                           DualWriteFailureHandler failureHandler) {
         this.primaryClient = primaryClient;
         this.secondaryClient = secondaryClient;
         this.dualWriteExecutor = dualWriteExecutor;
         this.properties = properties;
+        this.circuitBreaker = circuitBreaker;
+        this.metrics = metrics;
+        this.failureHandler = failureHandler;
     }
 
     /**
@@ -324,33 +337,8 @@ public class BatchOperations {
         public BatchResult<?> execute() {
             BatchResult<?> result = batch.execute();
 
-            // 异步执行备份集群操作
             if (isDualWriteEnabled() && !secondaryOperations.isEmpty()) {
-                if (dualWriteExecutor != null) {
-                    dualWriteExecutor.execute(() -> {
-                        try {
-                            RBatch secondaryBatch = secondaryClient.createBatch();
-                            for (Runnable op : secondaryOperations) {
-                                try {
-                                    op.run();
-                                } catch (Exception e) {
-                                    log.error("Batch secondary operation failed", e);
-                                }
-                            }
-                        } catch (Exception e) {
-                            log.error("Batch dual write to secondary failed", e);
-                        }
-                    });
-                } else {
-                    // 同步执行
-                    for (Runnable op : secondaryOperations) {
-                        try {
-                            op.run();
-                        } catch (Exception e) {
-                            log.error("Batch secondary operation failed", e);
-                        }
-                    }
-                }
+                executeSecondaryOperations();
             }
 
             return result;
@@ -362,24 +350,85 @@ public class BatchOperations {
         public RFuture<BatchResult<?>> executeAsync() {
             RFuture<BatchResult<?>> future = batch.executeAsync();
 
-            // 异步执行备份集群操作
             if (isDualWriteEnabled() && !secondaryOperations.isEmpty()) {
-                future.whenComplete((result, throwable) -> {
-                    if (throwable == null && dualWriteExecutor != null) {
-                        dualWriteExecutor.execute(() -> {
-                            for (Runnable op : secondaryOperations) {
-                                try {
-                                    op.run();
-                                } catch (Exception e) {
-                                    log.error("Batch secondary operation failed", e);
-                                }
-                            }
-                        });
+                future.whenComplete((batchResult, throwable) -> {
+                    if (throwable == null) {
+                        executeSecondaryOperations();
                     }
                 });
             }
 
             return future;
+        }
+
+        /**
+         * 执行备份集群操作（检查熔断器）
+         */
+        private void executeSecondaryOperations() {
+            if (!circuitBreaker.allowRequest()) {
+                log.debug("Circuit breaker is open, skip batch secondary write");
+                if (failureHandler != null) {
+                    Runnable batchAction = composeBatchAction();
+                    failureHandler.onCircuitBreakerSkip(new RetryTask(batchAction, "batch"));
+                }
+                return;
+            }
+
+            Runnable batchAction = composeBatchAction();
+
+            if (dualWriteExecutor != null) {
+                try {
+                    if (metrics != null) {
+                        metrics.recordSubmit();
+                    }
+                    dualWriteExecutor.execute(() -> {
+                        try {
+                            batchAction.run();
+                            if (metrics != null) {
+                                metrics.recordSuccess("batch");
+                            }
+                            circuitBreaker.recordSuccess();
+                        } catch (Exception e) {
+                            log.error("Batch secondary write failed", e);
+                            if (metrics != null) {
+                                metrics.recordFailure("batch");
+                            }
+                            circuitBreaker.recordFailure();
+                            if (failureHandler != null) {
+                                failureHandler.onWriteFailure(new RetryTask(batchAction, "batch"));
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    log.error("Failed to submit batch secondary write task", e);
+                    if (metrics != null) {
+                        metrics.recordSubmitFailure();
+                    }
+                    circuitBreaker.recordFailure();
+                }
+            } else {
+                try {
+                    batchAction.run();
+                } catch (Exception e) {
+                    log.error("Batch secondary write failed (sync)", e);
+                }
+            }
+        }
+
+        /**
+         * 将所有备份操作组合为一个 Runnable
+         */
+        private Runnable composeBatchAction() {
+            List<Runnable> ops = new ArrayList<>(secondaryOperations);
+            return () -> {
+                for (Runnable op : ops) {
+                    try {
+                        op.run();
+                    } catch (Exception e) {
+                        log.error("Batch secondary operation failed", e);
+                    }
+                }
+            };
         }
 
         /**

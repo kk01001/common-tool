@@ -1,6 +1,8 @@
 package io.github.kk01001.redisson.monitor;
 
 import io.github.kk01001.redisson.circuitbreaker.DualWriteCircuitBreaker;
+import io.github.kk01001.redisson.retry.DefaultDualWriteFailureHandler;
+import io.github.kk01001.redisson.retry.DualWriteFailureHandler;
 import org.springframework.boot.actuate.endpoint.annotation.DeleteOperation;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
@@ -26,10 +28,13 @@ public class DualWriteEndpoint {
 
     private final DualWriteMetrics metrics;
     private final DualWriteCircuitBreaker circuitBreaker;
+    private final DualWriteFailureHandler failureHandler;
 
-    public DualWriteEndpoint(DualWriteMetrics metrics, DualWriteCircuitBreaker circuitBreaker) {
+    public DualWriteEndpoint(DualWriteMetrics metrics, DualWriteCircuitBreaker circuitBreaker,
+                             DualWriteFailureHandler failureHandler) {
         this.metrics = metrics;
         this.circuitBreaker = circuitBreaker;
+        this.failureHandler = failureHandler;
     }
 
     /**
@@ -81,6 +86,18 @@ public class DualWriteEndpoint {
         operations.put("success", metrics.getOperationSuccessCount());
         operations.put("failure", metrics.getOperationFailureCount());
         result.put("operations", operations);
+
+        // 重试队列状态
+        if (failureHandler instanceof DefaultDualWriteFailureHandler defaultHandler) {
+            Map<String, Object> retryQueue = new LinkedHashMap<>();
+            retryQueue.put("retryQueueSize", defaultHandler.getRetryQueueSize());
+            retryQueue.put("deadLetterQueueSize", defaultHandler.getDeadLetterQueueSize());
+            retryQueue.put("retrySuccessCount", defaultHandler.getRetrySuccessCount());
+            retryQueue.put("retryFailureCount", defaultHandler.getRetryFailureCount());
+            retryQueue.put("discardCount", defaultHandler.getDiscardCount());
+            retryQueue.put("deadLetterCount", defaultHandler.getDeadLetterCount());
+            result.put("retryQueue", retryQueue);
+        }
 
         // 熔断器状态
         if (circuitBreaker != null) {

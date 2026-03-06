@@ -1,5 +1,6 @@
 package io.github.kk01001.redisson.config;
 
+import io.github.kk01001.redisson.circuitbreaker.CircuitBreakerState;
 import io.github.kk01001.redisson.circuitbreaker.DualWriteCircuitBreaker;
 import io.github.kk01001.redisson.factory.RedissonClientFactory;
 import io.github.kk01001.redisson.factory.RedissonClientFactoryImpl;
@@ -10,6 +11,11 @@ import io.github.kk01001.redisson.monitor.DualWriteEndpoint;
 import io.github.kk01001.redisson.monitor.DualWriteMetrics;
 import io.github.kk01001.redisson.properties.MultiRedissonProperties;
 import io.github.kk01001.redisson.properties.RedissonInstanceProperties;
+import io.github.kk01001.redisson.recovery.DualWriteRecoveryHandler;
+import io.github.kk01001.redisson.retry.DefaultDualWriteFailureHandler;
+import io.github.kk01001.redisson.retry.DualWriteFailureHandler;
+import io.github.kk01001.redisson.retry.DualWriteOverflowHandler;
+import io.github.kk01001.redisson.retry.DualWriteRejectedHandler;
 import io.github.kk01001.redisson.template.MultiRedissonTemplate;
 import jakarta.annotation.PreDestroy;
 import org.redisson.api.RedissonClient;
@@ -52,6 +58,7 @@ public class MultiRedissonAutoConfiguration {
     private final Map<String, RedissonClient> clients = new LinkedHashMap<>();
     private ThreadPoolExecutor dualWriteExecutor;
     private DualWriteMetrics dualWriteMetrics;
+    private DualWriteFailureHandler failureHandler;
 
     public MultiRedissonAutoConfiguration(MultiRedissonProperties properties) {
         this.properties = properties;
@@ -77,12 +84,44 @@ public class MultiRedissonAutoConfiguration {
     }
 
     /**
+     * 创建双写失败处理器
+     * <p>
+     * 用户可自定义实现 {@link DualWriteFailureHandler} 接口来替换默认实现。
+     * 例如基于 MQ、数据库等持久化方案。
+     * </p>
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "redisson.multi", name = "dual-write-enabled", havingValue = "true")
+    @ConditionalOnMissingBean(DualWriteFailureHandler.class)
+    public DualWriteFailureHandler dualWriteFailureHandler(DualWriteCircuitBreaker circuitBreaker,
+                                                           DualWriteMetrics metrics,
+                                                           ObjectProvider<DualWriteOverflowHandler> overflowHandlerProvider) {
+        MultiRedissonProperties.RetryConfig retryConfig = properties.getRetry();
+        if (!retryConfig.isEnabled()) {
+            log.info("Dual write retry is disabled");
+            return null;
+        }
+
+        DualWriteOverflowHandler overflowHandler = overflowHandlerProvider.getIfAvailable();
+        DefaultDualWriteFailureHandler handler = new DefaultDualWriteFailureHandler(
+                retryConfig, circuitBreaker, metrics, overflowHandler);
+        handler.start();
+        this.failureHandler = handler;
+
+        log.info("DefaultDualWriteFailureHandler created, queueCapacity={}, maxRetryCount={}, overflowHandler={}",
+                retryConfig.getQueueCapacity(), retryConfig.getMaxRetryCount(),
+                overflowHandler != null ? overflowHandler.getClass().getSimpleName() : "none");
+        return handler;
+    }
+
+    /**
      * 创建双写线程池
      */
     @Bean(name = "dualWriteExecutor")
     @ConditionalOnProperty(prefix = "redisson.multi", name = "dual-write-enabled", havingValue = "true")
     @ConditionalOnMissingBean(name = "dualWriteExecutor")
-    public ExecutorService dualWriteExecutor(DualWriteMetrics metrics) {
+    public ExecutorService dualWriteExecutor(DualWriteMetrics metrics,
+                                             ObjectProvider<DualWriteFailureHandler> failureHandlerProvider) {
         MultiRedissonProperties.DualWriteThreadPool config = properties.getDualWriteThreadPool();
 
         ThreadFactory threadFactory = new ThreadFactory() {
@@ -97,6 +136,8 @@ public class MultiRedissonAutoConfiguration {
             }
         };
 
+        DualWriteFailureHandler failureHandler = failureHandlerProvider.getIfAvailable();
+
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
                 config.getCorePoolSize(),
                 config.getMaxPoolSize(),
@@ -104,14 +145,13 @@ public class MultiRedissonAutoConfiguration {
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(config.getQueueCapacity()),
                 threadFactory,
-                new ThreadPoolExecutor.CallerRunsPolicy()
+                new DualWriteRejectedHandler(metrics, failureHandler)
         );
 
         executor.allowCoreThreadTimeOut(config.isAllowCoreThreadTimeOut());
 
         this.dualWriteExecutor = executor;
 
-        // 设置线程池到监控指标
         metrics.setExecutor(executor);
 
         log.info("Dual write executor created, corePoolSize: {}, maxPoolSize: {}, queueCapacity: {}",
@@ -173,8 +213,29 @@ public class MultiRedissonAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public DualWriteCircuitBreaker dualWriteCircuitBreaker() {
-        return new DualWriteCircuitBreaker(properties.getCircuitBreaker());
+    public DualWriteCircuitBreaker dualWriteCircuitBreaker(ObjectProvider<DualWriteRecoveryHandler> recoveryHandlerProvider) {
+        DualWriteCircuitBreaker circuitBreaker = new DualWriteCircuitBreaker(properties.getCircuitBreaker());
+
+        DualWriteRecoveryHandler recoveryHandler = recoveryHandlerProvider.getIfAvailable();
+        if (recoveryHandler != null) {
+            circuitBreaker.addStateChangeListener((from, to) -> {
+                if (to == CircuitBreakerState.CLOSED && from != CircuitBreakerState.CLOSED) {
+                    long openTimestamp = circuitBreaker.getStats().openTimestamp();
+                    long now = System.currentTimeMillis();
+                    DualWriteRecoveryHandler.RecoveryContext context = new DualWriteRecoveryHandler.RecoveryContext(
+                            from, openTimestamp, now, openTimestamp > 0 ? now - openTimestamp : 0
+                    );
+                    try {
+                        recoveryHandler.onRecovery(context);
+                    } catch (Exception e) {
+                        log.error("Recovery handler failed", e);
+                    }
+                }
+            });
+            log.info("DualWriteRecoveryHandler registered with circuit breaker");
+        }
+
+        return circuitBreaker;
     }
 
     /**
@@ -185,9 +246,11 @@ public class MultiRedissonAutoConfiguration {
     public MultiRedissonTemplate multiRedissonTemplate(RedissonClientHolder holder,
                                                        @Qualifier("dualWriteExecutor") ObjectProvider<ExecutorService> dualWriteExecutorProvider,
                                                        DualWriteMetrics metrics,
-                                                       DualWriteCircuitBreaker circuitBreaker) {
+                                                       DualWriteCircuitBreaker circuitBreaker,
+                                                       ObjectProvider<DualWriteFailureHandler> failureHandlerProvider) {
         ExecutorService dualWriteExecutor = dualWriteExecutorProvider.getIfAvailable();
-        return new MultiRedissonTemplate(holder, properties, dualWriteExecutor, metrics, circuitBreaker);
+        DualWriteFailureHandler failureHandler = failureHandlerProvider.getIfAvailable();
+        return new MultiRedissonTemplate(holder, properties, dualWriteExecutor, metrics, circuitBreaker, failureHandler);
     }
 
     /**
@@ -197,8 +260,10 @@ public class MultiRedissonAutoConfiguration {
     @ConditionalOnClass(name = "org.springframework.boot.actuate.endpoint.annotation.Endpoint")
     @ConditionalOnAvailableEndpoint(endpoint = DualWriteEndpoint.class)
     @ConditionalOnMissingBean
-    public DualWriteEndpoint dualWriteEndpoint(DualWriteMetrics metrics, DualWriteCircuitBreaker circuitBreaker) {
-        return new DualWriteEndpoint(metrics, circuitBreaker);
+    public DualWriteEndpoint dualWriteEndpoint(DualWriteMetrics metrics,
+                                                  DualWriteCircuitBreaker circuitBreaker,
+                                                  ObjectProvider<DualWriteFailureHandler> failureHandlerProvider) {
+        return new DualWriteEndpoint(metrics, circuitBreaker, failureHandlerProvider.getIfAvailable());
     }
 
     /**
@@ -227,7 +292,11 @@ public class MultiRedissonAutoConfiguration {
      */
     @PreDestroy
     public void destroy() {
-        // 先关闭线程池
+        if (failureHandler != null) {
+            log.info("Shutting down dual write failure handler...");
+            failureHandler.shutdown();
+        }
+
         if (dualWriteExecutor != null) {
             log.info("Shutting down dual write executor...");
             dualWriteExecutor.shutdown();
@@ -241,7 +310,6 @@ public class MultiRedissonAutoConfiguration {
             }
         }
 
-        // 关闭所有 RedissonClient
         log.info("Shutting down all RedissonClients...");
         for (Map.Entry<String, RedissonClient> entry : clients.entrySet()) {
             try {
