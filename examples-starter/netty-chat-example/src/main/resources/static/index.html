@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Netty IM</title>
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<style>
+:root{--bg0:#0b0b1a;--bg1:#111128;--bg2:#181838;--bg3:#1e1e48;--bg4:#252560;--bd:#2a2a5a;--accent:#7c7cff;--accent2:#6c63ff;--tx:#e0e0e0;--tx2:#999;--tx3:#666;--ok:#4caf50;--err:#ff6b6b;--warn:#ffa726}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg0);color:var(--tx);height:100vh;overflow:hidden;font-size:14px}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+input,textarea{font-family:inherit}
+a{color:inherit;text-decoration:none}
+
+/* ===== Login ===== */
+.login-bg{position:fixed;inset:0;background:linear-gradient(135deg,#0b0b1a,#181838);display:flex;align-items:center;justify-content:center;z-index:999}
+.login-card{background:var(--bg2);border-radius:16px;padding:36px;width:370px;border:1px solid var(--bd);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.login-card h2{text-align:center;margin-bottom:6px;font-size:22px;color:var(--accent)}
+.login-card .sub{text-align:center;color:var(--tx3);font-size:12px;margin-bottom:22px}
+.tabs{display:flex;border-radius:10px;overflow:hidden;border:1px solid var(--bd);margin-bottom:18px}
+.tabs button{flex:1;padding:9px;border:none;background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;transition:.2s}
+.tabs button.on{background:var(--accent);color:#fff}
+.fg{margin-bottom:13px}
+.fg label{display:block;margin-bottom:4px;font-size:11px;color:var(--tx2)}
+.fg input{width:100%;padding:10px 13px;border:1px solid var(--bd);border-radius:9px;background:var(--bg0);color:var(--tx);font-size:13px;outline:none}
+.fg input:focus{border-color:var(--accent)}
+.btn{width:100%;padding:11px;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s}
+.btn-p{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff}
+.btn-p:hover{box-shadow:0 4px 14px rgba(108,99,255,.4);transform:translateY(-1px)}
+.btn-g{background:transparent;color:var(--tx2);border:1px solid var(--bd);border-radius:9px}
+.btn-g:hover{background:var(--bd)}
+.btn-sm{width:auto;padding:5px 14px;font-size:12px;border-radius:7px}
+.btn-d{background:var(--err);color:#fff}
+.err-msg{color:var(--err);font-size:12px;text-align:center;margin-top:8px}
+.hint{text-align:center;color:#444;font-size:11px;margin-top:12px}
+
+/* ===== App Layout ===== */
+.app{display:flex;height:100vh}
+
+/* Nav */
+.nav{width:60px;background:var(--bg0);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:2px;border-right:1px solid var(--bd);flex-shrink:0}
+.nav-i{width:42px;height:42px;border:none;border-radius:12px;background:transparent;color:var(--tx2);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;position:relative;transition:.15s}
+.nav-i:hover,.nav-i.on{background:var(--accent);color:#fff}
+.nav-i .dot{position:absolute;top:3px;right:3px;background:var(--err);color:#fff;font-size:9px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px;line-height:1}
+.nav .sp{flex:1}
+.nav .av-btn{width:38px;height:38px;border-radius:50%;background:var(--accent2);color:#fff;border:2px solid transparent;cursor:pointer;font-size:14px;font-weight:700;transition:.2s}
+.nav .av-btn:hover,.nav .av-btn.on{border-color:var(--accent)}
+
+/* Panel */
+.panel{width:300px;background:var(--bg1);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
+.ph{padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.ph h3{font-size:15px;font-weight:600}
+.ph .act{width:28px;height:28px;border:1px solid var(--bd);border-radius:7px;background:transparent;color:var(--tx2);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.ph .act:hover{background:var(--bd);color:var(--accent)}
+.sb{padding:8px 16px}
+.sb input{width:100%;padding:8px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--bg0);color:var(--tx);font-size:12px;outline:none}
+.sb input:focus{border-color:var(--accent)}
+.ls{flex:1;overflow-y:auto}
+.li{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:.1s;position:relative}
+.li:hover{background:rgba(124,124,255,.06)}
+.li.on{background:rgba(124,124,255,.12)}
+.av{width:40px;height:40px;border-radius:50%;background:var(--accent2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover}
+.av.grp{background:#3a7;border-radius:12px}
+.ol-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);position:absolute;bottom:10px;left:44px;border:2px solid var(--bg1)}
+.li .inf{flex:1;min-width:0}
+.li .inf .nm{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .inf .la{font-size:11px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.li .mt{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.li .mt .tm{font-size:10px;color:#555}
+.li .mt .ur{background:var(--err);color:#fff;font-size:9px;min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+.empty-ls{text-align:center;padding:40px 20px;color:#444;font-size:12px}
+
+/* Friend request item */
+.fri{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--bd)}
+.fri .inf{flex:1;min-width:0}
+.fri .inf .nm{font-size:13px;font-weight:500}
+.fri .inf .la{font-size:11px;color:var(--tx3)}
+.fri .acts{display:flex;gap:5px}
+.fri .acts button{padding:4px 10px;border-radius:6px;border:none;cursor:pointer;font-size:11px}
+.fri .acts .ok-b{background:var(--ok);color:#fff}
+.fri .acts .no-b{background:transparent;color:var(--tx2);border:1px solid var(--bd)}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.main-empty{flex:1;display:flex;align-items:center;justify-content:center;color:#333;font-size:13px;flex-direction:column;gap:8px}
+
+/* Chat */
+.ch-hd{padding:12px 20px;border-bottom:1px solid var(--bd);background:var(--bg1);display:flex;align-items:center;justify-content:space-between}
+.ch-hd h3{font-size:15px;font-weight:600}
+.ch-hd .sub-t{font-size:11px;color:var(--tx2);margin-left:8px;font-weight:400}
+.ch-hd .det-b{border:none;background:transparent;color:var(--tx2);cursor:pointer;font-size:18px;padding:4px}
+.ch-hd .det-b:hover{color:var(--accent)}
+
+.msgs{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px}
+.m{display:flex;flex-direction:column;max-width:62%;animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.m.me{align-self:flex-end}.m.ot{align-self:flex-start}.m.sy{align-self:center;max-width:80%}
+.m-sn{font-size:10px;color:var(--tx3);margin-bottom:2px;padding:0 4px}
+.m.me .m-sn{text-align:right}
+.m-bb{padding:9px 14px;border-radius:14px;font-size:13px;line-height:1.5;word-break:break-word}
+.m.me .m-bb{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border-bottom-right-radius:4px}
+.m.ot .m-bb{background:var(--bg3);border-bottom-left-radius:4px}
+.m.sy .m-bb{background:transparent;color:#555;font-size:11px;text-align:center;padding:4px}
+.m-tm{font-size:9px;color:#555;margin-top:2px;padding:0 4px}
+.m.me .m-tm{text-align:right}
+.m-img{max-width:220px;border-radius:10px;cursor:pointer;display:block}
+.m-fl{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg0);border-radius:10px;cursor:pointer;min-width:180px}
+.m-fl:hover{background:var(--bg2)}
+.m-fl .ic{font-size:22px}
+.m-fl .fn{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.m-fl .fs{font-size:10px;color:var(--tx3);margin-top:1px}
+.m-au audio{width:200px;height:30px}
+
+/* Input area */
+.inp-a{padding:10px 20px;border-top:1px solid var(--bd);background:var(--bg1)}
+.up-pv{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg0);border-radius:8px;margin-bottom:8px}
+.up-pv img{width:36px;height:36px;object-fit:cover;border-radius:6px}
+.up-pv .fn{flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.up-pv .rm{width:22px;height:22px;border:none;background:rgba(255,107,107,.15);color:var(--err);border-radius:5px;cursor:pointer;font-size:12px}
+.rec-bar{display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2);border-radius:8px;margin-bottom:8px}
+.rec-dot{width:8px;height:8px;background:var(--err);border-radius:50%;animation:pu 1s infinite}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+.rec-stop{padding:3px 10px;border:1px solid var(--err);background:transparent;color:var(--err);border-radius:5px;cursor:pointer;font-size:10px;margin-left:auto}
+.tb{display:flex;gap:5px;margin-bottom:6px}
+.tb-b{width:30px;height:30px;border:1px solid var(--bd);border-radius:7px;background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+.tb-b:hover{background:var(--bd);color:var(--accent)}
+.inp-r{display:flex;gap:8px}
+.inp-r textarea{flex:1;padding:9px 13px;border:1px solid var(--bd);border-radius:9px;background:var(--bg0);color:var(--tx);font-size:13px;resize:none;outline:none;font-family:inherit;min-height:38px;max-height:90px}
+.inp-r textarea:focus{border-color:var(--accent)}
+.snd-b{padding:0 18px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.snd-b:disabled{opacity:.35;cursor:not-allowed}
+
+/* Profile */
+.prof{padding:40px;display:flex;flex-direction:column;align-items:center;gap:20px;flex:1}
+.prof .big-av{width:80px;height:80px;border-radius:50%;background:var(--accent2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;cursor:pointer;position:relative;overflow:hidden}
+.prof .big-av img{width:100%;height:100%;object-fit:cover}
+.prof .big-av:hover::after{content:'更换';position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:400}
+.prof .p-row{display:flex;align-items:center;gap:12px;width:300px}
+.prof .p-row label{width:60px;font-size:12px;color:var(--tx2);text-align:right;flex-shrink:0}
+.prof .p-row input{flex:1;padding:8px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--bg0);color:var(--tx);font-size:13px;outline:none}
+.prof .p-row input:disabled{color:var(--tx3);background:var(--bg2)}
+.prof .p-row input:focus{border-color:var(--accent)}
+
+/* Friend detail */
+.f-det{padding:40px;display:flex;flex-direction:column;align-items:center;gap:16px;flex:1}
+.f-det .big-av{width:72px;height:72px;border-radius:50%;background:var(--accent2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700}
+.f-det .f-nm{font-size:18px;font-weight:600}
+.f-det .f-un{font-size:13px;color:var(--tx2)}
+.f-det .f-acts{display:flex;gap:10px;margin-top:8px}
+
+/* Group detail sidebar */
+.g-det{width:280px;background:var(--bg1);border-left:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.g-det .gd-hd{padding:14px 16px;border-bottom:1px solid var(--bd);font-size:14px;font-weight:600}
+.g-det .gd-sec{padding:12px 16px;border-bottom:1px solid var(--bd)}
+.g-det .gd-sec h4{font-size:12px;color:var(--tx2);margin-bottom:8px}
+.g-det .gd-sec p{font-size:13px;line-height:1.5}
+.g-det .gd-inv{display:flex;gap:6px;margin-top:8px}
+.g-det .gd-inv input{flex:1;padding:6px 10px;border:1px solid var(--bd);border-radius:7px;background:var(--bg0);color:var(--tx);font-size:12px;outline:none}
+.g-det .gd-ml{flex:1;overflow-y:auto;padding:8px 0}
+.g-det .gd-mi{display:flex;align-items:center;gap:8px;padding:5px 16px}
+.g-det .gd-mi .av{width:28px;height:28px;font-size:11px}
+.g-det .gd-mi .nm{font-size:12px;flex:1}
+.g-det .gd-mi .rl{font-size:10px;color:var(--warn)}
+.g-det .gd-ft{padding:12px 16px;border-top:1px solid var(--bd)}
+
+/* Modals */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:200}
+.modal-c{background:var(--bg2);border-radius:14px;padding:24px;min-width:360px;max-width:440px;border:1px solid var(--bd);max-height:80vh;display:flex;flex-direction:column}
+.modal-c h3{margin-bottom:14px;font-size:16px}
+.modal-c .ls-s{flex:1;overflow-y:auto;max-height:300px}
+.modal-c .btns{display:flex;gap:8px;margin-top:14px}
+.modal-c .btns .btn{flex:1;padding:9px;font-size:13px}
+.img-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:300;cursor:pointer}
+.img-modal img{max-width:90vw;max-height:90vh;border-radius:8px}
+
+/* Checkbox for group creation */
+.ck-li{display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer}
+.ck-li input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+.ck-li .nm{font-size:13px}
+</style>
+</head>
+<body>
+<div id="app">
+<!-- ===== LOGIN ===== -->
+<div class="login-bg" v-if="!loggedIn">
+<div class="login-card">
+<h2>Netty IM</h2>
+<p class="sub">基于 Netty WebSocket Starter 的即时通讯</p>
+<div class="tabs">
+<button :class="{on:authTab==='login'}" @click="authTab='login'">登录</button>
+<button :class="{on:authTab==='register'}" @click="authTab='register'">注册</button>
+</div>
+<div class="fg"><label>用户名</label><input v-model="af.username" @keyup.enter="doAuth" placeholder="请输入用户名"/></div>
+<div class="fg"><label>密码</label><input v-model="af.password" type="password" @keyup.enter="doAuth" placeholder="请输入密码"/></div>
+<div class="fg" v-if="authTab==='register'"><label>昵称</label><input v-model="af.nickname" @keyup.enter="doAuth" placeholder="请输入昵称"/></div>
+<button class="btn btn-p" @click="doAuth">{{ authTab==='login'?'登 录':'注 册' }}</button>
+<p class="err-msg" v-if="authErr">{{ authErr }}</p>
+<p class="hint">测试账号: alice / bob / charlie，密码: 123456</p>
+</div>
+</div>
+
+<!-- ===== APP ===== -->
+<div class="app" v-if="loggedIn">
+
+<!-- Nav -->
+<div class="nav">
+<button class="nav-i" :class="{on:nav==='conv'}" @click="nav='conv';loadConvs()" title="消息">
+<span>💬</span><span class="dot" v-if="totalUnread>0">{{totalUnread>99?'99+':totalUnread}}</span>
+</button>
+<button class="nav-i" :class="{on:nav==='contacts'}" @click="nav='contacts';loadFriends();loadFReqs()" title="通讯录">
+<span>👥</span><span class="dot" v-if="fReqs.length>0">{{fReqs.length}}</span>
+</button>
+<button class="nav-i" :class="{on:nav==='groups'}" @click="nav='groups';loadGroups()" title="群组">
+<span>🏠</span>
+</button>
+<div class="sp"></div>
+<button class="av-btn" :class="{on:nav==='profile'}" @click="nav='profile';mainView='profile'" :title="me.nickname">
+{{me.nickname?(me.nickname[0]):'?'}}
+</button>
+</div>
+
+<!-- Panel -->
+<div class="panel">
+
+<!-- Conv panel -->
+<template v-if="nav==='conv'">
+<div class="ph"><h3>消息</h3></div>
+<div class="sb"><input v-model="convSearch" placeholder="搜索会话"/></div>
+<div class="ls">
+<div class="li" v-for="c in filteredConvs" :key="c.convId" :class="{on:activeConv&&activeConv.convId===c.convId}" @click="openConv(c)">
+<div class="av"><template v-if="c.chatType==='GROUP'"><div class="av grp">{{(c.targetName||'?')[0]}}</div></template><template v-else>{{(c.targetName||'?')[0]}}</template></div>
+<span class="ol-dot" v-if="c.chatType==='PRIVATE'&&isOL(c.targetId)"></span>
+<div class="inf"><div class="nm">{{c.targetName}}</div><div class="la">{{c.lastMsgContent||''}}</div></div>
+<div class="mt"><span class="tm">{{fmtT(c.lastMsgTime)}}</span><span class="ur" v-if="c.unreadCount>0">{{c.unreadCount}}</span></div>
+</div>
+<div class="empty-ls" v-if="!filteredConvs.length">暂无会话</div>
+</div>
+</template>
+
+<!-- Contacts panel -->
+<template v-if="nav==='contacts'">
+<div class="ph"><h3>通讯录</h3><button class="act" @click="showAddFriend=true" title="添加好友">+</button></div>
+<div class="sb"><input v-model="fSearch" placeholder="搜索好友"/></div>
+<!-- Friend requests -->
+<div v-if="fReqs.length" style="padding:4px 16px;font-size:11px;color:var(--warn)">好友申请 ({{fReqs.length}})</div>
+<div class="fri" v-for="r in fReqs" :key="r.requestId">
+<div class="av" style="width:32px;height:32px;font-size:12px">{{(r.nickname||'?')[0]}}</div>
+<div class="inf"><div class="nm">{{r.nickname}}</div><div class="la">{{r.requestMsg||'请求添加好友'}}</div></div>
+<div class="acts"><button class="ok-b" @click="acceptF(r.requestId)">同意</button><button class="no-b" @click="rejectF(r.requestId)">拒绝</button></div>
+</div>
+<div class="ls">
+<div class="li" v-for="f in filteredFriends" :key="f.friendId" :class="{on:mainView==='fDetail'&&fDetail&&fDetail.friendId===f.friendId}" @click="showFDetail(f)">
+<div class="av">{{(f.nickname||'?')[0]}}</div>
+<span class="ol-dot" v-if="isOL(f.friendId)"></span>
+<div class="inf"><div class="nm">{{f.nickname}}</div><div class="la">@{{f.username}}</div></div>
+</div>
+<div class="empty-ls" v-if="!filteredFriends.length">暂无好友</div>
+</div>
+</template>
+
+<!-- Groups panel -->
+<template v-if="nav==='groups'">
+<div class="ph"><h3>群组</h3><button class="act" @click="showCreateGroup=true" title="创建群组">+</button></div>
+<div class="ls">
+<div class="li" v-for="g in groups" :key="g.groupId" :class="{on:activeChat&&activeChat.chatType==='GROUP'&&activeChat.targetId==g.groupId}" @click="openGrpChat(g.groupId,g.name)">
+<div class="av grp">{{(g.name||'?')[0]}}</div>
+<div class="inf"><div class="nm">{{g.name}}</div><div class="la">{{g.notice||''}}</div></div>
+</div>
+<div class="empty-ls" v-if="!groups.length">暂无群组</div>
+</div>
+</template>
+
+<!-- Profile nav (panel shows user info summary) -->
+<template v-if="nav==='profile'">
+<div class="ph"><h3>个人中心</h3></div>
+<div style="padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:12px">
+<div class="av" style="width:56px;height:56px;font-size:22px">{{me.nickname?(me.nickname[0]):'?'}}</div>
+<div style="font-size:15px;font-weight:600">{{me.nickname}}</div>
+<div style="font-size:12px;color:var(--tx2)">@{{me.username}}</div>
+</div>
+</template>
+</div>
+
+<!-- Main content -->
+<div class="main">
+
+<!-- Empty state -->
+<div class="main-empty" v-if="mainView==='empty'">
+<span style="font-size:40px;opacity:.3">💬</span>
+<span>选择一个会话开始聊天</span>
+</div>
+
+<!-- Chat -->
+<template v-if="mainView==='chat'&&activeChat">
+<div style="display:flex;flex:1;min-height:0">
+<div style="flex:1;display:flex;flex-direction:column;min-width:0">
+<div class="ch-hd">
+<div style="display:flex;align-items:center">
+<h3>{{activeChat.name}}</h3>
+<span class="sub-t" v-if="activeChat.chatType==='GROUP'">(群聊)</span>
+<span class="sub-t" v-if="activeChat.chatType==='PRIVATE'&&isOL(activeChat.targetId)" style="color:var(--ok)">在线</span>
+</div>
+<button class="det-b" v-if="activeChat.chatType==='GROUP'" @click="toggleGDet" title="群详情">ℹ️</button>
+</div>
+<div class="msgs" ref="msgsRef">
+<div v-for="m in chatMsgs" :key="m.messageId||m._id" :class="['m',mCls(m)]">
+<div class="m-sn" v-if="!isSys(m)">{{m.nickname}}</div>
+<div class="m-bb">
+<template v-if="isSys(m)">{{m.content}}</template>
+<template v-if="mType(m)==='TEXT'">{{m.content}}</template>
+<template v-if="mType(m)==='IMAGE'"><img class="m-img" :src="'/api/file/preview/'+m.fileId" @click="pvImg=m.fileId"/></template>
+<template v-if="mType(m)==='FILE'"><a class="m-fl" :href="'/api/file/download/'+m.fileId" target="_blank"><span class="ic">📎</span><div><div class="fn">{{m.content||m.fileName||'文件'}}</div><div class="fs">{{fmtS(m.fileSize)}}</div></div></a></template>
+<template v-if="mType(m)==='AUDIO'"><div class="m-au"><audio controls :src="'/api/file/preview/'+m.fileId"></audio></div></template>
+</div>
+<div class="m-tm" v-if="!isSys(m)">{{fmtT(m.timestamp)}}</div>
+</div>
+</div>
+<div class="inp-a">
+<div class="up-pv" v-if="pFile"><img v-if="pFile.pv" :src="pFile.pv"/><span v-else style="font-size:18px">{{pFile.type==='AUDIO'?'🎵':'📄'}}</span><span class="fn">{{pFile.file.name}} ({{fmtS(pFile.file.size)}})</span><button class="rm" @click="clrFile">✕</button></div>
+<div class="rec-bar" v-if="isRec"><span class="rec-dot"></span><span style="font-size:11px;color:var(--err)">录音中 {{recSec}}s</span><button class="rec-stop" @click="stopRec">停止发送</button></div>
+<div class="tb">
+<button class="tb-b" @click="$refs.imgIn.click()" title="图片">🖼️</button>
+<button class="tb-b" @click="$refs.fileIn.click()" title="文件">📎</button>
+<button class="tb-b" @click="togRec" title="录音">🎤</button>
+</div>
+<div class="inp-r">
+<textarea v-model="inpTxt" @keydown.enter.exact.prevent="send" placeholder="输入消息，Enter 发送..." rows="1" @input="arSz"></textarea>
+<button class="snd-b" @click="send" :disabled="!canSend">发送</button>
+</div>
+</div>
+</div>
+<!-- Group detail sidebar -->
+<div class="g-det" v-if="showGDet&&activeChat.chatType==='GROUP'">
+<div class="gd-hd">群详情</div>
+<div class="gd-sec"><h4>群名称</h4><p>{{activeChat.name}}</p></div>
+<div class="gd-sec"><h4>群公告</h4><p>{{grpNotice||'暂无公告'}}</p></div>
+<div class="gd-sec">
+<h4>邀请好友</h4>
+<div class="gd-inv"><input v-model="invUid" placeholder="用户ID"/><button class="btn btn-p btn-sm" @click="invToGrp">邀请</button></div>
+</div>
+<div style="padding:8px 16px;font-size:12px;color:var(--tx2)">成员 ({{grpMembers.length}})</div>
+<div class="gd-ml">
+<div class="gd-mi" v-for="gm in grpMembers" :key="gm.userId">
+<div class="av">{{(gm.nickname||'?')[0]}}</div>
+<span class="nm">{{gm.nickname}}</span>
+<span class="rl" v-if="gm.role===2">群主</span>
+<span class="rl" v-if="gm.role===1">管理员</span>
+</div>
+</div>
+<div class="gd-ft">
+<button class="btn btn-d btn-sm" @click="leaveGrp" style="width:100%">退出群组</button>
+</div>
+</div>
+</div>
+</template>
+
+<!-- Friend detail -->
+<div class="f-det" v-if="mainView==='fDetail'&&fDetail">
+<div class="big-av">{{(fDetail.nickname||'?')[0]}}</div>
+<div class="f-nm">{{fDetail.nickname}}</div>
+<div class="f-un">@{{fDetail.username}}</div>
+<div style="font-size:12px;margin-top:4px" :style="{color:isOL(fDetail.friendId)?'var(--ok)':'var(--tx3)'}">{{isOL(fDetail.friendId)?'在线':'离线'}}</div>
+<div class="f-acts">
+<button class="btn btn-p btn-sm" @click="openPvChat(fDetail.friendId,fDetail.nickname)">发消息</button>
+<button class="btn btn-d btn-sm" @click="delFriend(fDetail.friendId)">删除好友</button>
+</div>
+</div>
+
+<!-- Friend requests view -->
+<div v-if="mainView==='fReqs'" style="padding:24px;flex:1">
+<h3 style="margin-bottom:16px">好友申请</h3>
+<div class="fri" v-for="r in fReqs" :key="r.requestId">
+<div class="av" style="width:36px;height:36px;font-size:13px">{{(r.nickname||'?')[0]}}</div>
+<div class="inf"><div class="nm">{{r.nickname}} <span style="color:var(--tx3);font-size:11px">@{{r.username}}</span></div><div class="la">{{r.requestMsg||'请求添加好友'}}</div></div>
+<div class="acts"><button class="ok-b" @click="acceptF(r.requestId)">同意</button><button class="no-b" @click="rejectF(r.requestId)">拒绝</button></div>
+</div>
+<div class="empty-ls" v-if="!fReqs.length">暂无好友申请</div>
+</div>
+
+<!-- Profile -->
+<div class="prof" v-if="mainView==='profile'">
+<div class="big-av" @click="$refs.avIn.click()">
+{{me.nickname?(me.nickname[0]):'?'}}
+</div>
+<div class="p-row"><label>用户名</label><input :value="me.username" disabled/></div>
+<div class="p-row"><label>昵称</label><input v-model="editNick" @blur="saveNick" @keyup.enter="saveNick"/></div>
+<button class="btn btn-d" style="width:200px;margin-top:20px" @click="logout">退出登录</button>
+</div>
+
+</div>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Add friend -->
+<div class="modal-bg" v-if="showAddFriend" @click.self="showAddFriend=false">
+<div class="modal-c">
+<h3>添加好友</h3>
+<div class="fg"><input v-model="srchKw" @input="doSrch" placeholder="搜索用户名或昵称"/></div>
+<div class="ls-s">
+<div class="li" v-for="u in srchRes" :key="u.userId" style="padding:8px 0">
+<div class="av" style="width:32px;height:32px;font-size:12px">{{(u.nickname||'?')[0]}}</div>
+<div class="inf"><div class="nm">{{u.nickname}}</div><div class="la">@{{u.username}}</div></div>
+<button class="btn btn-p btn-sm" @click="sendFReq(u.userId)">添加</button>
+</div>
+<div class="empty-ls" v-if="srchKw&&!srchRes.length">未找到用户</div>
+</div>
+<div class="btns"><button class="btn btn-g" @click="showAddFriend=false">关闭</button></div>
+</div>
+</div>
+
+<!-- Create group -->
+<div class="modal-bg" v-if="showCreateGroup" @click.self="showCreateGroup=false">
+<div class="modal-c">
+<h3>创建群组</h3>
+<div class="fg"><label>群名称</label><input v-model="newGrpName" placeholder="请输入群名称"/></div>
+<div style="font-size:12px;color:var(--tx2);margin-bottom:8px">选择好友加入群组</div>
+<div class="ls-s">
+<label class="ck-li" v-for="f in friends" :key="f.friendId">
+<input type="checkbox" :value="f.friendId" v-model="newGrpMembers"/>
+<div class="av" style="width:28px;height:28px;font-size:11px">{{(f.nickname||'?')[0]}}</div>
+<span class="nm">{{f.nickname}}</span>
+</label>
+</div>
+<div class="btns">
+<button class="btn btn-g" @click="showCreateGroup=false">取消</button>
+<button class="btn btn-p" @click="createGrp">创建</button>
+</div>
+</div>
+</div>
+
+<!-- Image preview -->
+<div class="img-modal" v-if="pvImg" @click="pvImg=null"><img :src="'/api/file/preview/'+pvImg"/></div>
+
+<!-- Hidden inputs -->
+<input type="file" ref="imgIn" accept="image/*" style="display:none" @change="onImg"/>
+<input type="file" ref="fileIn" style="display:none" @change="onFile"/>
+<input type="file" ref="avIn" accept="image/*" style="display:none" @change="onAvatar"/>
+</div>
+
+<script>
+const{createApp,ref,computed,nextTick,watch,onMounted}=Vue;
+createApp({
+setup(){
+/* Auth */
+const authTab=ref('login'),af=ref({username:'',password:'',nickname:''}),authErr=ref(''),loggedIn=ref(false);
+const me=ref({}),token=ref(''),connected=ref(false);
+
+/* Nav & views */
+const nav=ref('conv'),mainView=ref('empty');
+
+/* Data */
+const convs=ref([]),friends=ref([]),fReqs=ref([]),groups=ref([]);
+const activeChat=ref(null),activeConv=ref(null),chatMsgs=ref([]);
+const inpTxt=ref(''),pFile=ref(null),isRec=ref(false),recSec=ref(0);
+const msgsRef=ref(null),pvImg=ref(null);
+const convSearch=ref(''),fSearch=ref('');
+const onlineSet=ref(new Set());
+
+/* Friend detail */
+const fDetail=ref(null);
+
+/* Group detail */
+const showGDet=ref(false),grpMembers=ref([]),grpNotice=ref(''),invUid=ref('');
+
+/* Modals */
+const showAddFriend=ref(false),srchKw=ref(''),srchRes=ref([]);
+const showCreateGroup=ref(false),newGrpName=ref(''),newGrpMembers=ref([]);
+
+/* Profile */
+const editNick=ref('');
+
+let ws=null,mediaRec=null,audioChunks=[],recTimer=null,_id=0;
+
+const hdrs=()=>({Authorization:'Bearer '+token.value,'Content-Type':'application/json'});
+const api=async(u,o={})=>{try{const r=await fetch(u,{headers:hdrs(),...o});return r.json()}catch(e){return{}}};
+
+/* Computed */
+const totalUnread=computed(()=>convs.value.reduce((s,c)=>s+(c.unreadCount||0),0));
+const canSend=computed(()=>connected.value&&(inpTxt.value.trim()||pFile.value));
+const filteredConvs=computed(()=>{const k=convSearch.value.toLowerCase();return k?convs.value.filter(c=>(c.targetName||'').toLowerCase().includes(k)):convs.value});
+const filteredFriends=computed(()=>{const k=fSearch.value.toLowerCase();return k?friends.value.filter(f=>(f.nickname||'').toLowerCase().includes(k)||(f.username||'').toLowerCase().includes(k)):friends.value});
+
+/* Auth */
+async function doAuth(){
+authErr.value='';
+const url=authTab.value==='login'?'/api/auth/login':'/api/auth/register';
+const body=authTab.value==='login'?{username:af.value.username,password:af.value.password}:{...af.value};
+try{
+const d=await(await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
+if(d.success){token.value=d.token;me.value={id:d.userId,nickname:d.nickname,username:d.username,avatarFileId:d.avatarFileId};editNick.value=d.nickname;loggedIn.value=true;init()}
+else authErr.value=d.message||'操作失败';
+}catch(e){authErr.value='网络错误'}
+}
+
+function init(){loadConvs();loadFriends();loadFReqs();loadGroups();connectWs()}
+
+/* Data loaders */
+async function loadConvs(){convs.value=await api('/api/conversation/list')||[]}
+async function loadFriends(){friends.value=await api('/api/friend/list')||[]}
+async function loadFReqs(){fReqs.value=await api('/api/friend/requests')||[]}
+async function loadGroups(){groups.value=await api('/api/group/list')||[]}
+
+/* WebSocket */
+function connectWs(){
+const url=`ws://${location.hostname}:9001/ws/chat?token=${token.value}`;
+ws=new WebSocket(url);
+ws.onopen=()=>{connected.value=true};
+ws.onmessage=e=>{try{const m=JSON.parse(e.data);handleWsMsg(m)}catch(ex){}};
+ws.onclose=()=>{connected.value=false;setTimeout(()=>{if(loggedIn.value)connectWs()},3000)};
+ws.onerror=()=>{};
+}
+
+function handleWsMsg(m){
+if(m.action==='CHAT_MSG')onChatMsg(m);
+else if(m.action==='FRIEND_REQUEST'){fReqs.value.push(m);loadFReqs()}
+else if(m.action==='FRIEND_ACCEPTED')loadFriends();
+else if(m.action==='READ_RECEIPT'){}
+else if(m.action==='ONLINE_STATUS'){if(m.online)onlineSet.value.add(String(m.userId));else onlineSet.value.delete(String(m.userId));onlineSet.value=new Set(onlineSet.value)}
+}
+
+function onChatMsg(m){
+m._id=++_id;
+const ac=activeChat.value;
+const isActive=ac&&(
+(m.chatType==='PRIVATE'&&ac.chatType==='PRIVATE'&&(String(m.senderId)===String(ac.targetId)||String(m.senderId)===String(me.value.id)))
+||(m.chatType==='GROUP'&&ac.chatType==='GROUP'&&String(m.groupId)===String(ac.targetId))
+);
+if(isActive){chatMsgs.value.push(m);scBot()}
+loadConvs();
+}
+
+function isOL(uid){return onlineSet.value.has(String(uid))}
+
+/* Open conversations */
+async function openConv(c){
+activeConv.value=c;activeChat.value={targetId:c.targetId,chatType:c.chatType,name:c.targetName};
+mainView.value='chat';showGDet.value=false;
+await loadHistory();
+if(c.unreadCount>0){c.unreadCount=0;api(`/api/conversation/${c.convId}/read`,{method:'PUT',body:JSON.stringify({targetId:c.targetId,chatType:c.chatType})})}
+if(c.chatType==='PRIVATE'&&ws)ws.send(JSON.stringify({action:'READ_RECEIPT',targetId:c.targetId}));
+}
+
+async function openPvChat(tid,name){
+activeChat.value={targetId:tid,chatType:'PRIVATE',name};
+activeConv.value=convs.value.find(c=>c.chatType==='PRIVATE'&&String(c.targetId)===String(tid));
+mainView.value='chat';nav.value='conv';showGDet.value=false;
+await loadHistory();
+}
+
+async function openGrpChat(gid,name){
+activeChat.value={targetId:gid,chatType:'GROUP',name};
+activeConv.value=convs.value.find(c=>c.chatType==='GROUP'&&String(c.targetId)===String(gid));
+mainView.value='chat';showGDet.value=false;
+await loadHistory();
+}
+
+async function loadHistory(){
+if(!activeChat.value)return;
+const ac=activeChat.value;let msgs;
+if(ac.chatType==='PRIVATE')msgs=await api(`/api/message/private/history?targetId=${ac.targetId}&limit=100`);
+else msgs=await api(`/api/message/group/history?groupId=${ac.targetId}&limit=100`);
+chatMsgs.value=(msgs||[]).map(m=>({...m,_id:++_id}));scBot();
+}
+
+/* Send */
+function send(){
+if(!canSend.value||!ws)return;
+if(pFile.value){sendFile();return}
+const t=inpTxt.value.trim();if(!t)return;
+ws.send(JSON.stringify({action:'CHAT_MSG',chatType:activeChat.value.chatType,targetId:activeChat.value.targetId,msgType:'TEXT',content:t}));
+inpTxt.value='';
+}
+
+function sendFile(){
+const pf=pFile.value;if(!pf)return;
+const reader=new FileReader();
+reader.onload=()=>{
+ws.send(JSON.stringify({action:'CHAT_MSG',chatType:activeChat.value.chatType,targetId:activeChat.value.targetId,msgType:pf.type,data:reader.result.split(',')[1],fileName:pf.file.name,contentType:pf.file.type}));
+clrFile();
+};
+reader.readAsDataURL(pf.file);
+}
+
+function onImg(e){const f=e.target.files[0];if(!f)return;pFile.value={file:f,type:'IMAGE',pv:URL.createObjectURL(f)};e.target.value=''}
+function onFile(e){const f=e.target.files[0];if(!f)return;let t='FILE';if(f.type.startsWith('audio/'))t='AUDIO';else if(f.type.startsWith('image/'))t='IMAGE';pFile.value={file:f,type:t,pv:t==='IMAGE'?URL.createObjectURL(f):null};e.target.value=''}
+function clrFile(){if(pFile.value?.pv)URL.revokeObjectURL(pFile.value.pv);pFile.value=null}
+
+/* Recording */
+async function togRec(){
+if(isRec.value){stopRec();return}
+try{
+const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+audioChunks=[];mediaRec=new MediaRecorder(stream);
+mediaRec.ondataavailable=e=>audioChunks.push(e.data);
+mediaRec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());const blob=new Blob(audioChunks,{type:'audio/webm'});pFile.value={file:new File([blob],`rec_${Date.now()}.webm`,{type:'audio/webm'}),type:'AUDIO'};sendFile()};
+mediaRec.start();isRec.value=true;recSec.value=0;recTimer=setInterval(()=>recSec.value++,1000);
+}catch(e){alert('无法访问麦克风')}
+}
+function stopRec(){if(mediaRec&&mediaRec.state!=='inactive')mediaRec.stop();isRec.value=false;clearInterval(recTimer)}
+
+/* Friends */
+function showFDetail(f){fDetail.value=f;mainView.value='fDetail'}
+async function acceptF(rid){ws.send(JSON.stringify({action:'FRIEND_ACCEPT',requestId:rid}));fReqs.value=fReqs.value.filter(r=>r.requestId!==rid);setTimeout(loadFriends,500)}
+async function rejectF(rid){await api(`/api/friend/reject/${rid}`,{method:'POST'});fReqs.value=fReqs.value.filter(r=>r.requestId!==rid)}
+async function delFriend(fid){await api(`/api/friend/${fid}`,{method:'DELETE'});loadFriends();mainView.value='empty';fDetail.value=null}
+async function doSrch(){if(!srchKw.value.trim()){srchRes.value=[];return}srchRes.value=await api(`/api/user/search?keyword=${encodeURIComponent(srchKw.value)}`)||[]}
+function sendFReq(uid){ws.send(JSON.stringify({action:'FRIEND_REQUEST',targetId:uid,content:'请求添加好友'}));showAddFriend.value=false}
+
+/* Groups */
+async function createGrp(){
+if(!newGrpName.value.trim())return;
+const d=await api('/api/group/create',{method:'POST',body:JSON.stringify({name:newGrpName.value})});
+if(d.success&&newGrpMembers.value.length>0){
+for(const uid of newGrpMembers.value){await api(`/api/group/${d.groupId}/invite`,{method:'POST',body:JSON.stringify({userId:uid})})}
+}
+showCreateGroup.value=false;newGrpName.value='';newGrpMembers.value=[];loadGroups();
+}
+async function toggleGDet(){
+showGDet.value=!showGDet.value;
+if(showGDet.value&&activeChat.value){
+grpMembers.value=await api(`/api/group/${activeChat.value.targetId}/members`)||[];
+const g=groups.value.find(g=>String(g.groupId)===String(activeChat.value.targetId));
+grpNotice.value=g?g.notice:'';
+}
+}
+async function invToGrp(){
+if(!invUid.value||!activeChat.value)return;
+await api(`/api/group/${activeChat.value.targetId}/invite`,{method:'POST',body:JSON.stringify({userId:invUid.value})});
+invUid.value='';grpMembers.value=await api(`/api/group/${activeChat.value.targetId}/members`)||[];
+}
+async function leaveGrp(){
+if(!activeChat.value)return;
+await api(`/api/group/${activeChat.value.targetId}/leave`,{method:'POST'});
+loadGroups();activeChat.value=null;mainView.value='empty';showGDet.value=false;
+}
+
+/* Profile */
+async function saveNick(){
+if(!editNick.value.trim()||editNick.value===me.value.nickname)return;
+await api('/api/user/profile',{method:'PUT',body:JSON.stringify({nickname:editNick.value})});
+me.value.nickname=editNick.value;
+}
+async function onAvatar(e){
+const f=e.target.files[0];if(!f)return;
+const fd=new FormData();fd.append('file',f);
+const d=await(await fetch('/api/file/upload',{headers:{Authorization:'Bearer '+token.value},method:'POST',body:fd})).json();
+if(d.success){await api('/api/user/profile',{method:'PUT',body:JSON.stringify({avatarFileId:d.fileId})});me.value.avatarFileId=d.fileId}
+e.target.value='';
+}
+
+function logout(){if(ws)ws.close();loggedIn.value=false;connected.value=false;me.value={};token.value='';activeChat.value=null;mainView.value='empty';nav.value='conv'}
+
+/* Helpers */
+function mCls(m){if(isSys(m))return 'sy';return String(m.senderId)===String(me.value.id)?'me':'ot'}
+function isSys(m){return m.action==='SYSTEM'||m.type==='SYSTEM'||m.msgType==='SYSTEM'}
+function mType(m){return m.msgType||m.type||'TEXT'}
+function fmtT(t){if(!t)return '';const d=new Date(t);const now=new Date();if(d.toDateString()===now.toDateString())return d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});return (d.getMonth()+1)+'/'+d.getDate()+' '+d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}
+function fmtS(b){if(!b)return '';if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB'}
+function scBot(){nextTick(()=>{const el=msgsRef.value;if(el)el.scrollTop=el.scrollHeight})}
+function arSz(e){const el=e.target;el.style.height='auto';el.style.height=Math.min(el.scrollHeight,90)+'px'}
+
+return{
+authTab,af,authErr,loggedIn,me,token,connected,
+nav,mainView,
+convs,friends,fReqs,groups,activeChat,activeConv,chatMsgs,
+inpTxt,pFile,isRec,recSec,msgsRef,pvImg,
+convSearch,fSearch,fDetail,
+showGDet,grpMembers,grpNotice,invUid,
+showAddFriend,srchKw,srchRes,showCreateGroup,newGrpName,newGrpMembers,
+editNick,
+totalUnread,canSend,filteredConvs,filteredFriends,
+doAuth,loadConvs,loadFriends,loadFReqs,loadGroups,
+openConv,openPvChat,openGrpChat,send,
+onImg,onFile,clrFile,togRec,stopRec,
+showFDetail,acceptF,rejectF,delFriend,doSrch,sendFReq,
+createGrp,toggleGDet,invToGrp,leaveGrp,
+saveNick,onAvatar,logout,
+mCls,isSys,mType,fmtT,fmtS,arSz,isOL
+}
+}
+}).mount('#app');
+</script>
+</body>
+</html>

@@ -6,17 +6,14 @@ import io.github.kk01001.netty.config.ChannelOptionCustomizer;
 import io.github.kk01001.netty.config.NettyWebSocketProperties;
 import io.github.kk01001.netty.config.WebSocketPipelineConfigurer;
 import io.github.kk01001.netty.filter.MessageFilter;
-import io.github.kk01001.netty.handler.WebSocketAuthHandshakeHandler;
-import io.github.kk01001.netty.handler.WebSocketHandler;
+import io.github.kk01001.netty.handler.WebSocketFrameHandler;
+import io.github.kk01001.netty.handler.WebSocketHandshakeHandler;
 import io.github.kk01001.netty.handler.WebSocketHeartbeatHandler;
-import io.github.kk01001.netty.handler.WebSocketSessionHandler;
 import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
 import io.github.kk01001.netty.session.WebSocketSessionManager;
 import io.github.kk01001.netty.trace.MessageTracer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
@@ -41,24 +38,30 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author kk01001
+ * @date 2026-03-07 10:00:00
+ * @description Netty WebSocket 服务器，管理 Netty 生命周期和 Pipeline 配置
+ */
 @Slf4j
 public class NettyWebSocketServer implements InitializingBean, DisposableBean {
-    
+
     private final WebSocketEndpointRegistry registry;
     private final WebSocketSessionManager sessionManager;
     private final NettyWebSocketProperties properties;
     private final WebSocketAuthenticator authenticator;
-    private final WebSocketHeartbeatHandler heartbeatHandler;
     private final List<WebSocketPipelineConfigurer> pipelineConfigurers;
     private final List<ChannelOptionCustomizer> optionCustomizers;
     private final List<MessageFilter> messageFilters;
     private final MessageTracer messageTracer;
-    private final WebSocketClusterManager webSocketClusterManager;
+    private final WebSocketClusterManager clusterManager;
+    private final WebSocketHeartbeatHandler heartbeatHandler;
+
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Channel serverChannel;
     private SslContext sslContext;
-    
+
     public NettyWebSocketServer(
             WebSocketEndpointRegistry registry,
             WebSocketSessionManager sessionManager,
@@ -66,7 +69,9 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
             WebSocketAuthenticator authenticator,
             List<WebSocketPipelineConfigurer> pipelineConfigurers,
             List<ChannelOptionCustomizer> optionCustomizers,
-            List<MessageFilter> messageFilters, MessageTracer messageTracer, WebSocketClusterManager webSocketClusterManager) {
+            List<MessageFilter> messageFilters,
+            MessageTracer messageTracer,
+            WebSocketClusterManager clusterManager) {
         this.registry = registry;
         this.sessionManager = sessionManager;
         this.properties = properties;
@@ -75,46 +80,48 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
         this.optionCustomizers = optionCustomizers;
         this.messageFilters = messageFilters;
         this.messageTracer = messageTracer;
-        this.webSocketClusterManager = webSocketClusterManager;
+        this.clusterManager = clusterManager;
         this.heartbeatHandler = new WebSocketHeartbeatHandler();
+
+        if (messageFilters != null) {
+            messageFilters.sort(Comparator.comparingInt(MessageFilter::getOrder));
+        }
     }
-    
+
     @Override
     public void afterPropertiesSet() throws Exception {
-        // 初始化SSL上下文
         if (properties.getSsl().isEnabled()) {
             initSslContext();
         }
         start();
-        // 集群 初始化节点信息
-        webSocketClusterManager.init();
+        if (clusterManager != null) {
+            clusterManager.init();
+        }
+
+        sessionManager.setCloseCallback(session -> registry.handleClose(session));
     }
-    
+
     @Override
     public void destroy() throws Exception {
         stop();
-        // 集群 销毁节点信息
-        webSocketClusterManager.destroy();
+        if (clusterManager != null) {
+            clusterManager.destroy();
+        }
     }
-    
+
     private void initSslContext() throws Exception {
         File certFile = new File(properties.getSsl().getCertPath());
         File keyFile = new File(properties.getSsl().getKeyPath());
         String keyPassword = properties.getSsl().getKeyPassword();
-        
-        sslContext = SslContextBuilder.forServer(certFile, keyFile, keyPassword)
-                .build();
-        
+
+        sslContext = SslContextBuilder.forServer(certFile, keyFile, keyPassword).build();
         log.info("SSL上下文初始化成功");
     }
-    
-    /**
-     * 启动服务器
-     */
+
     public void start() throws Exception {
         bossGroup = new NioEventLoopGroup(properties.getBossThreads());
         workerGroup = new NioEventLoopGroup(properties.getWorkerThreads());
-        
+
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
@@ -123,65 +130,45 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
                         @Override
                         protected void initChannel(SocketChannel ch) {
                             ChannelPipeline pipeline = ch.pipeline();
-                            
-                            // 添加SSL处理器
+
                             if (properties.getSsl().isEnabled() && sslContext != null) {
                                 SSLEngine engine = sslContext.newEngine(ch.alloc());
                                 engine.setUseClientMode(false);
                                 pipeline.addFirst("ssl", new SslHandler(engine));
                             }
-                            
-                            // HTTP编解码
-                            pipeline.addLast(new HttpServerCodec());
-                            // 大数据流处理
-                            pipeline.addLast(new ChunkedWriteHandler());
-                            // HTTP消息聚合
-                            pipeline.addLast(new HttpObjectAggregator(properties.getMaxFrameSize()));
 
-                            // WebSocket握手和鉴权处理
-                            pipeline.addLast(new WebSocketAuthHandshakeHandler(
-                                    properties.getPath(),
-                                    String.join(",", properties.getSubprotocols()),
-                                    true,
-                                    properties.getMaxFrameSize(),
-                                    authenticator,
-                                    sessionManager,
-                                    registry,
-                                    messageTracer
-                            ));
+                            pipeline.addLast("httpCodec", new HttpServerCodec());
+                            pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
+                            pipeline.addLast("httpAggregator", new HttpObjectAggregator(properties.getMaxFrameSize()));
 
-                            // 会话处理器
-                            pipeline.addLast(new WebSocketSessionHandler(properties, sessionManager, messageTracer));
+                            pipeline.addLast("handshake", new WebSocketHandshakeHandler(
+                                    properties, authenticator, sessionManager, registry, messageTracer));
+                            pipeline.addLast("frameAggregator",
+                                    new io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator(
+                                            properties.getMaxFrameSize()));
 
-                            // 心跳处理
                             if (properties.getHeartbeat().isEnabled()) {
-                                pipeline.addLast(new IdleStateHandler(
-                                    properties.getHeartbeat().getReaderIdleTime(),
-                                    properties.getHeartbeat().getWriterIdleTime(),
-                                    0,
-                                    TimeUnit.SECONDS
-                                ));
-                                pipeline.addLast(heartbeatHandler);
+                                pipeline.addLast("idleState", new IdleStateHandler(
+                                        properties.getHeartbeat().getReaderIdleTime(),
+                                        properties.getHeartbeat().getWriterIdleTime(),
+                                        0, TimeUnit.SECONDS));
+                                pipeline.addLast("heartbeat", heartbeatHandler);
                             }
 
-                            // 调用自定义Pipeline配置
                             if (pipelineConfigurers != null) {
-                                // 按优先级排序
                                 pipelineConfigurers.sort(Comparator.comparingInt(WebSocketPipelineConfigurer::getOrder));
                                 for (WebSocketPipelineConfigurer configurer : pipelineConfigurers) {
                                     configurer.configurePipeline(pipeline);
                                 }
                             }
-                            
-                            // 业务处理
-                            pipeline.addLast("webSocketHandler", new WebSocketHandler(registry, messageFilters, messageTracer));
+
+                            pipeline.addLast("frameHandler", new WebSocketFrameHandler(
+                                    registry, messageFilters, messageTracer));
                         }
                     });
-            
-            // 应用默认选项
+
             applyDefaultOptions(bootstrap);
-            
-            // 应用自定义选项
+
             if (optionCustomizers != null) {
                 optionCustomizers.sort(Comparator.comparingInt(ChannelOptionCustomizer::getOrder));
                 for (ChannelOptionCustomizer customizer : optionCustomizers) {
@@ -190,17 +177,9 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
                 }
             }
 
-            // 绑定端口
-            ChannelFuture future = bootstrap.bind(properties.getPort()).sync();
-            serverChannel = future.channel();
-            
+            serverChannel = bootstrap.bind(properties.getPort()).sync().channel();
             log.info("WebSocket服务器启动成功: port={}", properties.getPort());
-            
-            // 等待服务器关闭
-            serverChannel.closeFuture().addListener((ChannelFutureListener) channelFuture -> {
-                stop();
-            });
-            
+
         } catch (Exception e) {
             log.error("WebSocket服务器启动失败", e);
             stop();
@@ -209,33 +188,39 @@ public class NettyWebSocketServer implements InitializingBean, DisposableBean {
     }
 
     private void applyDefaultOptions(ServerBootstrap bootstrap) {
-        // 应用服务端选项
         bootstrap.option(ChannelOption.SO_BACKLOG, properties.getServerOptions().getSoBacklog());
-        
-        // 应用客户端选项
         bootstrap.childOption(ChannelOption.SO_KEEPALIVE, properties.getChildOptions().isSoKeepalive())
                 .childOption(ChannelOption.TCP_NODELAY, properties.getChildOptions().isTcpNodelay())
                 .childOption(ChannelOption.SO_RCVBUF, properties.getChildOptions().getSoRcvbuf())
                 .childOption(ChannelOption.SO_SNDBUF, properties.getChildOptions().getSoSndbuf());
     }
-    
-    /**
-     * 停止服务器
-     */
+
     public void stop() {
         try {
             if (serverChannel != null) {
-                serverChannel.close();
+                serverChannel.close().sync();
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("关闭服务器通道被中断");
+        } catch (Exception e) {
+            log.error("关闭服务器通道失败", e);
+        }
+
+        try {
             if (bossGroup != null) {
-                bossGroup.shutdownGracefully();
+                bossGroup.shutdownGracefully(2, 5, TimeUnit.SECONDS).sync();
             }
             if (workerGroup != null) {
-                workerGroup.shutdownGracefully();
+                workerGroup.shutdownGracefully(2, 5, TimeUnit.SECONDS).sync();
             }
-            log.info("WebSocket服务器已停止");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("关闭EventLoopGroup被中断");
         } catch (Exception e) {
-            log.error("WebSocket服务器停止失败", e);
+            log.error("关闭EventLoopGroup失败", e);
         }
+
+        log.info("WebSocket服务器已停止");
     }
-} 
+}

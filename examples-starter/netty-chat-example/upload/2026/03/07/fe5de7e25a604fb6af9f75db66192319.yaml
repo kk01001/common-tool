@@ -1,0 +1,102 @@
+mixed-port: 7890
+allow-lan: true
+bind-address: '*'
+mode: rule
+log-level: info
+external-controller: '127.0.0.1:9090'
+
+dns:
+  enable: true
+  ipv6: false
+  default-nameserver:
+    - 223.5.5.5
+    - 223.6.6.6
+  nameserver:
+    - 1.1.1.1
+    - 8.8.8.8
+  fallback:
+    - tls://1.1.1.1:853
+    - tls://8.8.8.8:853
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    ipcidr:
+      - 240.0.0.0/4
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - '*.lan'
+    - 'localhost.ptlogin2.qq.com'
+    - 'dns.msftncsi.com'
+    - 'www.msftncsi.com'
+    - 'www.msftconnecttest.com'
+
+proxies:
+    - { name: '剩余流量：198.31 GB', server: 163.123.192.167, port: 50000, ports: 50000-50080, mport: 50000-50080, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: '距离下次重置剩余：29 天', server: 163.123.192.167, port: 50000, ports: 50000-50080, mport: 50000-50080, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 套餐到期：2025-07-12, server: 163.123.192.167, port: 50000, ports: 50000-50080, mport: 50000-50080, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇺🇸美国凤凰城_gpt, server: 163.123.192.167, port: 50000, ports: 50000-50080, mport: 50000-50080, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇺🇸美国凤凰城1号, server: 129.153.75.202, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.bing.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇺🇸美国凤凰城2号, server: 129.153.80.156, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.bing.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇺🇸美国凤凰城3号, server: 158.101.37.59, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.bing.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇺🇸美国凤凰城4号, server: 129.146.249.162, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.bing.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇯🇵日本, server: 131.186.42.162, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇸🇬新加坡hy, server: 140.245.52.9, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇫🇷法国hy, server: 62.210.71.30, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇸🇪瑞典斯德哥尔摩-1.5倍率, server: 129.151.193.163, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇰🇷韩国首尔-3倍率, server: 193.123.229.26, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.hoyoverse.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇰🇷韩国首尔2-3倍率, server: 146.56.148.206, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.hoyoverse.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇩🇪德国法兰克福, server: 138.2.179.192, port: 1, udp: true, skip-cert-verify: true, sni: www.bing.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇩🇪德国法兰克福2, server: 152.70.176.68, port: 1, udp: true, skip-cert-verify: true, sni: www.bing.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇧🇷巴西圣保罗-1.5倍率, server: 144.22.129.240, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇺🇸美国芝加哥, server: 149.130.215.22, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.bing.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇦🇪迪拜-1.2倍率, server: 139.185.32.100, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.hoyoverse.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇦🇪迪拜2-1.5倍率, server: 139.185.34.29, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.hoyoverse.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇰🇷韩国春川-1.5倍率, server: 146.56.114.61, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.hoyoverse.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇰🇷韩国春川2-1.5倍率, server: 152.67.200.22, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.hoyoverse.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇦🇺澳大利亚悉尼-1.5倍率, server: 159.13.38.138, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.hoyoverse.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇦🇺澳大利亚墨尔本-1.5倍率, server: 152.69.186.200, port: 50000, ports: 50000-53000, mport: 50000-53000, udp: true, skip-cert-verify: true, sni: www.hoyoverse.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇮🇳印度孟买-1.5倍率, server: 144.24.99.141, port: 53, udp: true, skip-cert-verify: true, sni: www.hoyoverse.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇮🇳印度海得拉巴-1.5倍率, server: 144.24.146.216, port: 53, udp: true, skip-cert-verify: true, sni: www.hoyoverse.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇬🇧英国伦敦-2倍率, server: 132.145.52.10, port: 65535, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇬🇧英国伦敦2-1.8倍率, server: 132.145.28.17, port: 65535, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇿🇦非洲约翰内斯堡-3.5倍率, server: 129.151.169.64, port: 65535, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇨🇦加拿大多伦多-1.5倍率, server: 40.233.77.86, port: 65535, udp: true, skip-cert-verify: true, sni: www.microsoft.com, type: hysteria2, password: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780 }
+    - { name: 🇺🇸美国凤凰城-0.1倍, type: vless, server: 129.146.102.191, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: xtls-rprx-vision, client-fingerprint: chrome, servername: djdownloadus.xn--4gq62f52gopi49k.com }
+    - { name: 🇩🇪德国-1倍, type: vless, server: 130.61.243.164, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: xtls-rprx-vision, client-fingerprint: safari, servername: djdownloadde.xn--4gq62f52gopi49k.com }
+    - { name: 🇺🇸美国凤凰城-三网-0.1倍, type: vless, server: 141.193.68.81, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: xtls-rprx-vision, client-fingerprint: safari, servername: djdownloadus.xn--4gq62f52gopi49k.com }
+    - { name: 🇺🇸美国1号-0.1倍, type: vless, server: 77.75.199.163, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: '', client-fingerprint: chrome, network: ws, ws-opts: { path: /djjc/us1, headers: { Host: k12us1.djjc.sbs } } }
+    - { name: 🇺🇸美国2号-0.1倍, type: vless, server: 77.75.199.163, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: '', client-fingerprint: safari, network: ws, ws-opts: { path: /djjc/us2, headers: { Host: k4us2.djjc.sbs } } }
+    - { name: 🇺🇸美国3号-0.1倍, type: vless, server: 77.75.199.163, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: '', client-fingerprint: ios, network: ws, ws-opts: { path: /djjc/us3, headers: { Host: k11us3.djjc.sbs } } }
+    - { name: 🇺🇸美国4号-0.1倍, type: vless, server: 77.75.199.163, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: '', client-fingerprint: ios, network: ws, ws-opts: { path: /djjc/us4, headers: { Host: kus4.djjc.sbs } } }
+    - { name: 🇯🇵日本-0.1—流媒体, type: vless, server: 77.75.199.163, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: '', client-fingerprint: safari, servername: k5jp1.djjc.sbs, network: ws, ws-opts: { path: /djjc/jp1, headers: { Host: k5jp1.djjc.sbs } } }
+    - { name: 🇫🇷法国, type: vless, server: 77.75.199.163, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: '', client-fingerprint: ios, servername: k2fr1.djjc.sbs, network: ws, ws-opts: { path: /djjc/fr1, headers: { Host: k2fr1.djjc.sbs } } }
+    - { name: 🇫🇷法国2, type: vless, server: 77.75.199.163, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: '', client-fingerprint: safari, servername: kfr2.djjc.sbs, network: ws, ws-opts: { path: /djjc/fr2, headers: { Host: kfr2.djjc.sbs } } }
+    - { name: 🇩🇪德国, type: vless, server: 77.75.199.163, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: '', client-fingerprint: ios, servername: k10de1.djjc.sbs, network: ws, ws-opts: { path: /djjc/de1, headers: { Host: k10de1.djjc.sbs } } }
+    - { name: 🇬🇧英国伦敦-1倍, type: vless, server: 130.162.183.221, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: xtls-rprx-vision, client-fingerprint: safari, servername: djdownloadgb.xn--4gq62f52gopi49k.com }
+    - { name: 🇹🇼台湾—TK专线, type: vless, server: c8217-b2a.h1.49d2.5e11.613.b297.djjsvip.cfd, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: xtls-rprx-vision, client-fingerprint: safari, servername: djdownloadtw1.xn--4gq62f52gopi49k.com }
+    - { name: 🇭🇰香港hkt-2倍, type: vless, server: c8217-b2a.h2.49d2.5e11.613.b297.djjsvip.cfd, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: xtls-rprx-vision, client-fingerprint: safari, servername: djdownloadhk1.xn--4gq62f52gopi49k.com }
+    - { name: 🇭🇰香港hkt2-1.5倍, type: vless, server: c8217-b2a.h3.49d2.5e11.613.b297.djjsvip.cfd, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: xtls-rprx-vision, client-fingerprint: safari, servername: djdownloadhk2.xn--4gq62f52gopi49k.com }
+    - { name: 🇮🇳印度孟买, type: vless, server: 144.24.99.33, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: xtls-rprx-vision, client-fingerprint: chrome, servername: djdownloadin.xn--4gq62f52gopi49k.com }
+    - { name: 🇮🇳印度孟买2, type: vless, server: 144.24.102.245, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: xtls-rprx-vision, client-fingerprint: safari, servername: djdownloadin.xn--4gq62f52gopi49k.com }
+    - { name: 🇰🇷韩国首尔, type: vless, server: 152.70.247.223, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: xtls-rprx-vision, client-fingerprint: safari, servername: djdownloadkr1.xn--4gq62f52gopi49k.com }
+    - { name: 🇰🇷韩国首尔2, type: vless, server: 146.56.43.3, port: 443, uuid: 4f3dd2e0-744e-4ca7-8be1-b97a31ea3780, udp: true, tls: true, skip-cert-verify: false, flow: xtls-rprx-vision, client-fingerprint: safari, servername: djdownloadkr1.xn--4gq62f52gopi49k.com }
+proxy-groups:
+    - { name: 顶级机场, type: select, proxies: [自动选择, 故障转移, '剩余流量：198.31 GB', '距离下次重置剩余：29 天', 套餐到期：2025-07-12, 🇺🇸美国凤凰城_gpt, 🇺🇸美国凤凰城1号, 🇺🇸美国凤凰城2号, 🇺🇸美国凤凰城3号, 🇺🇸美国凤凰城4号, 🇯🇵日本, 🇸🇬新加坡hy, 🇫🇷法国hy, 🇸🇪瑞典斯德哥尔摩-1.5倍率, 🇰🇷韩国首尔-3倍率, 🇰🇷韩国首尔2-3倍率, 🇩🇪德国法兰克福, 🇩🇪德国法兰克福2, 🇧🇷巴西圣保罗-1.5倍率, 🇺🇸美国芝加哥, 🇦🇪迪拜-1.2倍率, 🇦🇪迪拜2-1.5倍率, 🇰🇷韩国春川-1.5倍率, 🇰🇷韩国春川2-1.5倍率, 🇦🇺澳大利亚悉尼-1.5倍率, 🇦🇺澳大利亚墨尔本-1.5倍率, 🇮🇳印度孟买-1.5倍率, 🇮🇳印度海得拉巴-1.5倍率, 🇬🇧英国伦敦-2倍率, 🇬🇧英国伦敦2-1.8倍率, 🇿🇦非洲约翰内斯堡-3.5倍率, 🇨🇦加拿大多伦多-1.5倍率, 🇺🇸美国凤凰城-0.1倍, 🇩🇪德国-1倍, 🇺🇸美国凤凰城-三网-0.1倍, 🇺🇸美国1号-0.1倍, 🇺🇸美国2号-0.1倍, 🇺🇸美国3号-0.1倍, 🇺🇸美国4号-0.1倍, 🇯🇵日本-0.1—流媒体, 🇫🇷法国, 🇫🇷法国2, 🇩🇪德国, 🇬🇧英国伦敦-1倍, 🇹🇼台湾—TK专线, 🇭🇰香港hkt-2倍, 🇭🇰香港hkt2-1.5倍, 🇮🇳印度孟买, 🇮🇳印度孟买2, 🇰🇷韩国首尔, 🇰🇷韩国首尔2] }
+    - { name: 自动选择, type: url-test, proxies: ['剩余流量：198.31 GB', '距离下次重置剩余：29 天', 套餐到期：2025-07-12, 🇺🇸美国凤凰城_gpt, 🇺🇸美国凤凰城1号, 🇺🇸美国凤凰城2号, 🇺🇸美国凤凰城3号, 🇺🇸美国凤凰城4号, 🇯🇵日本, 🇸🇬新加坡hy, 🇫🇷法国hy, 🇸🇪瑞典斯德哥尔摩-1.5倍率, 🇰🇷韩国首尔-3倍率, 🇰🇷韩国首尔2-3倍率, 🇩🇪德国法兰克福, 🇩🇪德国法兰克福2, 🇧🇷巴西圣保罗-1.5倍率, 🇺🇸美国芝加哥, 🇦🇪迪拜-1.2倍率, 🇦🇪迪拜2-1.5倍率, 🇰🇷韩国春川-1.5倍率, 🇰🇷韩国春川2-1.5倍率, 🇦🇺澳大利亚悉尼-1.5倍率, 🇦🇺澳大利亚墨尔本-1.5倍率, 🇮🇳印度孟买-1.5倍率, 🇮🇳印度海得拉巴-1.5倍率, 🇬🇧英国伦敦-2倍率, 🇬🇧英国伦敦2-1.8倍率, 🇿🇦非洲约翰内斯堡-3.5倍率, 🇨🇦加拿大多伦多-1.5倍率, 🇺🇸美国凤凰城-0.1倍, 🇩🇪德国-1倍, 🇺🇸美国凤凰城-三网-0.1倍, 🇺🇸美国1号-0.1倍, 🇺🇸美国2号-0.1倍, 🇺🇸美国3号-0.1倍, 🇺🇸美国4号-0.1倍, 🇯🇵日本-0.1—流媒体, 🇫🇷法国, 🇫🇷法国2, 🇩🇪德国, 🇬🇧英国伦敦-1倍, 🇹🇼台湾—TK专线, 🇭🇰香港hkt-2倍, 🇭🇰香港hkt2-1.5倍, 🇮🇳印度孟买, 🇮🇳印度孟买2, 🇰🇷韩国首尔, 🇰🇷韩国首尔2], url: 'http://www.gstatic.com/generate_204', interval: 86400 }
+    - { name: 故障转移, type: fallback, proxies: ['剩余流量：198.31 GB', '距离下次重置剩余：29 天', 套餐到期：2025-07-12, 🇺🇸美国凤凰城_gpt, 🇺🇸美国凤凰城1号, 🇺🇸美国凤凰城2号, 🇺🇸美国凤凰城3号, 🇺🇸美国凤凰城4号, 🇯🇵日本, 🇸🇬新加坡hy, 🇫🇷法国hy, 🇸🇪瑞典斯德哥尔摩-1.5倍率, 🇰🇷韩国首尔-3倍率, 🇰🇷韩国首尔2-3倍率, 🇩🇪德国法兰克福, 🇩🇪德国法兰克福2, 🇧🇷巴西圣保罗-1.5倍率, 🇺🇸美国芝加哥, 🇦🇪迪拜-1.2倍率, 🇦🇪迪拜2-1.5倍率, 🇰🇷韩国春川-1.5倍率, 🇰🇷韩国春川2-1.5倍率, 🇦🇺澳大利亚悉尼-1.5倍率, 🇦🇺澳大利亚墨尔本-1.5倍率, 🇮🇳印度孟买-1.5倍率, 🇮🇳印度海得拉巴-1.5倍率, 🇬🇧英国伦敦-2倍率, 🇬🇧英国伦敦2-1.8倍率, 🇿🇦非洲约翰内斯堡-3.5倍率, 🇨🇦加拿大多伦多-1.5倍率, 🇺🇸美国凤凰城-0.1倍, 🇩🇪德国-1倍, 🇺🇸美国凤凰城-三网-0.1倍, 🇺🇸美国1号-0.1倍, 🇺🇸美国2号-0.1倍, 🇺🇸美国3号-0.1倍, 🇺🇸美国4号-0.1倍, 🇯🇵日本-0.1—流媒体, 🇫🇷法国, 🇫🇷法国2, 🇩🇪德国, 🇬🇧英国伦敦-1倍, 🇹🇼台湾—TK专线, 🇭🇰香港hkt-2倍, 🇭🇰香港hkt2-1.5倍, 🇮🇳印度孟买, 🇮🇳印度孟买2, 🇰🇷韩国首尔, 🇰🇷韩国首尔2], url: 'http://www.gstatic.com/generate_204', interval: 7200 }
+rules:
+    - RULE-SET,collection,DIRECT,no-resolve
+    - GEOIP,CN,DIRECT,no-resolve
+    - DOMAIN-SUFFIX,chengqitong.net,DIRECT
+    - DOMAIN-SUFFIX,oaifree.com,DIRECT
+    - MATCH,顶级机场
+
+
+rule-providers:
+  collection: 
+    type: http
+    behavior: classical
+    format: yaml
+    path: ./rules/collection.yaml
+    url: "https://gist.githubusercontent.com/cnfree8964/0864fd1d2e88936a095fb40d74ce4993/raw/collection.yaml"

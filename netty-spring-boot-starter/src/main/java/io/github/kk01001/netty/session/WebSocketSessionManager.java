@@ -15,13 +15,19 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
+/**
+ * @author kk01001
+ * @date 2026-03-07 10:00:00
+ * @description WebSocket 会话管理器，管理所有本机会话，支持连接数限制
+ */
 @Slf4j
 public class WebSocketSessionManager implements MessageDispatcher {
 
     /**
-     * path -> (sessionId -> session)
+     * sessionId -> session
      */
     protected final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
@@ -32,7 +38,14 @@ public class WebSocketSessionManager implements MessageDispatcher {
 
     private final ScheduledExecutorService scheduler;
     private final Duration sessionTimeout;
+    private final int maxConnections;
     private final ApplicationEventPublisher eventPublisher;
+    private final AtomicInteger connectionCount = new AtomicInteger(0);
+
+    /**
+     * 会话关闭回调，由外部设置（用于超时清理时触发 @OnClose）
+     */
+    private volatile SessionCloseCallback closeCallback;
 
     public WebSocketSessionManager(
             ScheduledExecutorService scheduler,
@@ -40,10 +53,28 @@ public class WebSocketSessionManager implements MessageDispatcher {
             ApplicationEventPublisher eventPublisher) {
         this.scheduler = scheduler;
         this.sessionTimeout = properties.getSessionTimeout();
+        this.maxConnections = properties.getMaxConnections();
         this.eventPublisher = eventPublisher;
         startSessionCleanup();
     }
-    
+
+    /**
+     * 设置会话关闭回调
+     */
+    public void setCloseCallback(SessionCloseCallback callback) {
+        this.closeCallback = callback;
+    }
+
+    /**
+     * 是否可以接受新连接
+     */
+    public boolean canAcceptConnection() {
+        if (maxConnections <= 0) {
+            return true;
+        }
+        return connectionCount.get() < maxConnections;
+    }
+
     /**
      * 添加会话
      */
@@ -52,37 +83,42 @@ public class WebSocketSessionManager implements MessageDispatcher {
             throw new IllegalArgumentException("session不能为空");
         }
         sessions.put(session.getId(), session);
-        log.debug("添加会话: userId={},sessionId={}", session.getUserId(), session.getId());
+        connectionCount.incrementAndGet();
 
-        // 发布会话添加事件
+        if (StringUtils.hasText(session.getUserId())) {
+            userIdSessions.put(session.getUserId(), session.getId());
+        }
+
+        log.debug("添加会话: userId={}, sessionId={}, total={}", 
+                session.getUserId(), session.getId(), connectionCount.get());
         eventPublisher.publishEvent(new WebSocketSessionEvent(this, session, WebSocketSessionEvent.EventType.ADD));
     }
-    
+
     /**
      * 移除会话
      */
     public void removeSession(String sessionId) {
         WebSocketSession session = sessions.remove(sessionId);
         if (session != null) {
-            userIdSessions.remove(session.getUserId());
+            connectionCount.decrementAndGet();
+            if (StringUtils.hasText(session.getUserId())) {
+                userIdSessions.remove(session.getUserId());
+            }
             session.close();
-            log.debug("移除会话: userId={}, sessionId={}", session.getUserId(), sessionId);
-            // 发布会话移除事件
-            eventPublisher.publishEvent(new WebSocketSessionEvent(this, session, WebSocketSessionEvent.EventType.REMOVE));
-
+            log.debug("移除会话: userId={}, sessionId={}, total={}",
+                    session.getUserId(), sessionId, connectionCount.get());
+            eventPublisher.publishEvent(
+                    new WebSocketSessionEvent(this, session, WebSocketSessionEvent.EventType.REMOVE));
         }
     }
-    
+
     /**
      * 获取所有会话
      */
     public Map<String, WebSocketSession> getSessions() {
         return sessions;
     }
-    
-    /**
-     * 广播消息给所有会话
-     */
+
     @Override
     public void broadcast(String message) {
         broadcast(message, session -> true);
@@ -90,10 +126,7 @@ public class WebSocketSessionManager implements MessageDispatcher {
 
     @Override
     public void broadcastLocal(String message, Predicate<WebSocketSession> filter) {
-        if (!StringUtils.hasText(message)) {
-            return;
-        }
-        if (CollectionUtils.isEmpty(sessions)) {
+        if (!StringUtils.hasText(message) || CollectionUtils.isEmpty(sessions)) {
             return;
         }
         sessions.values().stream()
@@ -108,16 +141,10 @@ public class WebSocketSessionManager implements MessageDispatcher {
                 });
     }
 
-    /**
-     * 广播消息给符合条件的会话, 所有节点
-     */
     @Override
     public void broadcast(String message, Predicate<WebSocketSession> filter) {
-        // 本机节点
         broadcastLocal(message, filter);
-
         log.debug("广播消息: message={}", message);
-        // 其他节点
         eventPublisher.publishEvent(new WebSocketMessageEvent(this, message, null));
     }
 
@@ -127,44 +154,43 @@ public class WebSocketSessionManager implements MessageDispatcher {
     public WebSocketSession getSession(String sessionId) {
         return sessions.get(sessionId);
     }
-    
-    /**
-     * 启动会话清理任务
-     */
+
     private void startSessionCleanup() {
-        scheduler.scheduleAtFixedRate(this::cleanupInactiveSessions, 
+        scheduler.scheduleAtFixedRate(this::cleanupInactiveSessions,
                 sessionTimeout.toMillis(), sessionTimeout.toMillis(), TimeUnit.MILLISECONDS);
     }
-    
-    /**
-     * 清理不活跃的会话
-     */
+
     private void cleanupInactiveSessions() {
         long now = System.currentTimeMillis();
         sessions.values().removeIf(session -> {
             if (!session.isActive() || now - session.getLastActiveTime() > sessionTimeout.toMillis()) {
+                connectionCount.decrementAndGet();
+                if (StringUtils.hasText(session.getUserId())) {
+                    userIdSessions.remove(session.getUserId());
+                }
+                if (closeCallback != null) {
+                    try {
+                        closeCallback.onSessionClose(session);
+                    } catch (Exception e) {
+                        log.error("执行会话关闭回调失败: sessionId={}", session.getId(), e);
+                    }
+                }
                 session.close();
                 log.debug("清理不活跃会话: userId={}, sessionId={}", session.getUserId(), session.getId());
+                eventPublisher.publishEvent(
+                        new WebSocketSessionEvent(this, session, WebSocketSessionEvent.EventType.REMOVE));
                 return true;
             }
             return false;
         });
     }
 
-    /**
-     * 发送消息给指定会话
-     * 如果会话不在本机，会通过事件机制转发
-     */
     @Override
     public void sendToSession(String sessionId, String message) {
         boolean local = sendToSessionLocal(sessionId, message);
-        if (local) {
-            return;
+        if (!local) {
+            eventPublisher.publishEvent(new WebSocketMessageEvent(this, message, sessionId));
         }
-        // 本地找不到，发布事件
-        eventPublisher.publishEvent(new WebSocketMessageEvent(this,
-                message,
-                sessionId));
     }
 
     @Override
@@ -172,8 +198,6 @@ public class WebSocketSessionManager implements MessageDispatcher {
         if (!StringUtils.hasText(message)) {
             return true;
         }
-
-        // 先查找本地会话
         WebSocketSession session = getSession(sessionId);
         if (session != null && session.isActive()) {
             try {
@@ -190,23 +214,28 @@ public class WebSocketSessionManager implements MessageDispatcher {
     public boolean sendToUser(String userId, String message) {
         String sessionId = userIdSessions.get(userId);
         if (!StringUtils.hasText(sessionId)) {
-            log.error("发送消息失败, 未找到匹配的session: userId={}, sessionId={}", userId, sessionId);
+            log.warn("发送消息失败, 未找到匹配的session: userId={}", userId);
             return false;
         }
         sendToSession(sessionId, message);
         return true;
     }
 
-    /**
-     * 获取会话数量
-     */
     @Override
     public int getSessionCount() {
-        return sessions.size();
+        return connectionCount.get();
     }
 
     @Override
     public Set<String> getUserIds() {
         return userIdSessions.keySet();
+    }
+
+    /**
+     * 会话关闭回调接口
+     */
+    @FunctionalInterface
+    public interface SessionCloseCallback {
+        void onSessionClose(WebSocketSession session);
     }
 }

@@ -7,66 +7,88 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * @author kk01001
+ * @date 2026-03-07 10:00:00
+ * @description 基于 Micrometer 的消息追踪器，Counter/Timer 在构造时一次性创建
+ */
 @Slf4j
 public class MetricsMessageTracer implements MessageTracer {
 
-    private final MeterRegistry registry;
-    private final NettyWebSocketProperties properties;
+    private final Counter sentCounter;
+    private final Counter receivedCounter;
+    private final Counter errorCounter;
+    private final Counter connectCounter;
+    private final Counter disconnectCounter;
+    private final Timer messageLatencyTimer;
 
     public MetricsMessageTracer(MeterRegistry registry, NettyWebSocketProperties properties) {
-        this.registry = registry;
-        this.properties = properties;
-    }
+        String path = properties.getPath();
+        String port = String.valueOf(properties.getPort());
 
-    private Counter createCounter(String name, String description) {
-        return Counter.builder(name)
-                .description(description)
-                .tags("path", properties.getPath(), 
-                     "port", String.valueOf(properties.getPort()))
+        this.sentCounter = Counter.builder("websocket.messages.sent")
+                .description("WebSocket发送消息计数")
+                .tags("path", path, "port", port)
                 .register(registry);
-    }
 
-    private Timer createTimer(String name, String description) {
-        return Timer.builder(name)
-                .description(description)
-                .tags("path", properties.getPath(), 
-                     "port", String.valueOf(properties.getPort()))
+        this.receivedCounter = Counter.builder("websocket.messages.received")
+                .description("WebSocket接收消息计数")
+                .tags("path", path, "port", port)
+                .register(registry);
+
+        this.errorCounter = Counter.builder("websocket.errors")
+                .description("WebSocket错误计数")
+                .tags("path", path, "port", port)
+                .register(registry);
+
+        this.connectCounter = Counter.builder("websocket.connections")
+                .description("WebSocket连接计数")
+                .tags("path", path, "port", port)
+                .register(registry);
+
+        this.disconnectCounter = Counter.builder("websocket.disconnections")
+                .description("WebSocket断开连接计数")
+                .tags("path", path, "port", port)
+                .register(registry);
+
+        this.messageLatencyTimer = Timer.builder("websocket.message.latency")
+                .description("WebSocket消息处理延迟")
+                .tags("path", path, "port", port)
                 .register(registry);
     }
 
     @Override
     public void traceSend(WebSocketSession session, String message) {
-        createCounter("websocket.messages.sent", "WebSocket发送消息计数").increment();
+        sentCounter.increment();
         log.debug("发送消息: sessionId={}, message={}", session.getId(), message);
     }
 
     @Override
     public void traceReceive(WebSocketSession session, String message) {
-        createCounter("websocket.messages.received", "WebSocket接收消息计数").increment();
+        receivedCounter.increment();
         log.debug("接收消息: sessionId={}, message={}", session.getId(), message);
     }
 
     @Override
     public void traceError(WebSocketSession session, Throwable error) {
-        createCounter("websocket.errors", "WebSocket错误计数").increment();
+        errorCounter.increment();
         log.error("发生错误: sessionId={}", session.getId(), error);
     }
 
     @Override
     public void traceConnect(WebSocketSession session) {
-        createCounter("websocket.connections", "WebSocket连接计数").increment();
-        log.debug("连接建立: sessionId={}, remoteAddress={}",
-                session.getId(), session.getChannel().remoteAddress());
+        connectCounter.increment();
+        log.debug("连接建立: sessionId={}, remoteAddress={}", session.getId(), session.getRemoteAddress());
     }
 
     @Override
     public void traceDisconnect(WebSocketSession session) {
-        createCounter("websocket.disconnections", "WebSocket断开连接计数").increment();
+        disconnectCounter.increment();
         log.info("连接断开: sessionId={}", session.getId());
     }
 
     @Override
     public Timer getMessageLatencyTimer() {
-        return createTimer("websocket.message.latency", "WebSocket消息处理延迟");
+        return messageLatencyTimer;
     }
-} 
+}
