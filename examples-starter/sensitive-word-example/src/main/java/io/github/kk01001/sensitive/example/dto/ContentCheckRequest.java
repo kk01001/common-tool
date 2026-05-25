@@ -1,11 +1,11 @@
-package io.github.kk01001.sensitive.example.dto;
+package io.github.archer099.sensitive.example.dto;
 
-import io.github.kk01001.sensitive.annotation.SensitiveWordField;
-import io.github.kk01001.sensitive.core.HandleType;
+import io.github.archer099.sensitive.annotation.SensitiveWordField;
+import io.github.archer099.sensitive.core.HandleType;
 import lombok.Data;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 内容检测请求
  */

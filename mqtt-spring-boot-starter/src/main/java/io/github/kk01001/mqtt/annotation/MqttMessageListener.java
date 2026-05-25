@@ -1,4 +1,4 @@
-package io.github.kk01001.mqtt.annotation;
+package io.github.archer099.mqtt.annotation;
 
 import java.lang.annotation.*;
 
@@ -6,7 +6,7 @@ import java.lang.annotation.*;
  * MQTT 消息监听器注解
  * 标注在方法上，用于接收 MQTT 消息
  *
- * @author kk01001
+ * @author archer099
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

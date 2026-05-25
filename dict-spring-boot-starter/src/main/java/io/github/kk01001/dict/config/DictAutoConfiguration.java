@@ -1,12 +1,12 @@
-package io.github.kk01001.dict.config;
+package io.github.archer099.dict.config;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import io.github.kk01001.dict.DictCache;
-import io.github.kk01001.dict.DictLoader;
-import io.github.kk01001.dict.DictRefresher;
-import io.github.kk01001.dict.jackson.DictModule;
-import io.github.kk01001.dict.jackson.DictSerializer;
-import io.github.kk01001.dict.properties.DictProperties;
+import io.github.archer099.dict.DictCache;
+import io.github.archer099.dict.DictLoader;
+import io.github.archer099.dict.DictRefresher;
+import io.github.archer099.dict.jackson.DictModule;
+import io.github.archer099.dict.jackson.DictSerializer;
+import io.github.archer099.dict.properties.DictProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

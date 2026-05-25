@@ -1,7 +1,7 @@
-package io.github.kk01001.examples.disruptor;
+package io.github.archer099.examples.disruptor;
 
 import com.lmax.disruptor.dsl.ProducerType;
-import io.github.kk01001.disruptor.annotation.DisruptorListener;
+import io.github.archer099.disruptor.annotation.DisruptorListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.model;
+package io.github.archer099.examples.model;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package io.github.kk01001.mqtt.interceptor;
+package io.github.archer099.mqtt.interceptor;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
@@ -6,7 +6,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
  * MQTT 消息拦截器接口
  * 可用于消息发送前的预处理、日志记录、监控等
  *
- * @author kk01001
+ * @author archer099
  */
 public interface MqttMessageInterceptor {
 

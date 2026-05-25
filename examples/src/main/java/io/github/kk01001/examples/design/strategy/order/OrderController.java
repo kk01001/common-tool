@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.design.strategy.order;
+package io.github.archer099.examples.design.strategy.order;
 
-import io.github.kk01001.design.pattern.strategy.StrategyFactory;
+import io.github.archer099.design.pattern.strategy.StrategyFactory;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

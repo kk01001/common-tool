@@ -1,4 +1,4 @@
-package io.github.kk01001.mq.config;
+package io.github.archer099.mq.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
@@ -6,7 +6,7 @@ import org.springframework.core.PriorityOrdered;
 import org.springframework.core.annotation.Order;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-08-23 09:24:00
  * @description
  */

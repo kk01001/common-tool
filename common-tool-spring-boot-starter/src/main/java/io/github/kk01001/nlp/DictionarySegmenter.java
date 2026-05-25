@@ -1,4 +1,4 @@
-package io.github.kk01001.nlp;
+package io.github.archer099.nlp;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-02-13 14:31:00
  * @description 基于字典的中文分词器，实现正向最大匹配、逆向最大匹配和双向最大匹配算法
  */

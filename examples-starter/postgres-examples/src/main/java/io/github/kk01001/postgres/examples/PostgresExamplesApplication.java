@@ -1,4 +1,4 @@
-package io.github.kk01001.postgres.examples;
+package io.github.archer099.postgres.examples;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

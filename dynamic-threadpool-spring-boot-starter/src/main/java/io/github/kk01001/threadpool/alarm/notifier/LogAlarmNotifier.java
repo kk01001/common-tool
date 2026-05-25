@@ -1,12 +1,12 @@
-package io.github.kk01001.threadpool.alarm.notifier;
+package io.github.archer099.threadpool.alarm.notifier;
 
-import io.github.kk01001.threadpool.alarm.AlarmEvent;
+import io.github.archer099.threadpool.alarm.AlarmEvent;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * 日志告警通知器
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class LogAlarmNotifier implements AlarmNotifier {

@@ -1,6 +1,6 @@
-package io.github.kk01001.sensitive.example.controller;
+package io.github.archer099.sensitive.example.controller;
 
-import io.github.kk01001.sensitive.core.SensitiveWordException;
+import io.github.archer099.sensitive.core.SensitiveWordException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 全局异常处理器
  */

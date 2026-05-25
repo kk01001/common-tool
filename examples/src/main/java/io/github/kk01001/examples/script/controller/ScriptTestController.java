@@ -1,8 +1,8 @@
-package io.github.kk01001.examples.script.controller;
+package io.github.archer099.examples.script.controller;
 
-import io.github.kk01001.examples.script.model.ScriptTestModel;
-import io.github.kk01001.script.enums.ScriptType;
-import io.github.kk01001.script.service.ScriptService;
+import io.github.archer099.examples.script.model.ScriptTestModel;
+import io.github.archer099.script.enums.ScriptType;
+import io.github.archer099.script.service.ScriptService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-19 15:30:00
  * @description 脚本执行测试控制器
  */

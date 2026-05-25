@@ -1,8 +1,8 @@
-package io.github.kk01001.design;
+package io.github.archer099.design;
 
-import io.github.kk01001.design.pattern.observer.ObserverFactory;
-import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainFactory;
-import io.github.kk01001.design.pattern.strategy.StrategyFactory;
+import io.github.archer099.design.pattern.observer.ObserverFactory;
+import io.github.archer099.design.pattern.responsibility.ResponsibilityChainFactory;
+import io.github.archer099.design.pattern.strategy.StrategyFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;

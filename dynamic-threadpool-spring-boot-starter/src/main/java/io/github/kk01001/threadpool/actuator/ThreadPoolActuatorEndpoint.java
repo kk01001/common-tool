@@ -1,9 +1,9 @@
-package io.github.kk01001.threadpool.actuator;
+package io.github.archer099.threadpool.actuator;
 
-import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
-import io.github.kk01001.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
-import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
-import io.github.kk01001.threadpool.thirdparty.adapter.ThirdPartyThreadPoolAdapter;
+import io.github.archer099.threadpool.custom.model.ThreadPoolConfig;
+import io.github.archer099.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
+import io.github.archer099.threadpool.registry.ThreadPoolRegistry;
+import io.github.archer099.threadpool.thirdparty.adapter.ThirdPartyThreadPoolAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
@@ -17,7 +17,7 @@ import java.util.Map;
  * 动态线程池 Actuator 端点
  * 提供查询和更新线程池配置的 HTTP 接口
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Endpoint(id = "dynamic-threadpool")
@@ -153,11 +153,11 @@ public class ThreadPoolActuatorEndpoint {
             String poolName, Integer corePoolSize, Integer maxPoolSize,
             Integer queueCapacity, Long keepAliveSeconds) {
         
-        io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig currentConfig = adapter.getConfig();
+        io.github.archer099.threadpool.thirdparty.ThirdPartyThreadPoolConfig currentConfig = adapter.getConfig();
         
         // 构建新配置
-        io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig.ThirdPartyThreadPoolConfigBuilder builder = 
-            io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig.builder()
+        io.github.archer099.threadpool.thirdparty.ThirdPartyThreadPoolConfig.ThirdPartyThreadPoolConfigBuilder builder = 
+            io.github.archer099.threadpool.thirdparty.ThirdPartyThreadPoolConfig.builder()
                 .poolName(poolName);
         
         // 设置参数（使用新值或保持原值）
@@ -185,7 +185,7 @@ public class ThreadPoolActuatorEndpoint {
             builder.keepAliveTime(currentConfig.getKeepAliveTime());
         }
         
-        io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig newConfig = builder.build();
+        io.github.archer099.threadpool.thirdparty.ThirdPartyThreadPoolConfig newConfig = builder.build();
         adapter.updateConfig(newConfig);
         
         Map<String, Object> result = new HashMap<>();

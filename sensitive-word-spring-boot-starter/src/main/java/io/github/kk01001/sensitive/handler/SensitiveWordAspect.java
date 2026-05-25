@@ -1,11 +1,11 @@
-package io.github.kk01001.sensitive.handler;
+package io.github.archer099.sensitive.handler;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import io.github.kk01001.sensitive.annotation.SensitiveWordCheck;
-import io.github.kk01001.sensitive.annotation.SensitiveWordField;
-import io.github.kk01001.sensitive.core.*;
-import io.github.kk01001.sensitive.properties.SensitiveWordProperties;
+import io.github.archer099.sensitive.annotation.SensitiveWordCheck;
+import io.github.archer099.sensitive.annotation.SensitiveWordField;
+import io.github.archer099.sensitive.core.*;
+import io.github.archer099.sensitive.properties.SensitiveWordProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -19,7 +19,7 @@ import java.lang.reflect.Parameter;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 敏感词检测 AOP 切面
  */
@@ -31,7 +31,7 @@ public class SensitiveWordAspect {
     private final SensitiveWordFilter sensitiveWordFilter;
     private final SensitiveWordProperties properties;
     
-    @Around("@annotation(io.github.kk01001.sensitive.annotation.SensitiveWordCheck)")
+    @Around("@annotation(io.github.archer099.sensitive.annotation.SensitiveWordCheck)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();

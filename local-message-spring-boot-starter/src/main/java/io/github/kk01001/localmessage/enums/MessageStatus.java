@@ -1,11 +1,11 @@
-package io.github.kk01001.localmessage.enums;
+package io.github.archer099.localmessage.enums;
 
 import lombok.Getter;
 
 /**
  * 本地消息状态枚举
  *
- * @author kk01001
+ * @author archer099
  */
 @Getter
 public enum MessageStatus {

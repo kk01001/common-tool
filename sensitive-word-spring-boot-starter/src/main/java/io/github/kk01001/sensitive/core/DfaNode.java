@@ -1,10 +1,10 @@
-package io.github.kk01001.sensitive.core;
+package io.github.archer099.sensitive.core;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description DFA 算法节点
  */

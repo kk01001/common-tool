@@ -1,4 +1,4 @@
-package io.github.kk01001.id;
+package io.github.archer099.id;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @author kk01001
+ * @author archer099
  * date:  2024-07-02 17:21
  */
 @Slf4j

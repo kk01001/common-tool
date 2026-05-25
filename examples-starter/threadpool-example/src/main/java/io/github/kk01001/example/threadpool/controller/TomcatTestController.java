@@ -1,4 +1,4 @@
-package io.github.kk01001.example.threadpool.controller;
+package io.github.archer099.example.threadpool.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Tomcat 线程池测试控制器
  * 
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @RestController

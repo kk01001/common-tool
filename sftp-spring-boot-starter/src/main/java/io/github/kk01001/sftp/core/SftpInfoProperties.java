@@ -1,4 +1,4 @@
-package io.github.kk01001.sftp.core;
+package io.github.archer099.sftp.core;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.time.Duration;
 
 /**
- * @author kk01001
+ * @author archer099
  * date:  2023-03-28 16:01
  */
 @Data

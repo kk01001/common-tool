@@ -1,7 +1,7 @@
-package io.github.kk01001.signature.example.controller;
+package io.github.archer099.signature.example.controller;
 
-import io.github.kk01001.signature.core.SignatureException;
-import io.github.kk01001.signature.example.dto.ApiResponse;
+import io.github.archer099.signature.core.SignatureException;
+import io.github.archer099.signature.example.dto.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description 全局异常处理器
  */

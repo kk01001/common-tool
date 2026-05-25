@@ -1,18 +1,18 @@
-package io.github.kk01001.graphql.examples.service.impl;
+package io.github.archer099.graphql.examples.service.impl;
 
-import io.github.kk01001.graphql.examples.entity.AuthorEntity;
-import io.github.kk01001.graphql.examples.entity.BookEntity;
-import io.github.kk01001.graphql.examples.dto.CreateAuthorInput;
-import io.github.kk01001.graphql.examples.dto.CreateBookInput;
-import io.github.kk01001.graphql.examples.dto.UpdateAuthorNameInput;
-import io.github.kk01001.graphql.examples.dto.UpdateBookTitleInput;
-import io.github.kk01001.graphql.examples.model.Author;
-import io.github.kk01001.graphql.examples.model.Book;
-import io.github.kk01001.graphql.examples.model.BookPage;
-import io.github.kk01001.graphql.examples.event.BookCreatedEvent;
-import io.github.kk01001.graphql.examples.repository.AuthorRepository;
-import io.github.kk01001.graphql.examples.repository.BookRepository;
-import io.github.kk01001.graphql.examples.service.LibraryService;
+import io.github.archer099.graphql.examples.entity.AuthorEntity;
+import io.github.archer099.graphql.examples.entity.BookEntity;
+import io.github.archer099.graphql.examples.dto.CreateAuthorInput;
+import io.github.archer099.graphql.examples.dto.CreateBookInput;
+import io.github.archer099.graphql.examples.dto.UpdateAuthorNameInput;
+import io.github.archer099.graphql.examples.dto.UpdateBookTitleInput;
+import io.github.archer099.graphql.examples.model.Author;
+import io.github.archer099.graphql.examples.model.Book;
+import io.github.archer099.graphql.examples.model.BookPage;
+import io.github.archer099.graphql.examples.event.BookCreatedEvent;
+import io.github.archer099.graphql.examples.repository.AuthorRepository;
+import io.github.archer099.graphql.examples.repository.BookRepository;
+import io.github.archer099.graphql.examples.service.LibraryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -105,7 +105,7 @@ public class LibraryServiceImpl implements LibraryService {
             return Optional.empty();
         }
         if ("error".equalsIgnoreCase(input.getTitle())) {
-            throw new io.github.kk01001.graphql.examples.exception.BusinessException("Title 'error' is not allowed!");
+            throw new io.github.archer099.graphql.examples.exception.BusinessException("Title 'error' is not allowed!");
         }
         BookEntity entity = new BookEntity();
         entity.setId(input.getId());

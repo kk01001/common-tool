@@ -1,6 +1,6 @@
-package io.github.kk01001.redisson.example.controller;
+package io.github.archer099.redisson.example.controller;
 
-import io.github.kk01001.redisson.template.MultiRedissonTemplate;
+import io.github.archer099.redisson.template.MultiRedissonTemplate;
 import org.redisson.api.RateIntervalUnit;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-17 10:30:00
  * @description 限流器 Demo - API限流实战案例
  */

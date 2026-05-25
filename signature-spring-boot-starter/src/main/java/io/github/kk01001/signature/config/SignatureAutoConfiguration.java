@@ -1,13 +1,13 @@
-package io.github.kk01001.signature.config;
+package io.github.archer099.signature.config;
 
-import io.github.kk01001.signature.handler.SignatureFilter;
-import io.github.kk01001.signature.handler.SignatureHandler;
-import io.github.kk01001.signature.handler.SignatureInterceptor;
-import io.github.kk01001.signature.properties.SignatureProperties;
-import io.github.kk01001.signature.store.AppSecretStore;
-import io.github.kk01001.signature.store.ConfigAppSecretStore;
-import io.github.kk01001.signature.store.InMemoryNonceStore;
-import io.github.kk01001.signature.store.NonceStore;
+import io.github.archer099.signature.handler.SignatureFilter;
+import io.github.archer099.signature.handler.SignatureHandler;
+import io.github.archer099.signature.handler.SignatureInterceptor;
+import io.github.archer099.signature.properties.SignatureProperties;
+import io.github.archer099.signature.store.AppSecretStore;
+import io.github.archer099.signature.store.ConfigAppSecretStore;
+import io.github.archer099.signature.store.InMemoryNonceStore;
+import io.github.archer099.signature.store.NonceStore;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -21,7 +21,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description 签名自动配置类
  */

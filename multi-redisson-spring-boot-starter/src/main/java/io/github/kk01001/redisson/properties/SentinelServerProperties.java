@@ -1,13 +1,13 @@
-package io.github.kk01001.redisson.properties;
+package io.github.archer099.redisson.properties;
 
-import io.github.kk01001.redisson.enums.RedissonReadMode;
+import io.github.archer099.redisson.enums.RedissonReadMode;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 10:00:00
  * @description 哨兵模式配置
  */

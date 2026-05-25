@@ -1,11 +1,11 @@
-package io.github.kk01001.mqtt.config;
+package io.github.archer099.mqtt.config;
 
 import lombok.Data;
 
 /**
  * MQTT SSL/TLS 配置
  *
- * @author kk01001
+ * @author archer099
  */
 @Data
 public class MqttSslProperties {

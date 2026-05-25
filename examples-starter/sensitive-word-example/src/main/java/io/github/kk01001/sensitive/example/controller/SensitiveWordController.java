@@ -1,12 +1,12 @@
-package io.github.kk01001.sensitive.example.controller;
+package io.github.archer099.sensitive.example.controller;
 
-import io.github.kk01001.sensitive.annotation.SensitiveWordCheck;
-import io.github.kk01001.sensitive.core.HandleType;
-import io.github.kk01001.sensitive.core.MatchType;
-import io.github.kk01001.sensitive.core.SensitiveWordResult;
-import io.github.kk01001.sensitive.example.dto.ContentCheckRequest;
-import io.github.kk01001.sensitive.example.dto.ContentCheckResponse;
-import io.github.kk01001.sensitive.example.service.SensitiveWordDemoService;
+import io.github.archer099.sensitive.annotation.SensitiveWordCheck;
+import io.github.archer099.sensitive.core.HandleType;
+import io.github.archer099.sensitive.core.MatchType;
+import io.github.archer099.sensitive.core.SensitiveWordResult;
+import io.github.archer099.sensitive.example.dto.ContentCheckRequest;
+import io.github.archer099.sensitive.example.dto.ContentCheckResponse;
+import io.github.archer099.sensitive.example.service.SensitiveWordDemoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 敏感词过滤示例控制器
  */

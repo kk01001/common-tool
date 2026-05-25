@@ -1,7 +1,7 @@
-package io.github.kk01001.examples.log;
+package io.github.archer099.examples.log;
 
-import io.github.kk01001.common.log.model.OperationLogInfo;
-import io.github.kk01001.common.log.service.OperationLogHandler;
+import io.github.archer099.common.log.model.OperationLogInfo;
+import io.github.archer099.common.log.service.OperationLogHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 

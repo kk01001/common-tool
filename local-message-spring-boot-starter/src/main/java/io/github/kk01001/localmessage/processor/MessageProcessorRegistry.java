@@ -1,4 +1,4 @@
-package io.github.kk01001.localmessage.processor;
+package io.github.archer099.localmessage.processor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 消息处理器注册中心
  * 管理所有的消息处理器
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Component

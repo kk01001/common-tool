@@ -1,4 +1,4 @@
-package io.github.kk01001.ffmpeg.model;
+package io.github.archer099.ffmpeg.model;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Objects;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 16:22:00
  * @description 音频转 HLS 请求
  */

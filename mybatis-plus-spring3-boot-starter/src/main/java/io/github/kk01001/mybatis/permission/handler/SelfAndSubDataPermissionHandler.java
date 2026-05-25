@@ -1,7 +1,7 @@
-package io.github.kk01001.mybatis.permission.handler;
+package io.github.archer099.mybatis.permission.handler;
 
-import io.github.kk01001.mybatis.permission.annotations.DataColumn;
-import io.github.kk01001.mybatis.permission.service.UserPermissionService;
+import io.github.archer099.mybatis.permission.annotations.DataColumn;
+import io.github.archer099.mybatis.permission.service.UserPermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-02-13 14:31:00
  * @description 本身及下级的数据权限处理器
  */

@@ -1,7 +1,7 @@
-package io.github.kk01001.ratelimter.aspect;
+package io.github.archer099.ratelimter.aspect;
 
-import io.github.kk01001.ratelimter.enums.RateLimiterType;
-import io.github.kk01001.ratelimter.enums.RedisClientType;
+import io.github.archer099.ratelimter.enums.RateLimiterType;
+import io.github.archer099.ratelimter.enums.RedisClientType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

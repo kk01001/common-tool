@@ -1,6 +1,6 @@
-package io.github.kk01001.redisson.example.controller;
+package io.github.archer099.redisson.example.controller;
 
-import io.github.kk01001.redisson.template.MultiRedissonTemplate;
+import io.github.archer099.redisson.template.MultiRedissonTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 18:00:00
  * @description 排行榜功能 - 使用 ZSet 实现点赞排行榜
  */

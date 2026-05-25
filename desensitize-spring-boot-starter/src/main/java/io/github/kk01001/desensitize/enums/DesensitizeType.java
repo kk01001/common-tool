@@ -1,7 +1,7 @@
-package io.github.kk01001.desensitize.enums;
+package io.github.archer099.desensitize.enums;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description
  */

@@ -1,15 +1,15 @@
-package io.github.kk01001.push.channel.jiguang.request;
+package io.github.archer099.push.channel.jiguang.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.kk01001.push.channel.jiguang.request.audience.Audience;
-import io.github.kk01001.push.channel.jiguang.request.callback.Callback;
-import io.github.kk01001.push.channel.jiguang.request.message.custom.CustomMessage;
-import io.github.kk01001.push.channel.jiguang.request.message.inapp.InAppMessage;
-import io.github.kk01001.push.channel.jiguang.request.message.notification.NotificationMessage;
-import io.github.kk01001.push.channel.jiguang.request.message.notification.ThirdNotificationMessage;
-import io.github.kk01001.push.channel.jiguang.request.message.sms.SmsMessage;
-import io.github.kk01001.push.channel.jiguang.request.options.Options;
+import io.github.archer099.push.channel.jiguang.request.audience.Audience;
+import io.github.archer099.push.channel.jiguang.request.callback.Callback;
+import io.github.archer099.push.channel.jiguang.request.message.custom.CustomMessage;
+import io.github.archer099.push.channel.jiguang.request.message.inapp.InAppMessage;
+import io.github.archer099.push.channel.jiguang.request.message.notification.NotificationMessage;
+import io.github.archer099.push.channel.jiguang.request.message.notification.ThirdNotificationMessage;
+import io.github.archer099.push.channel.jiguang.request.message.sms.SmsMessage;
+import io.github.archer099.push.channel.jiguang.request.options.Options;
 import lombok.Data;
 
 @Data

@@ -1,4 +1,4 @@
-package io.github.kk01001.mqtt.interceptor;
+package io.github.archer099.mqtt.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
  * MQTT 消息日志拦截器
  * 记录所有消息的发送和接收日志
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class LoggingMqttMessageInterceptor implements MqttMessageInterceptor {

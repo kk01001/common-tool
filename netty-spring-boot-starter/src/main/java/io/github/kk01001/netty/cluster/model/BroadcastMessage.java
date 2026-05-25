@@ -1,4 +1,4 @@
-package io.github.kk01001.netty.cluster.model;
+package io.github.archer099.netty.cluster.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

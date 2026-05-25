@@ -1,6 +1,6 @@
 # Disruptor Spring Boot Starter
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/disruptor-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.kk01001/disruptor-spring-boot-starter)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.archer099/disruptor-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.archer099/disruptor-spring-boot-starter)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 **一句话概述：** 将高性能事件处理框架 Disruptor 与 Spring Boot 无缝集成，支持注解驱动的事件处理、自动配置、性能监控，轻松构建高吞吐量、低延迟的事件驱动应用。
@@ -43,7 +43,7 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>disruptor-spring-boot-starter</artifactId>
     <version>${latest.version}</version>
 </dependency>
@@ -69,7 +69,7 @@ disruptor:
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 订单事件处理器
  */
@@ -95,7 +95,7 @@ public class OrderEventHandler {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 订单服务
  */
@@ -124,7 +124,7 @@ public class OrderService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 手动创建队列示例
  */
@@ -189,7 +189,7 @@ Disruptor 提供多种等待策略，可根据场景选择：
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 自定义线程工厂
  */
@@ -211,7 +211,7 @@ public class ThreadFactoryConfig {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 异常处理示例
  */

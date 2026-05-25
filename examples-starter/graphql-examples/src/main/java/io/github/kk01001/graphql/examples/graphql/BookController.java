@@ -1,10 +1,10 @@
-package io.github.kk01001.graphql.examples.graphql;
+package io.github.archer099.graphql.examples.graphql;
 
 import graphql.schema.DataFetchingFieldSelectionSet;
-import io.github.kk01001.graphql.examples.model.Author;
-import io.github.kk01001.graphql.examples.model.Book;
-import io.github.kk01001.graphql.examples.model.BookPage;
-import io.github.kk01001.graphql.examples.service.LibraryService;
+import io.github.archer099.graphql.examples.model.Author;
+import io.github.archer099.graphql.examples.model.Book;
+import io.github.archer099.graphql.examples.model.BookPage;
+import io.github.archer099.graphql.examples.service.LibraryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;

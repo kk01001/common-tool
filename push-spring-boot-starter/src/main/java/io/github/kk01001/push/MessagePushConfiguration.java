@@ -1,4 +1,4 @@
-package io.github.kk01001.push;
+package io.github.archer099.push;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
  * @date 2024-12-25 14:43:00
  * @description
  */
-@ComponentScan(basePackages = "io.github.kk01001.push")
+@ComponentScan(basePackages = "io.github.archer099.push")
 @Configuration(proxyBeanMethods = false)
 public class MessagePushConfiguration {
 

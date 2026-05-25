@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.log;
+package io.github.archer099.examples.log;
 
-import io.github.kk01001.common.log.service.OperatorInfoProvider;
+import io.github.archer099.common.log.service.OperatorInfoProvider;
 
 public class SecurityOperatorInfoProvider implements OperatorInfoProvider {
 

@@ -1,13 +1,13 @@
-package io.github.kk01001.resilience4j.annotation;
+package io.github.archer099.resilience4j.annotation;
 
-import io.github.kk01001.resilience4j.enums.FallbackStrategy;
+import io.github.archer099.resilience4j.enums.FallbackStrategy;
 
 import java.lang.annotation.*;
 
 /**
  * 舱壁（隔离）注解
  *
- * @author kk01001
+ * @author archer099
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

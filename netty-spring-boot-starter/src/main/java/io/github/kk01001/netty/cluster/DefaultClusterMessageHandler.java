@@ -1,6 +1,6 @@
-package io.github.kk01001.netty.cluster;
+package io.github.archer099.netty.cluster;
 
-import io.github.kk01001.netty.message.MessageDispatcher;
+import io.github.archer099.netty.message.MessageDispatcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

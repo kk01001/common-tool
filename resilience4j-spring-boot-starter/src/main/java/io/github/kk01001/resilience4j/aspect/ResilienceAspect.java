@@ -1,8 +1,8 @@
-package io.github.kk01001.resilience4j.aspect;
+package io.github.archer099.resilience4j.aspect;
 
 import cn.hutool.core.util.StrUtil;
-import io.github.kk01001.resilience4j.annotation.*;
-import io.github.kk01001.resilience4j.handler.FallbackHandler;
+import io.github.archer099.resilience4j.annotation.*;
+import io.github.archer099.resilience4j.handler.FallbackHandler;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 /**
  * Resilience4j 切面
  *
- * @author kk01001
+ * @author archer099
  */
 @Aspect
 @Component

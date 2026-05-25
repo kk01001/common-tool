@@ -1,4 +1,4 @@
-package io.github.kk01001.redis;
+package io.github.archer099.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -48,7 +48,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-02-13 14:31:00
  * @description
  * Redisson工具类，支持多机房Redis操作，包含string、hash、set、list、deque、zset、lock等操作

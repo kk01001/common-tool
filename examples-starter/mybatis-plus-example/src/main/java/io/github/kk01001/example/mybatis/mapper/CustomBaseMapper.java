@@ -1,4 +1,4 @@
-package io.github.kk01001.example.mybatis.mapper;
+package io.github.archer099.example.mybatis.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -8,7 +8,7 @@ import java.util.Collection;
  * 自定义 BaseMapper
  * 使用 starter 提供的批量插入方法
  *
- * @author kk01001
+ * @author archer099
  */
 public interface CustomBaseMapper<T> extends BaseMapper<T> {
 

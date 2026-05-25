@@ -1,4 +1,4 @@
-package io.github.kk01001.ffmpeg.examples.vo;
+package io.github.archer099.ffmpeg.examples.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 16:30:00
  * @description 音频转 HLS 结果
  */

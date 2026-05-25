@@ -1,4 +1,4 @@
-package io.github.kk01001.oss.model;
+package io.github.archer099.oss.model;
 
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;

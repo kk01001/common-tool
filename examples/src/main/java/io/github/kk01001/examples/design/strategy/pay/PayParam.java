@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.design.strategy.pay;
+package io.github.archer099.examples.design.strategy.pay;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.design.strategy.order;
+package io.github.archer099.examples.design.strategy.order;
 
 import lombok.Builder;
 import lombok.Data;

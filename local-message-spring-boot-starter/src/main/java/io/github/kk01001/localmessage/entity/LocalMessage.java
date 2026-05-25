@@ -1,6 +1,6 @@
-package io.github.kk01001.localmessage.entity;
+package io.github.archer099.localmessage.entity;
 
-import io.github.kk01001.localmessage.enums.MessageStatus;
+import io.github.archer099.localmessage.enums.MessageStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 本地消息表实体
  * 用户需要在数据库中创建对应的表结构
  *
- * @author kk01001
+ * @author archer099
  */
 @Data
 public class LocalMessage {

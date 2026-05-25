@@ -1,4 +1,4 @@
-package io.github.kk01001.robot.config;
+package io.github.archer099.robot.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

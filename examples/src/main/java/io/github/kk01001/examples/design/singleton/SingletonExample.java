@@ -1,7 +1,7 @@
-package io.github.kk01001.examples.design.singleton;
+package io.github.archer099.examples.design.singleton;
 
-import io.github.kk01001.design.pattern.singleton.SingletonFactory;
-import io.github.kk01001.design.pattern.singleton.SingletonPattern;
+import io.github.archer099.design.pattern.singleton.SingletonFactory;
+import io.github.archer099.design.pattern.singleton.SingletonPattern;
 import lombok.Data;
 
 /**

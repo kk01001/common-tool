@@ -1,4 +1,4 @@
-package io.github.kk01001.push.channel.jiguang.request.message.notification;
+package io.github.archer099.push.channel.jiguang.request.message.notification;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

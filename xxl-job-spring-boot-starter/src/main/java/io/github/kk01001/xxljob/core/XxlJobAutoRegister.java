@@ -1,12 +1,12 @@
-package io.github.kk01001.xxljob.core;
+package io.github.archer099.xxljob.core;
 
 import cn.hutool.core.collection.CollUtil;
 import com.xxl.job.core.handler.annotation.XxlJob;
-import io.github.kk01001.xxljob.annotations.XxlJobRegister;
-import io.github.kk01001.xxljob.model.XxlJobGroup;
-import io.github.kk01001.xxljob.model.XxlJobInfo;
-import io.github.kk01001.xxljob.service.XxlJobGroupService;
-import io.github.kk01001.xxljob.service.XxlJobInfoService;
+import io.github.archer099.xxljob.annotations.XxlJobRegister;
+import io.github.archer099.xxljob.model.XxlJobGroup;
+import io.github.archer099.xxljob.model.XxlJobInfo;
+import io.github.archer099.xxljob.service.XxlJobGroupService;
+import io.github.archer099.xxljob.service.XxlJobInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2023-01-23 16:01:00
  * 自动注册执行器和添加@Xxljob任务
  */

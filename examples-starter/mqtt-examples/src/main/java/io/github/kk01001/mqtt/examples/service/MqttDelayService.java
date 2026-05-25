@@ -1,6 +1,6 @@
-package io.github.kk01001.mqtt.examples.service;
+package io.github.archer099.mqtt.examples.service;
 
-import io.github.kk01001.mqtt.examples.dto.MqttDelayedSendRequestDTO;
+import io.github.archer099.mqtt.examples.dto.MqttDelayedSendRequestDTO;
 
 public interface MqttDelayService {
 

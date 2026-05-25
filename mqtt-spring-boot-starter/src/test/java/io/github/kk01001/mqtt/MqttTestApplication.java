@@ -1,6 +1,6 @@
-package io.github.kk01001.mqtt;
+package io.github.archer099.mqtt;
 
-import io.github.kk01001.mqtt.core.MqttTemplate;
+import io.github.archer099.mqtt.core.MqttTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * MQTT 测试应用
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @SpringBootApplication

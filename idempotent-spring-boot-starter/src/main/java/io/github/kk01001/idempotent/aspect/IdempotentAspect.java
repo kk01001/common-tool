@@ -1,7 +1,7 @@
-package io.github.kk01001.idempotent.aspect;
+package io.github.archer099.idempotent.aspect;
 
-import io.github.kk01001.idempotent.core.IdempotentKeyGenerator;
-import io.github.kk01001.idempotent.core.RedisIdempotentExecutor;
+import io.github.archer099.idempotent.core.IdempotentKeyGenerator;
+import io.github.archer099.idempotent.core.RedisIdempotentExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import java.lang.reflect.Method;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 幂等切面
  */

@@ -1,7 +1,7 @@
-package io.github.kk01001.redisson.enums;
+package io.github.archer099.redisson.enums;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 15:10:00
  * @description 故障节点检测器类型
  */

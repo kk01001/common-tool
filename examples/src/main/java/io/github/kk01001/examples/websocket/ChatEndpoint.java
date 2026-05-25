@@ -1,13 +1,13 @@
-package io.github.kk01001.examples.websocket;
+package io.github.archer099.examples.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.kk01001.netty.annotation.OnBinaryMessage;
-import io.github.kk01001.netty.annotation.OnClose;
-import io.github.kk01001.netty.annotation.OnError;
-import io.github.kk01001.netty.annotation.OnMessage;
-import io.github.kk01001.netty.annotation.OnOpen;
-import io.github.kk01001.netty.annotation.WebSocketEndpoint;
-import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.archer099.netty.annotation.OnBinaryMessage;
+import io.github.archer099.netty.annotation.OnClose;
+import io.github.archer099.netty.annotation.OnError;
+import io.github.archer099.netty.annotation.OnMessage;
+import io.github.archer099.netty.annotation.OnOpen;
+import io.github.archer099.netty.annotation.WebSocketEndpoint;
+import io.github.archer099.netty.session.WebSocketSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

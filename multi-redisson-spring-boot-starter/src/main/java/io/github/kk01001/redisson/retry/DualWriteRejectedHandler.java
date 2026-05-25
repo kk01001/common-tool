@@ -1,6 +1,6 @@
-package io.github.kk01001.redisson.retry;
+package io.github.archer099.redisson.retry;
 
-import io.github.kk01001.redisson.monitor.DualWriteMetrics;
+import io.github.archer099.redisson.monitor.DualWriteMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,7 +8,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-06 21:32:00
  * @description 双写线程池拒绝策略
  * <p>

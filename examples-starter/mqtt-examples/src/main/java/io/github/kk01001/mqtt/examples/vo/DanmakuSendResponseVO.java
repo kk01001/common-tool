@@ -1,4 +1,4 @@
-package io.github.kk01001.mqtt.examples.vo;
+package io.github.archer099.mqtt.examples.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

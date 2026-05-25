@@ -1,6 +1,6 @@
-package io.github.kk01001.postgres.examples.mapper;
+package io.github.archer099.postgres.examples.mapper;
 
-import io.github.kk01001.postgres.examples.entity.DemoUser;
+import io.github.archer099.postgres.examples.entity.DemoUser;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

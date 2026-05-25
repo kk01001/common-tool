@@ -1,15 +1,15 @@
-package io.github.kk01001.disruptor.template;
+package io.github.archer099.disruptor.template;
 
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
-import io.github.kk01001.disruptor.event.DisruptorEvent;
-import io.github.kk01001.disruptor.factory.DisruptorEventFactory;
-import io.github.kk01001.disruptor.handler.MessageHandler;
-import io.github.kk01001.disruptor.handler.MessageHandlerAdapter;
-import io.github.kk01001.disruptor.monitor.DisruptorMetrics;
+import io.github.archer099.disruptor.event.DisruptorEvent;
+import io.github.archer099.disruptor.factory.DisruptorEventFactory;
+import io.github.archer099.disruptor.handler.MessageHandler;
+import io.github.archer099.disruptor.handler.MessageHandlerAdapter;
+import io.github.archer099.disruptor.monitor.DisruptorMetrics;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-19 10:15:47
  * @description Disruptor模板类，提供消息发送的统一接口
  */

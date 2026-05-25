@@ -1,15 +1,15 @@
-package io.github.kk01001.threadpool.thirdparty.adapter;
+package io.github.archer099.threadpool.thirdparty.adapter;
 
-import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
-import io.github.kk01001.threadpool.thirdparty.ThirdPartyPoolType;
-import io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig;
+import io.github.archer099.threadpool.actuator.ThreadPoolMetrics;
+import io.github.archer099.threadpool.thirdparty.ThirdPartyPoolType;
+import io.github.archer099.threadpool.thirdparty.ThirdPartyThreadPoolConfig;
 
 /**
  * 第三方线程池适配器接口 (适配器模式)
  * 
  * <p>用于统一管理不同类型的第三方线程池（Tomcat、Dubbo、Hikari 等）
  * 
- * @author kk01001
+ * @author archer099
  */
 public interface ThirdPartyThreadPoolAdapter {
     

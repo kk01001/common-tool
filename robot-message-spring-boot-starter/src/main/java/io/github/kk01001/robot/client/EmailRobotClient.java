@@ -1,7 +1,7 @@
-package io.github.kk01001.robot.client;
+package io.github.archer099.robot.client;
 
-import io.github.kk01001.robot.message.EmailMessage;
-import io.github.kk01001.robot.message.RobotMessage;
+import io.github.archer099.robot.message.EmailMessage;
+import io.github.archer099.robot.message.RobotMessage;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;

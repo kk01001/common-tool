@@ -1,13 +1,13 @@
-package io.github.kk01001.examples.websocket;
+package io.github.archer099.examples.websocket;
 
-import io.github.kk01001.netty.auth.WebSocketAuthenticator;
-import io.github.kk01001.netty.config.ChannelOptionCustomizer;
-import io.github.kk01001.netty.config.WebSocketPipelineConfigurer;
-import io.github.kk01001.netty.filter.MessageFilter;
-import io.github.kk01001.netty.filter.MessageRateLimiter;
-import io.github.kk01001.netty.filter.MessageSizeFilter;
-import io.github.kk01001.netty.filter.SensitiveWordFilter;
-import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.archer099.netty.auth.WebSocketAuthenticator;
+import io.github.archer099.netty.config.ChannelOptionCustomizer;
+import io.github.archer099.netty.config.WebSocketPipelineConfigurer;
+import io.github.archer099.netty.filter.MessageFilter;
+import io.github.archer099.netty.filter.MessageRateLimiter;
+import io.github.archer099.netty.filter.MessageSizeFilter;
+import io.github.archer099.netty.filter.SensitiveWordFilter;
+import io.github.archer099.netty.session.WebSocketSession;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

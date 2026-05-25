@@ -1,10 +1,10 @@
-package io.github.kk01001.xxljob.service;
+package io.github.archer099.xxljob.service;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import io.github.kk01001.xxljob.constants.XxlJobConstants;
-import io.github.kk01001.xxljob.core.XxlJobProperties;
+import io.github.archer099.xxljob.constants.XxlJobConstants;
+import io.github.archer099.xxljob.core.XxlJobProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2023-02-02 14:03
  */
 @Slf4j

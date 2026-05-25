@@ -1,6 +1,6 @@
-package io.github.kk01001.threadpool.custom.model;
+package io.github.archer099.threadpool.custom.model;
 
-import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
+import io.github.archer099.threadpool.custom.config.DynamicThreadPoolProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * 线程池配置模型
  *
- * @author kk01001
+ * @author archer099
  */
 @Data
 @Builder

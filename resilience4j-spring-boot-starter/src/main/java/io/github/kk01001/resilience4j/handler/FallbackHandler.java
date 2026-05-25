@@ -1,9 +1,9 @@
-package io.github.kk01001.resilience4j.handler;
+package io.github.archer099.resilience4j.handler;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import io.github.kk01001.resilience4j.enums.FallbackStrategy;
-import io.github.kk01001.resilience4j.exception.ResilienceException;
+import io.github.archer099.resilience4j.enums.FallbackStrategy;
+import io.github.archer099.resilience4j.exception.ResilienceException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
 /**
  * 降级处理器
  *
- * @author kk01001
+ * @author archer099
  */
 public class FallbackHandler {
 

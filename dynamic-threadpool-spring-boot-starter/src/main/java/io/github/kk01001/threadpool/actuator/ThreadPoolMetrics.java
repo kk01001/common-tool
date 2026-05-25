@@ -1,4 +1,4 @@
-package io.github.kk01001.threadpool.actuator;
+package io.github.archer099.threadpool.actuator;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * 线程池指标
  *
- * @author kk01001
+ * @author archer099
  */
 @Data
 @Builder

@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.i18n;
+package io.github.archer099.examples.i18n;
 
-import io.github.kk01001.i18n.provider.I18nManager;
+import io.github.archer099.i18n.provider.I18nManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;

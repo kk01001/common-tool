@@ -1,7 +1,7 @@
-package io.github.kk01001.account.mapper;
+package io.github.archer099.account.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.kk01001.account.entity.Account;
+import io.github.archer099.account.entity.Account;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

@@ -1,9 +1,9 @@
-package io.github.kk01001.chat.example.controller;
+package io.github.archer099.chat.example.controller;
 
-import io.github.kk01001.chat.example.config.UserContext;
-import io.github.kk01001.chat.example.entity.ChatFile;
-import io.github.kk01001.chat.example.service.ChatFileService;
-import io.github.kk01001.chat.example.service.FileStorageService;
+import io.github.archer099.chat.example.config.UserContext;
+import io.github.archer099.chat.example.entity.ChatFile;
+import io.github.archer099.chat.example.service.ChatFileService;
+import io.github.archer099.chat.example.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 19:00:00
  * @description 文件上传下载接口
  */

@@ -1,4 +1,4 @@
-package io.github.kk01001.threadpool.custom.config;
+package io.github.archer099.threadpool.custom.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * 动态线程池配置属性
  *
- * @author kk01001
+ * @author archer099
  */
 @Data
 @ConfigurationProperties(prefix = "dynamic-threadpool")

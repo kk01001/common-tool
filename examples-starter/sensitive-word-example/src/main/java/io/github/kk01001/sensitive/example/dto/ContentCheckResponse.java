@@ -1,6 +1,6 @@
-package io.github.kk01001.sensitive.example.dto;
+package io.github.archer099.sensitive.example.dto;
 
-import io.github.kk01001.sensitive.core.SensitiveWordResult;
+import io.github.archer099.sensitive.core.SensitiveWordResult;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 内容检测响应
  */

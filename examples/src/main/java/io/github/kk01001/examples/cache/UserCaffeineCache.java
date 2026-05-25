@@ -1,7 +1,7 @@
-package io.github.kk01001.examples.cache;
+package io.github.archer099.examples.cache;
 
 import com.github.benmanes.caffeine.cache.RemovalCause;
-import io.github.kk01001.cache.core.AbstractLocalCaffeineCache;
+import io.github.archer099.cache.core.AbstractLocalCaffeineCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

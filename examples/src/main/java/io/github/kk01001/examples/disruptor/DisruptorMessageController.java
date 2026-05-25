@@ -1,10 +1,10 @@
-package io.github.kk01001.examples.disruptor;
+package io.github.archer099.examples.disruptor;
 
 import cn.hutool.core.util.IdUtil;
 import com.lmax.disruptor.dsl.ProducerType;
-import io.github.kk01001.disruptor.annotation.WaitStrategyType;
-import io.github.kk01001.disruptor.handler.MessageHandler;
-import io.github.kk01001.disruptor.template.DisruptorTemplate;
+import io.github.archer099.disruptor.annotation.WaitStrategyType;
+import io.github.archer099.disruptor.handler.MessageHandler;
+import io.github.archer099.disruptor.template.DisruptorTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;

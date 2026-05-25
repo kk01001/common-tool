@@ -1,4 +1,4 @@
-package io.github.kk01001.localmessage.config;
+package io.github.archer099.localmessage.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * 本地消息配置属性
  *
- * @author kk01001
+ * @author archer099
  */
 @Data
 @ConfigurationProperties(prefix = "local-message")

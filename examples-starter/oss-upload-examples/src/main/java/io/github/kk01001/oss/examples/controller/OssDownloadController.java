@@ -1,9 +1,9 @@
-package io.github.kk01001.oss.examples.controller;
+package io.github.archer099.oss.examples.controller;
 
 import cn.hutool.core.util.StrUtil;
-import io.github.kk01001.common.model.ApiResponse;
-import io.github.kk01001.oss.OssProperties;
-import io.github.kk01001.oss.client.OssClient;
+import io.github.archer099.common.model.ApiResponse;
+import io.github.archer099.oss.OssProperties;
+import io.github.archer099.oss.client.OssClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;

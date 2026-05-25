@@ -1,4 +1,4 @@
-package io.github.kk01001.crypto.annotation;
+package io.github.archer099.crypto.annotation;
 
 import java.lang.annotation.*;
 

@@ -1,9 +1,9 @@
-package io.github.kk01001.balancer;
+package io.github.archer099.balancer;
 
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2021/9/26 10:10
  */
 public interface LoadBalancer<T> {

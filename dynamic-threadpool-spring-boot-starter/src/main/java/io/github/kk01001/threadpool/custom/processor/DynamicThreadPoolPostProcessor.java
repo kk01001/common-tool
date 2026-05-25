@@ -1,10 +1,10 @@
-package io.github.kk01001.threadpool.custom.processor;
+package io.github.archer099.threadpool.custom.processor;
 
-import io.github.kk01001.threadpool.custom.annotation.DynamicThreadPool;
-import io.github.kk01001.threadpool.custom.factory.ThreadPoolFactory;
-import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
-import io.github.kk01001.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
-import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
+import io.github.archer099.threadpool.custom.annotation.DynamicThreadPool;
+import io.github.archer099.threadpool.custom.factory.ThreadPoolFactory;
+import io.github.archer099.threadpool.custom.model.ThreadPoolConfig;
+import io.github.archer099.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
+import io.github.archer099.threadpool.registry.ThreadPoolRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -18,7 +18,7 @@ import java.util.concurrent.Executor;
  * 动态线程池 BeanPostProcessor
  * 扫描并处理 @DynamicThreadPool 注解
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class DynamicThreadPoolPostProcessor implements BeanPostProcessor {

@@ -1,10 +1,10 @@
-package io.github.kk01001.netty.cluster;
+package io.github.archer099.netty.cluster;
 
-import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.archer099.netty.session.WebSocketSession;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 10:00:00
  * @description 空操作的集群管理器，非集群模式下使用
  */

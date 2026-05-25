@@ -1,9 +1,9 @@
-package io.github.kk01001.threadpool.alarm;
+package io.github.archer099.threadpool.alarm;
 
-import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
-import io.github.kk01001.threadpool.alarm.notifier.AlarmNotifier;
-import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
+import io.github.archer099.threadpool.actuator.ThreadPoolMetrics;
+import io.github.archer099.threadpool.alarm.notifier.AlarmNotifier;
+import io.github.archer099.threadpool.custom.config.DynamicThreadPoolProperties;
+import io.github.archer099.threadpool.registry.ThreadPoolRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 线程池告警处理器
  * 定时检查线程池指标并触发告警
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class ThreadPoolAlarmHandler {

@@ -1,16 +1,16 @@
-package io.github.kk01001.chat.example.service;
+package io.github.archer099.chat.example.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.kk01001.chat.example.entity.ChatMessage;
-import io.github.kk01001.chat.example.mapper.ChatMessageMapper;
+import io.github.archer099.chat.example.entity.ChatMessage;
+import io.github.archer099.chat.example.mapper.ChatMessageMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 18:00:00
  * @description 消息服务
  */

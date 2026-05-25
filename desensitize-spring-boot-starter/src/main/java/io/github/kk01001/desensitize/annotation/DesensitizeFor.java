@@ -1,11 +1,11 @@
-package io.github.kk01001.desensitize.annotation;
+package io.github.archer099.desensitize.annotation;
 
-import io.github.kk01001.desensitize.enums.DesensitizeType;
+import io.github.archer099.desensitize.enums.DesensitizeType;
 
 import java.lang.annotation.*;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description
  */

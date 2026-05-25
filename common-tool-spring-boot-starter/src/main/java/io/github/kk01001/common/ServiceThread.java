@@ -1,4 +1,4 @@
-package io.github.kk01001.common;
+package io.github.archer099.common;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * @author kk01001
+ * @author archer099
  * date:  2024-06-24 9:10
  */
 @Slf4j

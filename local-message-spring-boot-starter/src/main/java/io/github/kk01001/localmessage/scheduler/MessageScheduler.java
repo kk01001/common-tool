@@ -1,8 +1,8 @@
-package io.github.kk01001.localmessage.scheduler;
+package io.github.archer099.localmessage.scheduler;
 
-import io.github.kk01001.localmessage.config.LocalMessageProperties;
-import io.github.kk01001.localmessage.entity.LocalMessage;
-import io.github.kk01001.localmessage.service.LocalMessageService;
+import io.github.archer099.localmessage.config.LocalMessageProperties;
+import io.github.archer099.localmessage.entity.LocalMessage;
+import io.github.archer099.localmessage.service.LocalMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * 消息调度器
  * 定时扫描待处理和需要重试的消息
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Component

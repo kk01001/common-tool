@@ -1,9 +1,9 @@
-package io.github.kk01001.redisson.recovery;
+package io.github.archer099.redisson.recovery;
 
-import io.github.kk01001.redisson.circuitbreaker.CircuitBreakerState;
+import io.github.archer099.redisson.circuitbreaker.CircuitBreakerState;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-06 21:50:00
  * @description 双写恢复处理器接口
  * <p>

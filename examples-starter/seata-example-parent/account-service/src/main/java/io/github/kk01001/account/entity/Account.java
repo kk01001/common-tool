@@ -1,4 +1,4 @@
-package io.github.kk01001.account.entity;
+package io.github.archer099.account.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

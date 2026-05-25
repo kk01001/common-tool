@@ -1,4 +1,4 @@
-package io.github.kk01001.controller;
+package io.github.archer099.controller;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-28 14:32:00
  * @description Git信息查询控制器，用于获取由git-commit-id-plugin插件生成的Git仓库详细信息
  */

@@ -1,6 +1,6 @@
-package io.github.kk01001.design.pattern.observer;
+package io.github.archer099.design.pattern.observer;
 
-import io.github.kk01001.design.pattern.observer.annotation.Observer;
+import io.github.archer099.design.pattern.observer.annotation.Observer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 观察者工厂，用于管理观察者和主题之间的关系
  */

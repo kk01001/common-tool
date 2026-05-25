@@ -1,4 +1,4 @@
-package io.github.kk01001.dict.jackson;
+package io.github.archer099.dict.jackson;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import io.github.kk01001.dict.DictCache;
-import io.github.kk01001.dict.annotation.Dict;
+import io.github.archer099.dict.DictCache;
+import io.github.archer099.dict.annotation.Dict;
 
 import java.io.IOException;
 

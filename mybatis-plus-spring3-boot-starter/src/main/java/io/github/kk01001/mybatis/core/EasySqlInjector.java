@@ -1,4 +1,4 @@
-package io.github.kk01001.mybatis.core;
+package io.github.archer099.mybatis.core;
 
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.injector.methods.InsertBatchSomeColumn
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2022-09-20 10:47
  */
 public class EasySqlInjector extends DefaultSqlInjector {

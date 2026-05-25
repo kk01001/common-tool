@@ -55,5 +55,5 @@ logging:
   level:
     io:
       github:
-        kk01001:
+        archer099:
           signature: debug

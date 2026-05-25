@@ -1,10 +1,10 @@
-package io.github.kk01001.example.mybatis.service.impl;
+package io.github.archer099.example.mybatis.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.github.kk01001.example.mybatis.entity.Product;
-import io.github.kk01001.example.mybatis.enums.ProductStatus;
-import io.github.kk01001.example.mybatis.mapper.ProductMapper;
-import io.github.kk01001.example.mybatis.service.ProductService;
+import io.github.archer099.example.mybatis.entity.Product;
+import io.github.archer099.example.mybatis.enums.ProductStatus;
+import io.github.archer099.example.mybatis.mapper.ProductMapper;
+import io.github.archer099.example.mybatis.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.ResultContext;
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 产品服务实现类
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Service

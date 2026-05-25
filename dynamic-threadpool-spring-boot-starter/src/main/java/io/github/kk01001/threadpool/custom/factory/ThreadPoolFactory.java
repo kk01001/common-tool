@@ -1,13 +1,13 @@
-package io.github.kk01001.threadpool.custom.factory;
+package io.github.archer099.threadpool.custom.factory;
 
-import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
-import io.github.kk01001.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
+import io.github.archer099.threadpool.custom.config.DynamicThreadPoolProperties;
+import io.github.archer099.threadpool.custom.model.ThreadPoolConfig;
+import io.github.archer099.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
 
 /**
  * 线程池工厂
  *
- * @author kk01001
+ * @author archer099
  */
 public class ThreadPoolFactory {
 

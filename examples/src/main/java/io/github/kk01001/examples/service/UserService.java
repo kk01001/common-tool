@@ -1,7 +1,7 @@
-package io.github.kk01001.examples.service;
+package io.github.archer099.examples.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import io.github.kk01001.examples.entity.User;
+import io.github.archer099.examples.entity.User;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

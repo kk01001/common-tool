@@ -1,12 +1,12 @@
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-03-13 14:31:00
  * @description 当前天气显示观察者实现
  */
-package io.github.kk01001.examples.design.observer;
+package io.github.archer099.examples.design.observer;
 
-import io.github.kk01001.design.pattern.observer.IObserver;
-import io.github.kk01001.design.pattern.observer.annotation.Observer;
+import io.github.archer099.design.pattern.observer.IObserver;
+import io.github.archer099.design.pattern.observer.annotation.Observer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

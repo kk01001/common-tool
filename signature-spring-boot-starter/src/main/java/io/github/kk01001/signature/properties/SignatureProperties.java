@@ -1,6 +1,6 @@
-package io.github.kk01001.signature.properties;
+package io.github.archer099.signature.properties;
 
-import io.github.kk01001.signature.core.SignatureAlgorithm;
+import io.github.archer099.signature.core.SignatureAlgorithm;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description 签名配置属性
  */

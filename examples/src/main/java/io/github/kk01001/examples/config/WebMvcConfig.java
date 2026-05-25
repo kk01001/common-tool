@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.config;
+package io.github.archer099.examples.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;

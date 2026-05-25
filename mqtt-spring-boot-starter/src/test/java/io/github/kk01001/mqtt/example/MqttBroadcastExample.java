@@ -1,7 +1,7 @@
-package io.github.kk01001.mqtt.example;
+package io.github.archer099.mqtt.example;
 
-import io.github.kk01001.mqtt.core.MqttBroadcastTemplate;
-import io.github.kk01001.mqtt.core.MqttBroadcastTemplate.BatchSendResult;
+import io.github.archer099.mqtt.core.MqttBroadcastTemplate;
+import io.github.archer099.mqtt.core.MqttBroadcastTemplate.BatchSendResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * MQTT 广播和批量发送示例
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Component

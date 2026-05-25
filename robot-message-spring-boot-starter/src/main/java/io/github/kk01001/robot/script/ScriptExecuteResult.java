@@ -1,4 +1,4 @@
-package io.github.kk01001.robot.script;
+package io.github.archer099.robot.script;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,7 +1,7 @@
-package io.github.kk01001.design.pattern.statemachine.config;
+package io.github.archer099.design.pattern.statemachine.config;
 
-import io.github.kk01001.design.pattern.statemachine.event.StateMachineMetricsEventListener;
-import io.github.kk01001.design.pattern.statemachine.metrics.MicrometerStateMachineMetrics;
+import io.github.archer099.design.pattern.statemachine.event.StateMachineMetricsEventListener;
+import io.github.archer099.design.pattern.statemachine.metrics.MicrometerStateMachineMetrics;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-04-08 14:31:00
  * @description 状态机指标自动配置
  */

@@ -1,11 +1,11 @@
-package io.github.kk01001.mybatis.permission.interceptor;
+package io.github.archer099.mybatis.permission.interceptor;
 
-import io.github.kk01001.mybatis.permission.DataPermissionProperties;
-import io.github.kk01001.mybatis.permission.annotations.DataColumn;
-import io.github.kk01001.mybatis.permission.annotations.DataPermission;
-import io.github.kk01001.mybatis.permission.handler.DataPermissionHandlerFactory;
-import io.github.kk01001.mybatis.permission.handler.DataPermissionType;
-import io.github.kk01001.mybatis.permission.service.UserPermissionService;
+import io.github.archer099.mybatis.permission.DataPermissionProperties;
+import io.github.archer099.mybatis.permission.annotations.DataColumn;
+import io.github.archer099.mybatis.permission.annotations.DataPermission;
+import io.github.archer099.mybatis.permission.handler.DataPermissionHandlerFactory;
+import io.github.archer099.mybatis.permission.handler.DataPermissionType;
+import io.github.archer099.mybatis.permission.service.UserPermissionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
@@ -38,7 +38,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-02-13 14:31:00
  * @description 数据权限SQL拦截器，拦截查询操作，动态注入数据权限条件
  */

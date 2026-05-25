@@ -1,7 +1,7 @@
-package io.github.kk01001.redisson.retry;
+package io.github.archer099.redisson.retry;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-06 22:00:00
  * @description 重试队列溢出处理策略接口
  * <p>

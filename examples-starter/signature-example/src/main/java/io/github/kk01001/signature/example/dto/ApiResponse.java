@@ -1,4 +1,4 @@
-package io.github.kk01001.signature.example.dto;
+package io.github.archer099.signature.example.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description API响应DTO
  */

@@ -117,4 +117,4 @@ management:
 
 logging:
   level:
-    io.github.kk01001.redisson: DEBUG
+    io.github.archer099.redisson: DEBUG

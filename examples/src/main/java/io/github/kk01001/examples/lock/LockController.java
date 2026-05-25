@@ -1,7 +1,7 @@
-package io.github.kk01001.examples.lock;
+package io.github.archer099.examples.lock;
 
-import io.github.kk01001.lock.aspect.Lock;
-import io.github.kk01001.lock.enums.LockType;
+import io.github.archer099.lock.aspect.Lock;
+import io.github.archer099.lock.enums.LockType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,7 +1,7 @@
-package io.github.kk01001.util;
+package io.github.archer099.util;
 
 import cn.hutool.extra.spring.SpringUtil;
-import io.github.kk01001.exception.ParamsException;
+import io.github.archer099.exception.ParamsException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.springframework.util.CollectionUtils;
@@ -9,7 +9,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.Set;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2023-09-01 20:47:00
  */
 public class ValidationUtil {

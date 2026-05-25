@@ -1,12 +1,12 @@
-package io.github.kk01001.graphql.examples.graphql;
+package io.github.archer099.graphql.examples.graphql;
 
-import io.github.kk01001.graphql.examples.dto.CreateAuthorInput;
-import io.github.kk01001.graphql.examples.dto.CreateBookInput;
-import io.github.kk01001.graphql.examples.dto.UpdateAuthorNameInput;
-import io.github.kk01001.graphql.examples.dto.UpdateBookTitleInput;
-import io.github.kk01001.graphql.examples.model.Author;
-import io.github.kk01001.graphql.examples.model.Book;
-import io.github.kk01001.graphql.examples.service.LibraryService;
+import io.github.archer099.graphql.examples.dto.CreateAuthorInput;
+import io.github.archer099.graphql.examples.dto.CreateBookInput;
+import io.github.archer099.graphql.examples.dto.UpdateAuthorNameInput;
+import io.github.archer099.graphql.examples.dto.UpdateBookTitleInput;
+import io.github.archer099.graphql.examples.model.Author;
+import io.github.archer099.graphql.examples.model.Book;
+import io.github.archer099.graphql.examples.service.LibraryService;
 import jakarta.validation.Valid;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;

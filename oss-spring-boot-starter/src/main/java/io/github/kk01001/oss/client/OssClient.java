@@ -1,11 +1,11 @@
-package io.github.kk01001.oss.client;
+package io.github.archer099.oss.client;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.services.s3.transfer.model.UploadResult;
-import io.github.kk01001.oss.listener.CustomProgressListener;
-import io.github.kk01001.oss.model.ChunkDTO;
-import io.github.kk01001.oss.model.ChunkMergeDTO;
+import io.github.archer099.oss.listener.CustomProgressListener;
+import io.github.archer099.oss.model.ChunkDTO;
+import io.github.archer099.oss.model.ChunkMergeDTO;
 
 import java.io.File;
 import java.io.InputStream;
@@ -13,7 +13,7 @@ import java.time.Duration;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2022-09-19 22:32:00
  * Oss 基础操作
  * <a href="https://docs.aws.amazon.com/zh_cn/sdk-for-java/v1/developer-guide/examples-s3-buckets.html">...</a>

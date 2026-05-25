@@ -1,4 +1,4 @@
-package io.github.kk01001.oss;
+package io.github.archer099.oss;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
@@ -11,8 +11,8 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import io.github.kk01001.oss.client.OssClient;
-import io.github.kk01001.oss.client.S3OssClient;
+import io.github.archer099.oss.client.OssClient;
+import io.github.archer099.oss.client.S3OssClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description OSS配置类
  */

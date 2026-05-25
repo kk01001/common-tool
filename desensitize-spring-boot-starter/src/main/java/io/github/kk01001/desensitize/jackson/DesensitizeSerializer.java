@@ -1,19 +1,19 @@
-package io.github.kk01001.desensitize.jackson;
+package io.github.archer099.desensitize.jackson;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
-import io.github.kk01001.desensitize.annotation.Desensitize;
-import io.github.kk01001.desensitize.enums.DesensitizeType;
-import io.github.kk01001.desensitize.handler.DesensitizeHandler;
-import io.github.kk01001.desensitize.handler.DesensitizeHandlerFactory;
+import io.github.archer099.desensitize.annotation.Desensitize;
+import io.github.archer099.desensitize.enums.DesensitizeType;
+import io.github.archer099.desensitize.handler.DesensitizeHandler;
+import io.github.archer099.desensitize.handler.DesensitizeHandlerFactory;
 
 import java.io.IOException;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description
  */

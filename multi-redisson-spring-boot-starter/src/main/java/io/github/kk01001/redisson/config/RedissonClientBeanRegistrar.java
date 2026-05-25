@@ -1,9 +1,9 @@
-package io.github.kk01001.redisson.config;
+package io.github.archer099.redisson.config;
 
-import io.github.kk01001.redisson.factory.RedissonClientFactory;
-import io.github.kk01001.redisson.factory.RedissonClientFactoryImpl;
-import io.github.kk01001.redisson.properties.MultiRedissonProperties;
-import io.github.kk01001.redisson.properties.RedissonInstanceProperties;
+import io.github.archer099.redisson.factory.RedissonClientFactory;
+import io.github.archer099.redisson.factory.RedissonClientFactoryImpl;
+import io.github.archer099.redisson.properties.MultiRedissonProperties;
+import io.github.archer099.redisson.properties.RedissonInstanceProperties;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ import org.springframework.core.env.Environment;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 10:00:00
  * @description RedissonClient Bean 注册器，将所有配置的实例注册为 Spring Bean
  */

@@ -1,4 +1,4 @@
-package io.github.kk01001.localmessage.config;
+package io.github.archer099.localmessage.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -18,12 +18,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * 本地消息自动配置类
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @AutoConfiguration
 @EnableScheduling
-@ComponentScan(basePackages = "io.github.kk01001.localmessage")
+@ComponentScan(basePackages = "io.github.archer099.localmessage")
 @EnableConfigurationProperties(LocalMessageProperties.class)
 @ConditionalOnProperty(prefix = "local-message", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class LocalMessageAutoConfiguration {

@@ -1,4 +1,4 @@
-package io.github.kk01001.docs.properties;
+package io.github.archer099.docs.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

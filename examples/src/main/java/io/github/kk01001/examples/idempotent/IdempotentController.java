@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.idempotent;
+package io.github.archer099.examples.idempotent;
 
-import io.github.kk01001.idempotent.aspect.Idempotent;
+import io.github.archer099.idempotent.aspect.Idempotent;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;

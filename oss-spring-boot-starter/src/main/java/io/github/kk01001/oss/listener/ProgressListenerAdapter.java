@@ -1,11 +1,11 @@
-package io.github.kk01001.oss.listener;
+package io.github.archer099.oss.listener;
 
 import com.amazonaws.event.ProgressEvent;
 import com.amazonaws.event.ProgressListener;
 import lombok.RequiredArgsConstructor;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 进度监听适配器
  */

@@ -1,11 +1,11 @@
-package io.github.kk01001.threadpool.thirdparty.initializer;
+package io.github.archer099.threadpool.thirdparty.initializer;
 
-import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
-import io.github.kk01001.threadpool.thirdparty.ThirdPartyPoolType;
-import io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolProperties;
-import io.github.kk01001.threadpool.thirdparty.adapter.HikariThreadPoolAdapter;
-import io.github.kk01001.threadpool.thirdparty.adapter.ThirdPartyThreadPoolAdapter;
-import io.github.kk01001.threadpool.thirdparty.adapter.TomcatThreadPoolAdapter;
+import io.github.archer099.threadpool.registry.ThreadPoolRegistry;
+import io.github.archer099.threadpool.thirdparty.ThirdPartyPoolType;
+import io.github.archer099.threadpool.thirdparty.ThirdPartyThreadPoolProperties;
+import io.github.archer099.threadpool.thirdparty.adapter.HikariThreadPoolAdapter;
+import io.github.archer099.threadpool.thirdparty.adapter.ThirdPartyThreadPoolAdapter;
+import io.github.archer099.threadpool.thirdparty.adapter.TomcatThreadPoolAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.boot.web.server.WebServer;
@@ -20,7 +20,7 @@ import javax.sql.DataSource;
  * <p>
  * 在 Web 服务器初始化完成后自动注册配置的第三方线程池
  * 
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class ThirdPartyThreadPoolInitializer implements ApplicationListener<WebServerInitializedEvent> {

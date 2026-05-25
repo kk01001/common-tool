@@ -1,7 +1,7 @@
-package io.github.kk01001.graphql.examples.config;
+package io.github.archer099.graphql.examples.config;
 
 import graphql.scalars.ExtendedScalars;
-import io.github.kk01001.graphql.examples.directive.UppercaseDirective;
+import io.github.archer099.graphql.examples.directive.UppercaseDirective;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;

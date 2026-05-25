@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  io.github.kk01001.oss.OssConfiguration
+  io.github.archer099.oss.OssConfiguration

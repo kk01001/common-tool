@@ -1,4 +1,4 @@
-package io.github.kk01001.graphql.examples.entity;
+package io.github.archer099.graphql.examples.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  io.github.kk01001.ratelimter.RateLimiterConfiguration
+  io.github.archer099.ratelimter.RateLimiterConfiguration

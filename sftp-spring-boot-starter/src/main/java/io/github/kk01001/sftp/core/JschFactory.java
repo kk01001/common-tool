@@ -1,4 +1,4 @@
-package io.github.kk01001.sftp.core;
+package io.github.archer099.sftp.core;
 
 import cn.hutool.extra.ssh.JschUtil;
 import com.jcraft.jsch.ChannelSftp;
@@ -10,7 +10,7 @@ import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2023-03-29 20:38:00
  */
 @Slf4j

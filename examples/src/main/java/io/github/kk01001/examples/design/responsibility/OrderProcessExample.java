@@ -1,9 +1,9 @@
-package io.github.kk01001.examples.design.responsibility;
+package io.github.archer099.examples.design.responsibility;
 
-import io.github.kk01001.design.pattern.responsibility.ResponsibilityChain;
-import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainContext;
-import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainFactory;
-import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainHandler;
+import io.github.archer099.design.pattern.responsibility.ResponsibilityChain;
+import io.github.archer099.design.pattern.responsibility.ResponsibilityChainContext;
+import io.github.archer099.design.pattern.responsibility.ResponsibilityChainFactory;
+import io.github.archer099.design.pattern.responsibility.ResponsibilityChainHandler;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 

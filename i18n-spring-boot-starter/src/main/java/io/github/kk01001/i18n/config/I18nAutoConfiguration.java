@@ -1,13 +1,13 @@
-package io.github.kk01001.i18n.config;
+package io.github.archer099.i18n.config;
 
-import io.github.kk01001.i18n.properties.I18nProperties;
-import io.github.kk01001.i18n.provider.I18nManager;
-import io.github.kk01001.i18n.provider.I18nMessageProvider;
-import io.github.kk01001.i18n.provider.InMemoryMessageProvider;
-import io.github.kk01001.i18n.provider.ResourceBundleMessageProvider;
-import io.github.kk01001.i18n.resolver.CustomLocaleResolver;
-import io.github.kk01001.i18n.service.I18nService;
-import io.github.kk01001.i18n.source.CustomMessageSource;
+import io.github.archer099.i18n.properties.I18nProperties;
+import io.github.archer099.i18n.provider.I18nManager;
+import io.github.archer099.i18n.provider.I18nMessageProvider;
+import io.github.archer099.i18n.provider.InMemoryMessageProvider;
+import io.github.archer099.i18n.provider.ResourceBundleMessageProvider;
+import io.github.archer099.i18n.resolver.CustomLocaleResolver;
+import io.github.archer099.i18n.service.I18nService;
+import io.github.archer099.i18n.source.CustomMessageSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

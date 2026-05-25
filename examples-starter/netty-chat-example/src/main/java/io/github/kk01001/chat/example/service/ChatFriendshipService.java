@@ -1,9 +1,9 @@
-package io.github.kk01001.chat.example.service;
+package io.github.archer099.chat.example.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.kk01001.chat.example.entity.ChatFriendship;
-import io.github.kk01001.chat.example.mapper.ChatFriendshipMapper;
+import io.github.archer099.chat.example.entity.ChatFriendship;
+import io.github.archer099.chat.example.mapper.ChatFriendshipMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 18:00:00
  * @description 好友关系服务
  */

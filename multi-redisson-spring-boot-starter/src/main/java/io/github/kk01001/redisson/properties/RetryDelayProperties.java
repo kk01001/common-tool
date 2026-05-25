@@ -1,11 +1,11 @@
-package io.github.kk01001.redisson.properties;
+package io.github.archer099.redisson.properties;
 
-import io.github.kk01001.redisson.enums.DelayStrategyType;
+import io.github.archer099.redisson.enums.DelayStrategyType;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 15:30:00
  * @description 重试延迟策略配置
  */

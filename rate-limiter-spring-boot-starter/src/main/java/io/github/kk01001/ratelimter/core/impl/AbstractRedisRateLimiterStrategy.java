@@ -1,10 +1,10 @@
-package io.github.kk01001.ratelimter.core.impl;
+package io.github.archer099.ratelimter.core.impl;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.extra.spring.SpringUtil;
-import io.github.kk01001.ratelimter.enums.RedisClientType;
-import io.github.kk01001.ratelimter.model.FlowRule;
+import io.github.archer099.ratelimter.enums.RedisClientType;
+import io.github.archer099.ratelimter.model.FlowRule;
 import org.redisson.api.RScript;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.RedisTemplate;

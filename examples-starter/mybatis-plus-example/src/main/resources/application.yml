@@ -30,10 +30,10 @@ mybatis-plus:
       logic-delete-field: deleted
       logic-delete-value: 1
       logic-not-delete-value: 0
-  type-aliases-package: io.github.kk01001.example.mybatis.entity
+  type-aliases-package: io.github.archer099.example.mybatis.entity
 
 # 日志配置
 logging:
   level:
-    io.github.kk01001.example.mybatis: debug
+    io.github.archer099.example.mybatis: debug
     com.baomidou.mybatisplus: debug

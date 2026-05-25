@@ -1,11 +1,11 @@
-package io.github.kk01001.mqtt.examples.dto;
+package io.github.archer099.mqtt.examples.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 15:45:00
  * @description EMQX HTTP 鉴权请求 DTO
  */

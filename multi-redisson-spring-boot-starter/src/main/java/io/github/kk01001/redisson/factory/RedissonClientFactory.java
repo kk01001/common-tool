@@ -1,10 +1,10 @@
-package io.github.kk01001.redisson.factory;
+package io.github.archer099.redisson.factory;
 
-import io.github.kk01001.redisson.properties.RedissonInstanceProperties;
+import io.github.archer099.redisson.properties.RedissonInstanceProperties;
 import org.redisson.api.RedissonClient;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 10:00:00
  * @description RedissonClient 工厂接口，根据配置创建客户端
  */

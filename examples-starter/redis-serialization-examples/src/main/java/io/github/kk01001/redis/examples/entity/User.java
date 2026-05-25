@@ -1,4 +1,4 @@
-package io.github.kk01001.redis.examples.entity;
+package io.github.archer099.redis.examples.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * User entity for serialization testing
  * 
- * @author kk01001
+ * @author archer099
  */
 @Data
 @NoArgsConstructor

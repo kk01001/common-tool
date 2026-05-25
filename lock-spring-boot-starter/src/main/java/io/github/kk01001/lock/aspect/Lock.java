@@ -1,7 +1,7 @@
-package io.github.kk01001.lock.aspect;
+package io.github.archer099.lock.aspect;
 
-import io.github.kk01001.lock.enums.LockType;
-import io.github.kk01001.lock.enums.RedisClientType;
+import io.github.archer099.lock.enums.LockType;
+import io.github.archer099.lock.enums.RedisClientType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

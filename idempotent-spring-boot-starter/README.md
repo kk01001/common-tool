@@ -1,6 +1,6 @@
 # 接口幂等性 Spring Boot Starter
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/idempotent-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.kk01001/idempotent-spring-boot-starter)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.archer099/idempotent-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.archer099/idempotent-spring-boot-starter)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 **一句话概述：** 基于Redis的轻量级接口幂等性校验解决方案，通过注解轻松实现API接口的幂等性保证，防止重复请求引起的数据异常。
@@ -40,7 +40,7 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>idempotent-spring-boot-starter</artifactId>
     <version>${latest.version}</version>
 </dependency>
@@ -68,7 +68,7 @@ idempotent:
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 订单控制器
  */
@@ -155,7 +155,7 @@ public Result method(@RequestBody Request request) { ... }
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 自定义幂等键生成器
  */
@@ -182,7 +182,7 @@ public class CustomIdempotentKeyGenerator extends IdempotentKeyGenerator {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 全局异常处理器
  */
@@ -205,7 +205,7 @@ public class GlobalExceptionHandler {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 条件性幂等切面
  */
@@ -240,7 +240,7 @@ public class ConditionalIdempotentAspect {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 自定义幂等执行器
  */
@@ -265,7 +265,7 @@ public class CustomIdempotentExecutor {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 异步请求处理器
  */

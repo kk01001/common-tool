@@ -1,9 +1,9 @@
-package io.github.kk01001.common.model;
+package io.github.archer099.common.model;
 
 import lombok.Data;
 
 /**
- * @author kk01001
+ * @author archer099
  * date:  2024-07-02 11:38
  */
 @Data

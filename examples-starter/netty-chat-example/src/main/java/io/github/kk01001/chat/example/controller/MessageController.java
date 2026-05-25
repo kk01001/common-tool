@@ -1,11 +1,11 @@
-package io.github.kk01001.chat.example.controller;
+package io.github.archer099.chat.example.controller;
 
 import cn.hutool.json.JSONObject;
-import io.github.kk01001.chat.example.config.UserContext;
-import io.github.kk01001.chat.example.entity.ChatMessage;
-import io.github.kk01001.chat.example.entity.ChatUser;
-import io.github.kk01001.chat.example.service.ChatMessageService;
-import io.github.kk01001.chat.example.service.ChatUserService;
+import io.github.archer099.chat.example.config.UserContext;
+import io.github.archer099.chat.example.entity.ChatMessage;
+import io.github.archer099.chat.example.entity.ChatUser;
+import io.github.archer099.chat.example.service.ChatMessageService;
+import io.github.archer099.chat.example.service.ChatUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 19:00:00
  * @description 消息查询接口
  */

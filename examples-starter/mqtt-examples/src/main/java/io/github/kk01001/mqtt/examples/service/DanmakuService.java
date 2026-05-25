@@ -1,7 +1,7 @@
-package io.github.kk01001.mqtt.examples.service;
+package io.github.archer099.mqtt.examples.service;
 
-import io.github.kk01001.mqtt.examples.dto.DanmakuSendRequestDTO;
-import io.github.kk01001.mqtt.examples.vo.DanmakuSendResponseVO;
+import io.github.archer099.mqtt.examples.dto.DanmakuSendRequestDTO;
+import io.github.archer099.mqtt.examples.vo.DanmakuSendResponseVO;
 
 public interface DanmakuService {
 

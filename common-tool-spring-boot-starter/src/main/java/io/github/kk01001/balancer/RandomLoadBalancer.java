@@ -1,4 +1,4 @@
-package io.github.kk01001.balancer;
+package io.github.archer099.balancer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2021/9/26 12:54
  * 随机
  */

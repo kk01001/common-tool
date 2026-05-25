@@ -1,4 +1,4 @@
-package io.github.kk01001.util;
+package io.github.archer099.util;
 
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2023-06-18 19:42:00
  */
 @Slf4j

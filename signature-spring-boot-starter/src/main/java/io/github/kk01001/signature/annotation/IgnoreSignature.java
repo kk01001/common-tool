@@ -1,9 +1,9 @@
-package io.github.kk01001.signature.annotation;
+package io.github.archer099.signature.annotation;
 
 import java.lang.annotation.*;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description 忽略签名验证注解
  */

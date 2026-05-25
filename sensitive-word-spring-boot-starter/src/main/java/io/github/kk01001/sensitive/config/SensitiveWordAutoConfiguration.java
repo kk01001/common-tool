@@ -1,11 +1,11 @@
-package io.github.kk01001.sensitive.config;
+package io.github.archer099.sensitive.config;
 
-import io.github.kk01001.sensitive.core.DfaSensitiveWordFilter;
-import io.github.kk01001.sensitive.core.SensitiveWordFilter;
-import io.github.kk01001.sensitive.handler.SensitiveWordAspect;
-import io.github.kk01001.sensitive.handler.SensitiveWordService;
-import io.github.kk01001.sensitive.properties.SensitiveWordProperties;
-import io.github.kk01001.sensitive.util.SensitiveWordUtil;
+import io.github.archer099.sensitive.core.DfaSensitiveWordFilter;
+import io.github.archer099.sensitive.core.SensitiveWordFilter;
+import io.github.archer099.sensitive.handler.SensitiveWordAspect;
+import io.github.archer099.sensitive.handler.SensitiveWordService;
+import io.github.archer099.sensitive.properties.SensitiveWordProperties;
+import io.github.archer099.sensitive.util.SensitiveWordUtil;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -13,7 +13,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 敏感词自动配置类
  */

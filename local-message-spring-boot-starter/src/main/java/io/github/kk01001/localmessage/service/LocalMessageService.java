@@ -1,10 +1,10 @@
-package io.github.kk01001.localmessage.service;
+package io.github.archer099.localmessage.service;
 
-import io.github.kk01001.localmessage.dao.LocalMessageDao;
-import io.github.kk01001.localmessage.entity.LocalMessage;
-import io.github.kk01001.localmessage.enums.MessageStatus;
-import io.github.kk01001.localmessage.processor.MessageProcessor;
-import io.github.kk01001.localmessage.processor.MessageProcessorRegistry;
+import io.github.archer099.localmessage.dao.LocalMessageDao;
+import io.github.archer099.localmessage.entity.LocalMessage;
+import io.github.archer099.localmessage.enums.MessageStatus;
+import io.github.archer099.localmessage.processor.MessageProcessor;
+import io.github.archer099.localmessage.processor.MessageProcessorRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * 本地消息服务
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Service

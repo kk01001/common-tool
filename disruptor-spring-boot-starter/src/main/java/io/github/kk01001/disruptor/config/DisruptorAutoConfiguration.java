@@ -1,9 +1,9 @@
-package io.github.kk01001.disruptor.config;
+package io.github.archer099.disruptor.config;
 
 import com.lmax.disruptor.dsl.Disruptor;
-import io.github.kk01001.disruptor.monitor.DisruptorMetrics;
-import io.github.kk01001.disruptor.processor.DisruptorListenerProcessor;
-import io.github.kk01001.disruptor.template.DisruptorTemplate;
+import io.github.archer099.disruptor.monitor.DisruptorMetrics;
+import io.github.archer099.disruptor.processor.DisruptorListenerProcessor;
+import io.github.archer099.disruptor.template.DisruptorTemplate;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Role;
 import static org.springframework.beans.factory.config.BeanDefinition.ROLE_INFRASTRUCTURE;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-19 10:15:47
  * @description Disruptor自动配置类，用于自动装配相关Bean
  */

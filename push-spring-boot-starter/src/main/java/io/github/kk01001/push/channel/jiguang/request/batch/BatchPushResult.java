@@ -1,4 +1,4 @@
-package io.github.kk01001.push.channel.jiguang.request.batch;
+package io.github.archer099.push.channel.jiguang.request.batch;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

@@ -1,4 +1,4 @@
-package io.github.kk01001.postgres.examples.entity;
+package io.github.archer099.postgres.examples.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

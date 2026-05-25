@@ -26,9 +26,9 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>resilience4j-spring-boot-starter</artifactId>
-    <version>2.4.9</version>
+    <version>2.5.0</version>
 </dependency>
 ```
 

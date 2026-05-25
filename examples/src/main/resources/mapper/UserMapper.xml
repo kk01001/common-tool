@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.kk01001.examples.mapper.UserMapper">
+<mapper namespace="io.github.archer099.examples.mapper.UserMapper">
     
     <!-- 基础列 -->
     <sql id="Base_Column_List">
@@ -20,7 +20,7 @@
     </select>
 
     <!-- 分页查询导出数据 -->
-    <select id="queryUserExcelList" resultType="io.github.kk01001.examples.dto.UserExcelDTO">
+    <select id="queryUserExcelList" resultType="io.github.archer099.examples.dto.UserExcelDTO">
         SELECT 
             <include refid="Export_Column_List"/>
         FROM t_user
@@ -43,7 +43,7 @@
         </foreach>
     </insert>
 
-    <select id="queryUser" resultType="io.github.kk01001.examples.entity.User">
+    <select id="queryUser" resultType="io.github.archer099.examples.entity.User">
         select
             username,
             email,

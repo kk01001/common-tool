@@ -1,15 +1,15 @@
-package io.github.kk01001.push.channel.jiguang.service;
+package io.github.archer099.push.channel.jiguang.service;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.kk01001.push.channel.jiguang.request.PushSendParam;
-import io.github.kk01001.push.channel.jiguang.request.audience.Audience;
-import io.github.kk01001.push.channel.jiguang.request.message.notification.NotificationMessage;
-import io.github.kk01001.push.core.MessageNotification;
-import io.github.kk01001.push.core.NotificationProperties;
-import io.github.kk01001.push.core.NotificationType;
-import io.github.kk01001.push.core.SimpleNotificationRequest;
+import io.github.archer099.push.channel.jiguang.request.PushSendParam;
+import io.github.archer099.push.channel.jiguang.request.audience.Audience;
+import io.github.archer099.push.channel.jiguang.request.message.notification.NotificationMessage;
+import io.github.archer099.push.core.MessageNotification;
+import io.github.archer099.push.core.NotificationProperties;
+import io.github.archer099.push.core.NotificationType;
+import io.github.archer099.push.core.SimpleNotificationRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

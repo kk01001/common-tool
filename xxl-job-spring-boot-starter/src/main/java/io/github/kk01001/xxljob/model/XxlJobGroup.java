@@ -1,4 +1,4 @@
-package io.github.kk01001.xxljob.model;
+package io.github.archer099.xxljob.model;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2023-02-02 14:03
  */
 @Data

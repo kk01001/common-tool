@@ -1,7 +1,7 @@
-package io.github.kk01001.mybatis.permission.handler;
+package io.github.archer099.mybatis.permission.handler;
 
-import io.github.kk01001.mybatis.permission.annotations.DataColumn;
-import io.github.kk01001.mybatis.permission.service.UserPermissionService;
+import io.github.archer099.mybatis.permission.annotations.DataColumn;
+import io.github.archer099.mybatis.permission.service.UserPermissionService;
 
 import java.util.List;
 

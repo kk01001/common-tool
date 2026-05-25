@@ -1,9 +1,9 @@
-package io.github.kk01001.examples.design.statemachine;
+package io.github.archer099.examples.design.statemachine;
 
-import io.github.kk01001.design.pattern.statemachine.guard.StateTransitionGuard;
+import io.github.archer099.design.pattern.statemachine.guard.StateTransitionGuard;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-04-07 14:31:00
  * @description 订单金额守卫条件，只有订单金额大于等于100才允许支付
  */

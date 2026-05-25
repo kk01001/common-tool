@@ -1,6 +1,6 @@
-package io.github.kk01001.graphql.examples.event;
+package io.github.archer099.graphql.examples.event;
 
-import io.github.kk01001.graphql.examples.model.Book;
+import io.github.archer099.graphql.examples.model.Book;
 import org.springframework.context.ApplicationEvent;
 
 public class BookCreatedEvent extends ApplicationEvent {

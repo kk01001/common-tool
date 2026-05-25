@@ -1,7 +1,7 @@
-package io.github.kk01001.example.mybatis.entity;
+package io.github.archer099.example.mybatis.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import io.github.kk01001.example.mybatis.enums.ProductStatus;
+import io.github.archer099.example.mybatis.enums.ProductStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * 产品实体类
  * 用于演示乐观锁、批量操作、枚举转换等高级功能
  *
- * @author kk01001
+ * @author archer099
  */
 @Data
 @TableName("product")

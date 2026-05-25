@@ -24,7 +24,7 @@ Redisson 多集群自动配置组件，支持一个 Spring Boot 服务连接多�
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>multi-redisson-spring-boot-starter</artifactId>
     <version>${version}</version>
 </dependency>

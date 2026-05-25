@@ -1,4 +1,4 @@
-package io.github.kk01001.design.pattern.singleton;
+package io.github.archer099.design.pattern.singleton;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

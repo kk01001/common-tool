@@ -1,10 +1,10 @@
-package io.github.kk01001.push.channel.jiguang.request.batch;
+package io.github.archer099.push.channel.jiguang.request.batch;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.kk01001.push.channel.jiguang.request.message.custom.CustomMessage;
-import io.github.kk01001.push.channel.jiguang.request.message.notification.NotificationMessage;
-import io.github.kk01001.push.channel.jiguang.request.message.sms.SmsMessage;
+import io.github.archer099.push.channel.jiguang.request.message.custom.CustomMessage;
+import io.github.archer099.push.channel.jiguang.request.message.notification.NotificationMessage;
+import io.github.archer099.push.channel.jiguang.request.message.sms.SmsMessage;
 import lombok.Data;
 
 @Data

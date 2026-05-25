@@ -1,6 +1,6 @@
 # Rate Limiter Spring Boot Starter
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/rate-limiter-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.kk01001/rate-limiter-spring-boot-starter)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.archer099/rate-limiter-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.archer099/rate-limiter-spring-boot-starter)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 **一句话概述：** 集成多种限流算法和实现策略的 Spring Boot Starter，支持本地限流和分布式限流，提供注解驱动的简易使用方式，帮助系统轻松应对高并发场景。
@@ -55,7 +55,7 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>rate-limiter-spring-boot-starter</artifactId>
     <version>${latest.version}</version>
 </dependency>
@@ -67,7 +67,7 @@
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 商品服务
  */
@@ -119,7 +119,7 @@ public class ProductService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 全局异常处理
  */

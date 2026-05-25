@@ -1,14 +1,14 @@
-package io.github.kk01001.push.channel.umeng.service;
+package io.github.archer099.push.channel.umeng.service;
 
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.kk01001.push.channel.umeng.request.UmengNotificationRequest;
-import io.github.kk01001.push.core.MessageNotification;
-import io.github.kk01001.push.core.NotificationProperties;
-import io.github.kk01001.push.core.NotificationType;
-import io.github.kk01001.push.core.SimpleNotificationRequest;
+import io.github.archer099.push.channel.umeng.request.UmengNotificationRequest;
+import io.github.archer099.push.core.MessageNotification;
+import io.github.archer099.push.core.NotificationProperties;
+import io.github.archer099.push.core.NotificationType;
+import io.github.archer099.push.core.SimpleNotificationRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

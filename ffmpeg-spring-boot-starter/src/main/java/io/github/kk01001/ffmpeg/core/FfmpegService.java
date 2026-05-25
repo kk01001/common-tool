@@ -1,11 +1,11 @@
-package io.github.kk01001.ffmpeg.core;
+package io.github.archer099.ffmpeg.core;
 
-import io.github.kk01001.ffmpeg.model.AudioHlsRequest;
-import io.github.kk01001.ffmpeg.model.AudioHlsResult;
-import io.github.kk01001.ffmpeg.model.FfprobeResult;
+import io.github.archer099.ffmpeg.model.AudioHlsRequest;
+import io.github.archer099.ffmpeg.model.AudioHlsResult;
+import io.github.archer099.ffmpeg.model.FfprobeResult;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 16:22:00
  * @description FFmpeg 服务接口
  */

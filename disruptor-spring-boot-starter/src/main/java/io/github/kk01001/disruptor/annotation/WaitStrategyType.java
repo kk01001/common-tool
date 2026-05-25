@@ -1,11 +1,11 @@
-package io.github.kk01001.disruptor.annotation;
+package io.github.archer099.disruptor.annotation;
 
 import com.lmax.disruptor.*;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description Disruptor等待策略枚举类,用于配置消费者如何等待生产者
  */

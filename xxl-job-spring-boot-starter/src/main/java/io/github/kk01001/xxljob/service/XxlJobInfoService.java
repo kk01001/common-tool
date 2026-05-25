@@ -1,4 +1,4 @@
-package io.github.kk01001.xxljob.service;
+package io.github.archer099.xxljob.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
@@ -10,9 +10,9 @@ import cn.hutool.json.JSON;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import io.github.kk01001.xxljob.constants.XxlJobConstants;
-import io.github.kk01001.xxljob.core.XxlJobProperties;
-import io.github.kk01001.xxljob.model.XxlJobInfo;
+import io.github.archer099.xxljob.constants.XxlJobConstants;
+import io.github.archer099.xxljob.core.XxlJobProperties;
+import io.github.archer099.xxljob.model.XxlJobInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2023-02-02 14:03
  * 任务管理
  */

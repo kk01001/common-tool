@@ -1,12 +1,12 @@
-package io.github.kk01001.signature.handler;
+package io.github.archer099.signature.handler;
 
 import cn.hutool.core.util.StrUtil;
-import io.github.kk01001.signature.core.SignatureException;
-import io.github.kk01001.signature.core.SignatureResult;
-import io.github.kk01001.signature.properties.SignatureProperties;
-import io.github.kk01001.signature.store.AppSecretStore;
-import io.github.kk01001.signature.store.NonceStore;
-import io.github.kk01001.signature.util.SignatureUtil;
+import io.github.archer099.signature.core.SignatureException;
+import io.github.archer099.signature.core.SignatureResult;
+import io.github.archer099.signature.properties.SignatureProperties;
+import io.github.archer099.signature.store.AppSecretStore;
+import io.github.archer099.signature.store.NonceStore;
+import io.github.archer099.signature.util.SignatureUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description 签名处理器
  */

@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.data.scope;
+package io.github.archer099.examples.data.scope;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-05-17 14:30:00
  * @description 图书服务接口
  */

@@ -1,11 +1,11 @@
-package io.github.kk01001.util;
+package io.github.archer099.util;
 
 import cn.hutool.core.net.NetUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.util.StringUtils;
 
 /**
- * @author kk01001
+ * @author archer099
  * date:  2023-08-07 17:28
  */
 public class NetworkUtil {

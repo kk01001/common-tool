@@ -1,6 +1,6 @@
-package io.github.kk01001.robot.config;
+package io.github.archer099.robot.config;
 
-import io.github.kk01001.robot.client.*;
+import io.github.archer099.robot.client.*;
 import lombok.Data;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;

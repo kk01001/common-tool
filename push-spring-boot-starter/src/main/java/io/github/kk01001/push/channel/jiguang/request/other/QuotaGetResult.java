@@ -1,4 +1,4 @@
-package io.github.kk01001.push.channel.jiguang.request.other;
+package io.github.archer099.push.channel.jiguang.request.other;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

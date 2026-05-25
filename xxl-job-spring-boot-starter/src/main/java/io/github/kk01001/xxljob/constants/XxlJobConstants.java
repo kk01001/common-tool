@@ -1,7 +1,7 @@
-package io.github.kk01001.xxljob.constants;
+package io.github.archer099.xxljob.constants;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2023-02-02 14:03
  */
 public interface XxlJobConstants {

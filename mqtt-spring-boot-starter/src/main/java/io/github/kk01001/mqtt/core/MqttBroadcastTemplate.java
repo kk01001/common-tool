@@ -1,6 +1,6 @@
-package io.github.kk01001.mqtt.core;
+package io.github.archer099.mqtt.core;
 
-import io.github.kk01001.mqtt.config.MqttProperties;
+import io.github.archer099.mqtt.config.MqttProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * MQTT 广播和批量发送模板
  * 支持向多个设备同时发送消息
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class MqttBroadcastTemplate {

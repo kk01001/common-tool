@@ -1,6 +1,6 @@
-package io.github.kk01001.netty.message;
+package io.github.archer099.netty.message;
 
-import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.archer099.netty.session.WebSocketSession;
 
 import java.util.Set;
 import java.util.function.Predicate;

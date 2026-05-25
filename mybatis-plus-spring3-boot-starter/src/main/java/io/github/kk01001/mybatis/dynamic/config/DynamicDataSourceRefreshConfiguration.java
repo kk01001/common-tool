@@ -1,9 +1,9 @@
-package io.github.kk01001.mybatis.dynamic.config;
+package io.github.archer099.mybatis.dynamic.config;
 
 import com.baomidou.dynamic.datasource.creator.hikaricp.HikariDataSourceCreator;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
-import io.github.kk01001.mybatis.dynamic.refresh.DynamicDataSourcePropertiesBeanPostProcessor;
-import io.github.kk01001.mybatis.dynamic.refresh.DynamicDataSourceRefresher;
+import io.github.archer099.mybatis.dynamic.refresh.DynamicDataSourcePropertiesBeanPostProcessor;
+import io.github.archer099.mybatis.dynamic.refresh.DynamicDataSourceRefresher;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

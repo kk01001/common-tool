@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.controller;
+package io.github.archer099.examples.controller;
 
-import io.github.kk01001.examples.model.UserInfo;
+import io.github.archer099.examples.model.UserInfo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

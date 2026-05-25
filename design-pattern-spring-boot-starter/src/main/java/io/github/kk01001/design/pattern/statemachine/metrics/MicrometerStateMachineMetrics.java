@@ -1,6 +1,6 @@
-package io.github.kk01001.design.pattern.statemachine.metrics;
+package io.github.archer099.design.pattern.statemachine.metrics;
 
-import io.github.kk01001.design.pattern.statemachine.event.StateTransitionEvent;
+import io.github.archer099.design.pattern.statemachine.event.StateTransitionEvent;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-04-08 14:31:00
  * @description 集成Micrometer的状态机指标收集器
  */

@@ -1,7 +1,7 @@
-package io.github.kk01001.mybatis.permission.handler;
+package io.github.archer099.mybatis.permission.handler;
 
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import io.github.kk01001.mybatis.permission.annotations.DataColumn;
+import io.github.archer099.mybatis.permission.annotations.DataColumn;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-02-13 14:31:00
  * @description 数据权限处理器工厂
  */

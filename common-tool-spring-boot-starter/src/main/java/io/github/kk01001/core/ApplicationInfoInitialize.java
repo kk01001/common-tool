@@ -1,9 +1,9 @@
-package io.github.kk01001.core;
+package io.github.archer099.core;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.StrUtil;
-import io.github.kk01001.util.NetworkUtil;
+import io.github.archer099.util.NetworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -12,7 +12,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 
 /**
- * @author kk01001
+ * @author archer099
  * date:  2023-07-12 13:53
  * 应用信息打印初始化
  */

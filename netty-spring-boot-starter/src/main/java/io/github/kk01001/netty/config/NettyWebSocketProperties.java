@@ -1,4 +1,4 @@
-package io.github.kk01001.netty.config;
+package io.github.archer099.netty.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 10:00:00
  * @description Netty WebSocket 配置属性
  */

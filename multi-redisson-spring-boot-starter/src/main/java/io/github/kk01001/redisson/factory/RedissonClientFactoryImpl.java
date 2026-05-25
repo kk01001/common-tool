@@ -1,16 +1,16 @@
-package io.github.kk01001.redisson.factory;
+package io.github.archer099.redisson.factory;
 
-import io.github.kk01001.redisson.enums.DelayStrategyType;
-import io.github.kk01001.redisson.enums.FailedNodeDetectorType;
-import io.github.kk01001.redisson.enums.RedissonMode;
-import io.github.kk01001.redisson.enums.RedissonReadMode;
-import io.github.kk01001.redisson.properties.ClusterServerProperties;
-import io.github.kk01001.redisson.properties.FailedNodeDetectorProperties;
-import io.github.kk01001.redisson.properties.MasterSlaveServerProperties;
-import io.github.kk01001.redisson.properties.RedissonInstanceProperties;
-import io.github.kk01001.redisson.properties.RetryDelayProperties;
-import io.github.kk01001.redisson.properties.SentinelServerProperties;
-import io.github.kk01001.redisson.properties.SingleServerProperties;
+import io.github.archer099.redisson.enums.DelayStrategyType;
+import io.github.archer099.redisson.enums.FailedNodeDetectorType;
+import io.github.archer099.redisson.enums.RedissonMode;
+import io.github.archer099.redisson.enums.RedissonReadMode;
+import io.github.archer099.redisson.properties.ClusterServerProperties;
+import io.github.archer099.redisson.properties.FailedNodeDetectorProperties;
+import io.github.archer099.redisson.properties.MasterSlaveServerProperties;
+import io.github.archer099.redisson.properties.RedissonInstanceProperties;
+import io.github.archer099.redisson.properties.RetryDelayProperties;
+import io.github.archer099.redisson.properties.SentinelServerProperties;
+import io.github.archer099.redisson.properties.SingleServerProperties;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.FailedCommandsDetector;
@@ -38,7 +38,7 @@ import org.springframework.util.StringUtils;
 import java.time.Duration;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 10:00:00
  * @description RedissonClient 工厂实现类
  */

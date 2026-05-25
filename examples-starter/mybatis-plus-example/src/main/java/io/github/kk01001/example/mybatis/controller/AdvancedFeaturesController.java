@@ -1,7 +1,7 @@
-package io.github.kk01001.example.mybatis.controller;
+package io.github.archer099.example.mybatis.controller;
 
-import io.github.kk01001.example.mybatis.entity.Product;
-import io.github.kk01001.example.mybatis.service.ProductService;
+import io.github.archer099.example.mybatis.entity.Product;
+import io.github.archer099.example.mybatis.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * 高级功能演示控制器
  *
- * @author kk01001
+ * @author archer099
  */
 @RestController
 @RequestMapping("/api/advanced")

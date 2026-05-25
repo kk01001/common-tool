@@ -1,4 +1,4 @@
-package io.github.kk01001.xxljob.util;
+package io.github.archer099.xxljob.util;
 
 import com.xxl.job.core.context.XxlJobHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * date:  2023-02-27 9:23
  */
 @Slf4j

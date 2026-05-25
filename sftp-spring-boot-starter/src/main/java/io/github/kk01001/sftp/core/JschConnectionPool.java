@@ -1,4 +1,4 @@
-package io.github.kk01001.sftp.core;
+package io.github.archer099.sftp.core;
 
 import com.jcraft.jsch.ChannelSftp;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2023-03-29 20:45:00
  */
 @Slf4j

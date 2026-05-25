@@ -1,9 +1,9 @@
-package io.github.kk01001.mqtt.examples.controller;
+package io.github.archer099.mqtt.examples.controller;
 
-import io.github.kk01001.common.model.ApiResponse;
-import io.github.kk01001.mqtt.examples.dto.MqttBulkSendRequestDTO;
-import io.github.kk01001.mqtt.examples.service.MqttSendService;
-import io.github.kk01001.mqtt.examples.vo.MqttBulkSendResultVO;
+import io.github.archer099.common.model.ApiResponse;
+import io.github.archer099.mqtt.examples.dto.MqttBulkSendRequestDTO;
+import io.github.archer099.mqtt.examples.service.MqttSendService;
+import io.github.archer099.mqtt.examples.vo.MqttBulkSendResultVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 11:08:00
  * @description MQTT 批量发送接口
  */

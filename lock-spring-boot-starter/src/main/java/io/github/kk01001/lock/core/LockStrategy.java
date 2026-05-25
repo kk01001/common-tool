@@ -1,7 +1,7 @@
-package io.github.kk01001.lock.core;
+package io.github.archer099.lock.core;
 
-import io.github.kk01001.lock.enums.LockType;
-import io.github.kk01001.lock.model.LockRule;
+import io.github.archer099.lock.enums.LockType;
+import io.github.archer099.lock.model.LockRule;
 
 /**
  * @author linshiqiang

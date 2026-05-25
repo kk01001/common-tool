@@ -1,9 +1,9 @@
-package io.github.kk01001.idempotent;
+package io.github.archer099.idempotent;
 
-import io.github.kk01001.idempotent.aspect.IdempotentAspect;
-import io.github.kk01001.idempotent.config.IdempotentProperties;
-import io.github.kk01001.idempotent.core.IdempotentKeyGenerator;
-import io.github.kk01001.idempotent.core.RedisIdempotentExecutor;
+import io.github.archer099.idempotent.aspect.IdempotentAspect;
+import io.github.archer099.idempotent.config.IdempotentProperties;
+import io.github.archer099.idempotent.core.IdempotentKeyGenerator;
+import io.github.archer099.idempotent.core.RedisIdempotentExecutor;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 幂等自动配置
  */

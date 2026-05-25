@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.kk01001.postgres.examples.mapper.DemoUserMapper">
+<mapper namespace="io.github.archer099.postgres.examples.mapper.DemoUserMapper">
 
-    <resultMap id="DemoUserMap" type="io.github.kk01001.postgres.examples.entity.DemoUser">
+    <resultMap id="DemoUserMap" type="io.github.archer099.postgres.examples.entity.DemoUser">
         <id property="id" column="id"/>
         <result property="username" column="username"/>
         <result property="email" column="email"/>
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
-    <insert id="insert" parameterType="io.github.kk01001.postgres.examples.entity.DemoUser">
+    <insert id="insert" parameterType="io.github.archer099.postgres.examples.entity.DemoUser">
         <selectKey keyProperty="id" resultType="long" order="BEFORE">
             SELECT nextval('demo_user_id_seq')
         </selectKey>
@@ -23,7 +23,7 @@
         WHERE id = #{id}
     </select>
 
-    <update id="updateById" parameterType="io.github.kk01001.postgres.examples.entity.DemoUser">
+    <update id="updateById" parameterType="io.github.archer099.postgres.examples.entity.DemoUser">
         UPDATE demo_user
         <set>
             <if test="username != null and username != ''">

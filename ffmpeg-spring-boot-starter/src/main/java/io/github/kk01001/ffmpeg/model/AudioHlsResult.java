@@ -1,9 +1,9 @@
-package io.github.kk01001.ffmpeg.model;
+package io.github.archer099.ffmpeg.model;
 
 import lombok.Data;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 16:22:00
  * @description 音频转 HLS 结果
  */

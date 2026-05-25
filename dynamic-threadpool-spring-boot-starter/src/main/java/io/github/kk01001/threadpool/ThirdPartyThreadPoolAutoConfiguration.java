@@ -1,8 +1,8 @@
-package io.github.kk01001.threadpool;
+package io.github.archer099.threadpool;
 
-import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
-import io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolProperties;
-import io.github.kk01001.threadpool.thirdparty.initializer.ThirdPartyThreadPoolInitializer;
+import io.github.archer099.threadpool.registry.ThreadPoolRegistry;
+import io.github.archer099.threadpool.thirdparty.ThirdPartyThreadPoolProperties;
+import io.github.archer099.threadpool.thirdparty.initializer.ThirdPartyThreadPoolInitializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 第三方线程池自动配置
  * 
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Configuration

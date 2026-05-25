@@ -1,7 +1,7 @@
-package io.github.kk01001.chat.example.config;
+package io.github.archer099.chat.example.config;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 19:00:00
  * @description 当前登录用户上下文，基于 ThreadLocal
  */

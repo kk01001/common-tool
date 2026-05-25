@@ -1,10 +1,10 @@
-package io.github.kk01001.design.pattern.statemachine.event;
+package io.github.archer099.design.pattern.statemachine.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-04-07 14:31:00
  * @description 状态转换事件
  */

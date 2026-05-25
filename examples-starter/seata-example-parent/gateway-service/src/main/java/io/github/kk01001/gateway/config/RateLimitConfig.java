@@ -1,4 +1,4 @@
-package io.github.kk01001.gateway.config;
+package io.github.archer099.gateway.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.bucket4j.caffeine.CaffeineProxyManager;
@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-01-08 17:30:00
  * @description 限流配置
  */

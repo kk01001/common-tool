@@ -1,12 +1,12 @@
-package io.github.kk01001.examples.script.model;
+package io.github.archer099.examples.script.model;
 
-import io.github.kk01001.script.enums.ScriptType;
+import io.github.archer099.script.enums.ScriptType;
 import lombok.Data;
 
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-19 15:30:00
  * @description 脚本测试模型
  */

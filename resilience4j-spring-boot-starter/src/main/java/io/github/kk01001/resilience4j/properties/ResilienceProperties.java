@@ -1,4 +1,4 @@
-package io.github.kk01001.resilience4j.properties;
+package io.github.archer099.resilience4j.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Resilience4j 配置属性
  *
- * @author kk01001
+ * @author archer099
  */
 @ConfigurationProperties(prefix = "resilience4j")
 public class ResilienceProperties {

@@ -1,11 +1,11 @@
-package io.github.kk01001.examples.entity;
+package io.github.archer099.examples.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.github.kk01001.crypto.annotation.CryptoField;
-import io.github.kk01001.dict.annotation.Dict;
+import io.github.archer099.crypto.annotation.CryptoField;
+import io.github.archer099.dict.annotation.Dict;
 import lombok.Data;
 
 @Data

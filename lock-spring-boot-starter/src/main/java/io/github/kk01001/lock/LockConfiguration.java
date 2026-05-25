@@ -1,4 +1,4 @@
-package io.github.kk01001.lock;
+package io.github.archer099.lock;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
  * @description
  */
 @Configuration
-@ComponentScan("io.github.kk01001.lock")
+@ComponentScan("io.github.archer099.lock")
 public class LockConfiguration {
 }

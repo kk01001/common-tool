@@ -1,13 +1,13 @@
-package io.github.kk01001.signature.example.controller;
+package io.github.archer099.signature.example.controller;
 
-import io.github.kk01001.signature.annotation.IgnoreSignature;
-import io.github.kk01001.signature.annotation.SignatureVerify;
-import io.github.kk01001.signature.core.SignatureAlgorithm;
-import io.github.kk01001.signature.example.dto.ApiRequest;
-import io.github.kk01001.signature.example.dto.ApiResponse;
-import io.github.kk01001.signature.example.dto.NestedRequest;
-import io.github.kk01001.signature.handler.SignatureHandler;
-import io.github.kk01001.signature.util.SignatureUtil;
+import io.github.archer099.signature.annotation.IgnoreSignature;
+import io.github.archer099.signature.annotation.SignatureVerify;
+import io.github.archer099.signature.core.SignatureAlgorithm;
+import io.github.archer099.signature.example.dto.ApiRequest;
+import io.github.archer099.signature.example.dto.ApiResponse;
+import io.github.archer099.signature.example.dto.NestedRequest;
+import io.github.archer099.signature.handler.SignatureHandler;
+import io.github.archer099.signature.util.SignatureUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description API签名验证示例控制器
  */

@@ -1,9 +1,9 @@
-package io.github.kk01001.sensitive.core;
+package io.github.archer099.sensitive.core;
 
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 敏感词异常
  */

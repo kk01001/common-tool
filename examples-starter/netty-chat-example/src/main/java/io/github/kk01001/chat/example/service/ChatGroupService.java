@@ -1,11 +1,11 @@
-package io.github.kk01001.chat.example.service;
+package io.github.archer099.chat.example.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.kk01001.chat.example.entity.ChatGroup;
-import io.github.kk01001.chat.example.entity.ChatGroupMember;
-import io.github.kk01001.chat.example.mapper.ChatGroupMapper;
-import io.github.kk01001.chat.example.mapper.ChatGroupMemberMapper;
+import io.github.archer099.chat.example.entity.ChatGroup;
+import io.github.archer099.chat.example.entity.ChatGroupMember;
+import io.github.archer099.chat.example.mapper.ChatGroupMapper;
+import io.github.archer099.chat.example.mapper.ChatGroupMemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 18:00:00
  * @description 群组服务
  */

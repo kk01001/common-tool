@@ -1,12 +1,12 @@
-package io.github.kk01001.mqtt.examples.service.impl;
+package io.github.archer099.mqtt.examples.service.impl;
 
-import io.github.kk01001.common.model.ApiResponse; // only for potential reference
-import io.github.kk01001.exception.BizException;
-import io.github.kk01001.mqtt.config.MqttProperties;
-import io.github.kk01001.mqtt.core.MqttTemplate;
-import io.github.kk01001.mqtt.examples.dto.MqttBulkSendRequestDTO;
-import io.github.kk01001.mqtt.examples.service.MqttSendService;
-import io.github.kk01001.mqtt.examples.vo.MqttBulkSendResultVO;
+import io.github.archer099.common.model.ApiResponse; // only for potential reference
+import io.github.archer099.exception.BizException;
+import io.github.archer099.mqtt.config.MqttProperties;
+import io.github.archer099.mqtt.core.MqttTemplate;
+import io.github.archer099.mqtt.examples.dto.MqttBulkSendRequestDTO;
+import io.github.archer099.mqtt.examples.service.MqttSendService;
+import io.github.archer099.mqtt.examples.vo.MqttBulkSendResultVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 11:08:00
  * @description MQTT 发送服务实现
  */

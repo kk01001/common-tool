@@ -1,10 +1,10 @@
-package io.github.kk01001.mqtt.examples.service;
+package io.github.archer099.mqtt.examples.service;
 
-import io.github.kk01001.mqtt.examples.dto.EmqxAuthRequestDTO;
-import io.github.kk01001.mqtt.examples.vo.EmqxAuthResponseVO;
+import io.github.archer099.mqtt.examples.dto.EmqxAuthRequestDTO;
+import io.github.archer099.mqtt.examples.vo.EmqxAuthResponseVO;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 15:45:00
  * @description EMQX HTTP 鉴权服务接口
  */

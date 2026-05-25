@@ -63,5 +63,5 @@ mqtt:
 # Spring Boot 日志配置
 logging:
   level:
-    io.github.kk01001.mqtt: DEBUG
+    io.github.archer099.mqtt: DEBUG
     org.eclipse.paho: INFO

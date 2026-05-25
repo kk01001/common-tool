@@ -1,6 +1,6 @@
-package io.github.kk01001.crypto.config;
+package io.github.archer099.crypto.config;
 
-import io.github.kk01001.crypto.enums.CryptoType;
+import io.github.archer099.crypto.enums.CryptoType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;

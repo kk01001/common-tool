@@ -22,7 +22,7 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>sensitive-word-spring-boot-starter</artifactId>
     <version>${version}</version>
 </dependency>

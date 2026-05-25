@@ -1,8 +1,8 @@
-package io.github.kk01001.example.threadpool.config;
+package io.github.archer099.example.threadpool.config;
 
-import io.github.kk01001.threadpool.custom.annotation.DynamicThreadPool;
-import io.github.kk01001.threadpool.custom.factory.ThreadPoolFactory;
-import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
+import io.github.archer099.threadpool.custom.annotation.DynamicThreadPool;
+import io.github.archer099.threadpool.custom.factory.ThreadPoolFactory;
+import io.github.archer099.threadpool.registry.ThreadPoolRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,7 +11,7 @@ import java.util.concurrent.Executor;
 /**
  * 线程池配置
  *
- * @author kk01001
+ * @author archer099
  */
 @Configuration
 public class ThreadPoolConfig {

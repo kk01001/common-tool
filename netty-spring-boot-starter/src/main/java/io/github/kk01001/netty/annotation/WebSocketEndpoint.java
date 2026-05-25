@@ -1,4 +1,4 @@
-package io.github.kk01001.netty.annotation;
+package io.github.archer099.netty.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 10:00:00
  * @description WebSocket端点注解，标注在WebSocket处理类上，支持指定路径
  */

@@ -1,6 +1,6 @@
-package io.github.kk01001.mqtt.example;
+package io.github.archer099.mqtt.example;
 
-import io.github.kk01001.mqtt.core.MqttTemplate;
+import io.github.archer099.mqtt.core.MqttTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
  * MQTT 生产者示例
  * 演示如何使用 MqttTemplate 发送消息
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Component

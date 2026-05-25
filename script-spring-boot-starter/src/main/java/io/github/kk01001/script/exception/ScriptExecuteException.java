@@ -1,7 +1,7 @@
-package io.github.kk01001.script.exception;
+package io.github.archer099.script.exception;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-19 15:30:00
  * @description 脚本执行异常
  */

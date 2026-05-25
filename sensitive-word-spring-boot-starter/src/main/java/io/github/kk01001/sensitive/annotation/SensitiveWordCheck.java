@@ -1,12 +1,12 @@
-package io.github.kk01001.sensitive.annotation;
+package io.github.archer099.sensitive.annotation;
 
-import io.github.kk01001.sensitive.core.HandleType;
-import io.github.kk01001.sensitive.core.MatchType;
+import io.github.archer099.sensitive.core.HandleType;
+import io.github.archer099.sensitive.core.MatchType;
 
 import java.lang.annotation.*;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 敏感词检测注解，用于标记需要进行敏感词检测的方法参数或字段
  */

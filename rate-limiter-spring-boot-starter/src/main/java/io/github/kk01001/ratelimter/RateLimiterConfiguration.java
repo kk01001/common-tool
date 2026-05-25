@@ -1,4 +1,4 @@
-package io.github.kk01001.ratelimter;
+package io.github.archer099.ratelimter;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
  * @description
  */
 @Configuration
-@ComponentScan("io.github.kk01001.ratelimter")
+@ComponentScan("io.github.archer099.ratelimter")
 public class RateLimiterConfiguration {
 }

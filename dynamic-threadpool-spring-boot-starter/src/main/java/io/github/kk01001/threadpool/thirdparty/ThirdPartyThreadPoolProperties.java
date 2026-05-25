@@ -1,4 +1,4 @@
-package io.github.kk01001.threadpool.thirdparty;
+package io.github.archer099.threadpool.thirdparty;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * 第三方线程池配置属性
  * 
- * @author kk01001
+ * @author archer099
  */
 @Data
 @ConfigurationProperties(prefix = "dynamic-threadpool.third-party")

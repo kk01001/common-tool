@@ -1,4 +1,4 @@
-package io.github.kk01001.util;
+package io.github.archer099.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author kk01001
+ * @author archer099
  * date:  2024-07-11 13:33
  */
 @Slf4j

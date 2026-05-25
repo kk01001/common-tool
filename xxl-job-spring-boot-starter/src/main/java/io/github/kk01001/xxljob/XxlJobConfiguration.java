@@ -1,10 +1,10 @@
-package io.github.kk01001.xxljob;
+package io.github.archer099.xxljob;
 
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
-import io.github.kk01001.xxljob.core.XxlJobProperties;
+import io.github.archer099.xxljob.core.XxlJobProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -14,12 +14,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Assert;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2022/2/14 10:34
  */
 @Slf4j
 @Configuration(proxyBeanMethods = false)
-@ComponentScan(basePackages = "io.github.kk01001")
+@ComponentScan(basePackages = "io.github.archer099")
 @EnableConfigurationProperties(XxlJobProperties.class)
 @ConditionalOnProperty(prefix = "xxl-job", name = "enable", havingValue = "true")
 public class XxlJobConfiguration {

@@ -1,10 +1,10 @@
-package io.github.kk01001.xxljob.core;
+package io.github.archer099.xxljob.core;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2022/2/8 14:30
  * xxljob 属性
  */

@@ -1,9 +1,9 @@
-package io.github.kk01001.signature.example.dto;
+package io.github.archer099.signature.example.dto;
 
 import lombok.Data;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description API请求DTO
  */

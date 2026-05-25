@@ -1,4 +1,4 @@
-package io.github.kk01001.netty.auth;
+package io.github.archer099.netty.auth;
 
 import io.netty.handler.codec.http.FullHttpRequest;
 

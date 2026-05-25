@@ -1,4 +1,4 @@
-package io.github.kk01001.push.channel.umeng.request;
+package io.github.archer099.push.channel.umeng.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

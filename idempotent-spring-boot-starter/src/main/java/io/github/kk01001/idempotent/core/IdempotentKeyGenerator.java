@@ -1,4 +1,4 @@
-package io.github.kk01001.idempotent.core;
+package io.github.archer099.idempotent.core;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -13,7 +13,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.Assert;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 幂等key生成器
  */

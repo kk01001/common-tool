@@ -1,11 +1,11 @@
-package io.github.kk01001.threadpool.thirdparty;
+package io.github.archer099.threadpool.thirdparty;
 
 import lombok.Getter;
 
 /**
  * 第三方线程池类型枚举
  * 
- * @author kk01001
+ * @author archer099
  */
 @Getter
 public enum ThirdPartyPoolType {

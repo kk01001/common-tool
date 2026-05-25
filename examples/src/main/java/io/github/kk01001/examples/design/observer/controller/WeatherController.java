@@ -1,9 +1,9 @@
-package io.github.kk01001.examples.design.observer.controller;
+package io.github.archer099.examples.design.observer.controller;
 
-import io.github.kk01001.design.pattern.observer.ObserverFactory;
-import io.github.kk01001.examples.design.observer.WeatherSubject;
-import io.github.kk01001.examples.design.observer.dto.WeatherDataDTO;
-import io.github.kk01001.examples.design.observer.dto.WeatherResponse;
+import io.github.archer099.design.pattern.observer.ObserverFactory;
+import io.github.archer099.examples.design.observer.WeatherSubject;
+import io.github.archer099.examples.design.observer.dto.WeatherDataDTO;
+import io.github.archer099.examples.design.observer.dto.WeatherResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-03-13 14:31:00
  * @description 天气数据发送控制器
  */

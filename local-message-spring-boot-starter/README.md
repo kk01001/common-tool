@@ -18,9 +18,9 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>local-message-spring-boot-starter</artifactId>
-    <version>2.4.9</version>
+    <version>2.5.0</version>
 </dependency>
 ```
 
@@ -190,7 +190,7 @@ public interface MessageProcessor {
 
 ## 示例代码
 
-完整的使用示例请参考 `src/test/java/io/github/kk01001/localmessage/example/` 目录下的代码。
+完整的使用示例请参考 `src/test/java/io/github/archer099/localmessage/example/` 目录下的代码。
 
 ## 注意事项
 

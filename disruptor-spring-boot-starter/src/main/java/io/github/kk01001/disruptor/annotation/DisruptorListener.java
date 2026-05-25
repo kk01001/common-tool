@@ -1,11 +1,11 @@
-package io.github.kk01001.disruptor.annotation;
+package io.github.archer099.disruptor.annotation;
 
 import com.lmax.disruptor.dsl.ProducerType;
 
 import java.lang.annotation.*;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-19 10:15:47
  * @description 消息监听注解，用于标记消息处理方法
  */

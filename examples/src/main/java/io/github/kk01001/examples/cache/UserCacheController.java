@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.cache;
+package io.github.archer099.examples.cache;
 
-import io.github.kk01001.cache.factory.LocalCaffeineCacheFactory;
+import io.github.archer099.cache.factory.LocalCaffeineCacheFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-03-24 14:31:00
  * @description 缓存操作控制器
  */

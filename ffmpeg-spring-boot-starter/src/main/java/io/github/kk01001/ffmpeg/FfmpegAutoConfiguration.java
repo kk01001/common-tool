@@ -1,13 +1,13 @@
-package io.github.kk01001.ffmpeg;
+package io.github.archer099.ffmpeg;
 
-import io.github.kk01001.ffmpeg.core.FfmpegService;
-import io.github.kk01001.ffmpeg.core.impl.FfmpegServiceImpl;
+import io.github.archer099.ffmpeg.core.FfmpegService;
+import io.github.archer099.ffmpeg.core.impl.FfmpegServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 16:22:00
  * @description FFmpeg 自动配置
  */

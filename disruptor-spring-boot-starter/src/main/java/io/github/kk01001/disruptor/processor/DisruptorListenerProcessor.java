@@ -1,11 +1,11 @@
-package io.github.kk01001.disruptor.processor;
+package io.github.archer099.disruptor.processor;
 
 import com.lmax.disruptor.dsl.Disruptor;
-import io.github.kk01001.disruptor.annotation.DisruptorListener;
-import io.github.kk01001.disruptor.event.DisruptorEvent;
-import io.github.kk01001.disruptor.factory.DisruptorEventFactory;
-import io.github.kk01001.disruptor.handler.DisruptorHandler;
-import io.github.kk01001.disruptor.template.DisruptorTemplate;
+import io.github.archer099.disruptor.annotation.DisruptorListener;
+import io.github.archer099.disruptor.event.DisruptorEvent;
+import io.github.archer099.disruptor.factory.DisruptorEventFactory;
+import io.github.archer099.disruptor.handler.DisruptorHandler;
+import io.github.archer099.disruptor.template.DisruptorTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
@@ -19,7 +19,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-19 10:15:47
  * @description Disruptor监听器处理器，用于处理@DisruptorListener注解
  */

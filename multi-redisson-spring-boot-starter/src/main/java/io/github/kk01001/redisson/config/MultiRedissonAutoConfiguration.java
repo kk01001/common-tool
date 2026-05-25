@@ -1,22 +1,22 @@
-package io.github.kk01001.redisson.config;
+package io.github.archer099.redisson.config;
 
-import io.github.kk01001.redisson.circuitbreaker.CircuitBreakerState;
-import io.github.kk01001.redisson.circuitbreaker.DualWriteCircuitBreaker;
-import io.github.kk01001.redisson.factory.RedissonClientFactory;
-import io.github.kk01001.redisson.factory.RedissonClientFactoryImpl;
-import io.github.kk01001.redisson.health.RedissonHealthIndicator;
-import io.github.kk01001.redisson.holder.RedissonClientHolder;
-import io.github.kk01001.redisson.monitor.CircuitBreakerEndpoint;
-import io.github.kk01001.redisson.monitor.DualWriteEndpoint;
-import io.github.kk01001.redisson.monitor.DualWriteMetrics;
-import io.github.kk01001.redisson.properties.MultiRedissonProperties;
-import io.github.kk01001.redisson.properties.RedissonInstanceProperties;
-import io.github.kk01001.redisson.recovery.DualWriteRecoveryHandler;
-import io.github.kk01001.redisson.retry.DefaultDualWriteFailureHandler;
-import io.github.kk01001.redisson.retry.DualWriteFailureHandler;
-import io.github.kk01001.redisson.retry.DualWriteOverflowHandler;
-import io.github.kk01001.redisson.retry.DualWriteRejectedHandler;
-import io.github.kk01001.redisson.template.MultiRedissonTemplate;
+import io.github.archer099.redisson.circuitbreaker.CircuitBreakerState;
+import io.github.archer099.redisson.circuitbreaker.DualWriteCircuitBreaker;
+import io.github.archer099.redisson.factory.RedissonClientFactory;
+import io.github.archer099.redisson.factory.RedissonClientFactoryImpl;
+import io.github.archer099.redisson.health.RedissonHealthIndicator;
+import io.github.archer099.redisson.holder.RedissonClientHolder;
+import io.github.archer099.redisson.monitor.CircuitBreakerEndpoint;
+import io.github.archer099.redisson.monitor.DualWriteEndpoint;
+import io.github.archer099.redisson.monitor.DualWriteMetrics;
+import io.github.archer099.redisson.properties.MultiRedissonProperties;
+import io.github.archer099.redisson.properties.RedissonInstanceProperties;
+import io.github.archer099.redisson.recovery.DualWriteRecoveryHandler;
+import io.github.archer099.redisson.retry.DefaultDualWriteFailureHandler;
+import io.github.archer099.redisson.retry.DualWriteFailureHandler;
+import io.github.archer099.redisson.retry.DualWriteOverflowHandler;
+import io.github.archer099.redisson.retry.DualWriteRejectedHandler;
+import io.github.archer099.redisson.template.MultiRedissonTemplate;
 import jakarta.annotation.PreDestroy;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 10:00:00
  * @description Redisson 多集群自动配置类
  */

@@ -1,10 +1,10 @@
-package io.github.kk01001.oss;
+package io.github.archer099.oss;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description OSS配置属性
  */

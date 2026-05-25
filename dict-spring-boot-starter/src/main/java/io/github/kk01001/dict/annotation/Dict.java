@@ -1,4 +1,4 @@
-package io.github.kk01001.dict.annotation;
+package io.github.archer099.dict.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

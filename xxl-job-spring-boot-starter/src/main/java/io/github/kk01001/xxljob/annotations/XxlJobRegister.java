@@ -1,8 +1,8 @@
-package io.github.kk01001.xxljob.annotations;
+package io.github.archer099.xxljob.annotations;
 
-import io.github.kk01001.xxljob.enums.ExecutorBlockStrategyEnum;
-import io.github.kk01001.xxljob.enums.ExecutorRouteStrategyEnum;
-import io.github.kk01001.xxljob.enums.MisfireStrategyEnum;
+import io.github.archer099.xxljob.enums.ExecutorBlockStrategyEnum;
+import io.github.archer099.xxljob.enums.ExecutorRouteStrategyEnum;
+import io.github.archer099.xxljob.enums.MisfireStrategyEnum;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author kk01001
+ * @author archer099
  * date:  2023-02-02 14:03
  * xx-job任务配置信息
  */

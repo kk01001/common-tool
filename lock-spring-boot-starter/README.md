@@ -1,6 +1,6 @@
 # 分布式锁 Spring Boot Starter
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/lock-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.kk01001/lock-spring-boot-starter)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.archer099/lock-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.archer099/lock-spring-boot-starter)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 **一句话概述：** 基于 [Redisson](https://github.com/redisson/redisson) 的轻量级分布式锁解决方案，提供便捷的注解式锁定义，支持多种锁类型和灵活的锁策略配置。
@@ -41,7 +41,7 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>lock-spring-boot-starter</artifactId>
     <version>${latest.version}</version>
 </dependency>
@@ -64,7 +64,7 @@ spring:
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 订单服务
  */
@@ -164,7 +164,7 @@ public class OrderService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 使用复杂SpEL表达式构建锁键
  */
@@ -202,7 +202,7 @@ public class AdvancedOrderService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 非阻塞锁示例
  */
@@ -242,7 +242,7 @@ public class NonBlockingService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 锁规则生成器
  */
@@ -274,7 +274,7 @@ public class LockRuleGenerator {
 }
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 使用自定义规则的服务
  */
@@ -295,7 +295,7 @@ public class CustomRuleService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 限流服务
  */
@@ -436,7 +436,7 @@ public void processResource(String id) {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 高性能处理示例
  */

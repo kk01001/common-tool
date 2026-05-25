@@ -30,7 +30,7 @@ mybatis-plus:
 
 logging:
   level:
-    io.github.kk01001.netty: debug
+    io.github.archer099.netty: debug
 
 management:
   endpoints:

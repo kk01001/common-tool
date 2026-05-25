@@ -1,4 +1,4 @@
-package io.github.kk01001.mqtt.metrics;
+package io.github.archer099.mqtt.metrics;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * MQTT 指标统计
  *
- * @author kk01001
+ * @author archer099
  */
 @Data
 public class MqttMetrics {

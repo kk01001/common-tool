@@ -1,12 +1,12 @@
-package io.github.kk01001.script.config;
+package io.github.archer099.script.config;
 
-import io.github.kk01001.script.executor.GroovyScriptExecutor;
-import io.github.kk01001.script.executor.JavaExecutor;
-import io.github.kk01001.script.executor.JavaScriptExecutor;
-import io.github.kk01001.script.executor.LuaScriptExecutor;
-import io.github.kk01001.script.executor.PythonScriptExecutor;
-import io.github.kk01001.script.executor.ScriptExecutor;
-import io.github.kk01001.script.service.ScriptService;
+import io.github.archer099.script.executor.GroovyScriptExecutor;
+import io.github.archer099.script.executor.JavaExecutor;
+import io.github.archer099.script.executor.JavaScriptExecutor;
+import io.github.archer099.script.executor.LuaScriptExecutor;
+import io.github.archer099.script.executor.PythonScriptExecutor;
+import io.github.archer099.script.executor.ScriptExecutor;
+import io.github.archer099.script.service.ScriptService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-19 15:30:00
  * @description 脚本执行自动配置
  */

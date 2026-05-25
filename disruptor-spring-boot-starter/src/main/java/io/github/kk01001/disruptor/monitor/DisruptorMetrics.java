@@ -1,14 +1,14 @@
-package io.github.kk01001.disruptor.monitor;
+package io.github.archer099.disruptor.monitor;
 
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
-import io.github.kk01001.disruptor.event.DisruptorEvent;
+import io.github.archer099.disruptor.event.DisruptorEvent;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-19 10:15:47
  * @description Disruptor 监控类，用于监控 Disruptor 队列的缓冲区大小和剩余容量
  */

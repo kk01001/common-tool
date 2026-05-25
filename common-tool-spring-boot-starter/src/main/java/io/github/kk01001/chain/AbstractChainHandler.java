@@ -1,8 +1,8 @@
-package io.github.kk01001.chain;
+package io.github.archer099.chain;
 
 
 /**
- * @author kk01001
+ * @author archer099
  * @since 2022-10-17 10:20
  * 责任链抽象类
  */

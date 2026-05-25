@@ -1,9 +1,9 @@
-package io.github.kk01001.examples.oss;
+package io.github.archer099.examples.oss;
 
 import com.amazonaws.services.s3.transfer.model.UploadResult;
-import io.github.kk01001.oss.OssProperties;
-import io.github.kk01001.oss.client.OssClient;
-import io.github.kk01001.oss.listener.CustomProgressListener;
+import io.github.archer099.oss.OssProperties;
+import io.github.archer099.oss.client.OssClient;
+import io.github.archer099.oss.listener.CustomProgressListener;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

@@ -1,13 +1,13 @@
-package io.github.kk01001.localmessage.processor;
+package io.github.archer099.localmessage.processor;
 
-import io.github.kk01001.localmessage.entity.LocalMessage;
+import io.github.archer099.localmessage.entity.LocalMessage;
 import lombok.Getter;
 
 /**
  * 消息处理器接口
  * 用户需要实现此接口来处理不同业务类型的消息
  *
- * @author kk01001
+ * @author archer099
  */
 public interface MessageProcessor {
 

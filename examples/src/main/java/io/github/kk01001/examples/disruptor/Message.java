@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.disruptor;
+package io.github.archer099.examples.disruptor;
 
 import lombok.Data;
 

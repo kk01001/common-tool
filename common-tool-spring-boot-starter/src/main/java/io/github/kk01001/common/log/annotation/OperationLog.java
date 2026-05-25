@@ -1,4 +1,4 @@
-package io.github.kk01001.common.log.annotation;
+package io.github.archer099.common.log.annotation;
 
 import java.lang.annotation.*;
 

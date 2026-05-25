@@ -1,10 +1,10 @@
-package io.github.kk01001.signature.example;
+package io.github.archer099.signature.example;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description API签名验证示例应用
  */

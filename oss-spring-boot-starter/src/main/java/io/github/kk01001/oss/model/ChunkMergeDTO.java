@@ -1,4 +1,4 @@
-package io.github.kk01001.oss.model;
+package io.github.archer099.oss.model;
 
 import com.amazonaws.services.s3.model.PartETag;
 import com.amazonaws.services.s3.model.UploadPartResult;

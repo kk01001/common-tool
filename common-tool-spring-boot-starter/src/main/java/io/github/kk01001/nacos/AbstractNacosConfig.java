@@ -1,9 +1,9 @@
-package io.github.kk01001.nacos;
+package io.github.archer099.nacos;
 
 import com.alibaba.nacos.api.config.ConfigService;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2022/8/25 09:15
  */
 public abstract class AbstractNacosConfig {

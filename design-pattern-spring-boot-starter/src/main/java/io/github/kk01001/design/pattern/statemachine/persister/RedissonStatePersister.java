@@ -1,7 +1,7 @@
-package io.github.kk01001.design.pattern.statemachine.persister;
+package io.github.archer099.design.pattern.statemachine.persister;
 
-import io.github.kk01001.design.pattern.statemachine.config.StateMachineProperties;
-import io.github.kk01001.design.pattern.statemachine.exception.StatePersistException;
+import io.github.archer099.design.pattern.statemachine.config.StateMachineProperties;
+import io.github.archer099.design.pattern.statemachine.exception.StatePersistException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
@@ -9,7 +9,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.util.Assert;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-04-10 16:00:00
  * @description 使用Redisson进行状态持久化的实现
  */

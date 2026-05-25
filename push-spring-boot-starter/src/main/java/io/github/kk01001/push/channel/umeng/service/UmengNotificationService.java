@@ -1,11 +1,11 @@
-package io.github.kk01001.push.channel.umeng.service;
+package io.github.archer099.push.channel.umeng.service;
 
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.kk01001.push.channel.umeng.request.UmengNotificationRequest;
+import io.github.archer099.push.channel.umeng.request.UmengNotificationRequest;
 import org.springframework.stereotype.Service;
 
 /**

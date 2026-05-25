@@ -1,8 +1,8 @@
-package io.github.kk01001.examples.service.impl;
+package io.github.archer099.examples.service.impl;
 
-import io.github.kk01001.examples.mapper.UserInfoMapper;
-import io.github.kk01001.examples.model.UserInfo;
-import io.github.kk01001.examples.service.IUserInfoMybatisService;
+import io.github.archer099.examples.mapper.UserInfoMapper;
+import io.github.archer099.examples.model.UserInfo;
+import io.github.archer099.examples.service.IUserInfoMybatisService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 

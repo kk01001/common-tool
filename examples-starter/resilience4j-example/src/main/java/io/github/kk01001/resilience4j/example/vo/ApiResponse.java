@@ -1,9 +1,9 @@
-package io.github.kk01001.resilience4j.example.vo;
+package io.github.archer099.resilience4j.example.vo;
 
 /**
  * API 响应
  *
- * @author kk01001
+ * @author archer099
  */
 public class ApiResponse<T> {
     private int code;

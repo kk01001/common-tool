@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.data.scope;
+package io.github.archer099.examples.data.scope;
 
-import io.github.kk01001.mybatis.permission.handler.DataPermissionHandlerFactory;
+import io.github.archer099.mybatis.permission.handler.DataPermissionHandlerFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-05-17 14:30:00
  * @description 图书数据权限测试控制器
  */

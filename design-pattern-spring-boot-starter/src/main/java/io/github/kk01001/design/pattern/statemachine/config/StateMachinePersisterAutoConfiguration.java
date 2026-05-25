@@ -1,8 +1,8 @@
-package io.github.kk01001.design.pattern.statemachine.config;
+package io.github.archer099.design.pattern.statemachine.config;
 
-import io.github.kk01001.design.pattern.statemachine.persister.InMemoryStatePersister;
-import io.github.kk01001.design.pattern.statemachine.persister.RedissonStatePersister;
-import io.github.kk01001.design.pattern.statemachine.persister.StatePersister;
+import io.github.archer099.design.pattern.statemachine.persister.InMemoryStatePersister;
+import io.github.archer099.design.pattern.statemachine.persister.RedissonStatePersister;
+import io.github.archer099.design.pattern.statemachine.persister.StatePersister;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-04-10 16:30:00
  * @description 状态机持久化自动配置
  */

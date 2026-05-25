@@ -1,6 +1,6 @@
-package io.github.kk01001.mqtt.core;
+package io.github.archer099.mqtt.core;
 
-import io.github.kk01001.mqtt.annotation.MqttMessageListener;
+import io.github.archer099.mqtt.annotation.MqttMessageListener;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutorService;
  * MQTT 监听器注解处理器
  * 扫描并注册带有 @MqttMessageListener 注解的方法
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class MqttListenerAnnotationBeanPostProcessor implements BeanPostProcessor {

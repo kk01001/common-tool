@@ -1,9 +1,9 @@
-package io.github.kk01001.examples;
+package io.github.archer099.examples;
 
-import io.github.kk01001.common.log.annotation.EnableOperationLog;
-import io.github.kk01001.crypto.annotation.EnableParamsCrypto;
-import io.github.kk01001.examples.log.CustomOperationLogHandler;
-import io.github.kk01001.examples.log.SecurityOperatorInfoProvider;
+import io.github.archer099.common.log.annotation.EnableOperationLog;
+import io.github.archer099.crypto.annotation.EnableParamsCrypto;
+import io.github.archer099.examples.log.CustomOperationLogHandler;
+import io.github.archer099.examples.log.SecurityOperatorInfoProvider;
 import jakarta.servlet.MultipartConfigElement;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.util.unit.DataSize;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2024-06-23 15:41:00
  */
 @EnableOperationLog(

@@ -1,4 +1,4 @@
-package io.github.kk01001.chat.example.entity;
+package io.github.archer099.chat.example.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -8,7 +8,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 19:00:00
  * @description 聊天文件（数据库只存元信息和 URL，文件存储由策略决定）
  */

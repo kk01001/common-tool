@@ -1,13 +1,13 @@
-package io.github.kk01001.desensitize.handler;
+package io.github.archer099.desensitize.handler;
 
 import org.springframework.util.StringUtils;
 
-import io.github.kk01001.desensitize.annotation.Desensitize;
-import io.github.kk01001.desensitize.annotation.DesensitizeFor;
-import io.github.kk01001.desensitize.enums.DesensitizeType;
+import io.github.archer099.desensitize.annotation.Desensitize;
+import io.github.archer099.desensitize.annotation.DesensitizeFor;
+import io.github.archer099.desensitize.enums.DesensitizeType;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description
  */

@@ -1,10 +1,10 @@
-package io.github.kk01001.mqtt.examples.service.impl;
+package io.github.archer099.mqtt.examples.service.impl;
 
-import io.github.kk01001.mqtt.examples.config.EmqxAuthProperties;
-import io.github.kk01001.mqtt.examples.dto.EmqxAuthRequestDTO;
-import io.github.kk01001.mqtt.examples.service.EmqxAuthService;
-import io.github.kk01001.mqtt.examples.vo.EmqxAuthResponseVO;
-import io.github.kk01001.mqtt.examples.vo.EmqxAclRuleVO;
+import io.github.archer099.mqtt.examples.config.EmqxAuthProperties;
+import io.github.archer099.mqtt.examples.dto.EmqxAuthRequestDTO;
+import io.github.archer099.mqtt.examples.service.EmqxAuthService;
+import io.github.archer099.mqtt.examples.vo.EmqxAuthResponseVO;
+import io.github.archer099.mqtt.examples.vo.EmqxAclRuleVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 15:45:00
  * @description EMQX HTTP 鉴权服务实现
  */

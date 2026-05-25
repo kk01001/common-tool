@@ -1,4 +1,4 @@
-package io.github.kk01001.sensitive.core;
+package io.github.archer099.sensitive.core;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 基于 DFA（确定性有限自动机）算法的敏感词过滤器实现，时间复杂度 O(n)，空间换时间，适合大量文本检测
  */

@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.sql;
+package io.github.archer099.examples.sql;
 
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.parser.SqlParser;

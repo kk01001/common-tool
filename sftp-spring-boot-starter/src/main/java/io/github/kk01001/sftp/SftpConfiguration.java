@@ -1,7 +1,7 @@
-package io.github.kk01001.sftp;
+package io.github.archer099.sftp;
 
-import io.github.kk01001.sftp.core.JschConnectionPool;
-import io.github.kk01001.sftp.core.SftpInfoProperties;
+import io.github.archer099.sftp.core.JschConnectionPool;
+import io.github.archer099.sftp.core.SftpInfoProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author kk01001
+ * @author archer099
  * date:  2024-07-01 16:14
  */
 @Slf4j

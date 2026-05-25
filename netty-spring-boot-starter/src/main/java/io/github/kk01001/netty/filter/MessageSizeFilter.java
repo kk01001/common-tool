@@ -1,6 +1,6 @@
-package io.github.kk01001.netty.filter;
+package io.github.archer099.netty.filter;
 
-import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.archer099.netty.session.WebSocketSession;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

@@ -1,7 +1,7 @@
-package io.github.kk01001.examples.design.strategy.order;
+package io.github.archer099.examples.design.strategy.order;
 
-import io.github.kk01001.design.pattern.strategy.IStrategy;
-import io.github.kk01001.design.pattern.strategy.annotation.Strategy;
+import io.github.archer099.design.pattern.strategy.IStrategy;
+import io.github.archer099.design.pattern.strategy.annotation.Strategy;
 import org.springframework.stereotype.Component;
 
 @Component

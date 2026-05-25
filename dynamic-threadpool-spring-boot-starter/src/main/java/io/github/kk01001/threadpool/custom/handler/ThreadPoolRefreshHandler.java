@@ -1,8 +1,8 @@
-package io.github.kk01001.threadpool.custom.handler;
+package io.github.archer099.threadpool.custom.handler;
 
-import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
-import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
+import io.github.archer099.threadpool.custom.config.DynamicThreadPoolProperties;
+import io.github.archer099.threadpool.custom.model.ThreadPoolConfig;
+import io.github.archer099.threadpool.registry.ThreadPoolRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -13,7 +13,7 @@ import java.util.Map;
  * 线程池配置刷新处理器
  * 监听配置变化并更新线程池
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class ThreadPoolRefreshHandler implements ApplicationListener<ContextRefreshedEvent> {

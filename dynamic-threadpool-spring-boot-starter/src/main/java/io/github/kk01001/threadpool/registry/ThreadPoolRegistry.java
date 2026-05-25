@@ -1,9 +1,9 @@
-package io.github.kk01001.threadpool.registry;
+package io.github.archer099.threadpool.registry;
 
-import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
-import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
-import io.github.kk01001.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
-import io.github.kk01001.threadpool.thirdparty.adapter.ThirdPartyThreadPoolAdapter;
+import io.github.archer099.threadpool.actuator.ThreadPoolMetrics;
+import io.github.archer099.threadpool.custom.model.ThreadPoolConfig;
+import io.github.archer099.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
+import io.github.archer099.threadpool.thirdparty.adapter.ThirdPartyThreadPoolAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 线程池注册中心
  * 管理所有动态线程池
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class ThreadPoolRegistry {

@@ -1,4 +1,4 @@
-package io.github.kk01001.threadpool.queue;
+package io.github.archer099.threadpool.queue;
 
 import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
  * 可调整容量的阻塞队列
  * 基于 LinkedBlockingQueue 实现，支持动态修改容量
  * 
- * @author kk01001
+ * @author archer099
  */
 public class ResizableLinkedBlockingQueue<E> extends LinkedBlockingQueue<E> {
     

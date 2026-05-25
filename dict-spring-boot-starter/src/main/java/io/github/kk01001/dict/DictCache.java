@@ -1,4 +1,4 @@
-package io.github.kk01001.dict;
+package io.github.archer099.dict;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;

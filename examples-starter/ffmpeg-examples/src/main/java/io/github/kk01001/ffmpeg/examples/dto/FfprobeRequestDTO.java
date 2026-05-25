@@ -1,11 +1,11 @@
-package io.github.kk01001.ffmpeg.examples.dto;
+package io.github.archer099.ffmpeg.examples.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 16:30:00
  * @description ffprobe 请求参数
  */

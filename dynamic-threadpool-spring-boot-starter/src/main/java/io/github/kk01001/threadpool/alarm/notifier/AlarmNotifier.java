@@ -1,11 +1,11 @@
-package io.github.kk01001.threadpool.alarm.notifier;
+package io.github.archer099.threadpool.alarm.notifier;
 
-import io.github.kk01001.threadpool.alarm.AlarmEvent;
+import io.github.archer099.threadpool.alarm.AlarmEvent;
 
 /**
  * 告警通知器接口
  *
- * @author kk01001
+ * @author archer099
  */
 public interface AlarmNotifier {
 

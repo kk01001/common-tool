@@ -1,10 +1,10 @@
-package io.github.kk01001.mqtt.examples.service;
+package io.github.archer099.mqtt.examples.service;
 
-import io.github.kk01001.mqtt.examples.dto.MqttBulkSendRequestDTO;
-import io.github.kk01001.mqtt.examples.vo.MqttBulkSendResultVO;
+import io.github.archer099.mqtt.examples.dto.MqttBulkSendRequestDTO;
+import io.github.archer099.mqtt.examples.vo.MqttBulkSendResultVO;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 11:08:00
  * @description MQTT 发送服务接口
  */

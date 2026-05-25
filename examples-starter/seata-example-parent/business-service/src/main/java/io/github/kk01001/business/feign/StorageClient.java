@@ -1,12 +1,12 @@
-package io.github.kk01001.business.feign;
+package io.github.archer099.business.feign;
 
-import io.github.kk01001.seata.common.result.Result;
+import io.github.archer099.seata.common.result.Result;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-01-08 16:20:00
  * @description
  */

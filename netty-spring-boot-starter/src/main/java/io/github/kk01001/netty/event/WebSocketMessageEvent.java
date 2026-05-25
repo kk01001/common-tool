@@ -1,4 +1,4 @@
-package io.github.kk01001.netty.event;
+package io.github.archer099.netty.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;

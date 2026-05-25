@@ -1,7 +1,7 @@
-package io.github.kk01001.signature.core;
+package io.github.archer099.signature.core;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description 签名验证异常
  */

@@ -1,10 +1,10 @@
-package io.github.kk01001.threadpool.custom.initializer;
+package io.github.archer099.threadpool.custom.initializer;
 
-import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.custom.factory.ThreadPoolFactory;
-import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
-import io.github.kk01001.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
-import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
+import io.github.archer099.threadpool.custom.config.DynamicThreadPoolProperties;
+import io.github.archer099.threadpool.custom.factory.ThreadPoolFactory;
+import io.github.archer099.threadpool.custom.model.ThreadPoolConfig;
+import io.github.archer099.threadpool.custom.wrapper.DynamicThreadPoolWrapper;
+import io.github.archer099.threadpool.registry.ThreadPoolRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -15,7 +15,7 @@ import java.util.Map;
  * 线程池自动初始化器
  * 在应用启动时根据配置文件自动创建线程池
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class ThreadPoolAutoInitializer implements ApplicationRunner {

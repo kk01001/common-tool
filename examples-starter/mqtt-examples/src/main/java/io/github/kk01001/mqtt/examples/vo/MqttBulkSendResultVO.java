@@ -1,10 +1,10 @@
-package io.github.kk01001.mqtt.examples.vo;
+package io.github.archer099.mqtt.examples.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 11:08:00
  * @description MQTT 批量发送结果
  */

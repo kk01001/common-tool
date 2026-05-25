@@ -19,7 +19,7 @@ API 签名验证组件，支持防篡改、防重放攻击。
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>signature-spring-boot-starter</artifactId>
     <version>${version}</version>
 </dependency>

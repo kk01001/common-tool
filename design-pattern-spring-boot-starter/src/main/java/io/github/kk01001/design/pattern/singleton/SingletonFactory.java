@@ -1,4 +1,4 @@
-package io.github.kk01001.design.pattern.singleton;
+package io.github.archer099.design.pattern.singleton;
 
 import lombok.extern.slf4j.Slf4j;
 

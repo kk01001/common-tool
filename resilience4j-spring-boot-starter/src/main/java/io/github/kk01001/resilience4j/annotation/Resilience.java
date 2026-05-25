@@ -1,4 +1,4 @@
-package io.github.kk01001.resilience4j.annotation;
+package io.github.archer099.resilience4j.annotation;
 
 import java.lang.annotation.*;
 
@@ -6,7 +6,7 @@ import java.lang.annotation.*;
  * 组合注解，支持同时使用多个 Resilience4j 功能
  * 执行顺序：Retry -> CircuitBreaker -> RateLimiter -> TimeLimiter -> Bulkhead
  *
- * @author kk01001
+ * @author archer099
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

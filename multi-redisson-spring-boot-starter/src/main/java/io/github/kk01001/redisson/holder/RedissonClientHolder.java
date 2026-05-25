@@ -1,4 +1,4 @@
-package io.github.kk01001.redisson.holder;
+package io.github.archer099.redisson.holder;
 
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 10:00:00
  * @description RedissonClient 持有者，提供获取客户端的便捷方法
  */

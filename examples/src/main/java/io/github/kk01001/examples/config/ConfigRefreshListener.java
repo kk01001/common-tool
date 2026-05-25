@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.config;
+package io.github.archer099.examples.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;

@@ -1,8 +1,8 @@
-package io.github.kk01001.localmessage.example;
+package io.github.archer099.localmessage.example;
 
-import io.github.kk01001.localmessage.dao.LocalMessageDao;
-import io.github.kk01001.localmessage.entity.LocalMessage;
-import io.github.kk01001.localmessage.enums.MessageStatus;
+import io.github.archer099.localmessage.dao.LocalMessageDao;
+import io.github.archer099.localmessage.entity.LocalMessage;
+import io.github.archer099.localmessage.enums.MessageStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * 本地消息DAO实现示例（内存版本，仅用于演示）
  * 实际使用时需要实现真正的数据库操作
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Repository

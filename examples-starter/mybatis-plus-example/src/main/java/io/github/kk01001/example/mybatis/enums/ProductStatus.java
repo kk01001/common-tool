@@ -1,4 +1,4 @@
-package io.github.kk01001.example.mybatis.enums;
+package io.github.archer099.example.mybatis.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -8,7 +8,7 @@ import lombok.Getter;
  * 产品状态枚举
  * 演示 MyBatis Plus 枚举自动转换功能
  *
- * @author kk01001
+ * @author archer099
  */
 @Getter
 public enum ProductStatus {

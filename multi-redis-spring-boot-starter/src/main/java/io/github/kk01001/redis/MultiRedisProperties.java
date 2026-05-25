@@ -1,4 +1,4 @@
-package io.github.kk01001.redis;
+package io.github.archer099.redis;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2021/8/26 10:15
  */
 @Setter

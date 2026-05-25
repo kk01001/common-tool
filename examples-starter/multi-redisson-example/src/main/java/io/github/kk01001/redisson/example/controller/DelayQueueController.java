@@ -1,6 +1,6 @@
-package io.github.kk01001.redisson.example.controller;
+package io.github.archer099.redisson.example.controller;
 
-import io.github.kk01001.redisson.template.MultiRedissonTemplate;
+import io.github.archer099.redisson.template.MultiRedissonTemplate;
 import jakarta.annotation.PreDestroy;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-17 11:30:00
  * @description 延迟队列 Demo - 基于 ZSet 实现，订单超时、定时任务实战案例
  */

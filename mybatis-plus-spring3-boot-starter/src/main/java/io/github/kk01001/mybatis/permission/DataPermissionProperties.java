@@ -1,10 +1,10 @@
-package io.github.kk01001.mybatis.permission;
+package io.github.archer099.mybatis.permission;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-02-13 14:31:00
  * @description 数据权限配置属性
  */

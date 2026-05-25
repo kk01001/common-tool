@@ -1,12 +1,12 @@
-package io.github.kk01001.signature.handler;
+package io.github.archer099.signature.handler;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
-import io.github.kk01001.signature.annotation.IgnoreSignature;
-import io.github.kk01001.signature.annotation.SignatureVerify;
-import io.github.kk01001.signature.core.SignatureException;
-import io.github.kk01001.signature.core.SignatureResult;
-import io.github.kk01001.signature.properties.SignatureProperties;
+import io.github.archer099.signature.annotation.IgnoreSignature;
+import io.github.archer099.signature.annotation.SignatureVerify;
+import io.github.archer099.signature.core.SignatureException;
+import io.github.archer099.signature.core.SignatureResult;
+import io.github.archer099.signature.properties.SignatureProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description 签名验证拦截器
  */

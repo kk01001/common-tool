@@ -1,10 +1,10 @@
-package io.github.kk01001.exception;
+package io.github.archer099.exception;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2022/2/22 17:10
  * 参数异常
  */

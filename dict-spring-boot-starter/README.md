@@ -1,6 +1,6 @@
 # 字典翻译 Spring Boot Starter
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/dict-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.kk01001/dict-spring-boot-starter)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.archer099/dict-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.archer099/dict-spring-boot-starter)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 **一句话概述：** 简化开发的字典翻译工具，支持注解驱动自动翻译，高性能缓存机制提升效率，适用于Java后端的各类字典代码转文本场景。
@@ -40,7 +40,7 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>dict-spring-boot-starter</artifactId>
     <version>${latest.version}</version>
 </dependency>
@@ -64,7 +64,7 @@ dict:
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 数据库字典加载器
  */
@@ -114,7 +114,7 @@ public class DatabaseDictLoader implements DictLoader {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 用户信息VO
  */
@@ -199,7 +199,7 @@ public class UserVO {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 字典管理服务
  */
@@ -233,7 +233,7 @@ public class DictService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 字典定时刷新任务
  */
@@ -258,7 +258,7 @@ public class DictRefreshTask {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description Redis字典加载器
  */
@@ -308,7 +308,7 @@ public class RedisBasedDictLoader implements DictLoader {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 订单VO
  */
@@ -338,7 +338,7 @@ public class OrderVO {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 服务类中手动获取字典文本
  */

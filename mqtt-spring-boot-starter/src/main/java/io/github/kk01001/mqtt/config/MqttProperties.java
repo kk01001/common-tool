@@ -1,4 +1,4 @@
-package io.github.kk01001.mqtt.config;
+package io.github.archer099.mqtt.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -8,7 +8,7 @@ import java.time.Duration;
 /**
  * MQTT 配置属性
  *
- * @author kk01001
+ * @author archer099
  */
 @Data
 @ConfigurationProperties(prefix = "mqtt")

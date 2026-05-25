@@ -1,7 +1,7 @@
-package io.github.kk01001.ratelimter.manager;
+package io.github.archer099.ratelimter.manager;
 
 import cn.hutool.core.io.resource.ResourceUtil;
-import io.github.kk01001.ratelimter.enums.RateLimiterType;
+import io.github.archer099.ratelimter.enums.RateLimiterType;
 
 import java.util.HashMap;
 import java.util.Map;

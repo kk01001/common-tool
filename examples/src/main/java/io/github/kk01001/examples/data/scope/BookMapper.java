@@ -1,9 +1,9 @@
-package io.github.kk01001.examples.data.scope;
+package io.github.archer099.examples.data.scope;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.kk01001.mybatis.permission.annotations.DataColumn;
-import io.github.kk01001.mybatis.permission.annotations.DataPermission;
-import io.github.kk01001.mybatis.permission.handler.DataPermissionType;
+import io.github.archer099.mybatis.permission.annotations.DataColumn;
+import io.github.archer099.mybatis.permission.annotations.DataPermission;
+import io.github.archer099.mybatis.permission.handler.DataPermissionType;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-05-17 14:30:00
  * @description 图书Mapper接口
  */

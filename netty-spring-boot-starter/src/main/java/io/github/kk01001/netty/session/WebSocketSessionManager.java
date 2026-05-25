@@ -1,9 +1,9 @@
-package io.github.kk01001.netty.session;
+package io.github.archer099.netty.session;
 
-import io.github.kk01001.netty.config.NettyWebSocketProperties;
-import io.github.kk01001.netty.event.WebSocketMessageEvent;
-import io.github.kk01001.netty.event.WebSocketSessionEvent;
-import io.github.kk01001.netty.message.MessageDispatcher;
+import io.github.archer099.netty.config.NettyWebSocketProperties;
+import io.github.archer099.netty.event.WebSocketMessageEvent;
+import io.github.archer099.netty.event.WebSocketSessionEvent;
+import io.github.archer099.netty.message.MessageDispatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.CollectionUtils;
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 10:00:00
  * @description WebSocket 会话管理器，管理所有本机会话，支持连接数限制
  */

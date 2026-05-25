@@ -1,4 +1,4 @@
-package io.github.kk01001.ip2region.core;
+package io.github.archer099.ip2region.core;
 
 import lombok.Data;
 

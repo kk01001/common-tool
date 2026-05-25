@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.controller;
+package io.github.archer099.examples.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

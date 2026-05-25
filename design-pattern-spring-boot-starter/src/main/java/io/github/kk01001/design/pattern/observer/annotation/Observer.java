@@ -1,4 +1,4 @@
-package io.github.kk01001.design.pattern.observer.annotation;
+package io.github.archer099.design.pattern.observer.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

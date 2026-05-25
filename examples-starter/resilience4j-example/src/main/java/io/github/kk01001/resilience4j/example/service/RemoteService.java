@@ -1,4 +1,4 @@
-package io.github.kk01001.resilience4j.example.service;
+package io.github.archer099.resilience4j.example.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 模拟远程服务
  *
- * @author kk01001
+ * @author archer099
  */
 @Service
 public class RemoteService {

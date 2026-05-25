@@ -1,7 +1,7 @@
-package io.github.kk01001.enums;
+package io.github.archer099.enums;
 
 /**
- * @author kk01001
+ * @author archer099
  * date:  2023-07-21 10:05
  */
 public interface BaseEnum<T extends Enum<T> & BaseEnum<T>> {

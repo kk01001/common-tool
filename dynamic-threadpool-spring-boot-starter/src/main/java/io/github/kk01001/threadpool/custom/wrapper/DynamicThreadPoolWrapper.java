@@ -1,10 +1,10 @@
-package io.github.kk01001.threadpool.custom.wrapper;
+package io.github.archer099.threadpool.custom.wrapper;
 
 import com.alibaba.ttl.threadpool.TtlExecutors;
-import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
-import io.github.kk01001.threadpool.alarm.ThreadPoolAlarmHandler;
-import io.github.kk01001.threadpool.custom.model.ThreadPoolConfig;
-import io.github.kk01001.threadpool.queue.ResizableLinkedBlockingQueue;
+import io.github.archer099.threadpool.actuator.ThreadPoolMetrics;
+import io.github.archer099.threadpool.alarm.ThreadPoolAlarmHandler;
+import io.github.archer099.threadpool.custom.model.ThreadPoolConfig;
+import io.github.archer099.threadpool.queue.ResizableLinkedBlockingQueue;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * 动态线程池包装器
  * 包装 ThreadPoolExecutor，提供动态调整和监控能力
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Getter
@@ -105,7 +105,7 @@ public class DynamicThreadPoolWrapper {
         int capacity = config.getQueueCapacity();
         return switch (config.getQueueType()) {
             case RESIZABLE_LINKED_BLOCKING_QUEUE ->
-                    new io.github.kk01001.threadpool.queue.ResizableLinkedBlockingQueue<>(capacity);
+                    new io.github.archer099.threadpool.queue.ResizableLinkedBlockingQueue<>(capacity);
             case LINKED_BLOCKING_QUEUE -> new LinkedBlockingQueue<>(capacity);
             case ARRAY_BLOCKING_QUEUE -> new ArrayBlockingQueue<>(capacity);
             case SYNCHRONOUS_QUEUE -> new SynchronousQueue<>();

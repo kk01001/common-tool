@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.github.kk01001.common;
+package io.github.archer099.common;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;

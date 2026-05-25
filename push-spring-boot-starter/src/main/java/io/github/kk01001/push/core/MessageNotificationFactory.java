@@ -1,4 +1,4 @@
-package io.github.kk01001.push.core;
+package io.github.archer099.push.core;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

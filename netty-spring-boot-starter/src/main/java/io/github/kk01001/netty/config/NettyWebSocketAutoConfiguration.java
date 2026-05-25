@@ -1,17 +1,17 @@
-package io.github.kk01001.netty.config;
+package io.github.archer099.netty.config;
 
-import io.github.kk01001.netty.auth.DefaultWebSocketAuthenticator;
-import io.github.kk01001.netty.auth.WebSocketAuthenticator;
-import io.github.kk01001.netty.cluster.NoOpWebSocketClusterManager;
-import io.github.kk01001.netty.cluster.WebSocketClusterManager;
-import io.github.kk01001.netty.filter.MessageFilter;
-import io.github.kk01001.netty.message.MessageDispatcher;
-import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
-import io.github.kk01001.netty.server.NettyWebSocketServer;
-import io.github.kk01001.netty.session.WebSocketSessionManager;
-import io.github.kk01001.netty.trace.MessageTracer;
-import io.github.kk01001.netty.trace.MetricsMessageTracer;
-import io.github.kk01001.netty.trace.NoOpMessageTracer;
+import io.github.archer099.netty.auth.DefaultWebSocketAuthenticator;
+import io.github.archer099.netty.auth.WebSocketAuthenticator;
+import io.github.archer099.netty.cluster.NoOpWebSocketClusterManager;
+import io.github.archer099.netty.cluster.WebSocketClusterManager;
+import io.github.archer099.netty.filter.MessageFilter;
+import io.github.archer099.netty.message.MessageDispatcher;
+import io.github.archer099.netty.registry.WebSocketEndpointRegistry;
+import io.github.archer099.netty.server.NettyWebSocketServer;
+import io.github.archer099.netty.session.WebSocketSessionManager;
+import io.github.archer099.netty.trace.MessageTracer;
+import io.github.archer099.netty.trace.MetricsMessageTracer;
+import io.github.archer099.netty.trace.NoOpMessageTracer;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -31,7 +31,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 10:00:00
  * @description Netty WebSocket 自动配置
  */

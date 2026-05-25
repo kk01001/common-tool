@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.sql;
+package io.github.archer099.examples.sql;
 
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;

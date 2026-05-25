@@ -1,8 +1,8 @@
-package io.github.kk01001.script.executor;
+package io.github.archer099.script.executor;
 
-import io.github.kk01001.script.enums.ScriptType;
-import io.github.kk01001.script.exception.ScriptCompileException;
-import io.github.kk01001.script.exception.ScriptExecuteException;
+import io.github.archer099.script.enums.ScriptType;
+import io.github.archer099.script.exception.ScriptCompileException;
+import io.github.archer099.script.exception.ScriptExecuteException;
 import lombok.extern.slf4j.Slf4j;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
@@ -11,7 +11,7 @@ import org.luaj.vm2.lib.jse.JsePlatform;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-19 15:30:00
  * @description Lua脚本执行器
  */

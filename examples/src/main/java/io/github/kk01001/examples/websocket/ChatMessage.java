@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.websocket;
+package io.github.archer099.examples.websocket;
 
 import lombok.Data;
 

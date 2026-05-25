@@ -1,9 +1,9 @@
-package io.github.kk01001.chat.example.service;
+package io.github.archer099.chat.example.service;
 
 import java.io.IOException;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 19:00:00
  * @description 文件存储策略接口，支持本地存储和 OSS 扩展
  */

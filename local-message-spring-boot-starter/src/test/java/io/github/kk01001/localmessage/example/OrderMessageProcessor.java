@@ -1,7 +1,7 @@
-package io.github.kk01001.localmessage.example;
+package io.github.archer099.localmessage.example;
 
-import io.github.kk01001.localmessage.entity.LocalMessage;
-import io.github.kk01001.localmessage.processor.MessageProcessor;
+import io.github.archer099.localmessage.entity.LocalMessage;
+import io.github.archer099.localmessage.processor.MessageProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * 订单消息处理器示例
  * 演示如何实现MessageProcessor接口
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Component

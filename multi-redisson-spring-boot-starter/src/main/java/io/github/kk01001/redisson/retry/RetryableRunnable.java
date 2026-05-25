@@ -1,7 +1,7 @@
-package io.github.kk01001.redisson.retry;
+package io.github.archer099.redisson.retry;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-06 21:32:00
  * @description 可重试的 Runnable 包装，携带操作元信息用于拒绝时恢复
  */

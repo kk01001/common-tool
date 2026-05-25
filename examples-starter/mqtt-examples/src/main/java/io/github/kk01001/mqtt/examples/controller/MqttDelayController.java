@@ -1,8 +1,8 @@
-package io.github.kk01001.mqtt.examples.controller;
+package io.github.archer099.mqtt.examples.controller;
 
-import io.github.kk01001.common.model.ApiResponse;
-import io.github.kk01001.mqtt.examples.dto.MqttDelayedSendRequestDTO;
-import io.github.kk01001.mqtt.examples.service.MqttDelayService;
+import io.github.archer099.common.model.ApiResponse;
+import io.github.archer099.mqtt.examples.dto.MqttDelayedSendRequestDTO;
+import io.github.archer099.mqtt.examples.service.MqttDelayService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

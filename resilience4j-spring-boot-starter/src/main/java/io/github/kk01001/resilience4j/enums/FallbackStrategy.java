@@ -1,9 +1,9 @@
-package io.github.kk01001.resilience4j.enums;
+package io.github.archer099.resilience4j.enums;
 
 /**
  * 降级策略
  *
- * @author kk01001
+ * @author archer099
  */
 public enum FallbackStrategy {
     /**

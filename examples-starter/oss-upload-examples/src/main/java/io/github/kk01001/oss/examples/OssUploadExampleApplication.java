@@ -1,4 +1,4 @@
-package io.github.kk01001.oss.examples;
+package io.github.archer099.oss.examples;
 
 import jakarta.servlet.MultipartConfigElement;
 import org.springframework.boot.SpringApplication;

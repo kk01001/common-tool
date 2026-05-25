@@ -1,4 +1,4 @@
-package io.github.kk01001.oss.client;
+package io.github.archer099.oss.client;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
@@ -7,10 +7,10 @@ import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.amazonaws.services.s3.transfer.model.UploadResult;
 import com.amazonaws.util.IOUtils;
-import io.github.kk01001.oss.listener.CustomProgressListener;
-import io.github.kk01001.oss.listener.ProgressListenerAdapter;
-import io.github.kk01001.oss.model.ChunkDTO;
-import io.github.kk01001.oss.model.ChunkMergeDTO;
+import io.github.archer099.oss.listener.CustomProgressListener;
+import io.github.archer099.oss.listener.ProgressListenerAdapter;
+import io.github.archer099.oss.model.ChunkDTO;
+import io.github.archer099.oss.model.ChunkMergeDTO;
 import lombok.SneakyThrows;
 
 import java.io.ByteArrayInputStream;
@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2022-09-19 22:33:00
  */
 public class S3OssClient implements OssClient {

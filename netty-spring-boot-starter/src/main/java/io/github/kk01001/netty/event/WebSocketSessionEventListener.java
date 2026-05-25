@@ -1,12 +1,12 @@
-package io.github.kk01001.netty.event;
+package io.github.archer099.netty.event;
 
-import io.github.kk01001.netty.cluster.WebSocketClusterManager;
-import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.archer099.netty.cluster.WebSocketClusterManager;
+import io.github.archer099.netty.session.WebSocketSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 10:00:00
  * @description 会话事件监听器，将会话变更同步到集群管理器（由 AutoConfiguration 注册，不使用 @Component）
  */

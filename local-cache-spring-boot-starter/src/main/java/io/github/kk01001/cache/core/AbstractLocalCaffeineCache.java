@@ -1,4 +1,4 @@
-package io.github.kk01001.cache.core;
+package io.github.archer099.cache.core;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -10,7 +10,7 @@ import java.time.Duration;
 import java.util.function.Supplier;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-03-24 14:31:00
  * @description 抽象本地缓存类
  */

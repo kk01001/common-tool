@@ -1,7 +1,7 @@
-package io.github.kk01001.ip2region;
+package io.github.archer099.ip2region;
 
-import io.github.kk01001.ip2region.core.Ip2RegionProperties;
-import io.github.kk01001.ip2region.core.Ip2RegionTemplate;
+import io.github.archer099.ip2region.core.Ip2RegionProperties;
+import io.github.archer099.ip2region.core.Ip2RegionTemplate;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.lionsoul.ip2region.xdb.Searcher;

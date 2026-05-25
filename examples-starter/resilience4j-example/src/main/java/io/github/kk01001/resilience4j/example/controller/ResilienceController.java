@@ -1,8 +1,8 @@
-package io.github.kk01001.resilience4j.example.controller;
+package io.github.archer099.resilience4j.example.controller;
 
-import io.github.kk01001.resilience4j.example.service.RemoteService;
-import io.github.kk01001.resilience4j.example.service.ResilienceTestService;
-import io.github.kk01001.resilience4j.example.vo.ApiResponse;
+import io.github.archer099.resilience4j.example.service.RemoteService;
+import io.github.archer099.resilience4j.example.service.ResilienceTestService;
+import io.github.archer099.resilience4j.example.vo.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Resilience4j 测试控制器
  *
- * @author kk01001
+ * @author archer099
  */
 @RestController
 @RequestMapping("/api/resilience")

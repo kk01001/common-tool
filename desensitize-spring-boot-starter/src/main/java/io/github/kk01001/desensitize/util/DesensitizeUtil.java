@@ -1,12 +1,12 @@
-package io.github.kk01001.desensitize.util;
+package io.github.archer099.desensitize.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import io.github.kk01001.desensitize.handler.DesensitizeHandlerFactory;
-import io.github.kk01001.desensitize.jackson.DesensitizeSerializer;
+import io.github.archer099.desensitize.handler.DesensitizeHandlerFactory;
+import io.github.archer099.desensitize.jackson.DesensitizeSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -15,7 +15,7 @@ import org.springframework.context.ApplicationContextAware;
 /**
  * 脱敏工具类
  * 
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  */
 @Slf4j

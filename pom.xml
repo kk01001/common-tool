@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>common-tool</artifactId>
-    <version>2.4.9</version>
+    <version>2.5.0</version>
     <name>common-tool</name>
     <description>通用工具</description>
 
     <packaging>pom</packaging>
-    <url>https://github.com/kk01001/common-tool.git</url>
+    <url>https://github.com/archer099/common-tool.git</url>
 
     <modules>
         <module>examples</module>
@@ -231,18 +231,18 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/kk01001/common-tool.git</connection>
-        <developerConnection>scm:git:ssh://github.com:kk01001/common-tool.git</developerConnection>
-        <url>https://github.com/kk01001/common-tool.git</url>
+        <connection>scm:git:https://github.com/archer099/common-tool.git</connection>
+        <developerConnection>scm:git:ssh://github.com:archer099/common-tool.git</developerConnection>
+        <url>https://github.com/archer099/common-tool.git</url>
     </scm>
 
 
     <developers>
         <developer>
-            <name>kk01001</name>
+            <name>archer099</name>
             <email>656667021@qq.com</email>
-            <organization>kk01001</organization>
-            <organizationUrl>https://github.com/kk01001</organizationUrl>
+            <organization>archer099</organization>
+            <organizationUrl>https://github.com/archer099</organizationUrl>
         </developer>
     </developers>
 

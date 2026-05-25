@@ -1,9 +1,9 @@
-package io.github.kk01001.mqtt.exception;
+package io.github.archer099.mqtt.exception;
 
 /**
  * MQTT 连接异常
  *
- * @author kk01001
+ * @author archer099
  */
 public class MqttConnectionException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package io.github.kk01001.design.pattern.responsibility;
+package io.github.archer099.design.pattern.responsibility;
 
 import java.util.ArrayList;
 import java.util.HashMap;

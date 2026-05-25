@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@author kk01001
+@author archer099
 @date 2024-03-14 10:00:00
 @description MySQL 元数据查询工具
 """

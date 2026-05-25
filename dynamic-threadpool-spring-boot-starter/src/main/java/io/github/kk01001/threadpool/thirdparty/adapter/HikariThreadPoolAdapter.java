@@ -1,10 +1,10 @@
-package io.github.kk01001.threadpool.thirdparty.adapter;
+package io.github.archer099.threadpool.thirdparty.adapter;
 
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.HikariPoolMXBean;
-import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
-import io.github.kk01001.threadpool.thirdparty.ThirdPartyPoolType;
-import io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig;
+import io.github.archer099.threadpool.actuator.ThreadPoolMetrics;
+import io.github.archer099.threadpool.thirdparty.ThirdPartyPoolType;
+import io.github.archer099.threadpool.thirdparty.ThirdPartyThreadPoolConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * <p>
  * 用于动态管理 Hikari 数据库连接池的配置和监控
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class HikariThreadPoolAdapter extends AbstractThirdPartyThreadPoolAdapter {

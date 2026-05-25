@@ -1,18 +1,18 @@
-package io.github.kk01001.ffmpeg.examples.controller;
+package io.github.archer099.ffmpeg.examples.controller;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import io.github.kk01001.common.model.ApiResponse;
-import io.github.kk01001.ffmpeg.FfmpegProperties;
-import io.github.kk01001.ffmpeg.core.FfmpegService;
-import io.github.kk01001.ffmpeg.examples.dto.AudioHlsConvertDTO;
-import io.github.kk01001.ffmpeg.examples.dto.FfprobeRequestDTO;
-import io.github.kk01001.ffmpeg.examples.vo.AudioHlsConvertResultVO;
-import io.github.kk01001.ffmpeg.examples.vo.FfprobeResultVO;
-import io.github.kk01001.ffmpeg.model.AudioHlsRequest;
-import io.github.kk01001.ffmpeg.model.AudioHlsResult;
-import io.github.kk01001.ffmpeg.model.FfprobeResult;
+import io.github.archer099.common.model.ApiResponse;
+import io.github.archer099.ffmpeg.FfmpegProperties;
+import io.github.archer099.ffmpeg.core.FfmpegService;
+import io.github.archer099.ffmpeg.examples.dto.AudioHlsConvertDTO;
+import io.github.archer099.ffmpeg.examples.dto.FfprobeRequestDTO;
+import io.github.archer099.ffmpeg.examples.vo.AudioHlsConvertResultVO;
+import io.github.archer099.ffmpeg.examples.vo.FfprobeResultVO;
+import io.github.archer099.ffmpeg.model.AudioHlsRequest;
+import io.github.archer099.ffmpeg.model.AudioHlsResult;
+import io.github.archer099.ffmpeg.model.FfprobeResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 16:35:00
  * @description FFmpeg 示例接口：音频转 HLS 与 ffprobe
  */

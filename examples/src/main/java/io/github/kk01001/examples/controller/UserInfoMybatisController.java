@@ -1,7 +1,7 @@
-package io.github.kk01001.examples.controller;
+package io.github.archer099.examples.controller;
 
-import io.github.kk01001.examples.model.UserInfo;
-import io.github.kk01001.examples.service.IUserInfoMybatisService;
+import io.github.archer099.examples.model.UserInfo;
+import io.github.archer099.examples.service.IUserInfoMybatisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

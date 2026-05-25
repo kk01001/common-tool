@@ -1,7 +1,7 @@
-package io.github.kk01001.design.pattern.statemachine.guard;
+package io.github.archer099.design.pattern.statemachine.guard;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-04-07 14:31:00
  * @description 状态转换守卫接口，用于条件化状态转换判断
  */

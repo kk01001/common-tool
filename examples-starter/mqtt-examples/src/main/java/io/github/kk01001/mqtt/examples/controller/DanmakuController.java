@@ -1,9 +1,9 @@
-package io.github.kk01001.mqtt.examples.controller;
+package io.github.archer099.mqtt.examples.controller;
 
-import io.github.kk01001.common.model.ApiResponse;
-import io.github.kk01001.mqtt.examples.dto.DanmakuSendRequestDTO;
-import io.github.kk01001.mqtt.examples.service.DanmakuService;
-import io.github.kk01001.mqtt.examples.vo.DanmakuSendResponseVO;
+import io.github.archer099.common.model.ApiResponse;
+import io.github.archer099.mqtt.examples.dto.DanmakuSendRequestDTO;
+import io.github.archer099.mqtt.examples.service.DanmakuService;
+import io.github.archer099.mqtt.examples.vo.DanmakuSendResponseVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

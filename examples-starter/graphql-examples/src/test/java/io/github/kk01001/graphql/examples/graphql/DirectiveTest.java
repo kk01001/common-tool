@@ -1,4 +1,4 @@
-package io.github.kk01001.graphql.examples.graphql;
+package io.github.archer099.graphql.examples.graphql;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

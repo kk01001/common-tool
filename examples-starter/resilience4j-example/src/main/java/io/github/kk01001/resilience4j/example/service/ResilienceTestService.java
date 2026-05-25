@@ -1,7 +1,7 @@
-package io.github.kk01001.resilience4j.example.service;
+package io.github.archer099.resilience4j.example.service;
 
-import io.github.kk01001.resilience4j.annotation.*;
-import io.github.kk01001.resilience4j.enums.FallbackStrategy;
+import io.github.archer099.resilience4j.annotation.*;
+import io.github.archer099.resilience4j.enums.FallbackStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 /**
  * Resilience4j 测试服务
  *
- * @author kk01001
+ * @author archer099
  */
 @Service
 public class ResilienceTestService {

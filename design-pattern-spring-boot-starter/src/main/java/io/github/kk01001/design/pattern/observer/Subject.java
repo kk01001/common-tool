@@ -1,9 +1,9 @@
-package io.github.kk01001.design.pattern.observer;
+package io.github.archer099.design.pattern.observer;
 
 import java.util.EventObject;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 主题接口，所有消息实体都需要实现此接口以标识其所属主题
  */

@@ -1,7 +1,7 @@
-package io.github.kk01001.examples.design.statemachine;
+package io.github.archer099.examples.design.statemachine;
 
-import io.github.kk01001.design.pattern.statemachine.StateMachineFactory;
-import io.github.kk01001.design.pattern.statemachine.core.StateMachine;
+import io.github.archer099.design.pattern.statemachine.StateMachineFactory;
+import io.github.archer099.design.pattern.statemachine.core.StateMachine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-04-07 14:31:00
  * @description 订单控制器
  */

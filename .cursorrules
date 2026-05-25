@@ -11,12 +11,12 @@
 ## 生成的类需要添加注释
 /**  **/ 注释需要放在class上面  如果class上有注解 就放在注解上面
 格式为:
-- @author 作者 固定kk01001
+- @author 作者 固定archer099
 - @date 生成类的时间
 - @description 这个类的描述
 > 请根据以下格式生成注释：
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description
  */

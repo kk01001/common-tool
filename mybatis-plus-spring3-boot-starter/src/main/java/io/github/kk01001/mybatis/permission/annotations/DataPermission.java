@@ -1,4 +1,4 @@
-package io.github.kk01001.mybatis.permission.annotations;
+package io.github.archer099.mybatis.permission.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-02-13 14:31:00
  * @description 数据权限注解，用于标记需要数据权限控制的方法
  */

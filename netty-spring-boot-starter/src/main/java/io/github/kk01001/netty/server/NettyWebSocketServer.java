@@ -1,17 +1,17 @@
-package io.github.kk01001.netty.server;
+package io.github.archer099.netty.server;
 
-import io.github.kk01001.netty.auth.WebSocketAuthenticator;
-import io.github.kk01001.netty.cluster.WebSocketClusterManager;
-import io.github.kk01001.netty.config.ChannelOptionCustomizer;
-import io.github.kk01001.netty.config.NettyWebSocketProperties;
-import io.github.kk01001.netty.config.WebSocketPipelineConfigurer;
-import io.github.kk01001.netty.filter.MessageFilter;
-import io.github.kk01001.netty.handler.WebSocketFrameHandler;
-import io.github.kk01001.netty.handler.WebSocketHandshakeHandler;
-import io.github.kk01001.netty.handler.WebSocketHeartbeatHandler;
-import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
-import io.github.kk01001.netty.session.WebSocketSessionManager;
-import io.github.kk01001.netty.trace.MessageTracer;
+import io.github.archer099.netty.auth.WebSocketAuthenticator;
+import io.github.archer099.netty.cluster.WebSocketClusterManager;
+import io.github.archer099.netty.config.ChannelOptionCustomizer;
+import io.github.archer099.netty.config.NettyWebSocketProperties;
+import io.github.archer099.netty.config.WebSocketPipelineConfigurer;
+import io.github.archer099.netty.filter.MessageFilter;
+import io.github.archer099.netty.handler.WebSocketFrameHandler;
+import io.github.archer099.netty.handler.WebSocketHandshakeHandler;
+import io.github.archer099.netty.handler.WebSocketHeartbeatHandler;
+import io.github.archer099.netty.registry.WebSocketEndpointRegistry;
+import io.github.archer099.netty.session.WebSocketSessionManager;
+import io.github.archer099.netty.trace.MessageTracer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 10:00:00
  * @description Netty WebSocket 服务器，管理 Netty 生命周期和 Pipeline 配置
  */

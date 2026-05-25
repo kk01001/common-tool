@@ -1,6 +1,6 @@
-package io.github.kk01001.redisson.example.controller;
+package io.github.archer099.redisson.example.controller;
 
-import io.github.kk01001.redisson.template.MultiRedissonTemplate;
+import io.github.archer099.redisson.template.MultiRedissonTemplate;
 import org.redisson.api.GeoEntry;
 import org.redisson.api.GeoPosition;
 import org.redisson.api.GeoUnit;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-17 19:30:00
  * @description 地理位置 Demo - 附近的人/商家实战案例
  * <p>

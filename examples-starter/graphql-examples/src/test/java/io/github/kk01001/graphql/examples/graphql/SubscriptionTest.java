@@ -1,7 +1,7 @@
-package io.github.kk01001.graphql.examples.graphql;
+package io.github.archer099.graphql.examples.graphql;
 
-import io.github.kk01001.graphql.examples.dto.CreateBookInput;
-import io.github.kk01001.graphql.examples.model.Book;
+import io.github.archer099.graphql.examples.dto.CreateBookInput;
+import io.github.archer099.graphql.examples.model.Book;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

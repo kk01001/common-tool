@@ -1,4 +1,4 @@
-package io.github.kk01001.examples.design.observer.dto;
+package io.github.archer099.examples.design.observer.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-03-13 14:31:00
  * @description 天气数据响应DTO
  */

@@ -1,2 +1,2 @@
-io.github.kk01001.netty.config.NettyWebSocketAutoConfiguration
-io.github.kk01001.netty.config.NettyWebSocketClusterAutoConfiguration
+io.github.archer099.netty.config.NettyWebSocketAutoConfiguration
+io.github.archer099.netty.config.NettyWebSocketClusterAutoConfiguration

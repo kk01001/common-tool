@@ -1,6 +1,6 @@
-package io.github.kk01001.netty.cluster.model;
+package io.github.archer099.netty.cluster.model;
 
-import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.archer099.netty.session.WebSocketSession;
 import lombok.Data;
 
 @Data

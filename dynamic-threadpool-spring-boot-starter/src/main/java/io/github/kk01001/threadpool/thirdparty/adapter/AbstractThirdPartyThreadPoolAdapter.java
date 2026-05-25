@@ -1,9 +1,9 @@
-package io.github.kk01001.threadpool.thirdparty.adapter;
+package io.github.archer099.threadpool.thirdparty.adapter;
 
-import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
-import io.github.kk01001.threadpool.alarm.ThreadPoolAlarmHandler;
-import io.github.kk01001.threadpool.thirdparty.ThirdPartyPoolType;
-import io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig;
+import io.github.archer099.threadpool.actuator.ThreadPoolMetrics;
+import io.github.archer099.threadpool.alarm.ThreadPoolAlarmHandler;
+import io.github.archer099.threadpool.thirdparty.ThirdPartyPoolType;
+import io.github.archer099.threadpool.thirdparty.ThirdPartyThreadPoolConfig;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
  * <p>
  * 提供公共的模板方法和默认实现，子类只需实现特定的钩子方法
  * 
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public abstract class AbstractThirdPartyThreadPoolAdapter implements ThirdPartyThreadPoolAdapter {

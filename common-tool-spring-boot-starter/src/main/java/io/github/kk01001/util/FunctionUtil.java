@@ -1,4 +1,4 @@
-package io.github.kk01001.util;
+package io.github.archer099.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.function.ThrowingSupplier;

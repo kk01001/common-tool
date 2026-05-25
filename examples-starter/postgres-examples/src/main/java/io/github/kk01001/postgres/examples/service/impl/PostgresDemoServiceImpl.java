@@ -1,15 +1,15 @@
-package io.github.kk01001.postgres.examples.service.impl;
+package io.github.archer099.postgres.examples.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import io.github.kk01001.postgres.examples.dto.CreateUserDTO;
-import io.github.kk01001.postgres.examples.dto.IdDTO;
-import io.github.kk01001.postgres.examples.dto.PageQueryDTO;
-import io.github.kk01001.postgres.examples.dto.UpdateUserDTO;
-import io.github.kk01001.postgres.examples.entity.DemoUser;
-import io.github.kk01001.postgres.examples.mapper.DemoUserMapper;
-import io.github.kk01001.postgres.examples.service.PostgresDemoService;
-import io.github.kk01001.postgres.examples.vo.PageResultVO;
-import io.github.kk01001.postgres.examples.vo.UserVO;
+import io.github.archer099.postgres.examples.dto.CreateUserDTO;
+import io.github.archer099.postgres.examples.dto.IdDTO;
+import io.github.archer099.postgres.examples.dto.PageQueryDTO;
+import io.github.archer099.postgres.examples.dto.UpdateUserDTO;
+import io.github.archer099.postgres.examples.entity.DemoUser;
+import io.github.archer099.postgres.examples.mapper.DemoUserMapper;
+import io.github.archer099.postgres.examples.service.PostgresDemoService;
+import io.github.archer099.postgres.examples.vo.PageResultVO;
+import io.github.archer099.postgres.examples.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

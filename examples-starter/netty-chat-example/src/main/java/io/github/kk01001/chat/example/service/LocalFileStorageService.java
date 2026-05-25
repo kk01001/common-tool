@@ -1,4 +1,4 @@
-package io.github.kk01001.chat.example.service;
+package io.github.archer099.chat.example.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 19:00:00
  * @description 本地文件存储实现，文件按日期目录存储在项目本地
  */

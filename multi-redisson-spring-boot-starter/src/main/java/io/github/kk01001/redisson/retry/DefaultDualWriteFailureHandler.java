@@ -1,10 +1,10 @@
-package io.github.kk01001.redisson.retry;
+package io.github.archer099.redisson.retry;
 
-import io.github.kk01001.redisson.circuitbreaker.CircuitBreakerState;
-import io.github.kk01001.redisson.circuitbreaker.CircuitBreakerStateChangeListener;
-import io.github.kk01001.redisson.circuitbreaker.DualWriteCircuitBreaker;
-import io.github.kk01001.redisson.monitor.DualWriteMetrics;
-import io.github.kk01001.redisson.properties.MultiRedissonProperties;
+import io.github.archer099.redisson.circuitbreaker.CircuitBreakerState;
+import io.github.archer099.redisson.circuitbreaker.CircuitBreakerStateChangeListener;
+import io.github.archer099.redisson.circuitbreaker.DualWriteCircuitBreaker;
+import io.github.archer099.redisson.monitor.DualWriteMetrics;
+import io.github.archer099.redisson.properties.MultiRedissonProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-06 21:32:00
  * @description 默认的双写失败处理器，基于内存队列 + 后台线程重试
  * <p>

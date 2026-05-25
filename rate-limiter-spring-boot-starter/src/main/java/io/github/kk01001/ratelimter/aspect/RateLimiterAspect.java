@@ -1,9 +1,9 @@
-package io.github.kk01001.ratelimter.aspect;
+package io.github.archer099.ratelimter.aspect;
 
 import cn.hutool.core.util.StrUtil;
-import io.github.kk01001.ratelimter.core.RateLimiterFactory;
-import io.github.kk01001.ratelimter.exception.RateLimitException;
-import io.github.kk01001.ratelimter.model.FlowRule;
+import io.github.archer099.ratelimter.core.RateLimiterFactory;
+import io.github.archer099.ratelimter.exception.RateLimitException;
+import io.github.archer099.ratelimter.model.FlowRule;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

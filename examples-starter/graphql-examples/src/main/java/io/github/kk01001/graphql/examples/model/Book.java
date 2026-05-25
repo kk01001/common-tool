@@ -1,4 +1,4 @@
-package io.github.kk01001.graphql.examples.model;
+package io.github.archer099.graphql.examples.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

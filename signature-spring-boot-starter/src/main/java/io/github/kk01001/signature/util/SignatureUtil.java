@@ -1,4 +1,4 @@
-package io.github.kk01001.signature.util;
+package io.github.archer099.signature.util;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -6,14 +6,14 @@ import cn.hutool.crypto.digest.HMac;
 import cn.hutool.crypto.digest.HmacAlgorithm;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import io.github.kk01001.signature.core.SignatureAlgorithm;
+import io.github.archer099.signature.core.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description 签名工具类
  */

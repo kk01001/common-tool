@@ -1,6 +1,6 @@
-package io.github.kk01001.chat.example.ws;
+package io.github.archer099.chat.example.ws;
 
-import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.archer099.netty.session.WebSocketSession;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 18:00:00
  * @description 在线用户管理器
  */

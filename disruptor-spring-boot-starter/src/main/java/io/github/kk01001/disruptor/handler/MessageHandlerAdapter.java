@@ -1,10 +1,10 @@
-package io.github.kk01001.disruptor.handler;
+package io.github.archer099.disruptor.handler;
 
 import com.lmax.disruptor.EventHandler;
-import io.github.kk01001.disruptor.event.DisruptorEvent;
+import io.github.archer099.disruptor.event.DisruptorEvent;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-19 10:15:47
  * @description 消息处理器适配器
  */

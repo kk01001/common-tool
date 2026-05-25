@@ -1,13 +1,13 @@
-package io.github.kk01001.mybatis;
+package io.github.archer099.mybatis;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import io.github.kk01001.mybatis.core.DynamicTableProperties;
-import io.github.kk01001.mybatis.core.EasySqlInjector;
-import io.github.kk01001.mybatis.core.RequestDataHelper;
+import io.github.archer099.mybatis.core.DynamicTableProperties;
+import io.github.archer099.mybatis.core.EasySqlInjector;
+import io.github.archer099.mybatis.core.RequestDataHelper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +17,7 @@ import org.springframework.util.StringUtils;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2022-09-20 21:51:00
  */
 @Configuration(proxyBeanMethods = false)

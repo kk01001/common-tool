@@ -1,7 +1,7 @@
-package io.github.kk01001.redisson.monitor;
+package io.github.archer099.redisson.monitor;
 
-import io.github.kk01001.redisson.circuitbreaker.DualWriteCircuitBreaker;
-import io.github.kk01001.redisson.properties.MultiRedissonProperties;
+import io.github.archer099.redisson.circuitbreaker.DualWriteCircuitBreaker;
+import io.github.archer099.redisson.properties.MultiRedissonProperties;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 19:00:00
  * @description 熔断器操作端点
  * <p>

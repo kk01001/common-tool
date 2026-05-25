@@ -1,11 +1,11 @@
-package io.github.kk01001.mybatis.permission.service;
+package io.github.archer099.mybatis.permission.service;
 
-import io.github.kk01001.mybatis.permission.annotations.DataColumn;
+import io.github.archer099.mybatis.permission.annotations.DataColumn;
 
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-02-13 14:31:00
  * @description 用户权限服务接口，用于获取用户权限数据
  */

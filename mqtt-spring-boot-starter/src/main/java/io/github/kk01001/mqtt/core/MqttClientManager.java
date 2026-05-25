@@ -1,7 +1,7 @@
-package io.github.kk01001.mqtt.core;
+package io.github.archer099.mqtt.core;
 
-import io.github.kk01001.mqtt.config.MqttProperties;
-import io.github.kk01001.mqtt.config.MqttSslProperties;
+import io.github.archer099.mqtt.config.MqttProperties;
+import io.github.archer099.mqtt.config.MqttSslProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * MQTT 客户端管理器
  * 负责创建、管理和维护 MQTT 客户端连接
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class MqttClientManager {

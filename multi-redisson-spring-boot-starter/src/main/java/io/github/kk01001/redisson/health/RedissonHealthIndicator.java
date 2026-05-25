@@ -1,6 +1,6 @@
-package io.github.kk01001.redisson.health;
+package io.github.archer099.redisson.health;
 
-import io.github.kk01001.redisson.holder.RedissonClientHolder;
+import io.github.archer099.redisson.holder.RedissonClientHolder;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 17:00:00
  * @description Redisson 健康检查指示器
  */

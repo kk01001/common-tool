@@ -1,7 +1,7 @@
-package io.github.kk01001.design.pattern.statemachine.core;
+package io.github.archer099.design.pattern.statemachine.core;
 
-import io.github.kk01001.design.pattern.statemachine.annotations.StateTransition;
-import io.github.kk01001.design.pattern.statemachine.guard.StateTransitionGuard;
+import io.github.archer099.design.pattern.statemachine.annotations.StateTransition;
+import io.github.archer099.design.pattern.statemachine.guard.StateTransitionGuard;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-04-07 14:31:00
  * @description 默认状态转换处理器
  */

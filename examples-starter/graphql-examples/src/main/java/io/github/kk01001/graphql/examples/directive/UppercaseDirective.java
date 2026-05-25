@@ -1,4 +1,4 @@
-package io.github.kk01001.graphql.examples.directive;
+package io.github.archer099.graphql.examples.directive;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLFieldDefinition;

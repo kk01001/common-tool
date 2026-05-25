@@ -1,4 +1,4 @@
-package io.github.kk01001.gateway.loadbalancer;
+package io.github.archer099.gateway.loadbalancer;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-01-08 17:05:00
  * @description 灰度发布负载均衡器
  */

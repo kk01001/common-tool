@@ -1,7 +1,7 @@
-package io.github.kk01001.idempotent.core;
+package io.github.archer099.idempotent.core;
 
-import io.github.kk01001.idempotent.config.IdempotentProperties;
-import io.github.kk01001.idempotent.exception.IdempotentException;
+import io.github.archer099.idempotent.config.IdempotentProperties;
+import io.github.archer099.idempotent.exception.IdempotentException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
@@ -10,7 +10,7 @@ import org.redisson.api.RedissonClient;
 import java.time.Duration;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description Redis幂等执行器
  */

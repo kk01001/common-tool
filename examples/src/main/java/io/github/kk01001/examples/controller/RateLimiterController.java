@@ -1,8 +1,8 @@
-package io.github.kk01001.examples.controller;
+package io.github.archer099.examples.controller;
 
-import io.github.kk01001.examples.model.DataModel;
-import io.github.kk01001.ratelimter.aspect.RateLimiter;
-import io.github.kk01001.ratelimter.enums.RateLimiterType;
+import io.github.archer099.examples.model.DataModel;
+import io.github.archer099.ratelimter.aspect.RateLimiter;
+import io.github.archer099.ratelimter.enums.RateLimiterType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

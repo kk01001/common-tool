@@ -1,4 +1,4 @@
-package io.github.kk01001.ratelimter.enums;
+package io.github.archer099.ratelimter.enums;
 
 import org.redisson.api.RRateLimiter;
 

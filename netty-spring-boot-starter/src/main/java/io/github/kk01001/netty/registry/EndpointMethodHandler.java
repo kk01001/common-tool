@@ -1,4 +1,4 @@
-package io.github.kk01001.netty.registry;
+package io.github.archer099.netty.registry;
 
 import lombok.Data;
 

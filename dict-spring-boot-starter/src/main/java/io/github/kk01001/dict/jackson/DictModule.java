@@ -1,4 +1,4 @@
-package io.github.kk01001.dict.jackson;
+package io.github.archer099.dict.jackson;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.Module;

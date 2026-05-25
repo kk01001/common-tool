@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.model;
+package io.github.archer099.examples.model;
 
-import io.github.kk01001.dict.annotation.Dict;
+import io.github.archer099.dict.annotation.Dict;
 import lombok.Data;
 
 @Data

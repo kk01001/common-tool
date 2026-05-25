@@ -1,16 +1,16 @@
-package io.github.kk01001.desensitize.fastjson;
+package io.github.archer099.desensitize.fastjson;
 
 import com.alibaba.fastjson.serializer.ValueFilter;
-import io.github.kk01001.desensitize.annotation.Desensitize;
-import io.github.kk01001.desensitize.enums.DesensitizeType;
-import io.github.kk01001.desensitize.handler.DesensitizeHandler;
-import io.github.kk01001.desensitize.handler.DesensitizeHandlerFactory;
+import io.github.archer099.desensitize.annotation.Desensitize;
+import io.github.archer099.desensitize.enums.DesensitizeType;
+import io.github.archer099.desensitize.handler.DesensitizeHandler;
+import io.github.archer099.desensitize.handler.DesensitizeHandlerFactory;
 import lombok.RequiredArgsConstructor;
 
 import java.lang.reflect.Field;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description
  */

@@ -34,7 +34,7 @@
 ```xml
 
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>mqtt-spring-boot-starter</artifactId>
     <version>latest</version>
 </dependency>

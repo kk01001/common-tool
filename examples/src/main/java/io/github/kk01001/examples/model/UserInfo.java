@@ -1,10 +1,10 @@
-package io.github.kk01001.examples.model;
+package io.github.archer099.examples.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import io.github.kk01001.crypto.annotation.CryptoField;
-import io.github.kk01001.desensitize.annotation.Desensitize;
-import io.github.kk01001.desensitize.enums.DesensitizeType;
+import io.github.archer099.crypto.annotation.CryptoField;
+import io.github.archer099.desensitize.annotation.Desensitize;
+import io.github.archer099.desensitize.enums.DesensitizeType;
 import lombok.Data;
 
 @Data

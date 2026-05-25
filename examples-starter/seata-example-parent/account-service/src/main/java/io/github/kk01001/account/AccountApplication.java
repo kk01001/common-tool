@@ -1,4 +1,4 @@
-package io.github.kk01001.account;
+package io.github.archer099.account;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

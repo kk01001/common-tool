@@ -1,6 +1,6 @@
-package io.github.kk01001.docs.config;
+package io.github.archer099.docs.config;
 
-import io.github.kk01001.docs.properties.SwaggerProperties;
+import io.github.archer099.docs.properties.SwaggerProperties;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;

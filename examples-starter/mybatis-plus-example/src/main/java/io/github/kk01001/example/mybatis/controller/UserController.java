@@ -1,8 +1,8 @@
-package io.github.kk01001.example.mybatis.controller;
+package io.github.archer099.example.mybatis.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.kk01001.example.mybatis.entity.User;
-import io.github.kk01001.example.mybatis.service.UserService;
+import io.github.archer099.example.mybatis.entity.User;
+import io.github.archer099.example.mybatis.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * 用户控制器
  *
- * @author kk01001
+ * @author archer099
  */
 @RestController
 @RequestMapping("/api/users")

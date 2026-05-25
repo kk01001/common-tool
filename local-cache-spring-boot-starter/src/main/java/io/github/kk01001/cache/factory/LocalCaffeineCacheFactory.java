@@ -1,7 +1,7 @@
-package io.github.kk01001.cache.factory;
+package io.github.archer099.cache.factory;
 
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
-import io.github.kk01001.cache.core.AbstractLocalCaffeineCache;
+import io.github.archer099.cache.core.AbstractLocalCaffeineCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-03-24 14:31:00
  * @description 本地缓存工厂
  */

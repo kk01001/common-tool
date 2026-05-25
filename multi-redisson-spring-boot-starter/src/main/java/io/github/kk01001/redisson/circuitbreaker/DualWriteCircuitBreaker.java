@@ -1,6 +1,6 @@
-package io.github.kk01001.redisson.circuitbreaker;
+package io.github.archer099.redisson.circuitbreaker;
 
-import io.github.kk01001.redisson.properties.MultiRedissonProperties;
+import io.github.archer099.redisson.properties.MultiRedissonProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 18:00:00
  * @description 双写熔断器
  * <p>

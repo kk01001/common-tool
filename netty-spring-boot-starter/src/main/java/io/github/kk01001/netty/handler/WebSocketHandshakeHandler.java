@@ -1,11 +1,11 @@
-package io.github.kk01001.netty.handler;
+package io.github.archer099.netty.handler;
 
-import io.github.kk01001.netty.auth.WebSocketAuthenticator;
-import io.github.kk01001.netty.config.NettyWebSocketProperties;
-import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
-import io.github.kk01001.netty.session.WebSocketSession;
-import io.github.kk01001.netty.session.WebSocketSessionManager;
-import io.github.kk01001.netty.trace.MessageTracer;
+import io.github.archer099.netty.auth.WebSocketAuthenticator;
+import io.github.archer099.netty.config.NettyWebSocketProperties;
+import io.github.archer099.netty.registry.WebSocketEndpointRegistry;
+import io.github.archer099.netty.session.WebSocketSession;
+import io.github.archer099.netty.session.WebSocketSessionManager;
+import io.github.archer099.netty.trace.MessageTracer;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.UUID;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 10:00:00
  * @description WebSocket 握手处理器，统一处理 HTTP 升级、鉴权、Session 创建。
  *              每个 Channel 创建一个新实例（非 Sharable）。

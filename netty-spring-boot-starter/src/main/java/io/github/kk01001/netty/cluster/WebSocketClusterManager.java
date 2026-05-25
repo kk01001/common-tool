@@ -1,6 +1,6 @@
-package io.github.kk01001.netty.cluster;
+package io.github.archer099.netty.cluster;
 
-import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.archer099.netty.session.WebSocketSession;
 
 /**
  * WebSocket集群管理接口

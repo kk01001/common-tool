@@ -17,7 +17,7 @@
 
 ## Spring Boot 测试程序
 
-- **类路径**：`src/test/java/io/github/kk01001/mqtt/MqttTestApplication.java`
+- **类路径**：`src/test/java/io/github/archer099/mqtt/MqttTestApplication.java`
 - **作用**：启动后每 100ms 向 `demo/topic` 发布一条 JSON 消息，共发送 100 条。
 
 ### 运行步骤

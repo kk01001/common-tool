@@ -1,7 +1,7 @@
-package io.github.kk01001.examples.data.scope;
+package io.github.archer099.examples.data.scope;
 
-import io.github.kk01001.mybatis.permission.annotations.DataColumn;
-import io.github.kk01001.mybatis.permission.service.UserPermissionService;
+import io.github.archer099.mybatis.permission.annotations.DataColumn;
+import io.github.archer099.mybatis.permission.service.UserPermissionService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

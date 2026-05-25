@@ -1,6 +1,6 @@
-package io.github.kk01001.order.feign;
+package io.github.archer099.order.feign;
 
-import io.github.kk01001.seata.common.result.Result;
+import io.github.archer099.seata.common.result.Result;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;

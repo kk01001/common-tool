@@ -1,6 +1,6 @@
 # 多Redis实例 Spring Boot Starter
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/multi-redis-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.kk01001/multi-redis-spring-boot-starter)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.archer099/multi-redis-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.archer099/multi-redis-spring-boot-starter)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 **一句话概述：** 基于 [Redisson](https://github.com/redisson/redisson) 的多Redis实例配置组件，支持同时连接多个Redis集群，实现数据多机房同步和读写分离。
@@ -45,7 +45,7 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>multi-redis-spring-boot-starter</artifactId>
     <version>${latest.version}</version>
 </dependency>
@@ -95,7 +95,7 @@ spring:
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 用户服务
  */
@@ -150,7 +150,7 @@ public class UserService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 产品服务
  */
@@ -202,7 +202,7 @@ public class ProductService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 排行榜服务
  */
@@ -258,7 +258,7 @@ public class LeaderboardService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 消息队列服务
  */
@@ -311,7 +311,7 @@ public class MessageQueueService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description Redis直接访问服务
  */
@@ -484,7 +484,7 @@ spring:
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description Redis选择策略
  */
@@ -517,7 +517,7 @@ public class RedisLocationStrategy {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description Redis容错服务
  */
@@ -597,7 +597,7 @@ public class RedisFaultTolerantService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description Redis监控服务
  */

@@ -1,4 +1,4 @@
-package io.github.kk01001.i18n.service;
+package io.github.archer099.i18n.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;

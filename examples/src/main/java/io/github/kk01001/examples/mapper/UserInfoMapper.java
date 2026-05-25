@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.mapper;
+package io.github.archer099.examples.mapper;
 
-import io.github.kk01001.examples.model.UserInfo;
+import io.github.archer099.examples.model.UserInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

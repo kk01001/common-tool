@@ -16,4 +16,4 @@ spring:
 
 logging:
   level:
-    io.github.kk01001: DEBUG
+    io.github.archer099: DEBUG

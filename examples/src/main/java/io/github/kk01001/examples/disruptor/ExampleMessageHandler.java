@@ -1,7 +1,7 @@
-package io.github.kk01001.examples.disruptor;
+package io.github.archer099.examples.disruptor;
 
-import io.github.kk01001.disruptor.event.DisruptorEvent;
-import io.github.kk01001.disruptor.handler.MessageHandler;
+import io.github.archer099.disruptor.event.DisruptorEvent;
+import io.github.archer099.disruptor.handler.MessageHandler;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

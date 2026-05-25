@@ -1,4 +1,4 @@
-package io.github.kk01001.redis.examples.vo;
+package io.github.archer099.redis.examples.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 /**
  * Serialization result VO
  * 
- * @author kk01001
+ * @author archer099
  */
 @Data
 @NoArgsConstructor

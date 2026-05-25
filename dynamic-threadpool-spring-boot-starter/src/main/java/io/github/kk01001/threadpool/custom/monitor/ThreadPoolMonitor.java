@@ -1,8 +1,8 @@
-package io.github.kk01001.threadpool.custom.monitor;
+package io.github.archer099.threadpool.custom.monitor;
 
-import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
-import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
+import io.github.archer099.threadpool.actuator.ThreadPoolMetrics;
+import io.github.archer099.threadpool.custom.config.DynamicThreadPoolProperties;
+import io.github.archer099.threadpool.registry.ThreadPoolRegistry;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import java.util.Map;
  * 线程池监控器
  * 定时采集线程池指标并发布
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class ThreadPoolMonitor {

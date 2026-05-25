@@ -1,4 +1,4 @@
-package io.github.kk01001.design.pattern.observer;
+package io.github.archer099.design.pattern.observer;
 
 /**
  * @author linshiqiang

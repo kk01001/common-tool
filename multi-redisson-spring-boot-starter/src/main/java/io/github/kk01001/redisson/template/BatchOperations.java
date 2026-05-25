@@ -1,10 +1,10 @@
-package io.github.kk01001.redisson.template;
+package io.github.archer099.redisson.template;
 
-import io.github.kk01001.redisson.circuitbreaker.DualWriteCircuitBreaker;
-import io.github.kk01001.redisson.monitor.DualWriteMetrics;
-import io.github.kk01001.redisson.properties.MultiRedissonProperties;
-import io.github.kk01001.redisson.retry.DualWriteFailureHandler;
-import io.github.kk01001.redisson.retry.RetryTask;
+import io.github.archer099.redisson.circuitbreaker.DualWriteCircuitBreaker;
+import io.github.archer099.redisson.monitor.DualWriteMetrics;
+import io.github.archer099.redisson.properties.MultiRedissonProperties;
+import io.github.archer099.redisson.retry.DualWriteFailureHandler;
+import io.github.archer099.redisson.retry.RetryTask;
 import org.redisson.api.BatchOptions;
 import org.redisson.api.BatchResult;
 import org.redisson.api.RBatch;
@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 17:30:00
  * @description 批量操作封装类，支持 Pipeline 模式
  */

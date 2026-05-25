@@ -1,7 +1,7 @@
-package io.github.kk01001.crypto.config;
+package io.github.archer099.crypto.config;
 
-import io.github.kk01001.crypto.ParamsCryptoProvider;
-import io.github.kk01001.crypto.enums.CryptoType;
+import io.github.archer099.crypto.ParamsCryptoProvider;
+import io.github.archer099.crypto.enums.CryptoType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent;
 import org.springframework.context.event.EventListener;

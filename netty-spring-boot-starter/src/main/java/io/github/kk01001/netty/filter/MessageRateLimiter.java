@@ -1,6 +1,6 @@
-package io.github.kk01001.netty.filter;
+package io.github.archer099.netty.filter;
 
-import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.archer099.netty.session.WebSocketSession;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Iterator;
@@ -11,7 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 10:00:00
  * @description 消息频率限制过滤器，定期清理已断开连接的计数器防止内存泄漏
  */

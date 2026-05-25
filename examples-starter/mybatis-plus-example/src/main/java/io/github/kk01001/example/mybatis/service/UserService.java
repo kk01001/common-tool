@@ -1,14 +1,14 @@
-package io.github.kk01001.example.mybatis.service;
+package io.github.archer099.example.mybatis.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.kk01001.example.mybatis.entity.User;
+import io.github.archer099.example.mybatis.entity.User;
 
 import java.util.List;
 
 /**
  * 用户服务接口
  *
- * @author kk01001
+ * @author archer099
  */
 public interface UserService {
 

@@ -1,4 +1,4 @@
-package io.github.kk01001.account.service;
+package io.github.archer099.account.service;
 
 public interface AccountService {
     /**

@@ -1,4 +1,4 @@
-package io.github.kk01001.postgres.examples.dto;
+package io.github.archer099.postgres.examples.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;

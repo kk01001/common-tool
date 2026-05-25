@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.log;
+package io.github.archer099.examples.log;
 
-import io.github.kk01001.common.log.annotation.OperationType;
+import io.github.archer099.common.log.annotation.OperationType;
 import lombok.Data;
 
 /**

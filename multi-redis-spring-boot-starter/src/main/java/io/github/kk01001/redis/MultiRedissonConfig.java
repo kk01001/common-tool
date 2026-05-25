@@ -1,4 +1,4 @@
-package io.github.kk01001.redis;
+package io.github.archer099.redis;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2021/8/26 10:20
  * redisson 多机房配置
  */
-@ComponentScan(basePackages = "io.github.kk01001.redis")
+@ComponentScan(basePackages = "io.github.archer099.redis")
 @Configuration
 public class MultiRedissonConfig {
 

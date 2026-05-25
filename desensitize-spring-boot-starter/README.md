@@ -1,6 +1,6 @@
 # 数据脱敏 Spring Boot Starter
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/desensitize-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.kk01001/desensitize-spring-boot-starter)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.archer099/desensitize-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.archer099/desensitize-spring-boot-starter)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 **一句话概述：** 轻量级、易扩展的数据脱敏解决方案，支持多种脱敏策略，兼容主流JSON框架，通过简单注解即可保护敏感数据安全。
@@ -45,7 +45,7 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>desensitize-spring-boot-starter</artifactId>
     <version>${latest.version}</version>
 </dependency>
@@ -66,7 +66,7 @@ desensitize:
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 用户实体类
  */
@@ -99,7 +99,7 @@ public class UserDTO {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 用户控制器
  */
@@ -123,7 +123,7 @@ public class UserController {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 订单实体类
  */
@@ -149,7 +149,7 @@ public class OrderDTO {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 日志服务
  */
@@ -197,7 +197,7 @@ public class LogService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 自定义脱敏处理器
  */
@@ -225,7 +225,7 @@ public class MyCustomDesensitizeHandler implements DesensitizeHandler {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 海外手机号脱敏处理器
  */
@@ -260,7 +260,7 @@ public class OverseasPhoneDesensitizeHandler extends AbstractDesensitizeHandler 
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description Jackson配置类
  */
@@ -287,7 +287,7 @@ public class JacksonConfig {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description FastJson配置类
  */

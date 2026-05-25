@@ -1,4 +1,4 @@
-package io.github.kk01001.sensitive.core;
+package io.github.archer099.sensitive.core;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 敏感词检测结果
  */

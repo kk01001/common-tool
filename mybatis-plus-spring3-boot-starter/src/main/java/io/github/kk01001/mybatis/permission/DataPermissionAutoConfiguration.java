@@ -1,11 +1,11 @@
-package io.github.kk01001.mybatis.permission;
+package io.github.archer099.mybatis.permission;
 
-import io.github.kk01001.mybatis.MybatisPlusConfiguration;
-import io.github.kk01001.mybatis.permission.handler.DataPermissionHandlerFactory;
-import io.github.kk01001.mybatis.permission.handler.SelfAndSubDataPermissionHandler;
-import io.github.kk01001.mybatis.permission.handler.SelfDataPermissionHandler;
-import io.github.kk01001.mybatis.permission.interceptor.DataPermissionInterceptor;
-import io.github.kk01001.mybatis.permission.service.UserPermissionService;
+import io.github.archer099.mybatis.MybatisPlusConfiguration;
+import io.github.archer099.mybatis.permission.handler.DataPermissionHandlerFactory;
+import io.github.archer099.mybatis.permission.handler.SelfAndSubDataPermissionHandler;
+import io.github.archer099.mybatis.permission.handler.SelfDataPermissionHandler;
+import io.github.archer099.mybatis.permission.interceptor.DataPermissionInterceptor;
+import io.github.archer099.mybatis.permission.service.UserPermissionService;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-02-13 14:31:00
  * @description 数据权限自动配置类
  */

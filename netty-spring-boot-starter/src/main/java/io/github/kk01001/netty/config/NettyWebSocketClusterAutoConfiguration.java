@@ -1,13 +1,13 @@
-package io.github.kk01001.netty.config;
+package io.github.archer099.netty.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.kk01001.netty.cluster.ClusterMessageHandler;
-import io.github.kk01001.netty.cluster.DefaultClusterMessageHandler;
-import io.github.kk01001.netty.cluster.RedisWebSocketClusterManager;
-import io.github.kk01001.netty.cluster.WebSocketClusterManager;
-import io.github.kk01001.netty.event.WebSocketMessageEventListener;
-import io.github.kk01001.netty.event.WebSocketSessionEventListener;
-import io.github.kk01001.netty.message.MessageDispatcher;
+import io.github.archer099.netty.cluster.ClusterMessageHandler;
+import io.github.archer099.netty.cluster.DefaultClusterMessageHandler;
+import io.github.archer099.netty.cluster.RedisWebSocketClusterManager;
+import io.github.archer099.netty.cluster.WebSocketClusterManager;
+import io.github.archer099.netty.event.WebSocketMessageEventListener;
+import io.github.archer099.netty.event.WebSocketSessionEventListener;
+import io.github.archer099.netty.message.MessageDispatcher;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,7 +20,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 17:50:00
  * @description Netty WebSocket 集群模式自动配置，隔离 Redis 依赖避免类加载失败
  */

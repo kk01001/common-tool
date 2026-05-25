@@ -1,6 +1,6 @@
-package io.github.kk01001.netty.session;
+package io.github.archer099.netty.session;
 
-import io.github.kk01001.netty.trace.MessageTracer;
+import io.github.archer099.netty.trace.MessageTracer;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 10:00:00
  * @description WebSocket 会话，封装连接通道和会话属性
  */

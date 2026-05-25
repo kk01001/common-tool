@@ -1,4 +1,4 @@
-package io.github.kk01001.design.pattern.strategy.exception;
+package io.github.archer099.design.pattern.strategy.exception;
 
 import lombok.Getter;
 

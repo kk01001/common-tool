@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.design.statemachine;
+package io.github.archer099.examples.design.statemachine;
 
-import io.github.kk01001.design.pattern.statemachine.guard.StateTransitionGuard;
+import io.github.archer099.design.pattern.statemachine.guard.StateTransitionGuard;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-04-07 14:31:00
  * @description 订单取消时间守卫条件，限制在订单创建后30分钟内才能取消
  */

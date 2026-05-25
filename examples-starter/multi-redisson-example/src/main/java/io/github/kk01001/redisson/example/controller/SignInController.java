@@ -1,6 +1,6 @@
-package io.github.kk01001.redisson.example.controller;
+package io.github.archer099.redisson.example.controller;
 
-import io.github.kk01001.redisson.template.MultiRedissonTemplate;
+import io.github.archer099.redisson.template.MultiRedissonTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-17 19:30:00
  * @description 签到系统 Demo - 使用 BitSet 实现用户签到
  * <p>

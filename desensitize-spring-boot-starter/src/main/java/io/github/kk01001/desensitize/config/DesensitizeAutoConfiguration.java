@@ -1,8 +1,8 @@
-package io.github.kk01001.desensitize.config;
+package io.github.archer099.desensitize.config;
 
-import io.github.kk01001.desensitize.handler.DesensitizeHandlerFactory;
-import io.github.kk01001.desensitize.properties.DesensitizeProperties;
-import io.github.kk01001.desensitize.util.DesensitizeUtil;
+import io.github.archer099.desensitize.handler.DesensitizeHandlerFactory;
+import io.github.archer099.desensitize.properties.DesensitizeProperties;
+import io.github.archer099.desensitize.util.DesensitizeUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description
  */

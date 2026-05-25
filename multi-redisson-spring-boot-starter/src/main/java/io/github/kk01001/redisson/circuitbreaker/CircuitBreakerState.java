@@ -1,7 +1,7 @@
-package io.github.kk01001.redisson.circuitbreaker;
+package io.github.archer099.redisson.circuitbreaker;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 18:00:00
  * @description 熔断器状态枚举
  */

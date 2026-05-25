@@ -1,6 +1,6 @@
-package io.github.kk01001.localmessage.example;
+package io.github.archer099.localmessage.example;
 
-import io.github.kk01001.localmessage.service.LocalMessageService;
+import io.github.archer099.localmessage.service.LocalMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
  * 订单服务示例
  * 演示如何在业务代码中使用本地消息表
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Service

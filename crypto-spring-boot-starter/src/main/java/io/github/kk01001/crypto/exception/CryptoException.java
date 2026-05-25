@@ -1,4 +1,4 @@
-package io.github.kk01001.crypto.exception;
+package io.github.archer099.crypto.exception;
 
 public class CryptoException extends RuntimeException {
     

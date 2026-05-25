@@ -1,9 +1,9 @@
-package io.github.kk01001.resilience4j.exception;
+package io.github.archer099.resilience4j.exception;
 
 /**
  * Resilience4j 异常
  *
- * @author kk01001
+ * @author archer099
  */
 public class ResilienceException extends RuntimeException {
 

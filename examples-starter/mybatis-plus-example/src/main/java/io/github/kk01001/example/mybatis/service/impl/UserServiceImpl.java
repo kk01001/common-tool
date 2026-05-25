@@ -1,10 +1,10 @@
-package io.github.kk01001.example.mybatis.service.impl;
+package io.github.archer099.example.mybatis.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.kk01001.example.mybatis.entity.User;
-import io.github.kk01001.example.mybatis.mapper.UserMapper;
-import io.github.kk01001.example.mybatis.service.UserService;
+import io.github.archer099.example.mybatis.entity.User;
+import io.github.archer099.example.mybatis.mapper.UserMapper;
+import io.github.archer099.example.mybatis.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 用户服务实现类
  *
- * @author kk01001
+ * @author archer099
  */
 @Service
 @RequiredArgsConstructor

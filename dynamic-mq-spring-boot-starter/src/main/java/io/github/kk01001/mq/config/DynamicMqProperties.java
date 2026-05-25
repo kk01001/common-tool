@@ -1,11 +1,11 @@
-package io.github.kk01001.mq.config;
+package io.github.archer099.mq.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-08-23 09:27:00
  * @description
  */

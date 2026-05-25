@@ -1,7 +1,7 @@
-package io.github.kk01001.script.cache;
+package io.github.archer099.script.cache;
 
 import cn.hutool.crypto.SecureUtil;
-import io.github.kk01001.script.enums.ScriptType;
+import io.github.archer099.script.enums.ScriptType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-19 15:30:00
  * @description 脚本缓存管理器
  */

@@ -1,14 +1,14 @@
-package io.github.kk01001.design.pattern.statemachine;
+package io.github.archer099.design.pattern.statemachine;
 
-import io.github.kk01001.design.pattern.statemachine.annotations.StateMachineDefinition;
-import io.github.kk01001.design.pattern.statemachine.annotations.StateTransition;
-import io.github.kk01001.design.pattern.statemachine.annotations.TransitionGuard;
-import io.github.kk01001.design.pattern.statemachine.core.DefaultTransitionHandler;
-import io.github.kk01001.design.pattern.statemachine.core.StateMachine;
-import io.github.kk01001.design.pattern.statemachine.core.StateMachineBuilder;
-import io.github.kk01001.design.pattern.statemachine.core.StateTransitionHandler;
-import io.github.kk01001.design.pattern.statemachine.guard.StateTransitionGuard;
-import io.github.kk01001.design.pattern.statemachine.persister.StatePersister;
+import io.github.archer099.design.pattern.statemachine.annotations.StateMachineDefinition;
+import io.github.archer099.design.pattern.statemachine.annotations.StateTransition;
+import io.github.archer099.design.pattern.statemachine.annotations.TransitionGuard;
+import io.github.archer099.design.pattern.statemachine.core.DefaultTransitionHandler;
+import io.github.archer099.design.pattern.statemachine.core.StateMachine;
+import io.github.archer099.design.pattern.statemachine.core.StateMachineBuilder;
+import io.github.archer099.design.pattern.statemachine.core.StateTransitionHandler;
+import io.github.archer099.design.pattern.statemachine.guard.StateTransitionGuard;
+import io.github.archer099.design.pattern.statemachine.persister.StatePersister;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.BeansException;
@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-04-07 14:31:00
  * @description 状态机工厂
  */

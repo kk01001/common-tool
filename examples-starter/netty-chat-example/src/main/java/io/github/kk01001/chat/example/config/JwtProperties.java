@@ -1,11 +1,11 @@
-package io.github.kk01001.chat.example.config;
+package io.github.archer099.chat.example.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 18:00:00
  * @description JWT 配置属性
  */

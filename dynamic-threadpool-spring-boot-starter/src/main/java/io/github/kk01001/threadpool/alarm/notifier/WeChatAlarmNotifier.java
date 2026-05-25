@@ -1,16 +1,16 @@
-package io.github.kk01001.threadpool.alarm.notifier;
+package io.github.archer099.threadpool.alarm.notifier;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import io.github.kk01001.threadpool.alarm.AlarmEvent;
-import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
+import io.github.archer099.threadpool.alarm.AlarmEvent;
+import io.github.archer099.threadpool.custom.config.DynamicThreadPoolProperties;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * 企业微信告警通知器
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class WeChatAlarmNotifier implements AlarmNotifier {

@@ -1,4 +1,4 @@
-package io.github.kk01001.mqtt.examples.dto;
+package io.github.archer099.mqtt.examples.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

@@ -1,6 +1,6 @@
-package io.github.kk01001.mqtt.actuator;
+package io.github.archer099.mqtt.actuator;
 
-import io.github.kk01001.mqtt.core.MqttClientManager;
+import io.github.archer099.mqtt.core.MqttClientManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 /**
  * MQTT 健康检查指示器
  *
- * @author kk01001
+ * @author archer099
  */
 @Component
 @RequiredArgsConstructor

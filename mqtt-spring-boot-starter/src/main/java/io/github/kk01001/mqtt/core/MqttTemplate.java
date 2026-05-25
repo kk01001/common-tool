@@ -1,6 +1,6 @@
-package io.github.kk01001.mqtt.core;
+package io.github.archer099.mqtt.core;
 
-import io.github.kk01001.mqtt.config.MqttProperties;
+import io.github.archer099.mqtt.config.MqttProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
  * MQTT 消息发送模板
  * 提供便捷的消息发送方法
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class MqttTemplate {

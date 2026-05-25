@@ -1,4 +1,4 @@
-package io.github.kk01001.chat.example.config;
+package io.github.archer099.chat.example.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 19:00:00
  * @description JWT 全局拦截器，校验 Token 并注入 UserContext
  */

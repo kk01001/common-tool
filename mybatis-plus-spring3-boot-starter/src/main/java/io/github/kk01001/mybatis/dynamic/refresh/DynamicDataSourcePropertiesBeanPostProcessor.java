@@ -1,4 +1,4 @@
-package io.github.kk01001.mybatis.dynamic.refresh;
+package io.github.archer099.mybatis.dynamic.refresh;
 
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties;
 import org.springframework.beans.BeansException;

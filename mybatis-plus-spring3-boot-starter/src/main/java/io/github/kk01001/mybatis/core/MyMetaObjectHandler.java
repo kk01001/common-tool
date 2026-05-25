@@ -1,4 +1,4 @@
-package io.github.kk01001.mybatis.core;
+package io.github.archer099.mybatis.core;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2022-09-20 22:10:00
  */
 @Slf4j

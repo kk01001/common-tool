@@ -1,6 +1,6 @@
-package io.github.kk01001.threadpool.alarm;
+package io.github.archer099.threadpool.alarm;
 
-import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
+import io.github.archer099.threadpool.actuator.ThreadPoolMetrics;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 /**
  * 告警事件
  *
- * @author kk01001
+ * @author archer099
  */
 @Data
 @Builder

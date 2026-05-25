@@ -1,10 +1,10 @@
-package io.github.kk01001.sensitive.handler;
+package io.github.archer099.sensitive.handler;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.StrUtil;
-import io.github.kk01001.sensitive.core.*;
-import io.github.kk01001.sensitive.properties.SensitiveWordProperties;
+import io.github.archer099.sensitive.core.*;
+import io.github.archer099.sensitive.properties.SensitiveWordProperties;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 敏感词服务
  */

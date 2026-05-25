@@ -1,9 +1,9 @@
-package io.github.kk01001.chat.example.service;
+package io.github.archer099.chat.example.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.kk01001.chat.example.entity.ChatUser;
-import io.github.kk01001.chat.example.mapper.ChatUserMapper;
+import io.github.archer099.chat.example.entity.ChatUser;
+import io.github.archer099.chat.example.mapper.ChatUserMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 18:00:00
  * @description 用户服务
  */

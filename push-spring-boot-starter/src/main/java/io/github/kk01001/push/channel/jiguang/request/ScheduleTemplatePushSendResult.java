@@ -1,8 +1,8 @@
-package io.github.kk01001.push.channel.jiguang.request;
+package io.github.archer099.push.channel.jiguang.request;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.kk01001.push.channel.jiguang.request.other.TemplateResult;
+import io.github.archer099.push.channel.jiguang.request.other.TemplateResult;
 import lombok.Data;
 
 import java.util.List;

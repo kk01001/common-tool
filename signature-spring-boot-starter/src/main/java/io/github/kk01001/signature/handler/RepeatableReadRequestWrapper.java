@@ -1,4 +1,4 @@
-package io.github.kk01001.signature.handler;
+package io.github.archer099.signature.handler;
 
 import cn.hutool.core.io.IoUtil;
 import jakarta.servlet.ReadListener;
@@ -10,7 +10,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description 可重复读取请求体的 HttpServletRequest 包装器
  */

@@ -1,6 +1,6 @@
-package io.github.kk01001.order.service;
+package io.github.archer099.order.service;
 
-import io.github.kk01001.order.entity.Order;
+import io.github.archer099.order.entity.Order;
 
 public interface OrderService {
     /**

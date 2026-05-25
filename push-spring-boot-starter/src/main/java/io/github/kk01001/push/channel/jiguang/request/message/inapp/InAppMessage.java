@@ -1,4 +1,4 @@
-package io.github.kk01001.push.channel.jiguang.request.message.inapp;
+package io.github.archer099.push.channel.jiguang.request.message.inapp;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

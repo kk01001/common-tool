@@ -1,4 +1,4 @@
-package io.github.kk01001.script.config;
+package io.github.archer099.script.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

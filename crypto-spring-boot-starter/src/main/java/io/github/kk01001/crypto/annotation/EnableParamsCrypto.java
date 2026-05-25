@@ -1,6 +1,6 @@
-package io.github.kk01001.crypto.annotation;
+package io.github.archer099.crypto.annotation;
 
-import io.github.kk01001.crypto.config.ParamsCryptoAutoConfiguration;
+import io.github.archer099.crypto.config.ParamsCryptoAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

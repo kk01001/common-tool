@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  io.github.kk01001.sftp.SftpConfiguration
+  io.github.archer099.sftp.SftpConfiguration

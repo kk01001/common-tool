@@ -1,13 +1,13 @@
-package io.github.kk01001.netty.registry;
+package io.github.archer099.netty.registry;
 
-import io.github.kk01001.netty.annotation.OnBinaryMessage;
-import io.github.kk01001.netty.annotation.OnClose;
-import io.github.kk01001.netty.annotation.OnError;
-import io.github.kk01001.netty.annotation.OnMessage;
-import io.github.kk01001.netty.annotation.OnOpen;
-import io.github.kk01001.netty.annotation.WebSocketEndpoint;
-import io.github.kk01001.netty.config.NettyWebSocketProperties;
-import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.archer099.netty.annotation.OnBinaryMessage;
+import io.github.archer099.netty.annotation.OnClose;
+import io.github.archer099.netty.annotation.OnError;
+import io.github.archer099.netty.annotation.OnMessage;
+import io.github.archer099.netty.annotation.OnOpen;
+import io.github.archer099.netty.annotation.WebSocketEndpoint;
+import io.github.archer099.netty.config.NettyWebSocketProperties;
+import io.github.archer099.netty.session.WebSocketSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.ApplicationContext;
@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 10:00:00
  * @description WebSocket 端点注册表，支持多路径注册
  */

@@ -1,8 +1,8 @@
-package io.github.kk01001.threadpool.thirdparty.adapter;
+package io.github.archer099.threadpool.thirdparty.adapter;
 
-import io.github.kk01001.threadpool.actuator.ThreadPoolMetrics;
-import io.github.kk01001.threadpool.thirdparty.ThirdPartyPoolType;
-import io.github.kk01001.threadpool.thirdparty.ThirdPartyThreadPoolConfig;
+import io.github.archer099.threadpool.actuator.ThreadPoolMetrics;
+import io.github.archer099.threadpool.thirdparty.ThirdPartyPoolType;
+import io.github.archer099.threadpool.thirdparty.ThirdPartyThreadPoolConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.AbstractProtocol;
@@ -18,7 +18,7 @@ import java.util.concurrent.BlockingQueue;
  * 
  * <p>用于动态管理 Tomcat Web 服务器的线程池配置和监控
  * 
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 public class TomcatThreadPoolAdapter extends AbstractThirdPartyThreadPoolAdapter {

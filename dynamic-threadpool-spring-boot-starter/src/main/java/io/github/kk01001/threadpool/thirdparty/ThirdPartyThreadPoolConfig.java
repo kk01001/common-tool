@@ -1,4 +1,4 @@
-package io.github.kk01001.threadpool.thirdparty;
+package io.github.archer099.threadpool.thirdparty;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +9,7 @@ import lombok.Data;
  * <p>
  * 统一的配置接口，不同的适配器根据需要使用其中的字段
  * 
- * @author kk01001
+ * @author archer099
  */
 @Data
 @Builder

@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.service;
+package io.github.archer099.examples.service;
 
-import io.github.kk01001.examples.model.UserInfo;
+import io.github.archer099.examples.model.UserInfo;
 
 import java.util.List;
 

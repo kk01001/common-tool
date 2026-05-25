@@ -1,11 +1,11 @@
-package io.github.kk01001.desensitize.jackson;
+package io.github.archer099.desensitize.jackson;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.Module;
 import lombok.RequiredArgsConstructor;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description
  */

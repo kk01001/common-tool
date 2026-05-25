@@ -1,11 +1,11 @@
-package io.github.kk01001.mybatis.core;
+package io.github.archer099.mybatis.core;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * date 2023-07-22 15:23:00
  * 动态表名规则
  */

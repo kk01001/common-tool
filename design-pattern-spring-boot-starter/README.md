@@ -1,6 +1,6 @@
 # 设计模式 Spring Boot Starter
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/design-pattern-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.kk01001/design-pattern-spring-boot-starter)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.archer099/design-pattern-spring-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.archer099/design-pattern-spring-boot-starter)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 **一句话概述:** 一个将常见设计模式封装为 Spring Boot Starter 的工具库，旨在简化 Java 开发中设计模式的应用，提高代码质量和开发效率。
@@ -46,7 +46,7 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>design-pattern-spring-boot-starter</artifactId>
     <version>${latest.version}</version>
 </dependency>
@@ -78,7 +78,7 @@
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 支付方式枚举
  */
@@ -93,7 +93,7 @@ public enum PaymentTypeEnum {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 支付策略接口
  */
@@ -107,7 +107,7 @@ public interface PaymentStrategy extends IStrategy<PaymentContext, Boolean> {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 支付宝支付策略
  */
@@ -127,7 +127,7 @@ public class AlipayStrategy implements PaymentStrategy {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 支付服务
  */
@@ -170,7 +170,7 @@ public class PaymentService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 认证处理器
  */
@@ -196,7 +196,7 @@ public class AuthenticationHandler implements ResponsibilityChainHandler<LoginRe
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 角色检查处理器
  */
@@ -227,7 +227,7 @@ public class RoleCheckHandler implements ResponsibilityChainHandler<LoginRequest
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 登录服务
  */
@@ -283,7 +283,7 @@ public class LoginService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 订单支付成功事件
  */
@@ -316,12 +316,12 @@ public class OrderPaidEvent extends Subject {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 发送短信的观察者
  */
 @Component
-@io.github.kk01001.design.pattern.observer.annotation.Observer(topic = "ORDER_PAID")
+@io.github.archer099.design.pattern.observer.annotation.Observer(topic = "ORDER_PAID")
 public class SmsNotificationObserver implements IObserver<OrderPaidEvent> {
     @Override
     public void onUpdate(OrderPaidEvent event) {
@@ -340,7 +340,7 @@ public class SmsNotificationObserver implements IObserver<OrderPaidEvent> {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 订单服务
  */
@@ -387,7 +387,7 @@ public class OrderService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 配置管理器
  */
@@ -420,7 +420,7 @@ public class ConfigManager {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 使用单例
  */
@@ -467,7 +467,7 @@ public class AppService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 订单状态
  */
@@ -481,7 +481,7 @@ public enum OrderState {
 }
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 订单事件
  */
@@ -498,7 +498,7 @@ public enum OrderEvent {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 订单状态机
  */
@@ -547,7 +547,7 @@ public class OrderStateMachine {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 订单服务
  */

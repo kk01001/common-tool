@@ -1,6 +1,6 @@
-package io.github.kk01001.mqtt.example;
+package io.github.archer099.mqtt.example;
 
-import io.github.kk01001.mqtt.annotation.MqttMessageListener;
+import io.github.archer099.mqtt.annotation.MqttMessageListener;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
  * MQTT 消费者示例
  * 演示如何使用 @MqttMessageListener 注解接收消息
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Component

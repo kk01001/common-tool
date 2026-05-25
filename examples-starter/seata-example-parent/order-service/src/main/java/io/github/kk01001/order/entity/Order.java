@@ -1,4 +1,4 @@
-package io.github.kk01001.order.entity;
+package io.github.archer099.order.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

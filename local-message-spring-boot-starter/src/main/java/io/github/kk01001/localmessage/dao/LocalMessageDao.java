@@ -1,7 +1,7 @@
-package io.github.kk01001.localmessage.dao;
+package io.github.archer099.localmessage.dao;
 
-import io.github.kk01001.localmessage.entity.LocalMessage;
-import io.github.kk01001.localmessage.enums.MessageStatus;
+import io.github.archer099.localmessage.entity.LocalMessage;
+import io.github.archer099.localmessage.enums.MessageStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
  * 本地消息数据访问接口
  * 用户需要实现此接口来提供数据库操作
  *
- * @author kk01001
+ * @author archer099
  */
 public interface LocalMessageDao {
     

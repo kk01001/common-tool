@@ -1,8 +1,8 @@
-package io.github.kk01001.examples.design.responsibility;
+package io.github.archer099.examples.design.responsibility;
 
-import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainContext;
-import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainFactory;
-import io.github.kk01001.design.pattern.responsibility.ResponsibilityChainHandler;
+import io.github.archer099.design.pattern.responsibility.ResponsibilityChainContext;
+import io.github.archer099.design.pattern.responsibility.ResponsibilityChainFactory;
+import io.github.archer099.design.pattern.responsibility.ResponsibilityChainHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -1,4 +1,4 @@
-package io.github.kk01001.nlp;
+package io.github.archer099.nlp;
 
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.dictionary.CustomDictionary;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-02-13 14:31:00
  * @description HanLP分词工具类，提供中文分词、关键词提取、文本摘要等功能
  */

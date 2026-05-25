@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.exception;
+package io.github.archer099.examples.exception;
 
-import io.github.kk01001.common.model.ApiResponse;
+import io.github.archer099.common.model.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;

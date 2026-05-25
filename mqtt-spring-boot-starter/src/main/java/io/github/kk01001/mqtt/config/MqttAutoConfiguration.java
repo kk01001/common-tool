@@ -1,9 +1,9 @@
-package io.github.kk01001.mqtt.config;
+package io.github.archer099.mqtt.config;
 
-import io.github.kk01001.mqtt.core.MqttBroadcastTemplate;
-import io.github.kk01001.mqtt.core.MqttClientManager;
-import io.github.kk01001.mqtt.core.MqttListenerAnnotationBeanPostProcessor;
-import io.github.kk01001.mqtt.core.MqttTemplate;
+import io.github.archer099.mqtt.core.MqttBroadcastTemplate;
+import io.github.archer099.mqtt.core.MqttClientManager;
+import io.github.archer099.mqtt.core.MqttListenerAnnotationBeanPostProcessor;
+import io.github.archer099.mqtt.core.MqttTemplate;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * MQTT 自动配置类
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @Configuration

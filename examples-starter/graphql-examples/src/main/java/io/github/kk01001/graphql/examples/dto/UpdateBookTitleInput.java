@@ -1,4 +1,4 @@
-package io.github.kk01001.graphql.examples.dto;
+package io.github.archer099.graphql.examples.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

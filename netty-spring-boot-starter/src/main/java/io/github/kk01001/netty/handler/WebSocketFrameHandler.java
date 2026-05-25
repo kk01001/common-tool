@@ -1,9 +1,9 @@
-package io.github.kk01001.netty.handler;
+package io.github.archer099.netty.handler;
 
-import io.github.kk01001.netty.filter.MessageFilter;
-import io.github.kk01001.netty.registry.WebSocketEndpointRegistry;
-import io.github.kk01001.netty.session.WebSocketSession;
-import io.github.kk01001.netty.trace.MessageTracer;
+import io.github.archer099.netty.filter.MessageFilter;
+import io.github.archer099.netty.registry.WebSocketEndpointRegistry;
+import io.github.archer099.netty.session.WebSocketSession;
+import io.github.archer099.netty.trace.MessageTracer;
 import io.micrometer.core.instrument.Timer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,10 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
-import static io.github.kk01001.netty.handler.WebSocketHandshakeHandler.SESSION_ATTR;
+import static io.github.archer099.netty.handler.WebSocketHandshakeHandler.SESSION_ATTR;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 10:00:00
  * @description WebSocket 帧处理器，处理文本、二进制、Ping/Pong 等消息帧。
  *              Session 从 Channel 属性获取，过滤器在构造时排序。

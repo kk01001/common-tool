@@ -1,15 +1,15 @@
-package io.github.kk01001.sensitive.util;
+package io.github.archer099.sensitive.util;
 
-import io.github.kk01001.sensitive.core.DfaSensitiveWordFilter;
-import io.github.kk01001.sensitive.core.MatchType;
-import io.github.kk01001.sensitive.core.SensitiveWordFilter;
-import io.github.kk01001.sensitive.core.SensitiveWordResult;
+import io.github.archer099.sensitive.core.DfaSensitiveWordFilter;
+import io.github.archer099.sensitive.core.MatchType;
+import io.github.archer099.sensitive.core.SensitiveWordFilter;
+import io.github.archer099.sensitive.core.SensitiveWordResult;
 
 import java.util.List;
 import java.util.Set;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 敏感词工具类，提供静态方法，方便快速使用
  */

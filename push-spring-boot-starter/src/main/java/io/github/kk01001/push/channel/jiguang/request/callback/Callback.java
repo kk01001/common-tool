@@ -1,4 +1,4 @@
-package io.github.kk01001.push.channel.jiguang.request.callback;
+package io.github.archer099.push.channel.jiguang.request.callback;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

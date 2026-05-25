@@ -1,4 +1,4 @@
-package io.github.kk01001.netty.annotation;
+package io.github.archer099.netty.annotation;
 
 import java.lang.annotation.*;
 

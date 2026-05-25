@@ -1,4 +1,4 @@
-package io.github.kk01001.graphql.examples.config;
+package io.github.archer099.graphql.examples.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

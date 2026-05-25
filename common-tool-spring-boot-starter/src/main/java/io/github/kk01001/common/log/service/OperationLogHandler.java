@@ -1,6 +1,6 @@
-package io.github.kk01001.common.log.service;
+package io.github.archer099.common.log.service;
 
-import io.github.kk01001.common.log.model.OperationLogInfo;
+import io.github.archer099.common.log.model.OperationLogInfo;
 
 public interface OperationLogHandler {
     /**

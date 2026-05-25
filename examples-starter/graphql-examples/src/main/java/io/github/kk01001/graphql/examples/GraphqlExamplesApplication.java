@@ -1,4 +1,4 @@
-package io.github.kk01001.graphql.examples;
+package io.github.archer099.graphql.examples;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

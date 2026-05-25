@@ -1,15 +1,15 @@
-package io.github.kk01001.ffmpeg.core.impl;
+package io.github.archer099.ffmpeg.core.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.StrUtil;
-import io.github.kk01001.exception.BizException;
-import io.github.kk01001.ffmpeg.FfmpegProperties;
-import io.github.kk01001.ffmpeg.core.FfmpegService;
-import io.github.kk01001.ffmpeg.model.AudioHlsRequest;
-import io.github.kk01001.ffmpeg.model.AudioHlsResult;
-import io.github.kk01001.ffmpeg.model.FfprobeResult;
+import io.github.archer099.exception.BizException;
+import io.github.archer099.ffmpeg.FfmpegProperties;
+import io.github.archer099.ffmpeg.core.FfmpegService;
+import io.github.archer099.ffmpeg.model.AudioHlsRequest;
+import io.github.archer099.ffmpeg.model.AudioHlsResult;
+import io.github.archer099.ffmpeg.model.FfprobeResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 16:22:00
  * @description FFmpeg 服务实现
  */

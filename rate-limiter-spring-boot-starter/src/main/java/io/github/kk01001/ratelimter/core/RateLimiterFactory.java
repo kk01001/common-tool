@@ -1,8 +1,8 @@
-package io.github.kk01001.ratelimter.core;
+package io.github.archer099.ratelimter.core;
 
-import io.github.kk01001.ratelimter.enums.RateLimiterType;
-import io.github.kk01001.ratelimter.exception.RateLimitException;
-import io.github.kk01001.ratelimter.model.FlowRule;
+import io.github.archer099.ratelimter.enums.RateLimiterType;
+import io.github.archer099.ratelimter.exception.RateLimitException;
+import io.github.archer099.ratelimter.model.FlowRule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

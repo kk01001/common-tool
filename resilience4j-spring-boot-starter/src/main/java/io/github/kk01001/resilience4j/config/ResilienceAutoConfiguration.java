@@ -1,7 +1,7 @@
-package io.github.kk01001.resilience4j.config;
+package io.github.archer099.resilience4j.config;
 
-import io.github.kk01001.resilience4j.aspect.ResilienceAspect;
-import io.github.kk01001.resilience4j.properties.ResilienceProperties;
+import io.github.archer099.resilience4j.aspect.ResilienceAspect;
+import io.github.archer099.resilience4j.properties.ResilienceProperties;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Resilience4j 自动配置
  *
- * @author kk01001
+ * @author archer099
  */
 @Configuration
 @EnableConfigurationProperties(ResilienceProperties.class)

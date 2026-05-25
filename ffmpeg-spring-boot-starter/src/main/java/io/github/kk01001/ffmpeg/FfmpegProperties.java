@@ -1,11 +1,11 @@
-package io.github.kk01001.ffmpeg;
+package io.github.archer099.ffmpeg;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 16:22:00
  * @description FFmpeg 属性配置
  */

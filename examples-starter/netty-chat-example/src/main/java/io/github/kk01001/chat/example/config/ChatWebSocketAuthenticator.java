@@ -1,6 +1,6 @@
-package io.github.kk01001.chat.example.config;
+package io.github.archer099.chat.example.config;
 
-import io.github.kk01001.netty.auth.WebSocketAuthenticator;
+import io.github.archer099.netty.auth.WebSocketAuthenticator;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 18:00:00
  * @description WebSocket JWT 鉴权实现
  */

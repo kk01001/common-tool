@@ -1,4 +1,4 @@
-package io.github.kk01001.storage;
+package io.github.archer099.storage;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

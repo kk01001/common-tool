@@ -1,6 +1,6 @@
 # MyBatis-Plus Spring3 Boot Starter
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.kk01001/mybatis-plus-spring3-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.kk01001/mybatis-plus-spring3-boot-starter)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.archer099/mybatis-plus-spring3-boot-starter.svg?style=flat-square)](https://search.maven.org/artifact/io.github.archer099/mybatis-plus-spring3-boot-starter)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 **一句话概述：** 基于 [MyBatis-Plus](https://github.com/baomidou/mybatis-plus) 的增强版 Spring Boot 3 Starter，提供动态表名、多数据源、自动刷新等高级功能。
@@ -49,7 +49,7 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.kk01001</groupId>
+    <groupId>io.github.archer099</groupId>
     <artifactId>mybatis-plus-spring3-boot-starter</artifactId>
     <version>${latest.version}</version>
 </dependency>
@@ -97,7 +97,7 @@ mybatis:
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 用户服务
  */
@@ -174,7 +174,7 @@ spring:
 import com.baomidou.dynamic.datasource.annotation.DS;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 用户服务
  */
@@ -217,7 +217,7 @@ public class UserService {
 import com.baomidou.mybatisplus.extension.injector.methods.InsertBatchSomeColumn;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 自定义Mapper接口
  */
@@ -231,7 +231,7 @@ public interface UserMapper extends BaseMapper<User> {
 }
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 用户服务
  */
@@ -257,7 +257,7 @@ public class UserService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 数据源管理服务
  */
@@ -301,7 +301,7 @@ public class DataSourceService {
 import com.baomidou.mybatisplus.annotation.*;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 用户实体
  */
@@ -348,7 +348,7 @@ public class User {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description 多租户服务
  */
@@ -412,7 +412,7 @@ mybatis:
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2023-07-22 15:23:00
  * @description 用户服务
  */
@@ -458,7 +458,7 @@ public class UserService {
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2023-07-22 15:23:00
  * @description 自定义用户权限服务实现
  */
@@ -517,7 +517,7 @@ public class CustomUserPermissionServiceImpl implements UserPermissionService<Lo
 
 ```java
 /**
- * @author kk01001
+ * @author archer099
  * @date 2023-07-22 15:23:00
  * @description 自定义数据权限处理器
  */

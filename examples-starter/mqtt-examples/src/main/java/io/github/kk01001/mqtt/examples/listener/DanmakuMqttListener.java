@@ -1,6 +1,6 @@
-package io.github.kk01001.mqtt.examples.listener;
+package io.github.archer099.mqtt.examples.listener;
 
-import io.github.kk01001.mqtt.annotation.MqttMessageListener;
+import io.github.archer099.mqtt.annotation.MqttMessageListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

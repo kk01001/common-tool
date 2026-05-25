@@ -1,9 +1,9 @@
-package io.github.kk01001.chat.example.controller;
+package io.github.archer099.chat.example.controller;
 
 import cn.hutool.json.JSONObject;
-import io.github.kk01001.chat.example.config.JwtUtil;
-import io.github.kk01001.chat.example.entity.ChatUser;
-import io.github.kk01001.chat.example.service.ChatUserService;
+import io.github.archer099.chat.example.config.JwtUtil;
+import io.github.archer099.chat.example.entity.ChatUser;
+import io.github.archer099.chat.example.service.ChatUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-03-07 18:00:00
  * @description 登录注册接口
  */

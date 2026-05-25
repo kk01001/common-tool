@@ -1,4 +1,4 @@
-package io.github.kk01001.storage.service;
+package io.github.archer099.storage.service;
 
 public interface StorageService {
     /**

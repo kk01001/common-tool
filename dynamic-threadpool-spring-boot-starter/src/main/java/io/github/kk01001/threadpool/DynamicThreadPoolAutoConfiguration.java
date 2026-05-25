@@ -1,14 +1,14 @@
-package io.github.kk01001.threadpool;
+package io.github.archer099.threadpool;
 
-import io.github.kk01001.threadpool.actuator.ThreadPoolActuatorEndpoint;
-import io.github.kk01001.threadpool.alarm.ThreadPoolAlarmHandler;
-import io.github.kk01001.threadpool.custom.config.DynamicThreadPoolProperties;
-import io.github.kk01001.threadpool.custom.factory.ThreadPoolFactory;
-import io.github.kk01001.threadpool.custom.handler.ThreadPoolRefreshHandler;
-import io.github.kk01001.threadpool.custom.initializer.ThreadPoolAutoInitializer;
-import io.github.kk01001.threadpool.custom.monitor.ThreadPoolMonitor;
-import io.github.kk01001.threadpool.custom.processor.DynamicThreadPoolPostProcessor;
-import io.github.kk01001.threadpool.registry.ThreadPoolRegistry;
+import io.github.archer099.threadpool.actuator.ThreadPoolActuatorEndpoint;
+import io.github.archer099.threadpool.alarm.ThreadPoolAlarmHandler;
+import io.github.archer099.threadpool.custom.config.DynamicThreadPoolProperties;
+import io.github.archer099.threadpool.custom.factory.ThreadPoolFactory;
+import io.github.archer099.threadpool.custom.handler.ThreadPoolRefreshHandler;
+import io.github.archer099.threadpool.custom.initializer.ThreadPoolAutoInitializer;
+import io.github.archer099.threadpool.custom.monitor.ThreadPoolMonitor;
+import io.github.archer099.threadpool.custom.processor.DynamicThreadPoolPostProcessor;
+import io.github.archer099.threadpool.registry.ThreadPoolRegistry;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
@@ -22,7 +22,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * 动态线程池自动配置类
  *
- * @author kk01001
+ * @author archer099
  */
 @Slf4j
 @AutoConfiguration
@@ -127,9 +127,9 @@ public class DynamicThreadPoolAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(name = "logAlarmNotifier")
     @ConditionalOnProperty(prefix = "dynamic-threadpool.alarm", name = "enabled", havingValue = "true", matchIfMissing = true)
-    public io.github.kk01001.threadpool.alarm.notifier.LogAlarmNotifier logAlarmNotifier() {
+    public io.github.archer099.threadpool.alarm.notifier.LogAlarmNotifier logAlarmNotifier() {
         log.info("Initializing LogAlarmNotifier");
-        return new io.github.kk01001.threadpool.alarm.notifier.LogAlarmNotifier();
+        return new io.github.archer099.threadpool.alarm.notifier.LogAlarmNotifier();
     }
 
     /**
@@ -138,10 +138,10 @@ public class DynamicThreadPoolAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(name = "weChatAlarmNotifier")
     @ConditionalOnProperty(prefix = "dynamic-threadpool.alarm", name = "enabled", havingValue = "true", matchIfMissing = true)
-    public io.github.kk01001.threadpool.alarm.notifier.WeChatAlarmNotifier weChatAlarmNotifier(
+    public io.github.archer099.threadpool.alarm.notifier.WeChatAlarmNotifier weChatAlarmNotifier(
             DynamicThreadPoolProperties properties) {
         log.info("Initializing WeChatAlarmNotifier");
-        return new io.github.kk01001.threadpool.alarm.notifier.WeChatAlarmNotifier(properties.getAlarm());
+        return new io.github.archer099.threadpool.alarm.notifier.WeChatAlarmNotifier(properties.getAlarm());
     }
 
     /**
@@ -150,10 +150,10 @@ public class DynamicThreadPoolAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(name = "dingTalkAlarmNotifier")
     @ConditionalOnProperty(prefix = "dynamic-threadpool.alarm", name = "enabled", havingValue = "true", matchIfMissing = true)
-    public io.github.kk01001.threadpool.alarm.notifier.DingTalkAlarmNotifier dingTalkAlarmNotifier(
+    public io.github.archer099.threadpool.alarm.notifier.DingTalkAlarmNotifier dingTalkAlarmNotifier(
             DynamicThreadPoolProperties properties) {
         log.info("Initializing DingTalkAlarmNotifier");
-        return new io.github.kk01001.threadpool.alarm.notifier.DingTalkAlarmNotifier(properties.getAlarm());
+        return new io.github.archer099.threadpool.alarm.notifier.DingTalkAlarmNotifier(properties.getAlarm());
     }
 
     /**
@@ -165,7 +165,7 @@ public class DynamicThreadPoolAutoConfiguration {
     public ThreadPoolAlarmHandler threadPoolAlarmHandler(
             ThreadPoolRegistry registry,
             DynamicThreadPoolProperties properties,
-            java.util.List<io.github.kk01001.threadpool.alarm.notifier.AlarmNotifier> alarmNotifiers,
+            java.util.List<io.github.archer099.threadpool.alarm.notifier.AlarmNotifier> alarmNotifiers,
             @org.springframework.beans.factory.annotation.Value("${spring.application.name:unknown}") String applicationName) {
         log.info("Initializing ThreadPoolAlarmHandler");
         return new ThreadPoolAlarmHandler(registry, properties, alarmNotifiers, applicationName);

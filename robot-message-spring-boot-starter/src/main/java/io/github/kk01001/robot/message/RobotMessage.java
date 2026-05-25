@@ -1,4 +1,4 @@
-package io.github.kk01001.robot.message;
+package io.github.archer099.robot.message;
 
 import java.util.Map;
 

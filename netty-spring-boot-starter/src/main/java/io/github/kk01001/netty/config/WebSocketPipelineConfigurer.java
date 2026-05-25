@@ -1,4 +1,4 @@
-package io.github.kk01001.netty.config;
+package io.github.archer099.netty.config;
 
 import io.netty.channel.ChannelPipeline;
 

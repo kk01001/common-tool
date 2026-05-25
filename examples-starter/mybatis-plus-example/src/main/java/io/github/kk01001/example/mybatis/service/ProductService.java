@@ -1,6 +1,6 @@
-package io.github.kk01001.example.mybatis.service;
+package io.github.archer099.example.mybatis.service;
 
-import io.github.kk01001.example.mybatis.entity.Product;
+import io.github.archer099.example.mybatis.entity.Product;
 
 import java.util.List;
 import java.util.Map;
@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * 产品服务接口
  *
- * @author kk01001
+ * @author archer099
  */
 public interface ProductService {
 

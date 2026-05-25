@@ -1,4 +1,4 @@
-package io.github.kk01001.dict;
+package io.github.archer099.dict;
 
 import java.util.Map;
 

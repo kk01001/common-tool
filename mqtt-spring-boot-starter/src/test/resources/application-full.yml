@@ -153,7 +153,7 @@ logging:
     # INFO：一般信息，包括连接、订阅等关键操作
     # WARN：警告信息
     # ERROR：错误信息
-    io.github.kk01001.mqtt: DEBUG
+    io.github.archer099.mqtt: DEBUG
     
     # Eclipse Paho MQTT 客户端日志级别
     org.eclipse.paho: INFO

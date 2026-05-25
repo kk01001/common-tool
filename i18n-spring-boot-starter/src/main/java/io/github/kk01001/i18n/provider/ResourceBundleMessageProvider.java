@@ -1,4 +1,4 @@
-package io.github.kk01001.i18n.provider;
+package io.github.archer099.i18n.provider;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;

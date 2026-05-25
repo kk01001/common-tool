@@ -1,4 +1,4 @@
-package io.github.kk01001.util;
+package io.github.archer099.util;
 
 import cn.hutool.core.text.StrFormatter;
 import cn.hutool.core.util.IdUtil;
@@ -8,7 +8,7 @@ import org.slf4j.MDC;
 import java.util.Map;
 
 /**
- * @author kk01001
+ * @author archer099
  * @since 2022-10-21 16:50
  */
 public class TraceIdUtil {

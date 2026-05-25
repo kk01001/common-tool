@@ -1,4 +1,4 @@
-package io.github.kk01001.example.mybatis.entity;
+package io.github.archer099.example.mybatis.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 /**
  * 用户实体类
  *
- * @author kk01001
+ * @author archer099
  */
 @Data
 @TableName("user_info")

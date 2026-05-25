@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.kk01001.examples.mapper.UserInfoMapper">
+<mapper namespace="io.github.archer099.examples.mapper.UserInfoMapper">
     
-    <insert id="insert" parameterType="io.github.kk01001.examples.model.UserInfo">
+    <insert id="insert" parameterType="io.github.archer099.examples.model.UserInfo">
         INSERT INTO user_info (
             name, phone, email, id_card, bank_card, address, password
         ) VALUES (
@@ -10,7 +10,7 @@
         )
     </insert>
     
-    <update id="update" parameterType="io.github.kk01001.examples.model.UserInfo">
+    <update id="update" parameterType="io.github.archer099.examples.model.UserInfo">
         UPDATE user_info
         <set>
             <if test="name != null">name = #{name},</if>
@@ -79,7 +79,7 @@
         </foreach>
     </update>
     
-    <select id="selectByCondition" resultType="io.github.kk01001.examples.model.UserInfo">
+    <select id="selectByCondition" resultType="io.github.archer099.examples.model.UserInfo">
         SELECT * FROM user_info
         <where>
             <if test="name != null">AND name = #{name}</if>
@@ -91,7 +91,7 @@
         </where>
     </select>
 
-    <select id="selectByConditionWithParam" resultType="io.github.kk01001.examples.model.UserInfo">
+    <select id="selectByConditionWithParam" resultType="io.github.archer099.examples.model.UserInfo">
         SELECT * FROM user_info
         <where>
             <if test="param.name != null">AND name = #{param.name}</if>
@@ -103,7 +103,7 @@
         </where>
     </select>
     
-    <select id="selectByFields" resultType="io.github.kk01001.examples.model.UserInfo">
+    <select id="selectByFields" resultType="io.github.archer099.examples.model.UserInfo">
         SELECT * FROM user_info
         <where>
             <if test="name != null">AND name = #{name}</if>
@@ -112,7 +112,7 @@
         </where>
     </select>
     
-    <select id="selectById" resultType="io.github.kk01001.examples.model.UserInfo">
+    <select id="selectById" resultType="io.github.archer099.examples.model.UserInfo">
         SELECT * FROM user_info WHERE id = #{id}
     </select>
 </mapper>

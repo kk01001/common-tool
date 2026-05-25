@@ -1,10 +1,10 @@
-package io.github.kk01001.examples.service.impl;
+package io.github.archer099.examples.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.kk01001.examples.mapper.UserInfoPlusMapper;
-import io.github.kk01001.examples.model.UserInfo;
-import io.github.kk01001.examples.service.IUserInfoMybatisPlusService;
+import io.github.archer099.examples.mapper.UserInfoPlusMapper;
+import io.github.archer099.examples.model.UserInfo;
+import io.github.archer099.examples.service.IUserInfoMybatisPlusService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

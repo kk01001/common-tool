@@ -1,9 +1,9 @@
-package io.github.kk01001.ratelimter.core.impl;
+package io.github.archer099.ratelimter.core.impl;
 
 import com.google.common.util.concurrent.RateLimiter;
-import io.github.kk01001.ratelimter.core.RateLimiterStrategy;
-import io.github.kk01001.ratelimter.enums.RateLimiterType;
-import io.github.kk01001.ratelimter.model.FlowRule;
+import io.github.archer099.ratelimter.core.RateLimiterStrategy;
+import io.github.archer099.ratelimter.enums.RateLimiterType;
+import io.github.archer099.ratelimter.model.FlowRule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

@@ -1,7 +1,7 @@
-package io.github.kk01001.graphql.examples.graphql;
+package io.github.archer099.graphql.examples.graphql;
 
-import io.github.kk01001.graphql.examples.event.BookCreatedEvent;
-import io.github.kk01001.graphql.examples.model.Book;
+import io.github.archer099.graphql.examples.event.BookCreatedEvent;
+import io.github.archer099.graphql.examples.model.Book;
 import org.reactivestreams.Publisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.graphql.data.method.annotation.SubscriptionMapping;

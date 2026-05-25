@@ -1,7 +1,7 @@
-package io.github.kk01001.ratelimter.model;
+package io.github.archer099.ratelimter.model;
 
-import io.github.kk01001.ratelimter.enums.RateLimiterType;
-import io.github.kk01001.ratelimter.enums.RedisClientType;
+import io.github.archer099.ratelimter.enums.RateLimiterType;
+import io.github.archer099.ratelimter.enums.RedisClientType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

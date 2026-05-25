@@ -1,4 +1,4 @@
-package io.github.kk01001.mqtt.examples.dto;
+package io.github.archer099.mqtt.examples.dto;
 
 import cn.hutool.core.util.StrUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,7 +10,7 @@ import lombok.Data;
 import java.util.Objects;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-11-17 11:08:00
  * @description MQTT 批量发送请求参数
  */

@@ -1,4 +1,4 @@
-package io.github.kk01001.signature.handler;
+package io.github.archer099.signature.handler;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:23:23
  * @description 签名过滤器，用于包装请求以支持重复读取请求体
  */

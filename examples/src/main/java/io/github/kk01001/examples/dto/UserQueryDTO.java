@@ -1,6 +1,6 @@
-package io.github.kk01001.examples.dto;
+package io.github.archer099.examples.dto;
 
-import io.github.kk01001.crypto.annotation.CryptoField;
+import io.github.archer099.crypto.annotation.CryptoField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

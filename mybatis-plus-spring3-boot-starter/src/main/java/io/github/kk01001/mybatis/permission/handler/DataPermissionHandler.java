@@ -1,11 +1,11 @@
-package io.github.kk01001.mybatis.permission.handler;
+package io.github.archer099.mybatis.permission.handler;
 
-import io.github.kk01001.mybatis.permission.annotations.DataColumn;
+import io.github.archer099.mybatis.permission.annotations.DataColumn;
 
 import java.util.List;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-02-13 14:31:00
  * @description 数据权限处理器接口，用于生成SQL条件
  */

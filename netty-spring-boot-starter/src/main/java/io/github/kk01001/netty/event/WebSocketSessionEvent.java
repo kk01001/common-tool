@@ -1,6 +1,6 @@
-package io.github.kk01001.netty.event;
+package io.github.archer099.netty.event;
 
-import io.github.kk01001.netty.session.WebSocketSession;
+import io.github.archer099.netty.session.WebSocketSession;
 import org.springframework.context.ApplicationEvent;
 
 public class WebSocketSessionEvent extends ApplicationEvent {

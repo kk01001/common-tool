@@ -1,4 +1,4 @@
-package io.github.kk01001.resilience4j.example;
+package io.github.archer099.resilience4j.example;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Resilience4j 示例应用
  *
- * @author kk01001
+ * @author archer099
  */
 @SpringBootApplication
 public class Resilience4jExampleApplication {

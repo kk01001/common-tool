@@ -1,11 +1,11 @@
-package io.github.kk01001.redisson.properties;
+package io.github.archer099.redisson.properties;
 
-import io.github.kk01001.redisson.enums.RedissonMode;
+import io.github.archer099.redisson.enums.RedissonMode;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-15 10:00:00
  * @description 单个 Redisson 实例配置
  */

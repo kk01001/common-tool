@@ -1,4 +1,4 @@
-package io.github.kk01001.excel.config;
+package io.github.archer099.excel.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-22 10:00:00
  * @description Excel 线程池配置类
  */

@@ -1,7 +1,7 @@
-package io.github.kk01001.sensitive.properties;
+package io.github.archer099.sensitive.properties;
 
-import io.github.kk01001.sensitive.core.HandleType;
-import io.github.kk01001.sensitive.core.MatchType;
+import io.github.archer099.sensitive.core.HandleType;
+import io.github.archer099.sensitive.core.MatchType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2026-01-18 13:02:31
  * @description 敏感词配置属性
  */

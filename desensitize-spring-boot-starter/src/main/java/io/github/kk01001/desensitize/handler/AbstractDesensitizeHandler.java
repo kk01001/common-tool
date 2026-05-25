@@ -1,10 +1,10 @@
-package io.github.kk01001.desensitize.handler;
+package io.github.archer099.desensitize.handler;
 
-import io.github.kk01001.desensitize.annotation.Desensitize;
+import io.github.archer099.desensitize.annotation.Desensitize;
 import org.springframework.util.StringUtils;
 
 /**
- * @author kk01001
+ * @author archer099
  * @description 抽象脱敏处理器，提供通用的脱敏逻辑
  */
 public abstract class AbstractDesensitizeHandler implements DesensitizeHandler {

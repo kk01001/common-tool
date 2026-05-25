@@ -1,4 +1,4 @@
-package io.github.kk01001.graphql.examples.exception;
+package io.github.archer099.graphql.examples.exception;
 
 public class BusinessException extends RuntimeException {
     private final String message;

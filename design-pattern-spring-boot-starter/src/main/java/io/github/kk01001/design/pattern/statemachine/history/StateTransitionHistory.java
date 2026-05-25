@@ -1,9 +1,9 @@
-package io.github.kk01001.design.pattern.statemachine.history;
+package io.github.archer099.design.pattern.statemachine.history;
 
 import lombok.Getter;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2024-04-07 14:31:00
  * @description 状态转换历史记录
  */

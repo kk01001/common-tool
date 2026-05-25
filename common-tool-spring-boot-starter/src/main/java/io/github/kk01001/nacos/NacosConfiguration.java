@@ -1,4 +1,4 @@
-package io.github.kk01001.nacos;
+package io.github.archer099.nacos;
 
 import com.alibaba.cloud.nacos.NacosConfigProperties;
 import com.alibaba.nacos.api.NacosFactory;

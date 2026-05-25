@@ -1,4 +1,4 @@
-package io.github.kk01001.threadpool.custom.annotation;
+package io.github.archer099.threadpool.custom.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * 动态线程池注解
  * 标注在方法上，自动创建和管理线程池
  *
- * @author kk01001
+ * @author archer099
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

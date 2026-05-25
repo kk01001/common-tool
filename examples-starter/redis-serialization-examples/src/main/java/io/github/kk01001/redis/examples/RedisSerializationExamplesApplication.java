@@ -1,4 +1,4 @@
-package io.github.kk01001.redis.examples;
+package io.github.archer099.redis.examples;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Redis serialization examples application
  * 
- * @author kk01001
+ * @author archer099
  */
 @SpringBootApplication
 public class RedisSerializationExamplesApplication {

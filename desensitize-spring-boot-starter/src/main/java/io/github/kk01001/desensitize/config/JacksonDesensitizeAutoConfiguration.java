@@ -1,17 +1,17 @@
-package io.github.kk01001.desensitize.config;
+package io.github.archer099.desensitize.config;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import io.github.kk01001.desensitize.handler.DesensitizeHandlerFactory;
-import io.github.kk01001.desensitize.jackson.DesensitizeModule;
-import io.github.kk01001.desensitize.jackson.DesensitizeSerializer;
-import io.github.kk01001.desensitize.properties.DesensitizeProperties;
+import io.github.archer099.desensitize.handler.DesensitizeHandlerFactory;
+import io.github.archer099.desensitize.jackson.DesensitizeModule;
+import io.github.archer099.desensitize.jackson.DesensitizeSerializer;
+import io.github.archer099.desensitize.properties.DesensitizeProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author kk01001
+ * @author archer099
  * @date 2025-02-13 14:31:00
  * @description
  */
