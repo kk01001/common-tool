@@ -10,6 +10,8 @@
     </parent>
 
     <artifactId>mqtt-spring-boot-starter</artifactId>
+    <name>mqtt-spring-boot-starter</name>
+    <description>MQTT Spring Boot Starter</description>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

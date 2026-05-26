@@ -350,6 +350,16 @@
                         <artifact>redis-serialization-examples</artifact>
                         <artifact>multi-redisson-example</artifact>
                         <artifact>seata-example-parent</artifact>
+                        <artifact>sensitive-word-example</artifact>
+                        <artifact>signature-example</artifact>
+                        <artifact>resilience4j-example</artifact>
+                        <artifact>netty-chat-example</artifact>
+                        <artifact>seata-common</artifact>
+                        <artifact>account-service</artifact>
+                        <artifact>order-service</artifact>
+                        <artifact>storage-service</artifact>
+                        <artifact>business-service</artifact>
+                        <artifact>gateway-service</artifact>
                     </excludeArtifacts>
                     <autoPublish>true</autoPublish>
                 </configuration>
